@@ -1,0 +1,20 @@
+{
+  "name": "المنتور پرو [کانال آزمایشی - Staging]",
+  "slug": "elementor-pro",
+  "version": "4.3.3",
+  "tested": "6.7",
+  "requires": "6.0",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-06 00:00:00",
+  "author": "برند تست",
+  "author_homepage": "https://github.com/saadegh74/test-plugin",
+  "sections": {
+    "description": "نسخه ویژه افزونه المنتور پرو با پشتیبانی و به‌روزرسانی هوشمند برند تست.",
+    "changelog": "<h4>4.3.3</h4><ul><li>به‌روزرسانی به هسته پایدار نسخه 4.3.3</li><li>اصلاح کامل نام سازنده و متون اختصاصی به برند تست</li><li>پاکسازی و خنثی‌سازی کامل تمام ردپاهای فروشنده قبلی</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 500,
+  "downloaded": 1000,
+  "active_installs": 1000,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/updates/staging/elementor-pro/elementor-pro-v4.3.3.zip"
+}

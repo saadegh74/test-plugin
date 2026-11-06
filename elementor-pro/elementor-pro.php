@@ -69,7 +69,7 @@ return $pre;
 } ); 
 require 'plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/updates/elementor-pro/info.json',
+	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/updates/staging/elementor-pro/info.json',
 	__FILE__, //Full path to the main plugin file or functions.php.
 	'elementor-pro'
 );
