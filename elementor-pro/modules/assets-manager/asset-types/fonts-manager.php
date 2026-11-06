@@ -2,21 +2,27 @@
 namespace ElementorPro\Modules\AssetsManager\AssetTypes;
 
 use Elementor\Core\Admin\Menu\Admin_Menu_Manager;
-use Elementor\Utils;
-use ElementorPro\Core\Utils as Pro_Utils;
 use Elementor\Core\Common\Modules\Ajax\Module as Ajax;
+use Elementor\Modules\EditorOne\Classes\Menu_Data_Provider;
+use Elementor\Plugin;
+use Elementor\Settings;
+use Elementor\Utils;
+use ElementorPro\Base\Editor_One_Trait;
 use ElementorPro\Core\Behaviors\Feature_Lock;
+use ElementorPro\Core\Utils as Pro_Utils;
 use ElementorPro\License\API;
 use ElementorPro\Modules\AssetsManager\AssetTypes\AdminMenuItems\Custom_Fonts_Menu_Item;
 use ElementorPro\Modules\AssetsManager\AssetTypes\AdminMenuItems\Custom_Fonts_Promotion_Menu_Item;
+use ElementorPro\Modules\AssetsManager\AssetTypes\EditorOneMenuItems\Editor_One_Fonts_Menu_Item;
+use ElementorPro\Modules\AssetsManager\AssetTypes\EditorOneMenuItems\Editor_One_Fonts_Promotion;
 use ElementorPro\Modules\AssetsManager\Classes;
-use Elementor\Settings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
 class Fonts_Manager {
+	use Editor_One_Trait;
 
 	const CAPABILITY = 'manage_options';
 
@@ -238,6 +244,16 @@ class Fonts_Manager {
 
 			$font_type->render_preview_column( $post_id );
 		}
+
+		if ( 'font_type' === $column ) {
+			$font_type = $this->get_font_type_by_post_id( $post_id, true );
+
+			if ( false === $font_type ) {
+				return;
+			}
+
+			$font_type->render_type_column( $post_id );
+		}
 	}
 
 	/**
@@ -257,6 +273,10 @@ class Fonts_Manager {
 
 		if ( empty( $data['font'] ) ) {
 			throw new \Exception( 'Font is required.' );
+		}
+
+		if ( 'variable' === $data['type'] ) {
+			$data['type'] = 'custom';
 		}
 
 		$asset = $this->get_font_type_object( $data['type'] );
@@ -297,6 +317,42 @@ class Fonts_Manager {
 		return $title;
 	}
 
+	public function get_font_variables( $font_variables ) {
+		$font_manager_fonts = $this->get_fonts();
+
+		if ( empty( $font_manager_fonts ) ) {
+			return $font_variables;
+		}
+
+		foreach ( $font_manager_fonts as $font_family => $font_data ) {
+			if ( empty( $font_data['variables'] ) ) {
+				continue;
+			}
+
+			$font_variables[ $font_family ] = $font_data['variables'];
+		}
+
+		return $font_variables;
+	}
+
+	public function get_font_variable_ranges( $font_variable_ranges ) {
+		$font_manager_fonts = $this->get_fonts();
+
+		if ( empty( $font_manager_fonts ) ) {
+			return $font_variable_ranges;
+		}
+
+		foreach ( $font_manager_fonts as $font_family => $font_data ) {
+			if ( empty( $font_data['variable_ranges'] ) ) {
+				continue;
+			}
+
+			$font_variable_ranges[ $font_family ] = $font_data['variable_ranges'];
+		}
+
+		return $font_variable_ranges;
+	}
+
 	public function post_row_actions( $actions, $post ) {
 		if ( self::CPT !== $post->post_type ) {
 			return $actions;
@@ -329,6 +385,7 @@ class Fonts_Manager {
 			'cb' => '<input type="checkbox" />',
 			'title' => esc_html__( 'Font Family', 'elementor-pro' ),
 			'font_preview' => esc_html__( 'Preview', 'elementor-pro' ),
+			'font_type' => esc_html__( 'Type', 'elementor-pro' ),
 		];
 	}
 
@@ -348,6 +405,8 @@ class Fonts_Manager {
 		foreach ( $this->get_font_type_object() as $type => $instance ) {
 			$new_groups[ $type ] = $instance->get_name();
 		}
+
+		$new_groups['variable'] = esc_html__( 'Variable Fonts', 'elementor-pro' );
 
 		return array_replace( $new_groups, $font_groups );
 	}
@@ -402,11 +461,14 @@ class Fonts_Manager {
 
 		$new_fonts = [];
 		$font_types = [];
+
 		foreach ( $fonts->posts as $font ) {
 			$font_type = $this->get_font_type_by_post_id( $font->ID, true );
+
 			if ( false === $font_type ) {
 				continue;
 			}
+
 			$font_types = array_replace( $font_types, $font_type->get_font_family_type( $font->ID, $font->post_title ) );
 			$new_fonts = array_replace( $new_fonts, $font_type->get_font_data( $font->ID, $font->post_title ) );
 		}
@@ -491,33 +553,75 @@ class Fonts_Manager {
 		return $fonts;
 	}
 
-	/**
-	 * Enqueue fonts css
-	 *
-	 * @param $post_css
-	 */
-	public function enqueue_fonts( $post_css ) {
-		$used_fonts = $post_css->get_fonts();
-		$font_manager_fonts = $this->get_fonts();
+	private function resolve_font_data( $font_family ) {
+		if ( in_array( $font_family, $this->enqueued_fonts, true ) ) {
+			return null;
+		}
+
 		$font_types = $this->get_font_types();
 
+		if ( ! isset( $font_types[ $font_family ] ) ) {
+			return null;
+		}
+
+		$font_type_name = $font_types[ $font_family ];
+
+		if ( 'variable' === $font_type_name ) {
+			$font_type_name = 'custom';
+		}
+
+		$font_type = $this->get_font_type_object( $font_type_name );
+
+		if ( ! $font_type ) {
+			return null;
+		}
+
+		$font_manager_fonts = $this->get_fonts();
+		$font_data = isset( $font_manager_fonts[ $font_family ] ) ? $font_manager_fonts[ $font_family ] : [];
+
+		return [
+			'font_type' => $font_type,
+			'font_data' => $font_data,
+		];
+	}
+
+	public function enqueue_fonts( $post_css ) {
+		$used_fonts = $post_css->get_fonts();
+
 		foreach ( $used_fonts as $font_family ) {
-			if ( ! isset( $font_types[ $font_family ] ) || in_array( $font_family, $this->enqueued_fonts ) ) {
+			$resolved = $this->resolve_font_data( $font_family );
+
+			if ( ! $resolved ) {
 				continue;
 			}
 
-			$font_type = $this->get_font_type_object( $font_types[ $font_family ] );
-			if ( ! $font_type ) {
-				continue;
-			}
-
-			$font_data = [];
-			if ( isset( $font_manager_fonts[ $font_family ] ) ) {
-				$font_data = $font_manager_fonts[ $font_family ];
-			}
-			$font_type->enqueue_font( $font_family, $font_data, $post_css );
+			$resolved['font_type']->enqueue_font( $font_family, $resolved['font_data'], $post_css );
 
 			$this->enqueued_fonts[] = $font_family;
+		}
+	}
+
+	public function print_font_link( $font_family ) {
+		$resolved = $this->resolve_font_data( $font_family );
+
+		if ( ! $resolved ) {
+			return;
+		}
+
+		$font_face = isset( $resolved['font_data']['font_face'] ) ? $resolved['font_data']['font_face'] : '';
+
+		if ( empty( $font_face ) ) {
+			return;
+		}
+
+		wp_add_inline_style( 'elementor-pro-custom-fonts', $font_face );
+
+		$this->enqueued_fonts[] = $font_family;
+	}
+
+	public function register_custom_font_styles( $fonts_to_enqueue ) {
+		foreach ( $fonts_to_enqueue as $font_family ) {
+			$this->print_font_link( $font_family );
 		}
 	}
 
@@ -542,9 +646,14 @@ class Fonts_Manager {
 		return $categories;
 	}
 
-	/**
-	 * Register Font Manager action and filter hooks
-	 */
+	public function admin_menu_make_open_on_subpage( $parent_file ) {
+		if ( static::MENU_SLUG === $parent_file ) {
+			$parent_file = Settings::PAGE_ID;
+		}
+
+		return $parent_file;
+	}
+
 	protected function actions() {
 		add_action( 'init', [ $this, 'register_post_type_and_tax' ] );
 
@@ -552,6 +661,10 @@ class Fonts_Manager {
 			add_action( 'init', [ $this, 'redirect_admin_old_page_to_new' ] );
 
 			add_action( 'elementor/admin/menu/register', function ( Admin_Menu_Manager $admin_menu_manager ) {
+				if ( $this->is_editor_one_active() ) {
+					return;
+				}
+
 				$this->register_admin_menu( $admin_menu_manager );
 			} );
 
@@ -573,6 +686,14 @@ class Fonts_Manager {
 			}, 50 );
 
 			add_action( 'admin_head', [ $this, 'clean_admin_listing_page' ] );
+
+			add_action( 'elementor/editor-one/menu/register', function ( Menu_Data_Provider $menu_data_provider ) {
+				if ( $this->can_use_custom_fonts() ) {
+					$menu_data_provider->register_menu( new Editor_One_Fonts_Menu_Item() );
+				} else {
+					$menu_data_provider->register_menu( new Editor_One_Fonts_Promotion() );
+				}
+			} );
 		}
 
 		// TODO: Maybe just ignore all of those when the user can't use custom fonts?
@@ -586,11 +707,30 @@ class Fonts_Manager {
 		add_filter( 'elementor/finder/categories', [ $this, 'add_finder_item' ] );
 		add_action( 'elementor/css-file/post/parse', [ $this, 'enqueue_fonts' ] );
 		add_action( 'elementor/css-file/global/parse', [ $this, 'enqueue_fonts' ] );
+		add_action( 'elementor/fonts/register_styles', [ $this, 'register_custom_font_styles' ] );
+		add_action( 'elementor/fonts/print_font_links/custom', [ $this, 'print_font_link' ] );
+		add_action( 'elementor/fonts/print_font_links/variable', [ $this, 'print_font_link' ] );
+
+		add_action( 'wp_enqueue_scripts', function () {
+			wp_register_style( 'elementor-pro-custom-fonts', false, [], ELEMENTOR_PRO_VERSION );
+			wp_enqueue_style( 'elementor-pro-custom-fonts' );
+		}, 15 );
 		add_filter( 'post_updated_messages', [ $this, 'post_updated_messages' ] );
 		add_filter( 'enter_title_here', [ $this, 'update_enter_title_here' ], 10, 2 );
 
+		add_filter( 'elementor/typography/font_variables', [ $this, 'get_font_variables' ] );
+		add_filter( 'elementor/typography/font_variable_ranges', [ $this, 'get_font_variable_ranges' ] );
+
+		add_filter( 'parent_file', [ $this, 'admin_menu_make_open_on_subpage' ] );
+
 		// Ajax.
 		add_action( 'elementor/ajax/register_actions', [ $this, 'register_ajax_actions' ] );
+
+		add_filter( 'elementor/editor-one/admin-edit-post-types', function ( array $post_types ) {
+			$post_types[] = self::CPT;
+
+			return $post_types;
+		} );
 
 		/**
 		 * Elementor fonts manager loaded.

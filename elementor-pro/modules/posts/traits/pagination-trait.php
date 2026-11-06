@@ -1,6 +1,7 @@
 <?php
 namespace ElementorPro\Modules\Posts\Traits;
 
+use ElementorPro\Modules\GlobalWidget\Widgets\Global_Widget;
 use ElementorPro\Modules\Posts\Widgets\Posts_Base;
 use ElementorPro\Plugin;
 
@@ -36,12 +37,46 @@ trait Pagination_Trait {
 		$posts_widgets = [];
 
 		foreach ( $widgets as $widget ) {
-			if ( $widget instanceof Posts_Base ) {
+			if ( $widget instanceof Posts_Base || $widget instanceof Global_Widget ) {
 				$posts_widgets[] = $widget->get_name();
 			}
 		}
 
 		return $posts_widgets;
+	}
+
+	public function has_multiple_posts_widgets_on_page(): bool {
+		$queried_id = get_queried_object_id();
+
+		if ( $queried_id ) {
+			$post_id = $queried_id;
+		} else {
+			$post_id = get_the_ID();
+		}
+
+		if ( ! $post_id ) {
+			return false;
+		}
+
+		$document = Plugin::elementor()->documents->get( $post_id, false );
+
+		if ( ! $document ) {
+			return false;
+		}
+
+		$count = 0;
+		$posts_widgets = $this->get_widgets_that_support_pagination();
+
+		Plugin::elementor()->db->iterate_data(
+			$document->get_elements_data(),
+			function ( $element ) use ( &$count, $posts_widgets ) {
+				if ( $this->is_valid_post_widget( $element, $posts_widgets ) ) {
+					$count++;
+				}
+			}
+		);
+
+		return $count >= 2;
 	}
 
 	/**
@@ -120,9 +155,34 @@ trait Pagination_Trait {
 			} else {
 				return get_permalink();
 			}
+		} elseif ( $this->is_posts_page() ) {
+			return get_permalink( get_option( 'page_for_posts' ) );
 		}
 
 		// Fallback to home URL.
 		return home_url( '/' );
+	}
+
+	/**
+	 * Determines whether the query is for an existing blog posts index page
+	 *
+	 * @param bool $custom_page_option
+	 * @return bool
+	 */
+	private function is_posts_page( $custom_page_option = true ) {
+		if ( $custom_page_option ) {
+			return ! is_front_page() && is_home();
+		}
+
+		$posts_page_id = (int) get_option( 'page_for_posts' );
+		$base_url = get_query_var( 'pagination_base_url' );
+
+		if ( ! empty( $base_url ) ) {
+			$post_id = url_to_postid( $base_url );
+
+			return $posts_page_id === $post_id;
+		}
+
+		return false;
 	}
 }

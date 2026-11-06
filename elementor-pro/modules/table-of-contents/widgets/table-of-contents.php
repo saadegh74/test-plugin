@@ -10,6 +10,8 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Heading_Collector;
+use ElementorPro\Base\Markdown_Utils;
 use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,6 +38,28 @@ class Table_Of_Contents extends Base_Widget {
 
 	public function get_keywords() {
 		return [ 'toc' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-table-of-contents' ];
 	}
 
 	/**
@@ -155,6 +179,9 @@ class Table_Of_Contents extends Base_Widget {
 				'default' => [],
 				'label_block' => true,
 				'frontend_available' => true,
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -208,6 +235,21 @@ class Table_Of_Contents extends Base_Widget {
 			]
 		);
 
+		$this->add_control(
+			'no_headings_message',
+			[
+				'label' => esc_html__( 'No Headings Found Message', 'elementor-pro' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => esc_html__( 'No headings were found on this page.', 'elementor-pro' ),
+				'dynamic' => [
+					'active' => true,
+				],
+				'label_block' => true,
+				'separator' => 'before',
+				'frontend_available' => true,
+			]
+		);
+
 		$this->end_controls_section(); // table_of_contents
 
 		$this->start_controls_section(
@@ -234,13 +276,14 @@ class Table_Of_Contents extends Base_Widget {
 				'type' => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'frontend_available' => true,
+				'separator' => 'before',
 			]
 		);
 
 		$this->add_control(
 			'expand_icon',
 			[
-				'label' => esc_html__( 'Icon', 'elementor-pro' ),
+				'label' => esc_html__( 'Expand Icon', 'elementor-pro' ),
 				'type' => Controls_Manager::ICONS,
 				'default' => [
 					'value' => 'fas fa-chevron-down',
@@ -269,7 +312,7 @@ class Table_Of_Contents extends Base_Widget {
 		$this->add_control(
 			'collapse_icon',
 			[
-				'label' => esc_html__( 'Minimize Icon', 'elementor-pro' ),
+				'label' => esc_html__( 'Collapse Icon', 'elementor-pro' ),
 				'type' => Controls_Manager::ICONS,
 				'default' => [
 					'value' => 'fas fa-chevron-up',
@@ -307,7 +350,7 @@ class Table_Of_Contents extends Base_Widget {
 			}
 
 			$minimized_on_options[ $breakpoint_key ] = sprintf(
-				/* translators: 1: Breakpoint label, 2: `<` character, 3: Breakpoint value. */
+				/* translators: 1: Breakpoint label, 2: Comparison operator, 3: Breakpoint value in pixels. */
 				esc_html__( '%1$s (%2$s %3$dpx)', 'elementor-pro' ),
 				$breakpoint->get_label(),
 				'<',
@@ -339,6 +382,7 @@ class Table_Of_Contents extends Base_Widget {
 				'type' => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'frontend_available' => true,
+				'separator' => 'before',
 			]
 		);
 
@@ -400,7 +444,7 @@ class Table_Of_Contents extends Base_Widget {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'border_width',
 			[
 				'label' => esc_html__( 'Border Width', 'elementor-pro' ),
@@ -413,14 +457,18 @@ class Table_Of_Contents extends Base_Widget {
 					'em' => [
 						'max' => 2,
 					],
+					'rem' => [
+						'max' => 2,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--box-border-width: {{SIZE}}{{UNIT}}',
 				],
+				'separator' => 'before',
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'border_radius',
 			[
 				'label' => esc_html__( 'Border Radius', 'elementor-pro' ),
@@ -428,6 +476,18 @@ class Table_Of_Contents extends Base_Widget {
 				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--box-border-radius: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'header_separator_width',
+			[
+				'label' => esc_html__( 'Separator Width', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'selectors' => [
+					'{{WRAPPER}}' => '--separator-width: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -452,14 +512,20 @@ class Table_Of_Contents extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1000,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--box-min-height: {{SIZE}}{{UNIT}}',
 				],
 				'frontend_available' => true,
+				'separator' => 'after',
 			]
 		);
 
@@ -478,6 +544,33 @@ class Table_Of_Contents extends Base_Widget {
 			[
 				'label' => esc_html__( 'Header', 'elementor-pro' ),
 				'tab' => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_responsive_control(
+			'header_text_align',
+			[
+				'label' => esc_html__( 'Text Align', 'elementor-pro' ),
+				'type' => Controls_Manager::CHOOSE,
+				'options' => [
+					'start' => [
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
+						'icon' => 'eicon-text-align-left',
+					],
+					'center' => [
+						'title' => esc_html__( 'Center', 'elementor-pro' ),
+						'icon' => 'eicon-text-align-center',
+					],
+					'end' => [
+						'title' => esc_html__( 'End', 'elementor-pro' ),
+						'icon' => 'eicon-text-align-right',
+					],
+				],
+				'default' => 'start',
+				'classes' => 'elementor-control-start-end',
+				'selectors' => [
+					'{{WRAPPER}} .elementor-toc__header-title' => 'text-align: {{VALUE}}',
+				],
 			]
 		);
 
@@ -528,17 +621,53 @@ class Table_Of_Contents extends Base_Widget {
 				'selectors' => [
 					'{{WRAPPER}}' => '--toggle-button-color: {{VALUE}}',
 				],
+				'separator' => 'before',
 			]
 		);
 
-		$this->add_control(
-			'header_separator_width',
+		$this->add_responsive_control(
+			'toggle_button_position',
 			[
-				'label' => esc_html__( 'Separator Width', 'elementor-pro' ),
-				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+				'label' => esc_html__( 'Icon Position', 'elementor-pro' ),
+				'type' => Controls_Manager::CHOOSE,
+				'options' => [
+					'row-reverse' => [
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
+						'icon' => 'eicon-h-align-left',
+					],
+					'row' => [
+						'title' => esc_html__( 'End', 'elementor-pro' ),
+						'icon' => 'eicon-h-align-right',
+					],
+				],
+				'default' => 'row',
+				'toggle' => false,
+				'classes' => 'elementor-control-start-end',
 				'selectors' => [
-					'{{WRAPPER}}' => '--separator-width: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .elementor-toc__header' => 'flex-direction: {{VALUE}};',
+				],
+				'condition' => [
+					'minimize_box' => 'yes',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'heading_gap',
+			[
+				'label' => esc_html__( 'Gap', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'vw', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 100,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}} .elementor-toc__header' => 'column-gap: {{SIZE}}{{UNIT}};',
+				],
+				'condition' => [
+					'minimize_box' => 'yes',
 				],
 			]
 		);
@@ -561,8 +690,13 @@ class Table_Of_Contents extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1000,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 				],
 				'selectors' => [
@@ -582,7 +716,7 @@ class Table_Of_Contents extends Base_Widget {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'list_indent',
 			[
 				'label' => esc_html__( 'Indent', 'elementor-pro' ),
@@ -660,6 +794,21 @@ class Table_Of_Contents extends Base_Widget {
 				'default' => 'yes',
 				'selectors' => [
 					'{{WRAPPER}}' => '--item-text-hover-decoration: underline',
+				],
+			]
+		);
+
+		$this->add_control(
+			'item_text_hover_transition_duration',
+			[
+				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 's', 'ms', 'custom' ],
+				'default' => [
+					'unit' => 'ms',
+				],
+				'selectors' => [
+					'{{WRAPPER}}' => '--item-text-transition-duration: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -763,7 +912,7 @@ class Table_Of_Contents extends Base_Widget {
 					'tabindex' => '0',
 					'aria-controls' => $toc_id,
 					'aria-expanded' => 'true',
-					'aria-label' => esc_html__( 'Open table of contents', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Open table of contents', 'elementor-pro' ),
 				]
 			);
 			$this->add_render_attribute(
@@ -774,22 +923,26 @@ class Table_Of_Contents extends Base_Widget {
 					'tabindex' => '0',
 					'aria-controls' => $toc_id,
 					'aria-expanded' => 'true',
-					'aria-label' => esc_html__( 'Close table of contents', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Close table of contents', 'elementor-pro' ),
 				]
 			);
 		}
 
 		$html_tag = Utils::validate_html_tag( $settings['html_tag'] );
 		?>
+		<?php if ( ! Utils::is_empty( $settings['title'] ) || ( 'yes' === $settings['minimize_box'] ) ) : ?>
 		<div <?php $this->print_render_attribute_string( 'header' ); ?>>
+			<?php if ( ! Utils::is_empty( $settings['title'] ) ) : ?>
 			<<?php Utils::print_validated_html_tag( $html_tag ); ?> class="elementor-toc__header-title">
-				<?php $this->print_unescaped_setting( 'title' ); ?>
+				<?php echo wp_kses_post( $settings['title'] ); ?>
 			</<?php Utils::print_validated_html_tag( $html_tag ); ?>>
+			<?php endif; ?>
 			<?php if ( 'yes' === $settings['minimize_box'] ) : ?>
 				<div <?php $this->print_render_attribute_string( 'expand-button' ); ?>><?php Icons_Manager::render_icon( $settings['expand_icon'], [ 'aria-hidden' => 'true' ] ); ?></div>
 				<div <?php $this->print_render_attribute_string( 'collapse-button' ); ?>><?php Icons_Manager::render_icon( $settings['collapse_icon'], [ 'aria-hidden' => 'true' ] ); ?></div>
 			<?php endif; ?>
 		</div>
+		<?php endif; ?>
 		<div <?php $this->print_render_attribute_string( 'body' ); ?>>
 			<div class="elementor-toc__spinner-container">
 				<?php
@@ -809,5 +962,34 @@ class Table_Of_Contents extends Base_Widget {
 			</div>
 		</div>
 		<?php
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$blocks = [];
+		$title = Utils::html_to_plain_text( $settings['title'] ?? '' );
+
+		if ( '' !== trim( $title ) ) {
+			$blocks[] = Markdown_Utils::heading( $title, $settings['html_tag'] ?? 'h2' );
+		}
+
+		$tags = $settings['headings_by_tags'] ?? [];
+
+		if ( ! empty( $tags ) ) {
+			$post_id = get_the_ID();
+			$headings = $post_id
+				? Markdown_Heading_Collector::collect_from_document( $post_id, $tags, $this->get_id() )
+				: [];
+
+			if ( ! empty( $headings ) ) {
+				$ordered = 'numbers' === ( $settings['marker_view'] ?? '' );
+				$blocks[] = Markdown_Utils::nested_heading_list( $headings, $ordered );
+			} else {
+				$tag_list = implode( ', ', array_map( 'strtoupper', $tags ) );
+				$blocks[] = 'Indexes page headings: ' . $tag_list;
+			}
+		}
+
+		return Markdown_Utils::join_blocks( $blocks );
 	}
 }

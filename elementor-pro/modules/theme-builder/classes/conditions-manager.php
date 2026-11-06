@@ -38,6 +38,9 @@ class Conditions_Manager {
 
 		add_action( 'manage_' . Source_Local::CPT . '_posts_columns', [ $this, 'admin_columns_headers' ] );
 		add_action( 'manage_' . Source_Local::CPT . '_posts_custom_column', [ $this, 'admin_columns_content' ], 10, 2 );
+
+		add_action( 'manage_e-floating-buttons_posts_columns', [ $this, 'admin_columns_headers' ] );
+		add_action( 'manage_e-floating-buttons_posts_custom_column', [ $this, 'admin_columns_content' ], 10, 2 );
 	}
 
 	public function on_untrash_post( $post_id ) {
@@ -73,8 +76,7 @@ class Conditions_Manager {
 		$instances = $this->get_document_instances( $post_id );
 
 		if ( ! empty( $instances ) ) {
-			// PHPCS - the method get_document_instances is safe.
-			echo implode( '<br />', $instances ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wp_kses_post( implode( '<br />', $instances ) );
 		} else {
 			echo esc_html__( 'None', 'elementor-pro' );
 		}
@@ -112,9 +114,11 @@ class Conditions_Manager {
 			return '';
 		}
 
-		return esc_html__( 'Elementor recognized that you have set this location for other templates: ', 'elementor-pro' ) .
-			' ' .
-			implode( ', ', $conflicted );
+		return sprintf(
+			/* translators: %s: a list of conflicted templates */
+			esc_html__( 'We noticed that you already applied %s with the same condition.', 'elementor-pro' ),
+			implode( ', ', $conflicted )
+		) . '<br />' . esc_html__( "To continue, set different conditions for each so they don't conflict.", 'elementor-pro' );
 	}
 
 	public function get_conditions_conflicts_by_location( $condition, $location, $ignore_post_id = null ) {
@@ -135,6 +139,7 @@ class Conditions_Manager {
 			foreach ( $conditions_groups as $template_id => $conditions ) {
 				if ( ! get_post( $template_id ) ) {
 					$this->purge_post_from_cache( $template_id );
+					continue;
 				}
 
 				if ( $ignore_post_id === $template_id ) {
@@ -176,7 +181,11 @@ class Conditions_Manager {
 	 * @throws \Exception
 	 */
 	public function ajax_save_theme_template_conditions( $request ) {
-		$document = Utils::_unstable_get_document_for_edit( $request['editor_post_id'] );
+		$template_id = ! empty( $request['conditions_template_id'] )
+			? absint( $request['conditions_template_id'] )
+			: absint( $request['editor_post_id'] );
+
+		$document = Utils::_unstable_get_document_for_edit( $template_id );
 
 		if ( ! isset( $request['conditions'] ) ) {
 			$request['conditions'] = [];
@@ -305,9 +314,12 @@ class Conditions_Manager {
 
 		$document = $theme_builder_module->get_document( $post_id );
 
+		if ( ! $document ) {
+			return false;
+		}
+
 		if ( empty( $conditions_to_save ) ) {
-			// TODO: $document->delete_meta.
-			$is_saved = delete_post_meta( $post_id, '_elementor_conditions' );
+			$is_saved = $document->delete_meta( '_elementor_conditions' );
 		} else {
 			$is_saved = $document->update_meta( '_elementor_conditions', $conditions_to_save );
 		}

@@ -3,6 +3,7 @@ namespace ElementorPro\Modules\LoopBuilder\Widgets;
 
 use Elementor\Controls_Manager;
 use Elementor\Core\Base\Document;
+use ElementorPro\Base\Markdown_Utils;
 use ElementorPro\Modules\LoopBuilder\Documents\Loop as LoopDocument;
 use ElementorPro\Modules\LoopBuilder\Module;
 use ElementorPro\Modules\LoopBuilder\Skins\Skin_Loop_Post;
@@ -85,8 +86,10 @@ class Base extends Posts {
 		$this->register_navigation_section_controls();
 
 		$this->register_pagination_section_controls();
+		$this->register_additional_options_section_controls();
 
 		$this->register_design_layout_controls();
+		$this->register_design_nothing_found_message_controls();
 		$this->register_design_navigation_controls();
 		$this->register_design_pagination_controls();
 
@@ -340,7 +343,11 @@ class Base extends Posts {
 		);
 	}
 
+	protected function register_additional_options_section_controls() {}
+
 	protected function register_design_layout_controls() {}
+
+	protected function register_design_nothing_found_message_controls() {}
 
 	protected function register_design_navigation_controls() {}
 
@@ -361,4 +368,13 @@ class Base extends Posts {
 	public function before_skin_render() {}
 
 	public function after_skin_render() {}
+
+	public function render_markdown(): string {
+		ob_start();
+		$this->render_content();
+
+		$content = \Elementor\Modules\MarkdownRender\Html_To_Markdown::convert( (string) ob_get_clean() );
+
+		return Markdown_Utils::widget_section( $this->get_title(), $content );
+	}
 }

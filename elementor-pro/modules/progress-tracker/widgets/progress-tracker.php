@@ -10,6 +10,8 @@ use Elementor\Group_Control_Text_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Modules\PageTemplates\Module as PageTemplatesModule;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Utils;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -35,6 +37,28 @@ class ProgressTracker extends Base_Widget {
 
 	public function get_keywords() {
 		return [ 'progress', 'tracker', 'read', 'scroll' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-progress-tracker' ];
 	}
 
 	private function register_content_controls() {
@@ -82,6 +106,9 @@ class ProgressTracker extends Base_Widget {
 				'type' => Controls_Manager::TEXT,
 				'description' => esc_html__( 'Add the CSS ID or Class of a specific element on this page to track its progress separately', 'elementor-pro' ),
 				'frontend_available' => true,
+				'ai' => [
+					'active' => false,
+				],
 				'condition' => [
 					'relative_to' => 'selector',
 				],
@@ -94,7 +121,6 @@ class ProgressTracker extends Base_Widget {
 			[
 				'type' => Controls_Manager::RAW_HTML,
 				'raw' => esc_html__( 'Note: You can only track progress relative to Post Content on a single post template.', 'elementor-pro' ),
-				'separator' => 'none',
 				'content_classes' => 'elementor-descriptor',
 				'condition' => [
 					'relative_to' => 'post_content',
@@ -182,8 +208,13 @@ class ProgressTracker extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 200,
+					],
+					'em' => [
+						'max' => 20,
+					],
+					'rem' => [
+						'max' => 20,
 					],
 				],
 				'selectors' => [
@@ -225,8 +256,13 @@ class ProgressTracker extends Base_Widget {
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 400,
+					],
+					'em' => [
+						'max' => 40,
+					],
+					'rem' => [
+						'max' => 40,
 					],
 				],
 				'selectors' => [
@@ -289,11 +325,11 @@ class ProgressTracker extends Base_Widget {
 				'default' => 'none',
 				'options' => [
 					'none' => esc_html__( 'None', 'elementor-pro' ),
-					'solid' => _x( 'Solid', 'Border Control', 'elementor-pro' ),
-					'double' => _x( 'Double', 'Border Control', 'elementor-pro' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'elementor-pro' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'elementor-pro' ),
-					'groove' => _x( 'Groove', 'Border Control', 'elementor-pro' ),
+					'solid' => esc_html__( 'Solid', 'elementor-pro' ),
+					'double' => esc_html__( 'Double', 'elementor-pro' ),
+					'dotted' => esc_html__( 'Dotted', 'elementor-pro' ),
+					'dashed' => esc_html__( 'Dashed', 'elementor-pro' ),
+					'groove' => esc_html__( 'Groove', 'elementor-pro' ),
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--horizontal-progress-border: {{VALUE}};',
@@ -381,8 +417,13 @@ class ProgressTracker extends Base_Widget {
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 400,
+					],
+					'em' => [
+						'max' => 40,
+					],
+					'rem' => [
+						'max' => 40,
 					],
 				],
 				'selectors' => [
@@ -420,12 +461,13 @@ class ProgressTracker extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
 					],
-					'vh' => [
-						'min' => 0,
-						'max' => 100,
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -445,11 +487,11 @@ class ProgressTracker extends Base_Widget {
 				'default' => 'none',
 				'options' => [
 					'none' => esc_html__( 'None', 'elementor-pro' ),
-					'solid' => _x( 'Solid', 'Border Control', 'elementor-pro' ),
-					'double' => _x( 'Double', 'Border Control', 'elementor-pro' ),
-					'dotted' => _x( 'Dotted', 'Border Control', 'elementor-pro' ),
-					'dashed' => _x( 'Dashed', 'Border Control', 'elementor-pro' ),
-					'groove' => _x( 'Groove', 'Border Control', 'elementor-pro' ),
+					'solid' => esc_html__( 'Solid', 'elementor-pro' ),
+					'double' => esc_html__( 'Double', 'elementor-pro' ),
+					'dotted' => esc_html__( 'Dotted', 'elementor-pro' ),
+					'dashed' => esc_html__( 'Dashed', 'elementor-pro' ),
+					'groove' => esc_html__( 'Groove', 'elementor-pro' ),
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--horizontal-border-style: {{VALUE}};',
@@ -631,5 +673,37 @@ class ProgressTracker extends Base_Widget {
 		<?php endif; ?>
 		</div>
 		<?php
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$lines = [];
+
+		$relative_to = $settings['relative_to'] ?? 'entire_page';
+		$relative_labels = [
+			'entire_page' => esc_html__( 'Entire Page', 'elementor-pro' ),
+			'post_content' => esc_html__( 'Post Content', 'elementor-pro' ),
+			'selector' => esc_html__( 'Selector', 'elementor-pro' ),
+		];
+
+		$lines[] = '- **' . esc_html__( 'Progress relative to', 'elementor-pro' ) . ':** ' . ( $relative_labels[ $relative_to ] ?? $relative_to );
+
+		if ( 'selector' === $relative_to ) {
+			$selector = $settings['selector'] ?? '';
+
+			if ( '' !== $selector ) {
+				$lines[] = '- **' . esc_html__( 'Selector', 'elementor-pro' ) . ':** `' . $selector . '`';
+			}
+		}
+
+		$type = $settings['type'] ?? 'horizontal';
+		$type_labels = [
+			'horizontal' => esc_html__( 'Horizontal', 'elementor-pro' ),
+			'circular' => esc_html__( 'Circular', 'elementor-pro' ),
+		];
+
+		$lines[] = '- **' . esc_html__( 'Tracker Type', 'elementor-pro' ) . ':** ' . ( $type_labels[ $type ] ?? $type );
+
+		return Markdown_Utils::bullet_list( $lines );
 	}
 }

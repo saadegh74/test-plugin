@@ -46,8 +46,8 @@ class Cart extends Base_Widget {
 		];
 	}
 
-	public function get_style_depends() {
-		return [ 'select2' ];
+	public function get_style_depends(): array {
+		return [ 'widget-woocommerce-cart', 'select2' ];
 	}
 
 	protected function register_controls() {
@@ -720,8 +720,13 @@ class Cart extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -765,8 +770,13 @@ class Cart extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -863,8 +873,13 @@ class Cart extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
-						'max' => 60,
+						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -978,6 +993,7 @@ class Cart extends Base_Widget {
 					'px' => [
 						'min' => 0,
 						'max' => 3000,
+						'step' => 100,
 					],
 				],
 				'selectors' => [
@@ -1133,14 +1149,15 @@ class Cart extends Base_Widget {
 			[
 				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ) . ' (ms)',
 				'type' => Controls_Manager::SLIDER,
-				'selectors' => [
-					'{{WRAPPER}}' => '--forms-buttons-hover-transition-duration: {{SIZE}}ms',
-				],
 				'range' => [
 					'px' => [
 						'min' => 0,
 						'max' => 3000,
+						'step' => 100,
 					],
+				],
+				'selectors' => [
+					'{{WRAPPER}}' => '--forms-buttons-hover-transition-duration: {{SIZE}}ms',
 				],
 			]
 		);
@@ -1243,8 +1260,13 @@ class Cart extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
-						'max' => 60,
+						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1297,8 +1319,13 @@ class Cart extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1428,7 +1455,7 @@ class Cart extends Base_Widget {
 			[
 				'label' => esc_html__( 'Weight', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
-				'size_units' => [ 'px' ],
+				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'selectors' => [
 					'{{WRAPPER}}' => '--order-summary-items-divider-weight: {{SIZE}}{{UNIT}};',
 				],
@@ -1528,8 +1555,13 @@ class Cart extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
-						'max' => 60,
+						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -1704,14 +1736,15 @@ class Cart extends Base_Widget {
 			[
 				'label' => esc_html__( 'Transition Duration', 'elementor-pro' ) . ' (ms)',
 				'type' => Controls_Manager::SLIDER,
-				'selectors' => [
-					'{{WRAPPER}}' => '--checkout-button-hover-transition-duration: {{SIZE}}ms',
-				],
 				'range' => [
 					'px' => [
 						'min' => 0,
 						'max' => 3000,
+						'step' => 100,
 					],
+				],
+				'selectors' => [
+					'{{WRAPPER}}' => '--checkout-button-hover-transition-duration: {{SIZE}}ms',
 				],
 			]
 		);
@@ -2325,10 +2358,10 @@ class Cart extends Base_Widget {
 		<div class="coupon e-cart-section shop_table">
 			<div class="form-row coupon-col">
 				<div class="coupon-col-start">
-					<input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php esc_attr_e( 'Coupon code', 'elementor-pro' ); ?>" />
+					<input type="text" name="coupon_code" class="input-text" id="coupon_code" value="" placeholder="<?php echo esc_attr__( 'Coupon code', 'elementor-pro' ); ?>" />
 				</div>
 				<div class="coupon-col-end">
-					<button <?php $this->print_render_attribute_string( 'button_coupon' ); ?> value="<?php esc_attr_e( 'Apply coupon', 'elementor-pro' ); ?>"><?php esc_attr_e( 'Apply coupon', 'elementor-pro' ); ?></button>
+					<button <?php $this->print_render_attribute_string( 'button_coupon' ); ?> value="<?php echo esc_attr__( 'Apply coupon', 'elementor-pro' ); ?>"><?php echo esc_html__( 'Apply coupon', 'elementor-pro' ); ?></button>
 				</div>
 				<?php do_action( 'woocommerce_cart_coupon' ); ?>
 			</div>
@@ -2371,14 +2404,17 @@ class Cart extends Base_Widget {
 	 * @return boolean
 	 */
 	private function should_render_coupon() {
-		$settings = $this->get_settings_for_display();
-		$coupon_display_control = true;
-
-		if ( '' === $settings['section_coupon_display'] ) {
-			$coupon_display_control = false;
+		if ( ! wc_coupons_enabled() ) {
+			return false;
 		}
 
-		return wc_coupons_enabled() && $coupon_display_control;
+		$settings = $this->get_settings_for_display();
+
+		if ( isset( $settings['section_coupon_display'] ) && '' === $settings['section_coupon_display'] ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

@@ -37,6 +37,10 @@ class Archive_Products_Deprecated extends Products {
 		return false;
 	}
 
+	public function get_style_depends(): array {
+		return [ 'widget-woocommerce-products', 'widget-woocommerce-products-archive' ];
+	}
+
 	protected function register_controls() {
 		$this->deprecated_notice( Plugin::get_title(), '2.5.0', '', esc_html__( 'Archive Products', 'elementor-pro' ) );
 
@@ -50,9 +54,9 @@ class Archive_Products_Deprecated extends Products {
 		$this->add_control(
 			'wc_notice_do_not_use_customizer',
 			[
-				'type' => Controls_Manager::RAW_HTML,
-				'raw' => esc_html__( 'Note that these layout settings will override settings made in Appearance > Customize', 'elementor-pro' ),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'type' => Controls_Manager::ALERT,
+				'alert_type' => 'info',
+				'content' => esc_html__( 'Note that these layout settings will override settings made in Appearance > Customize', 'elementor-pro' ),
 			]
 		);
 
@@ -101,7 +105,7 @@ class Archive_Products_Deprecated extends Products {
 			[
 				'label' => esc_html__( 'Nothing Found Message', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXTAREA,
-				'default' => esc_html__( 'It seems we can\'t find what you\'re looking for.', 'elementor-pro' ),
+				'default' => esc_html__( 'It seems we can’t find what you’re looking for.', 'elementor-pro' ),
 			]
 		);
 

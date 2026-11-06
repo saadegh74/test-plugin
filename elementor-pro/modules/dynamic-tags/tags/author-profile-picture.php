@@ -1,7 +1,7 @@
 <?php
 namespace ElementorPro\Modules\DynamicTags\Tags;
 
-use ElementorPro\Modules\DynamicTags\Tags\Base\Data_Tag;
+use ElementorPro\Modules\DynamicTags\Tags\Base\Pro_Data_Tag;
 use ElementorPro\Core\Utils;
 use ElementorPro\Modules\DynamicTags\Module;
 
@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Author_Profile_Picture extends Data_Tag {
+class Author_Profile_Picture extends Pro_Data_Tag {
 
 	public function get_name() {
 		return 'author-profile-picture';
@@ -24,7 +24,10 @@ class Author_Profile_Picture extends Data_Tag {
 	}
 
 	public function get_categories() {
-		return [ Module::IMAGE_CATEGORY ];
+		return [
+			Module::IMAGE_CATEGORY,
+			Module::MEDIA_CATEGORY,
+		];
 	}
 
 	public function get_value( array $options = [] ) {

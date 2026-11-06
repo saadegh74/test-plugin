@@ -8,6 +8,8 @@ use Elementor\Controls_Manager;
 use ElementorPro\Core\Utils;
 use ElementorPro\Modules\Posts\Traits\Button_Widget_Trait;
 use ElementorPro\Modules\Posts\Traits\Pagination_Trait;
+use ElementorPro\Modules\LoopBuilder\Module as LoopBuilderModule;
+use ElementorPro\Modules\Woocommerce\Module as WoocommerceModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -60,6 +62,8 @@ abstract class Posts_Base extends Base_Widget {
 			'section_condition' => [
 				'pagination_type' => 'load_more_on_click',
 			],
+			'prefix_class' => 'load-more-align-',
+			'alignment_default' => 'center',
 		] );
 	}
 
@@ -142,6 +146,12 @@ abstract class Posts_Base extends Base_Widget {
 					'px' => [
 						'max' => 50,
 					],
+					'em' => [
+						'max' => 5,
+					],
+					'rem' => [
+						'max' => 5,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--load-more—spacing: {{SIZE}}{{UNIT}};',
@@ -156,6 +166,12 @@ abstract class Posts_Base extends Base_Widget {
 			'section_pagination',
 			[
 				'label' => esc_html__( 'Pagination', 'elementor-pro' ),
+				'condition' => [
+					'_skin!' => [
+						LoopBuilderModule::LOOP_POST_TAXONOMY_SKIN_ID,
+						WoocommerceModule::LOOP_PRODUCT_TAXONOMY_SKIN_ID,
+					],
+				],
 			]
 		);
 
@@ -240,20 +256,25 @@ abstract class Posts_Base extends Base_Widget {
 				'label' => esc_html__( 'Alignment', 'elementor-pro' ),
 				'type' => Controls_Manager::CHOOSE,
 				'options' => [
-					'left' => [
-						'title' => esc_html__( 'Left', 'elementor-pro' ),
+					'start' => [
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-left',
 					],
 					'center' => [
 						'title' => esc_html__( 'Center', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-center',
 					],
-					'right' => [
-						'title' => esc_html__( 'Right', 'elementor-pro' ),
+					'end' => [
+						'title' => esc_html__( 'End', 'elementor-pro' ),
 						'icon' => 'eicon-text-align-right',
 					],
 				],
 				'default' => 'center',
+				'classes' => 'elementor-control-start-end',
+				'selectors_dictionary' => [
+					'left' => is_rtl() ? 'end' : 'start',
+					'right' => is_rtl() ? 'start' : 'end',
+				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-pagination' => 'text-align: {{VALUE}};',
 				],
@@ -363,8 +384,6 @@ abstract class Posts_Base extends Base_Widget {
 		$this->register_button_content_controls( [
 			'button_text' => esc_html__( 'Load More', 'elementor-pro' ),
 			'control_label_name' => esc_html__( 'Button Text', 'elementor-pro' ),
-			'prefix_class' => 'load-more-align-',
-			'alignment_default' => 'center',
 			'section_condition' => [
 				'pagination_type' => 'load_more_on_click',
 			],
@@ -577,8 +596,13 @@ abstract class Posts_Base extends Base_Widget {
 				],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -598,8 +622,13 @@ abstract class Posts_Base extends Base_Widget {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -679,7 +708,7 @@ abstract class Posts_Base extends Base_Widget {
 
 		if ( $i > 1 ) {
 			if ( '' === get_option( 'permalink_structure' ) || in_array( $post->post_status, [ 'draft', 'pending' ] ) ) {
-				$url = add_query_arg( 'page', $i, $url );
+				$url = add_query_arg( $this->get_wp_pagination_query_var(), $i, $url );
 			} elseif ( get_option( 'show_on_front' ) === 'page' && (int) get_option( 'page_on_front' ) === $post->ID ) {
 				$url = trailingslashit( $url ) . user_trailingslashit( "$wp_rewrite->pagination_base/" . $i, 'single_paged' );
 			} else {
@@ -688,8 +717,7 @@ abstract class Posts_Base extends Base_Widget {
 		}
 
 		if ( $i > 1 && $this->is_allow_to_use_custom_page_option() ) {
-			$raw_url = $this->get_base_url() . '&e-page-' . $this->get_id() . '=' . $i;
-			$url = $this->format_query_string_concatenation( $raw_url );
+			$url = $this->get_wp_link_page_url_for_custom_page_option( $url, $i, $post_id ?? 0 );
 		}
 
 		if ( 1 === $i && $this->is_allow_to_use_custom_page_option() ) {
@@ -708,11 +736,15 @@ abstract class Posts_Base extends Base_Widget {
 			$url = $this->get_wp_link_page_url_for_normal_page_load( $url );
 		}
 
-		return $url;
+		return esc_url( apply_filters( 'elementor/posts/wp_link_page', $url ) );
 	}
 
 	public function is_allow_to_use_custom_page_option() {
-		return 'ajax' === $this->get_settings_for_display( 'pagination_load_type' ) || 'yes' === $this->get_settings_for_display( 'pagination_individual_handle' );
+		if ( 'ajax' === $this->get_settings_for_display( 'pagination_load_type' ) || 'yes' === $this->get_settings_for_display( 'pagination_individual_handle' ) ) {
+			return true;
+		}
+
+		return $this->has_multiple_posts_widgets_on_page();
 	}
 
 	protected function get_base_url_for_rest_request( $post_id, $url ) {
@@ -723,7 +755,7 @@ abstract class Posts_Base extends Base_Widget {
 		global $wp_rewrite;
 
 		if ( $wp_rewrite->using_permalinks() && ( $this->current_url_contains_taxonomy_filter() || $this->referer_contains_taxonomy_filter() ) ) {
-			$url = get_query_var( 'pagination_base_url' ) . user_trailingslashit( "$wp_rewrite->pagination_base/", 'single_paged' );
+			$url = $this->is_allow_to_use_custom_page_option() ? get_query_var( 'pagination_base_url' ) : get_query_var( 'pagination_base_url' ) . user_trailingslashit( "$wp_rewrite->pagination_base/", 'single_paged' );
 		} else {
 			$url = remove_query_arg( 'p', $url );
 		}
@@ -773,7 +805,7 @@ abstract class Posts_Base extends Base_Widget {
 		$e_filters = '';
 
 		foreach ( $query_params as $param_key => $param_value ) {
-			if ( strpos( $param_key, 'e-filter' ) ) {
+			if ( false !== strpos( $param_key, 'e-filter' ) ) {
 				$e_filters .= '&' . $param_key . '=' . $param_value;
 			}
 		}
@@ -782,11 +814,11 @@ abstract class Posts_Base extends Base_Widget {
 	}
 
 	public function current_url_contains_taxonomy_filter() {
-		return strpos( Utils::_unstable_get_super_global_value( $_SERVER, 'QUERY_STRING' ), 'e-filter-' );
+		return false !== strpos( Utils::_unstable_get_super_global_value( $_SERVER, 'QUERY_STRING' ), 'e-filter-' );
 	}
 
 	public function referer_contains_taxonomy_filter() {
-		return strpos( Utils::_unstable_get_super_global_value( $_SERVER, 'HTTP_REFERER' ), 'e-filter-' );
+		return false !== strpos( Utils::_unstable_get_super_global_value( $_SERVER, 'HTTP_REFERER' ), 'e-filter-' );
 	}
 
 	protected function format_query_string_concatenation( $input ) {
@@ -856,4 +888,46 @@ abstract class Posts_Base extends Base_Widget {
 	}
 
 	public function render_plain_content() {}
+
+	/**
+	 * @param string $url
+	 * @param int $i
+	 * @param int $post_id
+	 * @return string
+	 */
+	private function get_wp_link_page_url_for_custom_page_option( $url, $i, $post_id ) {
+		$base_raw_url = $this->is_rest_request() ? $this->get_base_url_for_rest_request( $post_id, $url ) : $this->get_base_url();
+		$pagination_key = 'e-page-' . $this->get_id();
+
+		if ( 'yes' === $this->get_settings_for_display( 'pagination_individual_handle' ) ) {
+			$base_raw_url .= $this->get_pagination_query_vars_for_others_individually_paginated_widgets( $pagination_key );
+		}
+
+		return $this->format_query_string_concatenation( $base_raw_url . '&' . $pagination_key . '=' . $i );
+	}
+
+	private function get_pagination_query_vars_for_others_individually_paginated_widgets( string $pagination_key ): string {
+		wp_parse_str( htmlspecialchars_decode( Utils::_unstable_get_super_global_value( $_SERVER, 'QUERY_STRING' ) ), $query_params );
+
+		$e_page = '';
+
+		foreach ( $query_params as $param_key => $param_value ) {
+			if ( false !== strpos( $param_key, 'e-page' ) && $pagination_key !== $param_key ) {
+				$e_page .= '&' . $param_key . '=' . $param_value;
+			}
+		}
+
+		return $e_page;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function get_wp_pagination_query_var() {
+		if ( '' === get_option( 'permalink_structure' ) && $this->is_posts_page( $this->is_allow_to_use_custom_page_option() ) ) {
+			return 'paged';
+		}
+
+		return 'page';
+	}
 }

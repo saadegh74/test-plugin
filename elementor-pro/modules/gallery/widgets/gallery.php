@@ -13,6 +13,7 @@ use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
 use Elementor\Utils;
 use ElementorPro\Base\Base_Widget;
+use ElementorPro\Base\Markdown_Utils;
 use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -43,20 +44,20 @@ class Gallery extends Base_Widget {
 		return [ 'elementor-gallery' ];
 	}
 
-	public function get_style_depends() {
-		return [ 'elementor-gallery' ];
+	public function get_style_depends(): array {
+		return [ 'widget-gallery', 'elementor-gallery', 'e-transitions' ];
 	}
 
 	public function get_icon() {
 		return 'eicon-gallery-justified';
 	}
 
-	public function get_inline_css_depends() {
-		if ( 'multiple' === $this->get_settings_for_display( 'gallery_type' ) ) {
-			return [ 'nav-menu' ];
-		}
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
 
-		return [];
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
 	protected function register_controls() {
@@ -298,6 +299,46 @@ class Gallery extends Base_Widget {
 				'condition' => [
 					'link_to' => 'file',
 				],
+				'assets' => [
+					'styles' => [
+						[
+							'name' => 'e-swiper',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'link_to',
+										'operator' => '===',
+										'value' => 'file',
+									],
+									[
+										'name' => 'open_lightbox',
+										'operator' => '!==',
+										'value' => 'no',
+									],
+								],
+							],
+						],
+					],
+					'scripts' => [
+						[
+							'name' => 'swiper',
+							'conditions' => [
+								'terms' => [
+									[
+										'name' => 'link_to',
+										'operator' => '===',
+										'value' => 'file',
+									],
+									[
+										'name' => 'open_lightbox',
+										'operator' => '!==',
+										'value' => 'no',
+									],
+								],
+							],
+						],
+					],
+				],
 			]
 		);
 
@@ -364,6 +405,9 @@ class Gallery extends Base_Widget {
 				],
 				'dynamic' => [
 					'active' => true,
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -565,6 +609,9 @@ class Gallery extends Base_Widget {
 					'em' => [
 						'max' => 2,
 					],
+					'em' => [
+						'max' => 2,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--image-border-width: {{SIZE}}{{UNIT}};',
@@ -669,6 +716,7 @@ class Gallery extends Base_Widget {
 					'px' => [
 						'min' => 0,
 						'max' => 3000,
+						'step' => 100,
 					],
 				],
 				'selectors' => [
@@ -830,6 +878,7 @@ class Gallery extends Base_Widget {
 					'px' => [
 						'min' => 0,
 						'max' => 3000,
+						'step' => 100,
 					],
 				],
 				'selectors' => [
@@ -1082,6 +1131,7 @@ class Gallery extends Base_Widget {
 					'px' => [
 						'min' => 0,
 						'max' => 3000,
+						'step' => 100,
 					],
 				],
 				'selectors' => [
@@ -1381,10 +1431,12 @@ class Gallery extends Base_Widget {
 
 		foreach ( $galleries as $gallery ) {
 			foreach ( $gallery as $item ) {
-				$image_src = wp_get_attachment_image_src( $item['id'] );
+				$image_src = 'custom' !== $settings['thumbnail_image_size']
+					? wp_get_attachment_image_src( $item['id'], $settings['thumbnail_image_size'] )[0]
+					: Group_Control_Image_Size::get_attachment_image_src( $item['id'], 'thumbnail_image', $settings );
 
 				$this->add_render_attribute( 'gallery_item_image_' . $item['id'], [
-					'style' => "background-image: url('{$image_src[0]}');",
+					'style' => "background-image: url('{$image_src}');",
 				] );
 			}
 		}
@@ -1417,7 +1469,7 @@ class Gallery extends Base_Widget {
 				'titles-container',
 				[
 					'class' => 'elementor-gallery__titles-container',
-					'aria-label' => esc_html__( 'Gallery filter', 'elementor-pro' ),
+					'aria-label' => esc_attr__( 'Gallery filter', 'elementor-pro' ),
 				]
 			);
 
@@ -1434,7 +1486,7 @@ class Gallery extends Base_Widget {
 			<div <?php $this->print_render_attribute_string( 'titles-container' ); ?>>
 				<?php if ( $settings['show_all_galleries'] ) { ?>
 					<a class="elementor-item elementor-gallery-title" role="button" tabindex="0" data-gallery-index="all">
-						<?php $this->print_unescaped_setting( 'show_all_galleries_label' ); ?>
+						<?php echo wp_kses_post( $settings['show_all_galleries_label'] ); ?>
 					</a>
 				<?php } ?>
 
@@ -1506,16 +1558,8 @@ class Gallery extends Base_Widget {
 					continue;
 				}
 				$attachment = get_post( $id );
-				$image_data = [
-					'alt' => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
-					'media' => wp_get_attachment_image_src( $id, 'full' )['0'],
-					'src' => $image_src['0'],
-					'width' => $image_src['1'],
-					'height' => $image_src['2'],
-					'caption' => $attachment->post_excerpt,
-					'description' => $attachment->post_content,
-					'title' => $attachment->post_title,
-				];
+
+				$image_data = $this->get_image_data( $attachment, $id, $image_src, $settings );
 
 				$this->add_render_attribute( 'gallery_item_' . $unique_index, [
 					'class' => [
@@ -1541,7 +1585,7 @@ class Gallery extends Base_Widget {
 						$href = $image_data['media'];
 
 						$this->add_render_attribute( 'gallery_item_' . $unique_index, [
-							'href' => $href,
+							'href' => esc_url( $href ),
 						] );
 
 						if ( Plugin::elementor()->editor->is_edit_mode() ) {
@@ -1599,5 +1643,62 @@ class Gallery extends Base_Widget {
 			//endforeach; ?>
 		</div>
 	<?php }
+	}
+
+	protected function get_image_data( $attachment, $image_id, $image_src, $settings ): array {
+		$image_data = [
+			'alt' => get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true ),
+			'media' => wp_get_attachment_image_src( $image_id, 'full' )['0'],
+			'src' => $image_src['0'],
+			'width' => $image_src['1'],
+			'height' => $image_src['2'],
+			'caption' => $attachment->post_excerpt,
+			'description' => $attachment->post_content,
+			'title' => $attachment->post_title,
+		];
+
+		if ( 'custom' !== $settings['thumbnail_image_size'] ) {
+			return $image_data;
+		}
+
+		$image_data['src'] = Group_Control_Image_Size::get_attachment_image_src( $image_id, 'thumbnail_image', $settings );
+		$image_data['width'] = $settings['thumbnail_image_custom_dimension']['width'];
+		$image_data['height'] = $settings['thumbnail_image_custom_dimension']['height'];
+
+		return $image_data;
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$lines = [];
+
+		if ( 'multiple' === ( $settings['gallery_type'] ?? 'single' ) && ! empty( $settings['galleries'] ) ) {
+			foreach ( $settings['galleries'] as $gallery_group ) {
+				$title = Markdown_Utils::plain_text( $gallery_group['gallery_title'] ?? '' );
+				$images = $gallery_group['multiple_gallery'] ?? [];
+
+				if ( '' !== $title ) {
+					$lines[] = '### ' . $title;
+				}
+
+				foreach ( $images as $image ) {
+					$image_md = Markdown_Utils::image_from_media_array( $image );
+
+					if ( '' !== $image_md ) {
+						$lines[] = $image_md;
+					}
+				}
+			}
+		} elseif ( ! empty( $settings['gallery'] ) ) {
+			foreach ( $settings['gallery'] as $image ) {
+				$image_md = Markdown_Utils::image_from_media_array( $image );
+
+				if ( '' !== $image_md ) {
+					$lines[] = $image_md;
+				}
+			}
+		}
+
+		return Markdown_Utils::join_blocks( $lines );
 	}
 }

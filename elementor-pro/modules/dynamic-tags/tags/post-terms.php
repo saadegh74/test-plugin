@@ -2,7 +2,7 @@
 namespace ElementorPro\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use ElementorPro\Modules\DynamicTags\Tags\Base\Tag;
+use ElementorPro\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use ElementorPro\Modules\DynamicTags\Module;
 use ElementorPro\Core\Utils;
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Post_Terms extends Tag {
+class Post_Terms extends Pro_Tag {
 	public function get_name() {
 		return 'post-terms';
 	}
@@ -71,6 +71,9 @@ class Post_Terms extends Tag {
 				'label' => esc_html__( 'Separator', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => ', ',
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -87,7 +90,7 @@ class Post_Terms extends Tag {
 	public function render() {
 		$settings = $this->get_settings();
 
-		if ( 'yes' === $settings['link'] ) {
+		if ( 'yes' === $settings['link'] || true === $settings['link'] ) {
 			$value = get_the_term_list( get_the_ID(), $settings['taxonomy'], '', $settings['separator'] );
 		} else {
 			$terms = get_the_terms( get_the_ID(), $settings['taxonomy'] );

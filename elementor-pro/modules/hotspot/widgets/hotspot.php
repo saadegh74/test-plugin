@@ -13,6 +13,7 @@ use Elementor\Icons_Manager;
 use Elementor\Utils;
 use Elementor\Widget_Image;
 use ElementorPro\Base\Base_Widget_Trait;
+use ElementorPro\Base\Markdown_Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -35,6 +36,28 @@ class Hotspot extends Widget_Image {
 
 	public function get_keywords() {
 		return [ 'image', 'tooltip', 'CTA', 'dot' ];
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function has_widget_inner_wrapper(): bool {
+		return true;
+	}
+
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 3.24.0
+	 * @access public
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'widget-hotspot' ];
 	}
 
 	protected function register_controls() {
@@ -92,7 +115,6 @@ class Hotspot extends Widget_Image {
 				'dynamic' => [
 					'active' => true,
 				],
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 			]
 		);
 
@@ -106,6 +128,9 @@ class Hotspot extends Widget_Image {
 			]
 		);
 
+		$start = is_rtl() ? 'right' : 'left';
+		$end = is_rtl() ? 'left' : 'right';
+
 		$repeater->add_control(
 			'hotspot_icon_position',
 			[
@@ -113,12 +138,12 @@ class Hotspot extends Widget_Image {
 				'type' => Controls_Manager::CHOOSE,
 				'options' => [
 					'start' => [
-						'title' => esc_html__( 'Icon Start', 'elementor-pro' ),
-						'icon' => 'eicon-h-align-left',
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
+						'icon' => "eicon-h-align-{$start}",
 					],
 					'end' => [
-						'title' => esc_html__( 'Icon End', 'elementor-pro' ),
-						'icon' => 'eicon-h-align-right',
+						'title' => esc_html__( 'End', 'elementor-pro' ),
+						'icon' => "eicon-h-align-{$end}",
 					],
 				],
 				'selectors_dictionary' => [
@@ -144,12 +169,17 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'default' => [
-					'size' => '5',
+					'size' => 5,
 				],
 				'selectors' => [
 					'{{WRAPPER}} {{CURRENT_ITEM}} .e-hotspot__button' =>
@@ -181,9 +211,13 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1000,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 				],
 				'selectors' => [
@@ -203,9 +237,13 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1000,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 				],
 				'selectors' => [
@@ -232,7 +270,7 @@ class Hotspot extends Widget_Image {
 		$repeater->start_controls_tab(
 			'hotspot_position_tab',
 			[
-				'label' => esc_html__( 'POSITION', 'elementor-pro' ),
+				'label' => esc_html__( 'Position', 'elementor-pro' ),
 			]
 		);
 
@@ -264,7 +302,7 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ '%' ],
 				'default' => [
 					'unit' => '%',
-					'size' => '50',
+					'size' => 50,
 				],
 				'selectors' => [
 					'{{WRAPPER}} {{CURRENT_ITEM}}' =>
@@ -301,7 +339,7 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ '%' ],
 				'default' => [
 					'unit' => '%',
-					'size' => '50',
+					'size' => 50,
 				],
 				'selectors' => [
 					'{{WRAPPER}} {{CURRENT_ITEM}}' =>
@@ -374,9 +412,13 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 2000,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 200,
+					],
+					'rem' => [
+						'max' => 200,
 					],
 				],
 				'selectors' => [
@@ -460,8 +502,9 @@ class Hotspot extends Widget_Image {
 				'type' => Controls_Manager::SLIDER,
 				'range' => [
 					'px' => [
-						'min' => 100,
+						'min' => 0,
 						'max' => 20000,
+						'step' => 100,
 					],
 				],
 				'condition' => [
@@ -560,6 +603,7 @@ class Hotspot extends Widget_Image {
 					'px' => [
 						'min' => 0,
 						'max' => 10000,
+						'step' => 100,
 					],
 				],
 				'selectors' => [
@@ -693,14 +737,14 @@ class Hotspot extends Widget_Image {
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', '%', 'em', 'rem', 'custom' ],
 				'range' => [
-					'%' => [
-						'min' => 0,
-						'max' => 100,
-					],
 					'px' => [
-						'min' => 0,
 						'max' => 300,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 30,
+					],
+					'rem' => [
+						'max' => 30,
 					],
 				],
 				'selectors' => [
@@ -728,9 +772,13 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1000,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 				],
 				'selectors' => [
@@ -747,9 +795,13 @@ class Hotspot extends Widget_Image {
 				'size_units' => [ 'px', 'em', 'rem', 'vh', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 1000,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 100,
+					],
+					'rem' => [
+						'max' => 100,
 					],
 				],
 				'selectors' => [
@@ -779,14 +831,14 @@ class Hotspot extends Widget_Image {
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
-					'em' => [
-						'min' => 0,
+					'px' => [
 						'max' => 100,
 					],
-					'px' => [
-						'min' => 0,
-						'max' => 100,
-						'step' => 1,
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -894,18 +946,45 @@ class Hotspot extends Widget_Image {
 		$this->add_responsive_control(
 			'style_tooltip_width',
 			[
-				'label' => esc_html__( 'Width', 'elementor-pro' ),
+				'label' => esc_html__( 'Min Width', 'elementor-pro' ),
 				'type' => Controls_Manager::SLIDER,
 				'size_units' => [ 'px', 'em', 'rem', 'vw', 'custom' ],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 2000,
-						'step' => 1,
+					],
+					'em' => [
+						'max' => 200,
+					],
+					'rem' => [
+						'max' => 200,
 					],
 				],
 				'selectors' => [
 					'{{WRAPPER}}' => '--tooltip-min-width: {{SIZE}}{{UNIT}}',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'style_tooltip_max_width',
+			[
+				'label' => esc_html__( 'Max Width', 'elementor-pro' ),
+				'type' => Controls_Manager::SLIDER,
+				'size_units' => [ 'px', 'em', 'rem', 'vw', 'custom' ],
+				'range' => [
+					'px' => [
+						'max' => 2000,
+					],
+					'em' => [
+						'max' => 200,
+					],
+					'rem' => [
+						'max' => 200,
+					],
+				],
+				'selectors' => [
+					'{{WRAPPER}}' => '--tooltip-max-width: {{SIZE}}{{UNIT}}',
 				],
 			]
 		);
@@ -962,6 +1041,10 @@ class Hotspot extends Widget_Image {
 
 	protected function render() {
 		$settings = $this->get_settings_for_display();
+
+		if ( empty( $settings['image']['url'] ) ) {
+			return;
+		}
 
 		$is_tooltip_direction_animation = 'e-hotspot--slide-direction' === $settings['tooltip_animation'] || 'e-hotspot--fade-direction' === $settings['tooltip_animation'];
 		$show_tooltip = 'none' === $settings['tooltip_trigger'];
@@ -1106,6 +1189,9 @@ class Hotspot extends Widget_Image {
 
 		const imageUrl = elementor.imagesManager.getImageUrl( image );
 
+		if ( ! imageUrl ) {
+			return;
+		}
 		#>
 		<img src="{{ imageUrl }}" title="" alt="">
 		<#
@@ -1208,5 +1294,52 @@ class Hotspot extends Widget_Image {
 			</{{{ hotspotElementTag }}}>
 		<# }); #>
 		<?php
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$blocks = [];
+
+		if ( ! empty( $settings['image']['url'] ) ) {
+			$image_md = Markdown_Utils::image_from_media_array( $settings['image'] );
+
+			if ( '' !== $image_md ) {
+				$blocks[] = $image_md;
+			}
+		}
+
+		$hotspots = $settings['hotspot'] ?? [];
+
+		if ( ! empty( $hotspots ) ) {
+			$lines = [];
+
+			foreach ( $hotspots as $hotspot ) {
+				$label = Utils::html_to_plain_text( $hotspot['hotspot_label'] ?? '' );
+				$tooltip = \Elementor\Modules\MarkdownRender\Html_To_Markdown::convert( $hotspot['hotspot_tooltip_content'] ?? '' );
+				$url = $hotspot['hotspot_link']['url'] ?? '';
+
+				$text = '' !== $label ? $label : $tooltip;
+
+				if ( '' === $text ) {
+					continue;
+				}
+
+				$line = '' !== $url
+					? '- [' . $text . '](' . esc_url( $url ) . ')'
+					: '- ' . $text;
+
+				if ( '' !== $label && '' !== $tooltip && $label !== $tooltip ) {
+					$line .= ': ' . $tooltip;
+				}
+
+				$lines[] = $line;
+			}
+
+			if ( ! empty( $lines ) ) {
+				$blocks[] = implode( "\n", $lines );
+			}
+		}
+
+		return Markdown_Utils::join_blocks( $blocks );
 	}
 }

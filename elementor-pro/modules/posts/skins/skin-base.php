@@ -12,6 +12,7 @@ use Elementor\Icons_Manager;
 use Elementor\Skin_Base as Elementor_Skin_Base;
 use Elementor\Utils;
 use Elementor\Widget_Base;
+use ElementorPro\Modules\LoopBuilder\Providers\Taxonomy_Loop_Provider;
 use ElementorPro\Modules\Posts\Traits\Button_Widget_Trait;
 use ElementorPro\Plugin;
 use ElementorPro\Modules\Posts\Widgets\Posts_Base;
@@ -152,6 +153,14 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 						'min' => 10,
 						'max' => 600,
 					],
+					'em' => [
+						'min' => 1,
+						'max' => 60,
+					],
+					'rem' => [
+						'min' => 1,
+						'max' => 60,
+					],
 				],
 				'default' => [
 					'size' => 100,
@@ -185,12 +194,12 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				'tablet_default' => '2',
 				'mobile_default' => '1',
 				'options' => [
-					'1' => '1',
-					'2' => '2',
-					'3' => '3',
-					'4' => '4',
-					'5' => '5',
-					'6' => '6',
+					'1' => esc_html__( '1', 'elementor-pro' ),
+					'2' => esc_html__( '2', 'elementor-pro' ),
+					'3' => esc_html__( '3', 'elementor-pro' ),
+					'4' => esc_html__( '4', 'elementor-pro' ),
+					'5' => esc_html__( '5', 'elementor-pro' ),
+					'6' => esc_html__( '6', 'elementor-pro' ),
 				],
 				'prefix_class' => 'elementor-grid%s-',
 				'frontend_available' => true,
@@ -308,6 +317,9 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				'dynamic' => [
 					'active' => true,
 				],
+				'ai' => [
+					'active' => false,
+				],
 				'default' => esc_html__( 'Read More »', 'elementor-pro' ),
 				'condition' => [
 					$this->get_control_id( 'show_read_more' ) => 'yes',
@@ -423,8 +435,13 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -444,8 +461,13 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				],
 				'range' => [
 					'px' => [
-						'min' => 0,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'frontend_available' => true,
@@ -517,6 +539,12 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				'range' => [
 					'px' => [
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -641,6 +669,12 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 					'px' => [
 						'max' => 100,
 					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-post__title' => 'margin-bottom: {{SIZE}}{{UNIT}};',
@@ -715,6 +749,12 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 					'px' => [
 						'max' => 100,
 					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-post__meta-data' => 'margin-bottom: {{SIZE}}{{UNIT}};',
@@ -774,6 +814,12 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				'range' => [
 					'px' => [
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -839,6 +885,12 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 					'px' => [
 						'max' => 100,
 					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-post__text' => 'margin-bottom: {{SIZE}}{{UNIT}};',
@@ -859,6 +911,7 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 		$query = $this->parent->get_query();
 
 		if ( ! $query->found_posts ) {
+			$this->handle_no_posts_found();
 			return;
 		}
 
@@ -872,8 +925,10 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 			while ( $query->have_posts() ) {
 				$query->the_post();
 
+				$this->add_render_hooks();
 				$this->current_permalink = get_permalink();
 				$this->render_post();
+				$this->remove_render_hooks();
 			}
 		}
 
@@ -881,6 +936,10 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 
 		$this->render_loop_footer();
 	}
+
+	protected function add_render_hooks() {}
+
+	protected function remove_render_hooks() {}
 
 	public function filter_excerpt_length() {
 		return $this->get_instance_value( 'excerpt_length' );
@@ -1004,7 +1063,7 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 
 	protected function render_post_header() {
 		?>
-		<article <?php post_class( [ 'elementor-post elementor-grid-item' ] ); ?>>
+		<article <?php post_class( [ 'elementor-post elementor-grid-item' ] ); ?> role="listitem">
 		<?php
 	}
 
@@ -1034,19 +1093,22 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 		];
 	}
 
+	protected function handle_no_posts_found() {}
+
 	protected function render_loop_header() {
 		$classes = $this->get_loop_header_widget_classes();
 
-		/** @var \WP_Query $wp_query */
-		$wp_query = $this->parent->get_query();
+		/** @var \WP_Query $e_wp_query */
+		$e_wp_query = $this->parent->get_query();
 
 		// Use grid only if found posts.
-		if ( $wp_query->found_posts ) {
+		if ( isset( $e_wp_query->found_posts ) || Taxonomy_Loop_Provider::is_loop_taxonomy() ) {
 			$classes[] = 'elementor-grid';
 		}
 
 		$render_attributes = apply_filters( 'elementor/skin/loop_header_attributes', [
 			'class' => $classes,
+			'role' => 'list',
 		] );
 
 		$this->parent->add_render_attribute( 'container', $render_attributes );
@@ -1173,14 +1235,14 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 
 		// PHPCS - Seems that `$links` is safe.
 		?>
-		<nav class="elementor-pagination" aria-label="<?php esc_attr_e( 'Pagination', 'elementor-pro' ); ?>">
+		<nav class="elementor-pagination" aria-label="<?php echo esc_attr__( 'Pagination', 'elementor-pro' ); ?>">
 			<?php echo implode( PHP_EOL, $links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</nav>
 		<?php
 	}
 
 	protected function get_pagination_format( $paginate_args ) {
-		$query_string_connector = is_preview() && ! empty( $paginate_args['base'] ) && strpos( $paginate_args['base'], '?' ) ? '&' : '?';
+		$query_string_connector = ! empty( $paginate_args['base'] ) && strpos( $paginate_args['base'], '?' ) ? '&' : '?';
 		return $query_string_connector . 'e-page-' . $this->parent->get_id() . '=%#%';
 	}
 
@@ -1232,7 +1294,8 @@ abstract class Skin_Base extends Elementor_Skin_Base {
 				unset( $paginate_args['format'] );
 			}
 		} else {
-			$paginate_args['base'] = trailingslashit( $pagination_base_url ) . '%_%';
+			$base = $this->parent->is_allow_to_use_custom_page_option() ? $pagination_base_url . '&%_%' : trailingslashit( $pagination_base_url ) . '%_%';
+			$paginate_args['base'] = $base;
 			$paginate_args['format'] = '&page=%#%';
 			$paginate_args['add_args'] = $add_args;
 		}

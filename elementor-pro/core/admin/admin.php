@@ -15,7 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Admin extends App {
-	const USAGE_PARAM_INSTALL_TIME = 'install_time_pro';
 
 	/**
 	 * Get module name.
@@ -40,11 +39,9 @@ class Admin extends App {
 	public function enqueue_styles() {
 		$suffix = Utils::is_script_debug() ? '' : '.min';
 
-		$direction_suffix = is_rtl() ? '-rtl' : '';
-
 		wp_register_style(
 			'elementor-pro-admin',
-			ELEMENTOR_PRO_ASSETS_URL . 'css/admin' . $direction_suffix . $suffix . '.css',
+			ELEMENTOR_PRO_URL . 'assets/css/admin' . $suffix . '.css',
 			[],
 			ELEMENTOR_PRO_VERSION
 		);
@@ -177,11 +174,11 @@ class Admin extends App {
 				'field_args' => [
 					'type' => 'raw_html',
 					'html' => sprintf(
-						$rollback_html . '<a data-placeholder-text="' . esc_html__( 'Reinstall', 'elementor-pro' ) . ' v{VERSION}" href="#" data-placeholder-url="%s" class="button elementor-button-spinner elementor-rollback-button">%s</a>',
+						$rollback_html . '<button data-placeholder-text="' . esc_html__( 'Reinstall', 'elementor-pro' ) . ' v{VERSION}" data-placeholder-url="%s" class="button elementor-button-spinner elementor-rollback-button">%s</button>',
 						wp_nonce_url( admin_url( 'admin-post.php?action=elementor_pro_rollback&version=VERSION' ), 'elementor_pro_rollback' ),
 						__( 'Reinstall', 'elementor-pro' )
 					),
-					'desc' => '<span style="color: red;">' . esc_html__( 'Warning: Please backup your database before making the rollback.', 'elementor-pro' ) . '</span>',
+					'desc' => '<span style="color: red;">' . esc_html__( 'Warning: Please back up your database before making the rollback.', 'elementor-pro' ) . '</span>',
 				],
 			],
 		] );
@@ -228,12 +225,6 @@ class Admin extends App {
 		wp_die( '', esc_html__( 'Rollback to Previous Version', 'elementor-pro' ), [ 'response' => 200 ] );
 	}
 
-	public function plugin_action_links( $links ) {
-		unset( $links['go_pro'] );
-
-		return $links;
-	}
-
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
 		if ( ELEMENTOR_PRO_PLUGIN_BASE === $plugin_file ) {
 			$row_meta = [
@@ -246,54 +237,65 @@ class Admin extends App {
 		return $plugin_meta;
 	}
 
-	public function change_tracker_params( $params ) {
-		unset( $params['is_first_time'] );
-
-		if ( ! isset( $params['events'] ) ) {
-			$params['events'] = [];
-		}
-
-		$params['events'] = array_merge( $params['events'], [
-			self::USAGE_PARAM_INSTALL_TIME => gmdate( 'Y-m-d H:i:s', Plugin::instance()->license_admin->get_installed_time() ),
-		] );
-
-		return $params;
-	}
-
 	public function add_finder_items( array $categories ) {
-		$settings_url = Settings::get_url();
-
 		$categories['settings']['items']['integrations'] = [
 			'title' => esc_html__( 'Integrations', 'elementor-pro' ),
 			'icon' => 'integration',
-			'url' => $settings_url . '#tab-integrations',
+			'url' => Settings::get_settings_tab_url( 'integrations' ),
 			'keywords' => [ 'integrations', 'settings', 'typekit', 'facebook', 'recaptcha', 'mailchimp', 'drip', 'activecampaign', 'getresponse', 'convertkit', 'elementor' ],
 		];
 
 		return $categories;
 	}
 
+	public function register_ajax_actions( $ajax_manager ) {
+		$ajax_manager->register_ajax_action( 'elementor_site_mailer_campaign', [ $this, 'handle_hints_cta' ] );
+	}
+
+	public function handle_hints_cta( $request ) {
+		if ( ! current_user_can( 'install_plugins' ) ) {
+			wp_send_json_error();
+		}
+
+		if ( empty( $request['source'] ) ) {
+			return;
+		}
+
+		$campaign_data = [
+			'source' => sanitize_key( $request['source'] ),
+			'campaign' => 'sm-plg-v' . ProUtils\Abtest::get_variation( 'plg_site_mailer_submission' ),
+			'medium' => 'wp-dash',
+		];
+
+		set_transient( 'elementor_site_mailer_campaign', $campaign_data, 30 * DAY_IN_SECONDS );
+	}
+
 	/**
 	 * Admin constructor.
 	 */
 	public function __construct() {
-		$this->add_component( 'canary-deployment', new Canary_Deployment() );
-
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'admin_menu', [ $this, 'remove_go_pro_menu' ], 0 );
 
 		add_action( 'elementor/admin/after_create_settings/' . Tools::PAGE_ID, [ $this, 'register_admin_tools_fields' ], 50 );
 
-		add_filter( 'plugin_action_links_' . ELEMENTOR_PLUGIN_BASE, [ $this, 'plugin_action_links' ], 50 );
+		add_filter( 'plugin_action_links_' . ELEMENTOR_PLUGIN_BASE, function ( $links ) {
+			return Action_Links::get_links( $links );
+		}, 50 );
+		add_filter( 'plugin_action_links_' . ELEMENTOR_PRO_PLUGIN_BASE, function ( $links ) {
+			return Action_Links::get_pro_links( $links );
+		}, 50 );
+
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 
 		add_filter( 'elementor/finder/categories', [ $this, 'add_finder_items' ] );
 
-		add_filter( 'elementor/tracker/send_tracking_data_params', [ $this, 'change_tracker_params' ], 200 );
 		add_action( 'admin_post_elementor_pro_rollback', [ $this, 'post_elementor_pro_rollback' ] );
 		add_action( 'in_plugin_update_message-' . ELEMENTOR_PRO_PLUGIN_BASE, function( $plugin_data ) {
 			Plugin::elementor()->admin->version_update_warning( ELEMENTOR_PRO_VERSION, $plugin_data['new_version'] );
 		} );
+
+		add_action( 'elementor/ajax/register_actions', [ $this, 'register_ajax_actions' ] );
 	}
 }

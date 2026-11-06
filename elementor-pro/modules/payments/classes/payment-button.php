@@ -9,6 +9,8 @@ use Elementor\Group_Control_Typography;
 use Elementor\Modules\DynamicTags\Module as TagsModule;
 use Elementor\Widget_Button;
 use ElementorPro\Base\Base_Widget_Trait;
+use ElementorPro\Base\Markdown_Utils;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -149,6 +151,9 @@ abstract class Payment_Button extends Widget_Button {
 				'type' => Controls_Manager::TEXT,
 				'dynamic' => [
 					'active' => true,
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -428,15 +433,9 @@ abstract class Payment_Button extends Widget_Button {
 			'default' => '#FFF',
 		] );
 
-		$this->update_control(
-			'icon_align',
-			[
-				'options' => [
-					'left' => esc_html__( 'Before Text', 'elementor-pro' ),
-					'right' => esc_html__( 'After Text', 'elementor-pro' ),
-				],
-			]
-		);
+		$this->update_control( 'border_border', [
+			'default' => 'none',
+		] );
 	}
 
 	// Add typography settings for custom messages.
@@ -498,7 +497,7 @@ abstract class Payment_Button extends Widget_Button {
 	}
 
 	// Render the checkout button.
-	protected function render_button( Widget_Base $instance = null, $tag = 'a' ) {
+	protected function render_button( ?Widget_Base $instance = null, $tag = 'a' ) {
 		$this->add_render_attribute( 'button', 'class', 'elementor-payment-button' );
 
 		?>
@@ -512,7 +511,12 @@ abstract class Payment_Button extends Widget_Button {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 
-		$this->add_render_attribute( 'wrapper', 'class', 'elementor-button-wrapper' );
+		$optimized_markup = Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
+
+		if ( ! $optimized_markup ) {
+			$this->add_render_attribute( 'wrapper', 'class', 'elementor-button-wrapper' );
+		}
+
 		$this->add_render_attribute( 'button', 'class', 'elementor-button' );
 		$this->add_render_attribute( 'button', 'role', 'button' );
 
@@ -522,16 +526,21 @@ abstract class Payment_Button extends Widget_Button {
 
 		if ( ! empty( $settings['size'] ) ) {
 			$this->add_render_attribute( 'button', 'class', 'elementor-size-' . $settings['size'] );
+		} else {
+			$this->add_render_attribute( 'button', 'class', 'elementor-size-sm' ); // BC, to make sure the class is always present
 		}
 
 		if ( $settings['hover_animation'] ) {
 			$this->add_render_attribute( 'button', 'class', 'elementor-animation-' . $settings['hover_animation'] );
 		}
-
 		?>
+		<?php if ( ! $optimized_markup ) : ?>
 		<div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
+		<?php endif; ?>
 			<?php $this->render_button(); ?>
+		<?php if ( ! $optimized_markup ) : ?>
 		</div>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -539,16 +548,48 @@ abstract class Payment_Button extends Widget_Button {
 		return;
 		?>
 		<#
+		const optimized_markup = elementorCommon.config.experimentalFeatures.e_optimized_markup;
+
+		if ( ! optimized_markup ) {
+			view.addRenderAttribute( 'wrapper', 'class', 'elementor-button-wrapper' );
+		}
+
+		view.addRenderAttribute( 'button', 'class', 'elementor-button' );
+		view.addRenderAttribute( 'content-wrapper', 'class', 'elementor-button-content-wrapper' );
+		view.addRenderAttribute( 'icon', 'class', 'elementor-button-icon' );
 		view.addRenderAttribute( 'text', 'class', 'elementor-button-text' );
+
+		if ( '' !== settings.link?.url ) {
+			view.addRenderAttribute( 'button', 'class', 'elementor-button-link' );
+			view.addRenderAttribute( 'button', 'href', elementor.helpers.sanitizeUrl( settings.link?.url ) );
+		} else {
+			view.addRenderAttribute( 'button', 'role', 'button' );
+		}
+
+		if ( '' !== settings.button_css_id ) {
+			view.addRenderAttribute( 'button', 'id', settings.button_css_id );
+		}
+
+		if ( '' !== settings.size ) {
+			view.addRenderAttribute( 'button', 'class', 'elementor-size-' + settings.size );
+		}
+
+		if ( '' !== settings.hover_animation ) {
+			view.addRenderAttribute( 'button', 'class', 'elementor-animation-' + settings.hover_animation );
+		}
+
 		view.addInlineEditingAttributes( 'text', 'none' );
-		var iconHTML = elementor.helpers.renderIcon( view, settings.selected_icon, { 'aria-hidden': true }, 'i' , 'object' ),
-		migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' );
+
+		const iconHTML = elementor.helpers.renderIcon( view, settings.selected_icon, { 'aria-hidden': true }, 'i' , 'object' );
+		const migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' );
 		#>
-		<div class="elementor-button-wrapper">
-			<a id="{{ settings.button_css_id }}" class="elementor-button elementor-size-{{ settings.size }} elementor-animation-{{ settings.hover_animation }}" href="#" role="button">
-				<span class="elementor-button-content-wrapper">
+		<# if ( ! optimized_markup ) { #>
+		<div {{{ view.getRenderAttributeString( 'wrapper' ) }}}>
+		<# } #>
+			<a {{{ view.getRenderAttributeString( 'button' ) }}}>
+				<span {{{ view.getRenderAttributeString( 'content-wrapper' ) }}}>
 					<# if ( settings.icon || settings.selected_icon ) { #>
-					<span class="elementor-button-icon elementor-align-icon-{{ settings.icon_align }}">
+					<span {{{ view.getRenderAttributeString( 'icon' ) }}}>
 						<# if ( ( migrated || ! settings.icon ) && iconHTML.rendered ) { #>
 							{{{ iconHTML.value }}}
 						<# } else { #>
@@ -559,12 +600,56 @@ abstract class Payment_Button extends Widget_Button {
 					<span {{{ view.getRenderAttributeString( 'text' ) }}}>{{{ settings.text }}}</span>
 				</span>
 			</a>
+		<# if ( ! optimized_markup ) { #>
 		</div>
+		<# } #>
 		<?php
 	}
 
 	// Check if it's sandbox mode.
 	protected function is_sandbox() {
 		return 'yes' === $this->get_settings_for_display( 'sandbox_mode' );
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$lines = [];
+
+		$product_name = Markdown_Utils::plain_text( $settings['product_name'] ?? '' );
+
+		if ( '' !== $product_name ) {
+			$lines[] = '- **' . esc_html__( 'Product', 'elementor-pro' ) . ':** ' . $product_name;
+		}
+
+		$price = $settings['product_price'] ?? '';
+		$currency = $settings['currency'] ?? '';
+
+		if ( '' !== $price || '' !== $currency ) {
+			$lines[] = '- **' . esc_html__( 'Price', 'elementor-pro' ) . ':** ' . trim( $price . ' ' . strtoupper( (string) $currency ) );
+		}
+
+		$type = $settings['type'] ?? '';
+
+		if ( '' !== $type ) {
+			$type_labels = [
+				self::PAYMENT_TYPE_CHECKOUT => esc_html__( 'Checkout', 'elementor-pro' ),
+				self::PAYMENT_TYPE_DONATION => esc_html__( 'Donation', 'elementor-pro' ),
+				self::PAYMENT_TYPE_SUBSCRIPTION => esc_html__( 'Subscription', 'elementor-pro' ),
+			];
+
+			$lines[] = '- **' . esc_html__( 'Type', 'elementor-pro' ) . ':** ' . ( $type_labels[ $type ] ?? $type );
+		}
+
+		$button_text = Markdown_Utils::plain_text( $settings['text'] ?? '' );
+
+		if ( '' !== $button_text ) {
+			$lines[] = '- **' . esc_html__( 'Button', 'elementor-pro' ) . ':** ' . Markdown_Utils::button( $button_text );
+		}
+
+		if ( $this->is_sandbox() ) {
+			$lines[] = '- **' . esc_html__( 'Mode', 'elementor-pro' ) . ':** ' . esc_html__( 'Sandbox', 'elementor-pro' );
+		}
+
+		return Markdown_Utils::bullet_list( $lines );
 	}
 }

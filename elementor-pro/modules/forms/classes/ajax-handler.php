@@ -148,8 +148,23 @@ class Ajax_Handler {
 		 */
 		$record = apply_filters( 'elementor_pro/forms/record/actions_before', $record, $this );
 
+		/**
+		 * Submit actions.
+		 *
+		 * Filters the list of action names that will be executed after form
+		 * submission. This hook allows developers to add, remove, or replace
+		 * submit actions programmatically.
+		 *
+		 * @since 4.0.3
+		 *
+		 * @param string[]     $submit_actions Array of action name strings (e.g. 'email', 'redirect').
+		 * @param Form_Record  $record         An instance of the form record.
+		 * @param Ajax_Handler $this           An instance of the ajax handler.
+		 */
+		$submit_actions = apply_filters( 'elementor_pro/forms/submit_actions', $form['settings']['submit_actions'], $record, $this );
+
 		foreach ( $actions as $action ) {
-			if ( ! in_array( $action->get_name(), $form['settings']['submit_actions'], true ) ) {
+			if ( ! in_array( $action->get_name(), $submit_actions, true ) ) {
 				continue;
 			}
 
@@ -159,12 +174,15 @@ class Ajax_Handler {
 				$action->run( $record, $this );
 
 				$this->handle_bc_errors( $errors );
-			} catch ( \Exception $e ) {
-				$exception = $e;
+			} catch ( \Throwable $e ) {
+				$admin_message = "{$action->get_label()} {$e->getMessage()}";
+				$exception = $e instanceof \Exception
+					? $e
+					: new \Exception( $this->get_default_message( self::ERROR, $this->current_form['settings'] ), 0, $e );
 
 				// Add an admin error.
-				if ( ! in_array( $exception->getMessage(), $this->messages['admin_error'], true ) ) {
-					$this->add_admin_error_message( "{$action->get_label()} {$exception->getMessage()}" );
+				if ( ! in_array( $admin_message, $this->messages['admin_error'], true ) ) {
+					$this->add_admin_error_message( $admin_message );
 				}
 
 				// Add a user error.

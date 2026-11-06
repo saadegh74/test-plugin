@@ -7,6 +7,8 @@ use Elementor\Core\Kits\Documents\Tabs\Global_Typography;
 use Elementor\Group_Control_Typography;
 use Elementor\Icons_Manager;
 use Elementor\Repeater;
+use ElementorPro\Base\Markdown_Utils;
+use ElementorPro\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -34,24 +36,19 @@ class Post_Info extends Base {
 		return [ 'post', 'info', 'date', 'time', 'author', 'taxonomy', 'comments', 'terms', 'avatar' ];
 	}
 
-	public function get_style_depends() {
-		if ( Icons_Manager::is_migration_allowed() ) {
-			return [
-				'elementor-icons-fa-regular',
-				'elementor-icons-fa-solid',
-			];
-		}
-
-		return [];
+	public function has_widget_inner_wrapper(): bool {
+		return ! Plugin::elementor()->experiments->is_feature_active( 'e_optimized_markup' );
 	}
 
-	public function get_inline_css_depends() {
-		return [
-			[
-				'name' => 'icon-list',
-				'is_core_dependency' => true,
-			],
-		];
+	public function get_style_depends(): array {
+		$style_depends = [ 'widget-post-info', 'widget-icon-list' ];
+
+		if ( Icons_Manager::is_migration_allowed() ) {
+			$style_depends[] = 'elementor-icons-fa-regular';
+			$style_depends[] = 'elementor-icons-fa-solid';
+		}
+
+		return $style_depends;
 	}
 
 	protected function register_controls() {
@@ -133,10 +130,13 @@ class Post_Info extends Base {
 					'date_format' => 'custom',
 				],
 				'description' => sprintf(
-					/* translators: %s: Allowed data letters (see: http://php.net/manual/en/function.date.php). */
-					__( 'Use the letters: %s', 'elementor-pro' ),
+					/* translators: %s: Allowed date format letters (see: http://php.net/manual/en/function.date.php). */
+					esc_html_x( 'Use the letters: %s', 'date format', 'elementor-pro' ),
 					'l D d j S F m M n Y y'
 				),
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -170,10 +170,13 @@ class Post_Info extends Base {
 					'time_format' => 'custom',
 				],
 				'description' => sprintf(
-					/* translators: %s: Allowed time letters (see: http://php.net/manual/en/function.time.php). */
-					__( 'Use the letters: %s', 'elementor-pro' ),
+					/* translators: %s: Allowed time format letters (see: http://php.net/manual/en/function.time.php). */
+					esc_html_x( 'Use the letters: %s', 'time format', 'elementor-pro' ),
 					'g G H i a A'
 				),
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -201,6 +204,9 @@ class Post_Info extends Base {
 				],
 				'dynamic' => [
 					'active' => true,
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -274,7 +280,10 @@ class Post_Info extends Base {
 			[
 				'label' => esc_html__( 'Comments', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
-				'placeholder' => esc_html__( '%s Comments', 'elementor-pro' ),
+				'placeholder' => esc_html(
+					/* translators: %s: Number of comments. */
+					__( '%s Comments', 'elementor-pro' )
+				),
 				'condition' => [
 					'comments_custom_strings' => 'yes',
 					'type' => 'comments',
@@ -411,7 +420,13 @@ class Post_Info extends Base {
 				'size_units' => [ 'px', 'em', 'rem', 'custom' ],
 				'range' => [
 					'px' => [
-						'max' => 50,
+						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 				],
 				'selectors' => [
@@ -497,6 +512,12 @@ class Post_Info extends Base {
 						'min' => 1,
 						'max' => 20,
 					],
+					'em' => [
+						'max' => 2,
+					],
+					'rem' => [
+						'max' => 2,
+					],
 				],
 				'condition' => [
 					'divider' => 'yes',
@@ -521,6 +542,12 @@ class Post_Info extends Base {
 					'px' => [
 						'min' => 1,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 					'%' => [
 						'min' => 1,
@@ -550,6 +577,12 @@ class Post_Info extends Base {
 					'px' => [
 						'min' => 1,
 						'max' => 100,
+					],
+					'em' => [
+						'max' => 10,
+					],
+					'rem' => [
+						'max' => 10,
 					],
 					'%' => [
 						'min' => 1,
@@ -623,6 +656,12 @@ class Post_Info extends Base {
 					'px' => [
 						'min' => 6,
 					],
+					'em' => [
+						'max' => 0.6,
+					],
+					'rem' => [
+						'max' => 0.6,
+					],
 				],
 				'selectors' => [
 					'{{WRAPPER}} .elementor-icon-list-icon' => 'width: {{SIZE}}{{UNIT}};',
@@ -651,6 +690,12 @@ class Post_Info extends Base {
 				'range' => [
 					'px' => [
 						'max' => 50,
+					],
+					'em' => [
+						'max' => 5,
+					],
+					'rem' => [
+						'max' => 5,
 					],
 				],
 				'selectors' => [
@@ -780,7 +825,10 @@ class Post_Info extends Base {
 					$default_strings = [
 						'string_no_comments' => esc_html__( 'No Comments', 'elementor-pro' ),
 						'string_one_comment' => esc_html__( 'One Comment', 'elementor-pro' ),
-						'string_comments' => esc_html__( '%s Comments', 'elementor-pro' ),
+						'string_comments' => esc_html(
+							/* translators: %s: Number of comments. */
+							__( '%s Comments', 'elementor-pro' )
+						),
 					];
 
 					if ( 'yes' === $repeater_item['comments_custom_strings'] ) {
@@ -946,7 +994,11 @@ class Post_Info extends Base {
 					[
 						'class' => 'elementor-avatar',
 						'src' => $item_data['image'],
-						'alt' => $item_data['text'],
+						'alt' => sprintf(
+							/* translators: %s: Person name. */
+							esc_attr__( 'Picture of %s', 'elementor-pro' ),
+							$item_data['text']
+						),
 						'loading' => 'lazy',
 					]
 				);
@@ -986,9 +1038,18 @@ class Post_Info extends Base {
 				<?php
 				foreach ( $item_data['terms_list'] as $term ) :
 					if ( ! empty( $term['url'] ) ) :
-						$terms_list[] = '<a href="' . esc_attr( $term['url'] ) . '" class="' . $item_class . '">' . esc_html( $term['text'] ) . '</a>';
+						$terms_list[] = sprintf(
+							'<a href="%1$s" class="%2$s">%3$s</a>',
+							esc_url( $term['url'] ),
+							esc_attr( $item_class ),
+							esc_html( $term['text'] )
+						);
 					else :
-						$terms_list[] = '<span class="' . $item_class . '">' . esc_html( $term['text'] ) . '</span>';
+						$terms_list[] = sprintf(
+							'<span class="%1$s">%2$s</span>',
+							esc_attr( $item_class ),
+							esc_html( $term['text'] )
+						);
 					endif;
 				endforeach;
 
@@ -998,12 +1059,17 @@ class Post_Info extends Base {
 				</span>
 			<?php else : ?>
 				<?php
-				echo wp_kses( $item_data['text'], [
+				$content = ( 'date' === $item_data['type'] || 'time' === $item_data['type'] )
+					? sprintf( '<time>%s</time>', $item_data['text'] )
+					: $item_data['text'];
+
+				echo wp_kses( $content, [
 					'a' => [
 						'href' => [],
 						'title' => [],
 						'rel' => [],
 					],
+					'time' => [],
 				] );
 				?>
 			<?php endif; ?>
@@ -1041,5 +1107,34 @@ class Post_Info extends Base {
 
 	public function get_group_name() {
 		return 'theme-elements';
+	}
+
+	public function render_markdown(): string {
+		$settings = $this->get_settings_for_display();
+		$items = $settings['icon_list'] ?? [];
+		$lines = [];
+
+		foreach ( $items as $repeater_item ) {
+			$item_data = $this->get_meta_data( $repeater_item );
+			$text = Markdown_Utils::plain_text( $item_data['text'] ?? '' );
+			$url = $item_data['url']['url'] ?? '';
+
+			if ( ! empty( $item_data['terms_list'] ) ) {
+				$term_texts = array_map( static function ( $term ) {
+					return $term['text'] ?? '';
+				}, $item_data['terms_list'] );
+				$text = implode( ', ', array_filter( $term_texts ) );
+			}
+
+			if ( '' === $text ) {
+				continue;
+			}
+
+			$lines[] = '' !== $url
+				? '- [' . $text . '](' . esc_url( $url ) . ')'
+				: '- ' . $text;
+		}
+
+		return Markdown_Utils::bullet_list( $lines );
 	}
 }

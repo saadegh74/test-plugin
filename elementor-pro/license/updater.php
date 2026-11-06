@@ -1,6 +1,8 @@
 <?php
 namespace ElementorPro\License;
 
+use ElementorPro\Core\Utils as ProUtils;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -24,7 +26,10 @@ class Updater {
 	}
 
 	private function setup_hooks() {
-		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ], 50 );
+		if ( ! $this->is_elementor_pro_rollback() ) {
+			add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ], 50 );
+		}
+
 		add_action( 'delete_site_transient_update_plugins', [ $this, 'delete_transients' ] );
 		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
 
@@ -66,7 +71,9 @@ class Updater {
 		// include an unmodified $wp_version
 		include( ABSPATH . WPINC . '/version.php' );
 
-		 
+		if ( version_compare( $wp_version, $version_info['requires'], '<' ) ) {
+			return $_transient_data;
+		}
 
 		if ( ! empty( $version_info['elementor_requires'] ) ) {
 			if ( version_compare( ELEMENTOR_VERSION, $version_info['elementor_requires'], '<' ) ) {
@@ -79,7 +86,14 @@ class Updater {
 
 		$plugin_info->plugin = $this->plugin_name;
 
-		 
+		if ( version_compare( $this->plugin_version, $version_info['new_version'], '<' ) ) {
+			$_transient_data->response[ $this->plugin_name ] = $plugin_info;
+			$_transient_data->checked[ $this->plugin_name ] = $version_info['new_version'];
+		} else {
+			$_transient_data->no_update[ $this->plugin_name ] = $plugin_info;
+			$_transient_data->checked[ $this->plugin_name ] = $this->plugin_version;
+		}
+
 		$_transient_data->last_checked = current_time( 'timestamp' );
 
 		if ( ! isset( $_transient_data->translations ) ) {
@@ -112,10 +126,6 @@ class Updater {
 
 		if ( ! is_object( $_transient_data ) ) {
 			$_transient_data = new \stdClass();
-		}
-
-		if ( 'plugins.php' === $pagenow && is_multisite() ) {
-			return $_transient_data;
 		}
 
 		return $this->check_transient_data( $_transient_data );
@@ -231,5 +241,9 @@ class Updater {
 		$cache_key = API::TRANSIENT_KEY_PREFIX . ELEMENTOR_PRO_VERSION;
 
 		delete_option( $cache_key );
+	}
+
+	protected function is_elementor_pro_rollback(): bool {
+		return 'elementor_pro_rollback' === ProUtils::_unstable_get_super_global_value( $_GET, 'action' );
 	}
 }

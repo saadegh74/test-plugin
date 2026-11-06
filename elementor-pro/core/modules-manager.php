@@ -32,10 +32,19 @@ final class Modules_Manager {
 			'admin-top-bar',
 			'notes',
 			'announcements',
+			'element-manager',
+			'checklist',
 
 			// Modules with Widgets.
+			'attributes',
+			'atomic-widgets',
+			'atomic-form',
+			'collection-loop',
+			'display-conditions',
+			'transitions',
 			'theme-builder',
 			'loop-builder',
+			'off-canvas',
 			'posts',
 			'gallery',
 			'forms',
@@ -68,6 +77,15 @@ final class Modules_Manager {
 			'mega-menu',
 			'nested-carousel',
 			'loop-filter',
+			'tiers',
+			'link-in-bio',
+			'floating-buttons',
+			'search',
+			'cloud-library',
+			'variables',
+			'editor-one',
+			'interactions',
+			'mcp',
 		];
 
 		foreach ( $modules as $module_name ) {

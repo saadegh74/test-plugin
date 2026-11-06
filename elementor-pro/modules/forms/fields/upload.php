@@ -14,7 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Upload extends Field_Base {
 
-	private $fixed_files_indices = false;
+	public $fixed_files_indices = false;
+
+	const MODE_LINK = 'link';
+	const MODE_ATTACH = 'attach';
+	const MODE_BOTH = 'both';
+
+	const DEFAULT_FILE_TYPES = 'jpg,jpeg,png,gif,pdf,doc,docx,ppt,pptx,odt,avi,ogg,m4a,mov,mp3,mp4,mpg,wav,wmv';
 
 	public function get_type() {
 		return 'upload';
@@ -37,23 +43,47 @@ class Upload extends Field_Base {
 		}
 
 		$field_controls = [
-			'file_sizes' => [
-				'name' => 'file_sizes',
-				'label' => esc_html__( 'Max. File Size', 'elementor-pro' ),
+			'attachment_type' => [
+				'name' => 'attachment_type',
+				'label' => esc_html__( 'Send files', 'elementor-pro' ),
 				'type' => Controls_Manager::SELECT,
 				'condition' => [
 					'field_type' => $this->get_type(),
 				],
-				'options' => $this->get_upload_file_size_options(),
-				'description' => esc_html__( 'If you need to increase max upload size please contact your hosting.', 'elementor-pro' ),
+				'options' => [
+					self::MODE_LINK => esc_html__( 'Email with link', 'elementor-pro' ),
+					self::MODE_ATTACH => esc_html__( 'Email with attachment', 'elementor-pro' ),
+					self::MODE_BOTH => esc_html__( 'Email with both', 'elementor-pro' ),
+				],
+				'default' => self::MODE_LINK,
+				'description' => esc_html__( "Uploads you receive via link are stored on your server. However, uploads via attachment won't be saved on your server, and under Submissions", 'elementor-pro' ),
 				'tab' => 'content',
 				'inner_tab' => 'form_fields_content_tab',
 				'tabs_wrapper' => 'form_fields_tabs',
+			],
+			'file_sizes' => [
+				'name' => 'file_sizes',
+				'label' => esc_html__( 'Max. File Size', 'elementor-pro' ),
+				'placeholder' => esc_html__( 'Size in MB', 'elementor-pro' ),
+				'type' => Controls_Manager::NUMBER,
+				'min' => 1,
+				'max' => wp_max_upload_size() / pow( 1024, 2 ),
+				'condition' => [
+					'field_type' => $this->get_type(),
+				],
+				'description' => esc_html__( 'Size is in MB. If you need to increase max upload size please contact your hosting.', 'elementor-pro' ),
+				'tab' => 'content',
+				'inner_tab' => 'form_fields_content_tab',
+				'tabs_wrapper' => 'form_fields_tabs',
+				'title' => esc_html__( 'Size in MB', 'elementor-pro' ),
 			],
 			'file_types' => [
 				'name' => 'file_types',
 				'label' => esc_html__( 'Allowed File Types', 'elementor-pro' ),
 				'type' => Controls_Manager::TEXT,
+				'ai' => [
+					'active' => false,
+				],
 				'condition' => [
 					'field_type' => $this->get_type(),
 				],
@@ -149,9 +179,10 @@ class Upload extends Field_Base {
 						$files[ $position ][0][ $key ] = $value;
 					}
 				}
-				// remove old key reference
-				unset( $files[ $key ] );
 			}
+
+			// remove original key reference
+			unset( $files[ $key ] );
 		}
 		$_FILES['form_fields'] = $files;
 		$this->fixed_files_indices = true;
@@ -185,7 +216,7 @@ class Upload extends Field_Base {
 	private function is_file_type_valid( $field, $file ) {
 		// File type validation
 		if ( empty( $field['file_types'] ) ) {
-			$field['file_types'] = 'jpg,jpeg,png,gif,pdf,doc,docx,ppt,pptx,odt,avi,ogg,m4a,mov,mp3,mp4,mpg,wav,wmv';
+			$field['file_types'] = self::DEFAULT_FILE_TYPES;
 		}
 
 		$file_extension = pathinfo( $file['name'], PATHINFO_EXTENSION );
@@ -196,6 +227,118 @@ class Upload extends Field_Base {
 		$file_extension = strtolower( $file_extension );
 
 		return ( in_array( $file_extension, $file_types_meta ) && ! in_array( $file_extension, $this->get_blacklist_file_ext() ) );
+	}
+
+	/**
+	 * Validates uploaded file content against allowed types using WordPress core validation.
+	 *
+	 * Uses wp_check_filetype_and_ext() as the primary content validator, which performs
+	 * MIME sniffing internally. For images, enforces strict MIME validation and checks for
+	 * archive/phar polyglots (which WordPress does not detect). For non-image extensions,
+	 * preserves backward compatibility by allowing admin-configured extensions that WordPress
+	 * does not recognize in its MIME type list (e.g., CAD formats like stl, dwg).
+	 *
+	 * @param string $path          Path to uploaded file (tmp_name).
+	 * @param string $original_name Original filename.
+	 * @param array  $field         Field configuration.
+	 *
+	 * @return bool True if content is allowed, false otherwise.
+	 */
+	private function is_uploaded_content_allowed( $path, $original_name, $field ) {
+		$allowed_extensions = $this->get_allowed_file_extensions( $field );
+		$extension = strtolower( pathinfo( $original_name, PATHINFO_EXTENSION ) );
+
+		if ( ! in_array( $extension, $allowed_extensions, true ) ) {
+			return false;
+		}
+
+		$checked = wp_check_filetype_and_ext( $path, $original_name );
+		$image_extensions = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff' ];
+		$is_image_extension = in_array( $extension, $image_extensions, true );
+
+		if ( $is_image_extension ) {
+			if ( empty( $checked['ext'] ) || empty( $checked['type'] ) ) {
+				return false;
+			}
+
+			if ( $this->file_contains_archive( $path ) ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		// Allow non-image extensions for backward compatibility with admin-configured types
+		// that WordPress does not recognize (e.g., stl, dwg).
+		return true;
+	}
+
+	private function get_allowed_file_extensions( $field ) {
+		$file_types = $field['file_types'] ?? '';
+
+		if ( '' === $file_types ) {
+			$file_types = self::DEFAULT_FILE_TYPES;
+		}
+
+		$extensions = array_map( 'trim', explode( ',', strtolower( $file_types ) ) );
+
+		return array_values( array_diff( $extensions, $this->get_blacklist_file_ext() ) );
+	}
+
+	private function file_contains_archive( $path ) {
+		$handle = fopen( $path, 'rb' );
+
+		if ( ! $handle ) {
+			return true;
+		}
+
+		$phar_stub = '__HALT_COMPILER();';
+		$overlap = strlen( $phar_stub ) - 1;
+		$previous_tail = '';
+		$is_first_chunk = true;
+
+		while ( ! feof( $handle ) ) {
+			$chunk = fread( $handle, 1024 * 1024 );
+
+			if ( false === $chunk ) {
+				fclose( $handle );
+
+				return true;
+			}
+
+			if ( $is_first_chunk && 0 === strpos( $chunk, 'PK' ) ) {
+				fclose( $handle );
+
+				return true;
+			}
+
+			$is_first_chunk = false;
+
+			if ( false !== strpos( $previous_tail . $chunk, $phar_stub ) ) {
+				fclose( $handle );
+
+				return true;
+			}
+
+			$previous_tail = substr( $chunk, -$overlap );
+		}
+
+		fclose( $handle );
+
+		if ( ! class_exists( '\ZipArchive' ) ) {
+			return false;
+		}
+
+		$zip = new \ZipArchive();
+		$opened = $zip->open( $path );
+
+		if ( true === $opened ) {
+			$zip->close();
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -241,6 +384,12 @@ class Upload extends Field_Base {
 				'tmp',
 				'cgi',
 				'svg',
+				'php2',
+				'phtm',
+				'phar',
+				'hphp',
+				'phpt',
+				'svgz',
 			];
 
 			/**
@@ -286,8 +435,9 @@ class Upload extends Field_Base {
 				/* translators: %s: phpinfo() */
 				UPLOAD_ERR_EXTENSION => sprintf( esc_html__( 'A PHP extension stopped the file upload. PHP does not provide a way to ascertain which extension caused the file upload to stop; examining the list of loaded extensions with %s may help.', 'elementor-pro' ), 'phpinfo()' ),
 			];
-			$this->fix_file_indices();
 		}
+
+		$this->fix_file_indices();
 
 		$id = $field['id'];
 		$files = Utils::_unstable_get_super_global_value( $_FILES, 'form_fields' );
@@ -295,7 +445,7 @@ class Upload extends Field_Base {
 		if ( ! empty( $field['max_files'] ) ) {
 			if ( count( $files[ $id ] ) > $field['max_files'] ) {
 				$error_message = sprintf(
-					/* translators: %d: The number of allowed files. */
+					/* translators: %d: Maximum number of allowed files. */
 					_n( 'You can upload only %d file.', 'You can upload up to %d files.', intval( $field['max_files'] ), 'elementor-pro' ),
 					intval( $field['max_files'] )
 				);
@@ -308,7 +458,7 @@ class Upload extends Field_Base {
 		foreach ( $files[ $id ] as $index => $file ) {
 			// not uploaded
 			if ( ! $field['required'] && UPLOAD_ERR_NO_FILE === $file['error'] ) {
-				return;
+				continue;
 			}
 
 			// is the file required and missing?
@@ -436,22 +586,6 @@ class Upload extends Field_Base {
 		return $path;
 	}
 
-	/**
-	 * creates array of upload sizes based on server limits
-	 * to use in the file_sizes control
-	 * @return array
-	 */
-	private function get_upload_file_size_options() {
-		$max_file_size = wp_max_upload_size() / pow( 1024, 2 ); //MB
-
-		$sizes = [];
-
-		for ( $file_size = 1; $file_size <= $max_file_size; $file_size++ ) {
-			$sizes[ $file_size ] = $file_size . 'MB';
-		}
-
-		return $sizes;
-	}
 
 	/**
 	 * process file and move it to uploads directory
@@ -463,21 +597,34 @@ class Upload extends Field_Base {
 	public function process_field( $field, Classes\Form_Record $record, Classes\Ajax_Handler $ajax_handler ) {
 		$id = $field['id'];
 		$files = Utils::_unstable_get_super_global_value( $_FILES, 'form_fields' );
+
 		foreach ( $files[ $id ] as $index => $file ) {
 			if ( UPLOAD_ERR_NO_FILE === $file['error'] ) {
 				continue;
 			}
-			$uploads_dir = $this->get_ensure_upload_dir();
+
 			$file_extension = pathinfo( $file['name'], PATHINFO_EXTENSION );
+			if ( in_array( strtolower( $file_extension ), $this->get_blacklist_file_ext(), true ) ) {
+				continue;
+			}
+
+			if ( ! $this->is_uploaded_content_allowed( $file['tmp_name'], $file['name'], $field ) ) {
+				$ajax_handler->add_error( $id, esc_html__( 'This file type is not allowed.', 'elementor-pro' ) );
+				continue;
+			}
+
+			$uploads_dir = $this->get_ensure_upload_dir();
 			$filename = uniqid() . '.' . $file_extension;
 			$filename = wp_unique_filename( $uploads_dir, $filename );
 			$new_file = trailingslashit( $uploads_dir ) . $filename;
+
 			if ( is_dir( $uploads_dir ) && is_writable( $uploads_dir ) ) {
-				$move_new_file = @ move_uploaded_file( $file['tmp_name'], $new_file );
+				$move_new_file = Plugin::instance()->php_api->move_uploaded_file( $file['tmp_name'], $new_file );
 				if ( false !== $move_new_file ) {
 					// Set correct file permissions.
 					$perms = 0644;
 					@ chmod( $new_file, $perms );
+
 					$record->add_file( $id, $index,
 						[
 							'path' => $new_file,

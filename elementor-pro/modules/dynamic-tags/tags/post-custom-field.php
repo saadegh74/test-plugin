@@ -30,6 +30,8 @@ class Post_Custom_Field extends Tag {
 			Module::POST_META_CATEGORY,
 			Module::COLOR_CATEGORY,
 			Module::DATETIME_CATEGORY,
+			Module::MEDIA_CATEGORY,
+			Module::SVG_CATEGORY,
 		];
 	}
 
@@ -60,9 +62,22 @@ class Post_Custom_Field extends Tag {
 				'condition' => [
 					'key' => '',
 				],
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
+	}
+
+	public function get_custom_field_value( string $key ) : string {
+		$value = get_post_meta( get_the_ID(), $key, true );
+
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		return $value;
 	}
 
 	public function render() {
@@ -76,7 +91,11 @@ class Post_Custom_Field extends Tag {
 			return;
 		}
 
-		$value = get_post_meta( get_the_ID(), $key, true );
+		$value = $this->get_custom_field_value( $key );
+
+		if ( empty( $value ) ) {
+			return;
+		}
 
 		echo wp_kses_post( $value );
 	}
@@ -96,5 +115,16 @@ class Post_Custom_Field extends Tag {
 		}
 
 		return $options;
+	}
+
+	public function get_editor_config() {
+		$config = parent::get_editor_config();
+
+		$config['meta'] = [
+			'origin' => 'elementor',
+			'required_license' => Module::LICENSE_FEATURE_ACF_NAME,
+		];
+
+		return $config;
 	}
 }
