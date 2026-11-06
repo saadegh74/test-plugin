@@ -1,0 +1,141 @@
+/*
+Created BY  : Masoud Ghorbankhani
+Last Update : 1397/12/21
+*/
+
+/*Start Fonts*/
+@font-face {
+    font-family: IRANSans;
+    font-style: normal;
+    font-weight: normal;
+    src: url('font/IRANSansWeb.woff') format('woff');  /* All Major Browsers */
+}
+body, .elementor-panel, .elementor-panel #elementor-panel-elements-search-input, .elementor-button, input, select, textarea,
+.elementor-add-section-drag-title, .elementor-templates-modal .dialog-widget-content, .elementor-templates-modal .dialog-widget-content, .elementor-select-preset-title ,.elementor-element-wrapper .title-wrapper,elementor-panel-menu-item-title,button.elementor-panel-heading.elementor-panel-category-title,.elementor-panel .elementor-panel-menu-item,elementor-panel-heading,.elementor-panel-heading-title{
+    font-family: "IRANSans",Arial,Helvetica,Verdana,sans-serif !important;
+}
+.elementor-loading-title {
+    letter-spacing: 0 !important;
+    font-size: 13px !important;
+}
+.elementor-add-section-drag-title {
+    font-style: normal !important;
+}
+.elementor-control-type-switcher .elementor-switch-label {
+    font-size: 8px !important;
+}
+.elementor-control-type-dimensions .elementor-control-dimension-label {
+    font-size: 10px !important;
+    line-height: 12px !important;
+}
+.elementor-dynamic-cover__title {
+    line-height: 2 !important;
+}
+.elementor-template-library-blank-title {
+    font-size: 18px !important;
+}
+.elementor-template-library-blank-message {
+    font-size: 14px !important;
+}
+#elementor-template-library-filter-toolbar-remote {
+    font-size: 13px !important;
+}
+#elementor-icons-manager-modal .elementor-button.elementor-button-success:not([disabled]) {
+    font-size: 0 !important;
+}
+
+#elementor-icons-manager-modal .elementor-button.elementor-button-success::before {
+    content: "تایید";
+    font-size: 14px;
+}
+.eui-rtl-qjk7zt.MuiTypography-root {
+    font-family: IRANSans !important;
+}
+.eui-rtl-14zdfnv .MuiTab-root:not(.MuiTab-labelIcon) {
+    font-family: IRANSans !important;
+}
+.eui-rtl-1a65cqv:not(.Mui-selected) {
+    font-family: IRANSans !important;
+}
+.eui-rtl-dvda75 {
+	font-family: IRANSans !important;}
+.eui-rtl-1fa50xd {
+	font-family: IRANSans !important;}
+.eui-rtl-zbta6t .MuiChip-label {
+    font-family: IRANSans !important;
+}
+.eui-rtl-wvceku {
+    font-family: IRANSans !important;
+}
+.eui-rtl-jvxr5w button:not(:last-of-type) {
+    font-family: IRANSans !important;
+}
+.eui-rtl-mzfcxz {
+    font-family: IRANSans !important;
+}
+.eui-rtl-dcfdt2 {
+    font-family: IRANSans !important;
+}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-outlined.MuiButton-outlinedSecondary.MuiButton-sizeSmall.MuiButton-outlinedSizeSmall.MuiButton-colorSecondary.MuiButton-root.MuiButton-outlined.MuiButton-outlinedSecondary.MuiButton-sizeSmall.MuiButton-outlinedSizeSmall.MuiButton-colorSecondary.eui-rtl-l46f4d {
+    font-family: IRANSans !important;
+}
+.eui-rtl-acszck .MuiSelect-select.MuiSelect-outlined, .eui-rtl-acszck .MuiSelect-select.MuiSelect-filled {
+    font-family: IRANSans !important;
+}
+.eui-rtl-qtif7w {
+    font-family: IRANSans !important;
+}
+span.MuiTypography-root.MuiTypography-caption.MuiTypography-alignCenter.eui-rtl-1nopoxh {
+    font-family: IRANSans !important;
+}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-outlined.MuiButton-outlinedSecondary.MuiButton-sizeSmall.MuiButton-outlinedSizeSmall.MuiButton-colorSecondary.MuiButton-root.MuiButton-outlined.MuiButton-outlinedSecondary.MuiButton-sizeSmall.MuiButton-outlinedSizeSmall.MuiButton-colorSecondary.eui-rtl-13sqfkm {
+    font-family: IRANSans !important;
+}
+.eui-rtl-ww1q33 {
+    font-family: IRANSans !important;
+}
+.eui-rtl-68o8xu {
+    font-family: IRANSans !important;
+}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-colorPrimary.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-colorPrimary.eui-rtl-1j5ptf3 {
+    font-family: IRANSans !important;
+}
+.eui-rtl-14zdfnv .MuiTab-root {
+    font-family: IRANSans !important;
+}
+.eui-rtl-1yk3831 {
+    font-family: IRANSans !important;
+}
+.eui-rtl-uxa5t3.MuiTypography-root {
+    font-family: IRANSans !important;
+}
+.eui-rtl-14tqbo1 {
+    font-family: IRANSans !important;
+}
+.eui-rtl-wgy20g {
+    font-family: IRANSans !important;
+}
+.eui-rtl-uec4bv button:not(:last-of-type) {
+    font-family: IRANSans !important;
+}
+.eui-rtl-oa4vnx {
+    font-family: IRANSans !important;
+}
+.eui-rtl-cis2f8 {
+	font-family: IRANSans !important;}
+.eui-rtl-btyuaw {
+	font-family: IRANSans !important;}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textSecondary.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-colorSecondary.MuiButton-root.MuiButton-text.MuiButton-textSecondary.MuiButton-sizeMedium.MuiButton-textSizeMedium.MuiButton-colorSecondary.eui-rtl-clxmxd {
+    font-family: IRANSans !important;
+}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedSecondary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-colorSecondary.MuiButton-root.MuiButton-contained.MuiButton-containedSecondary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-colorSecondary.eui-rtl-13e1qlq {
+    font-family: IRANSans !important;
+}
+.eui-rtl-1nj2l87 {
+	font-family: IRANSans !important;}
+button.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeLarge.MuiButton-containedSizeLarge.MuiButton-colorPrimary.Mui-disabled.MuiButtonGroup-grouped.MuiButtonGroup-groupedHorizontal.MuiButtonGroup-groupedContained.MuiButtonGroup-groupedContainedHorizontal.MuiButtonGroup-groupedContainedPrimary.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeLarge.MuiButton-containedSizeLarge.MuiButton-colorPrimary.MuiButtonGroup-firstButton.eui-rtl-109neg {
+    font-family: IRANSans !important;
+}
+.eui-rtl-1n6trzk {
+    font-family: IRANSans !important;
+}
