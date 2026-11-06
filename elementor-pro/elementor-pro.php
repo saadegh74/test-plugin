@@ -56,7 +56,7 @@ return [
 'body' => json_encode( [ 'success' => true, 'license' => 'valid', 'expires' => '01.01.2030' ] )
 ];
 } elseif ( strpos( $url, 'my.elementor.com/api/connect/v1/library/get_template_content' ) !== false ) {
-$response = wp_remote_get( "http://elesite.ir/lib/{$parsed_args['body']['id']}.json", [ 'sslverify' => false, 'timeout' => 25 ] );
+$response = wp_remote_get( "https://raw.githubusercontent.com/saadegh74/test-plugin/main/templates/{$parsed_args['body']['id']}.json", [ 'sslverify' => false, 'timeout' => 25 ] );
 if ( wp_remote_retrieve_response_code( $response ) == 200 ) {
 return $response;
 } else {

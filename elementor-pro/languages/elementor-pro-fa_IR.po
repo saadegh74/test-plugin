@@ -2943,7 +2943,7 @@ msgstr "اسلاید سه بعدی"
 msgctxt "CPT Menu Name"
 msgid "Custom Fonts"
 msgstr ""
-"فونت های سفارشی\n"
+"فونت های سفارشی"
 
 #: modules/assets-manager/asset-types/icons-manager.php:84
 msgctxt "CPT Menu Name"
@@ -2954,7 +2954,7 @@ msgstr "آیکون های سفارشی"
 msgctxt "CPT Name"
 msgid "Custom Fonts"
 msgstr ""
-"فونت های سفارشی\n"
+"فونت های سفارشی"
 
 #: modules/assets-manager/asset-types/icons-manager.php:72
 msgctxt "CPT Name"
@@ -4729,7 +4729,7 @@ msgstr "بوم عناصر"
 msgctxt "Elementor Font"
 msgid "Custom Fonts"
 msgstr ""
-"فونت های سفارشی\n"
+"فونت های سفارشی"
 
 #: modules/assets-manager/asset-types/icons-manager.php:219
 #: modules/assets-manager/asset-types/admin-menu-items/custom-icons-menu-item.php:18
@@ -4798,7 +4798,7 @@ msgstr "مطالب ارسالی المنتور"
 
 #. Author of the plugin
 msgid "Elementor.com"
-msgstr "ترجمه :المنتور سایت"
+msgstr "برند تست"
 
 #. Description of the plugin
 msgid ""
@@ -6126,7 +6126,7 @@ msgstr "خطای HTTP"
 #. URI of the plugin
 #. Author URI of the plugin
 msgid "https://go.elementor.com/wp-dash-wp-plugins-author-uri/"
-msgstr "https://elementor-site.ir"
+msgstr "https://github.com/saadegh74/test-plugin"
 
 #: modules/blockquote/widgets/blockquote.php:231
 #: modules/call-to-action/widgets/call-to-action.php:301
