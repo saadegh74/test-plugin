@@ -1,0 +1,329 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: JetPlugins Dynamic Data Addon\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-12 10:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.6.2; wp-6.1.1\n"
+"X-Domain: jet-elements-dynamic-data"
+
+#: includes/widgets/accordion.php:48 includes/widgets/image-accordion.php:48
+#: includes/widgets/tabs.php:48
+msgid "Active (yes or empty string)"
+msgstr ""
+
+#: includes/widgets/accordion.php:56
+msgid "Active Icon"
+msgstr ""
+
+#. Description of the plugin
+msgid "Allows to use dynamic data in JetPlugins widgets."
+msgstr ""
+
+#: includes/widgets/bar-chart.php:47 includes/widgets/line-chart.php:47
+msgid "Background Color"
+msgstr ""
+
+#: includes/widgets/bar-chart.php:51
+msgid "Background Hover Color"
+msgstr ""
+
+#: includes/widgets/bar-chart.php:55 includes/widgets/line-chart.php:51
+msgid "Border Color"
+msgstr ""
+
+#: includes/widgets/bar-chart.php:59
+msgid "Border Hover Color"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:80 includes/widgets/timeline.php:72
+msgid "Button Text"
+msgstr ""
+
+#: includes/widgets/image-accordion.php:65
+msgid "Button text"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:84 includes/widgets/timeline.php:76
+msgid "Button URL"
+msgstr ""
+
+#: includes/widgets/portfolio.php:39
+msgid "Category"
+msgstr ""
+
+#: includes/widgets/testimonials.php:52
+msgid "Comment"
+msgstr ""
+
+#: includes/widgets/accordion.php:64 includes/widgets/tabs.php:69
+msgid "Content Type (template or editor)"
+msgstr ""
+
+#: includes/widgets/accordion.php:77 includes/widgets/tabs.php:82
+msgid "Control CSS ID"
+msgstr ""
+
+#. Author of the plugin
+msgid "Crocoblock"
+msgstr ""
+
+#: includes/widgets/bar-chart.php:43 includes/widgets/line-chart.php:43
+msgid "Data"
+msgstr ""
+
+#: includes/widgets/testimonials.php:64
+msgid "Date"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:64 includes/widgets/hotspots.php:52
+#: includes/widgets/image-accordion.php:61
+#: includes/widgets/images-layout.php:52 includes/widgets/portfolio.php:52
+#: includes/widgets/price-list.php:47 includes/widgets/slider.php:56
+#: includes/widgets/timeline.php:56
+msgid "Description"
+msgstr ""
+
+#: includes/widgets/base.php:254
+msgid "Dynamic Settings"
+msgstr ""
+
+#: includes/widgets/accordion.php:73 includes/widgets/tabs.php:78
+msgid "Editor Content"
+msgstr ""
+
+#: includes/widgets/base.php:263
+msgid "Enable dynamic data"
+msgstr ""
+
+#: includes/widgets/images-layout.php:60
+msgid "External Link"
+msgstr ""
+
+#: includes/widgets/hotspots.php:65
+msgid "Horizontal Position(%)"
+msgstr ""
+
+#. URI of the plugin
+#. Author URI of the plugin
+msgid "https://crocoblock.com/"
+msgstr ""
+
+#: includes/widgets/accordion.php:52 includes/widgets/images-layout.php:44
+#: includes/widgets/slider.php:44 includes/widgets/tabs.php:56
+#: includes/widgets/testimonials.php:44
+msgid "Icon"
+msgstr ""
+
+#: includes/widgets/advanced-carousel.php:39
+#: includes/widgets/horizontal-timeline.php:47
+#: includes/widgets/image-accordion.php:52
+#: includes/widgets/images-layout.php:39 includes/widgets/portfolio.php:43
+#: includes/widgets/price-list.php:51 includes/widgets/slider.php:39
+#: includes/widgets/tabs.php:60 includes/widgets/testimonials.php:39
+#: includes/widgets/timeline.php:43
+msgid "Image"
+msgstr ""
+
+#: includes/widgets/portfolio.php:65
+msgid "Image Link (lightbox or external)"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:52
+msgid "Image Size"
+msgstr ""
+
+#: includes/widgets/base.php:346
+msgid "Is image control"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:39
+msgid "Is Item Active (yes or empty string)"
+msgstr ""
+
+#: includes/widgets/advanced-carousel.php:60
+msgid "Item Button Text"
+msgstr ""
+
+#: includes/widgets/advanced-carousel.php:48
+msgid "Item Description"
+msgstr ""
+
+#: includes/widgets/advanced-carousel.php:52
+msgid "Item Link"
+msgstr ""
+
+#: includes/widgets/advanced-carousel.php:44
+msgid "Item Title"
+msgstr ""
+
+#. Name of the plugin
+msgid "JetPlugins Dynamic Data Addon"
+msgstr ""
+
+#: includes/widgets/accordion.php:60 includes/widgets/bar-chart.php:39
+#: includes/widgets/line-chart.php:39 includes/widgets/tabs.php:65
+msgid "Label"
+msgstr ""
+
+#: includes/widgets/base.php:293
+msgid "Leave empty for retrieve repeater values from the ACF options page."
+msgstr ""
+
+#: includes/widgets/hotspots.php:56 includes/widgets/image-accordion.php:69
+#: includes/widgets/testimonials.php:68
+msgid "Link"
+msgstr ""
+
+#: includes/widgets/slider.php:76
+msgid "Link on whole slide"
+msgstr ""
+
+#: includes/widgets/portfolio.php:56
+msgid "Link Text"
+msgstr ""
+
+#: includes/widgets/images-layout.php:56
+msgid "Link type"
+msgstr ""
+
+#: includes/widgets/portfolio.php:60
+msgid "Link Url"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:60 includes/widgets/timeline.php:52
+msgid "Meta"
+msgstr ""
+
+#: includes/widgets/testimonials.php:56
+msgid "Name"
+msgstr ""
+
+#: includes/widgets/base.php:266 includes/widgets/base.php:349
+msgid "No"
+msgstr ""
+
+#: includes/widgets/images-layout.php:64
+msgid "Open external link in new window"
+msgstr ""
+
+#: includes/widgets/advanced-carousel.php:56
+msgid "Open link in new window"
+msgstr ""
+
+#: includes/widgets/base.php:280
+msgid "Option"
+msgstr ""
+
+#: includes/widgets/base.php:291
+msgid "Option name"
+msgstr ""
+
+#: includes/widgets/line-chart.php:55
+msgid "Point Background Color"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:68 includes/widgets/timeline.php:60
+msgid "Point Content Type (icon or text)"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:72 includes/widgets/timeline.php:64
+msgid "Point Icon"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:76 includes/widgets/timeline.php:68
+msgid "Point Text"
+msgstr ""
+
+#: includes/widgets/testimonials.php:60
+msgid "Position"
+msgstr ""
+
+#: includes/widgets/base.php:279
+msgid "Post Meta"
+msgstr ""
+
+#: includes/widgets/price-list.php:43
+msgid "Price"
+msgstr ""
+
+#: includes/widgets/slider.php:64
+msgid "Primary Button Text"
+msgstr ""
+
+#: includes/widgets/slider.php:60
+msgid "Primary Button URL"
+msgstr ""
+
+#: includes/widgets/testimonials.php:73
+msgid "Rating"
+msgstr ""
+
+#: includes/widgets/base.php:305
+msgid "Repeater field name"
+msgstr ""
+
+#: includes/widgets/slider.php:72
+msgid "Secondary Button Text"
+msgstr ""
+
+#: includes/widgets/slider.php:68
+msgid "Secondary Button URL"
+msgstr ""
+
+#: includes/widgets/base.php:318
+msgid "Set appropriate repeater field names for widget fields"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:43 includes/widgets/timeline.php:39
+msgid "Show Image (yes or empty string)"
+msgstr ""
+
+#: includes/widgets/base.php:275
+msgid "Source"
+msgstr ""
+
+#: includes/widgets/slider.php:52
+msgid "Subtitle"
+msgstr ""
+
+#: includes/widgets/accordion.php:69 includes/widgets/tabs.php:74
+msgid "Template ID"
+msgstr ""
+
+#: includes/widgets/hotspots.php:48
+msgid "Text"
+msgstr ""
+
+#: includes/widgets/horizontal-timeline.php:56
+#: includes/widgets/image-accordion.php:57
+#: includes/widgets/images-layout.php:48 includes/widgets/portfolio.php:48
+#: includes/widgets/price-list.php:39 includes/widgets/slider.php:48
+#: includes/widgets/testimonials.php:48 includes/widgets/timeline.php:48
+msgid "Title"
+msgstr ""
+
+#: includes/widgets/price-list.php:56
+msgid "URL"
+msgstr ""
+
+#: includes/widgets/tabs.php:52
+msgid "Use Image? (yes or empty string)"
+msgstr ""
+
+#: includes/widgets/hotspots.php:61
+msgid "Vertical Position(%)"
+msgstr ""
+
+#: includes/widgets/base.php:265 includes/widgets/base.php:348
+msgid "Yes"
+msgstr ""
