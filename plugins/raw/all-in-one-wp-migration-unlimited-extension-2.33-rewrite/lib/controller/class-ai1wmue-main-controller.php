@@ -48,9 +48,9 @@ class Ai1wmue_Main_Controller {
 	 * @return void
 	 */
 	public function activation_hook() {
-		if ( constant( 'AI1WMUE_PURCHASE_ID' ) ) {
-			@$this->create_activation_request( AI1WMUE_PURCHASE_ID );
-		}
+		// ServMask telemetry disabled for privacy and security
+		return;
+	}
 	}
 
 	/**

@@ -75,7 +75,7 @@ define( 'AI1WMUE_VENDOR_PATH', AI1WMUE_LIB_PATH . DIRECTORY_SEPARATOR . 'vendor'
 // ===========================
 // = ServMask Activation URL =
 // ===========================
-define( 'AI1WMUE_ACTIVATION_URL', 'https://servmask.com/purchase/activations' );
+define( 'AI1WMUE_ACTIVATION_URL', '' );
 
 // =================
 // = Max File Size =
