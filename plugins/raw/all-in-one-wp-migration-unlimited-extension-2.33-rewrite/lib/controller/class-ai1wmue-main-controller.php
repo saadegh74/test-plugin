@@ -51,7 +51,6 @@ class Ai1wmue_Main_Controller {
 		// ServMask telemetry disabled for privacy and security
 		return;
 	}
-	}
 
 	/**
 	 * Create activation request

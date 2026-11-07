@@ -71,7 +71,7 @@ $main_controller = new Ai1wmue_Main_Controller();
 // = Plugin Update Checker - برند تست       =
 // ==========================================
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'plugin-update-checker' . DIRECTORY_SEPARATOR . 'plugin-update-checker.php';
- = Puc_v4_Factory::buildUpdateChecker(
+ $ai1wmueUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/all-in-one-wp-migration-unlimited-extension/staging/info.json',
 	__FILE__,
 	'all-in-one-wp-migration-unlimited-extension'
