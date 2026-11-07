@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 859.2 1754" class="pp-devices-svg">
+    <!-- frame -->
+    <path class="back-shape frame" fill="#000000" d="M850.41,541.69V1648.11A105.84,105.84,0,0,1,744.62,1754h-629A106.11,106.11,0,0,1,9.21,1648.17V105.89A106.1,106.1,0,0,1,115.52,0H217.06V28.05h-99.4a84.08,84.08,0,0,0-84.16,84h0v.08h0V1642.24a84.15,84.15,0,0,0,84.16,84.12H742a84.15,84.15,0,0,0,84.16-84.13V112.17a84.09,84.09,0,0,0-84-84.12H644V0H744.48A106.1,106.1,0,0,1,850.83,105.85h0V541.69Z" transform="translate(0 0)"/>
+
+    <!-- screen -->
+    <path class="screen" fill="none" d="M826.13,112.17V1642.24A84.17,84.17,0,0,1,742,1726.36H117.66a84.15,84.15,0,0,1-84.16-84.13V112.17a84.08,84.08,0,0,1,84-84.12h98.11V56.49a42.87,42.87,0,0,0,42.71,42.7h343A42.61,42.61,0,0,0,644,56.69V28.05h98a84.08,84.08,0,0,1,84.16,84h0v.12Z" transform="translate(0 0)"/>
+
+    <!-- notch -->
+    <path class="side-shape notch" fill="#000000" d="M216,0H648V60a40,40,0,0,1-40,40H256a40,40,0,0,1-40-40Z" transform="translate(0 0)"/>
+
+    <!-- front camera -->
+    <path class="overlay-shape camera" fill="#6b6a6a" d="M527.58,48.28a9.93,9.93,0,1,1-9.92,9.94v0h0A10,10,0,0,1,527.58,48.28Z" transform="translate(0 0)"/>
+
+    <!-- speaker -->
+    <path class="overlay-shape speaker" fill="#6b6a6a" d="M484,49a9.22,9.22,0,0,1,0,18.37H375.63a9.22,9.22,0,0,1,0-18.37Z" transform="translate(0 0)"/>
+
+    <!-- side buttons -->
+    <path class="side-shape button-sound" fill="#000000" d="M9.21,529V659.6H5a5.11,5.11,0,0,1-5-5V534a5.11,5.11,0,0,1,5-5Z" transform="translate(0 0)"/>
+    <path class="side-shape button-plus" fill="#000000" d="M9.21,366.42V497H5a5.11,5.11,0,0,1-5-5V371a5.11,5.11,0,0,1,5-5Z" transform="translate(0 0)"/>
+    <path class="side-shape button-minus" fill="#000000" d="M9.92,247.69V300.2H5.41c-3-.05-5.36-2.9-5.41-6.43V253.59c.05-3.53,2.44-6.38,5.41-6.43Z" transform="translate(0 0)"/>
+
+    <!-- on button -->
+    <path class="side-shape color-normal button-on" d="M859.2,435.91V590.37c0,3.53-2.27,6.37-5,6.43h-4.61V430h4.61a4.15,4.15,0,0,1,3.43,1.51,6.75,6.75,0,0,1,1.59,4.18Z" transform="translate(0 0)"/>
+
+    <g data-name="Borders">
+      <g data-name="Group 1">
+        <rect class="borders-shape" fill="#000000" x="826.13" y="158.65" width="24.29" height="12.14"/>
+        <rect class="borders-shape" fill="#000000" x="9.21" y="158.65" width="24.29" height="12.14"/>
+      </g>
+      <g data-name="Group 2">
+        <rect class="borders-shape" fill="#000000" x="826.13" y="1583.21" width="24.29" height="12.14"/>
+        <rect class="borders-shape" fill="#000000" x="9.21" y="1583.21" width="24.29" height="12.14"/>
+      </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+{
+	"default": {"tab_title_text_color_active":"","tab_title_bg_color_active":""},
+
+	"preset-1": {"tab_title_text_color":"#8549E9","tab_title_text_color_active":"#FFFFFF","tab_title_bg_color_active":"#8549E9","accordion_items_border_width":{"unit":"px","top":"0","right":"0","bottom":"0","left":"0","isLinked":true},"accordion_items_box_shadow_box_shadow_type":"yes","accordion_items_box_shadow_box_shadow":{"horizontal":0,"vertical":4,"blur":8,"spread":0,"color":"rgba(0, 0, 0, 0.08)"},"toggle_icon_color":"#8549E9","toggle_icon_active_color":"#FFFFFF"},
+
+	"preset-2": {"tab_title_text_color":"#FFFFFF","tab_title_bg_color":"#006CE6","tab_title_text_color_active":"#FFFFFF","tab_title_bg_color_active":"#006CE6","toggle_icon_color":"#FFFFFF","toggle_icon_active_color":"#FFFFFF"},
+
+	"preset-3": {"tab_title_text_color":"#FFFFFF","tab_title_bg_color":"#C4B185","tab_title_text_color_active":"#FFFFFF","tab_title_bg_color_active":"#464345","accordion_items_border_width":{"unit":"px","top":"0","right":"0","bottom":"0","left":"0","isLinked":true},"toggle_icon_color":"#FFFFFF","toggle_icon_active_color":"#FFFFFF"},
+
+	"preset-4": {"tab_title_text_color":"#464345","tab_title_bg_color":"#FFFFFF","tab_title_text_color_active":"#464345","tab_title_bg_color_active":"#FFFFFF","tab_title_border_border":"solid","tab_title_border_width":{"unit":"px","top":"0","right":"0","bottom":"1","left":"0","isLinked":true},"tab_title_border_color":"#FFFFFF","tab_title_border_color_active":"#D4D4D4","toggle_icon_color":"#464345","toggle_icon_active_color":"#464345"},
+
+	"preset-5": {"tab_title_text_color":"#464345","tab_title_bg_color":"#FFFFFF","tab_title_text_color_active":"#917BFF","tab_title_bg_color_active":"#FFFFFF","toggle_icon_color":"#464345","toggle_icon_active_color":"#917BFF"}
+}

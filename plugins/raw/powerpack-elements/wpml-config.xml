@@ -1,0 +1,16 @@
+<wpml-config>
+    <elementor-widgets>
+    	<widget name="pp-table">
+    		<fields-in-item items_of="table_headers">
+       			<field type="Heading text" editor_type="LINE">table_header_col</field>
+    		</fields-in-item>
+    		<fields-in-item items_of="table_body_content">
+        		<field type="Table - Cell Text" editor_type="AREA">cell_text</field>
+				<field type="Link" editor_type="LINE">url</field>
+    		</fields-in-item>
+    		<fields-in-item items_of="table_footer_content">
+        		<field type="Cell text" editor_type="AREA">cell_text</field>
+    		</fields-in-item>
+    	</widget>
+    </elementor-widgets>
+</wpml-config>

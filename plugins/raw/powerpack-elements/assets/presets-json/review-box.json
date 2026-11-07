@@ -1,0 +1,7 @@
+{
+	"default": {"review_type":"stars","pros":"","cons":"","final_rating":"yes"},
+
+	"preset-1": {"review_type":"percent","pros":"","cons":"","final_rating":""},
+
+	"preset-2": {"review_type":"stars","pros":"yes","cons":"yes","final_rating":"yes"}
+}
