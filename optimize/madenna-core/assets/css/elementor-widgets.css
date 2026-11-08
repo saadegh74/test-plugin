@@ -1,0 +1,217 @@
+/* 
+ * Madenna Core - Elementor Widgets Styles
+ * This file replaces inline <style> tags to fix Elementor 403 Forbidden errors.
+ */
+
+/* ==========================================================================
+   Widget: Auto FAQ (سوالات متداول مادنا)
+   ========================================================================== */
+.mad-faq-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 18px;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+}
+
+.mad-faq-summary {
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mad-faq-summary::-webkit-details-marker {
+    display: none;
+}
+
+.mad-ans {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 10px;
+    margin-top: 8px;
+    line-height: 1.8;
+}
+
+/* ==========================================================================
+   Widget: Categories Grid (دسته‌بندی‌های مادنا)
+   ========================================================================== */
+.mad-cats-grid-wrap {
+    display: grid;
+}
+
+.mad-cat-item {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: all 0.3s;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.mad-cat-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.mad-cat-img-wrap {
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+.mad-cat-content {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+}
+
+.mad-cat-content-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.mad-cat-icon {
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.mad-svg-icon {
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    background-color: currentColor;
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+}
+
+.mad-cat-title {
+    font-size: 17px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.mad-cat-subtitle {
+    font-size: 12px;
+    color: #3b82f6;
+    font-weight: 600;
+    display: block;
+}
+
+.mad-cat-excerpt {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.7;
+    margin: 10px 0;
+}
+
+.mad-cat-btn {
+    margin-top: auto;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2563eb;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   Widget: Tools Grid (ابزارهای مادنا)
+   ========================================================================== */
+.mad-tls-grid-wrap {
+    display: grid;
+}
+
+.mad-tool-item {
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: all 0.2s;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.mad-tool-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.mad-tool-img-wrap {
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+.mad-tool-content-wrap {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: center;
+}
+
+.mad-tool-content-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.mad-tool-icon {
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    transition: all 0.3s;
+}
+
+.mad-tool-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.mad-tool-subtitle {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+    display: block;
+}
+
+.mad-tool-excerpt {
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.mad-tool-btn {
+    margin-top: auto;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2563eb;
+    display: inline-block;
+}

@@ -1,0 +1,1062 @@
+/*
+
+استایل جامع پاپ‌آپ احراز هویت، دکمه هدر، داشبورد پرونده کاربری و مودال نمایش نتیجه
+
+نسخه نهایی ۸.۰ - کامل و واکنش‌گرا برای موبایل و دسکتاپ
+
+Location: /assets/css/madenna-vault.css
+*/
+
+/* ==========================================================================
+
+افکت قفل و تاری غیرقابل‌نفوذ روی نتیجه ابزار (قبل از احراز هویت)
+========================================================================== */
+.mad-vault-blurred {
+filter: blur(22px) grayscale(35%) !important;
+-webkit-filter: blur(22px) grayscale(35%) !important;
+opacity: 0.14 !important;
+pointer-events: none !important;
+user-select: none !important;
+-webkit-user-select: none !important;
+transition: filter 0.5s ease, opacity 0.5s ease !important;
+position: relative;
+max-height: 360px !important;
+overflow: hidden !important;
+}
+
+.mad-vault-unlocked {
+filter: blur(0) !important;
+-webkit-filter: blur(0) !important;
+opacity: 1 !important;
+pointer-events: auto !important;
+user-select: auto !important;
+max-height: none !important;
+overflow: visible !important;
+transition: filter 0.5s ease, opacity 0.5s ease !important;
+}
+
+/* مخفی‌سازی مراحل سوالات و فرم‌های ورودی قبل از نتیجه در مودال پروفایل بدون حذف از DOM */
+.mad-vault-result-modal-body [data-vault-hidden-step="true"] {
+display: none !important;
+}
+
+/* تبدیل گریدهای ۲ ستونه (فرم + نتیجه) به تمام‌عرض در مودال پروفایل زمانی که فرم مخفی شده است */
+.mad-vault-result-modal-body [data-vault-single-col="true"] {
+display: block !important;
+grid-template-columns: 1fr !important;
+}
+.mad-vault-result-modal-body [data-vault-single-col="true"] > *:not([data-vault-hidden-step="true"]) {
+width: 100% !important;
+max-width: 100% !important;
+}
+
+/* تضمین صحت بردرهای تیلوند داخل کانتینر ابزار در مودال پروفایل */
+.mad-vault-result-modal-body .madenna-tool-wrapper *,
+.mad-vault-result-modal-body .madenna-tool-wrapper ::before,
+.mad-vault-result-modal-body .madenna-tool-wrapper ::after {
+box-sizing: border-box;
+border-width: 0;
+border-style: solid;
+border-color: #bfc9c6;
+}
+
+/* ==========================================================================
+2. پس‌زمینه و پنجره پاپ‌آپ ورود / ثبت‌نام
+========================================================================== */
+#madenna-vault-modal.mad-vault-overlay,
+.mad-vault-overlay {
+position: fixed !important;
+top: 0 !important;
+right: 0 !important;
+bottom: 0 !important;
+left: 0 !important;
+width: 100vw !important;
+height: 100vh !important;
+background: rgba(15, 23, 42, 0.72) !important;
+backdrop-filter: blur(7px) !important;
+-webkit-backdrop-filter: blur(7px) !important;
+z-index: 9999999 !important;
+display: none;
+align-items: center !important;
+justify-content: center !important;
+padding: 16px !important;
+direction: rtl !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+box-sizing: border-box !important;
+}
+
+#madenna-vault-modal.mad-vault-overlay.is-open {
+display: flex !important;
+}
+
+.mad-vault-window {
+background: #ffffff !important;
+width: 100% !important;
+max-width: 450px !important;
+border-radius: 22px !important;
+border: 1px solid #bfc9c6 !important;
+box-shadow: 0 25px 60px -15px rgba(15, 86, 80, 0.28) !important;
+padding: 26px 24px !important;
+position: relative !important;
+text-align: right !important;
+color: #191c1c !important;
+max-height: 92vh !important;
+overflow-y: auto !important;
+box-sizing: border-box !important;
+margin: auto !important;
+}
+
+.mad-vault-close,
+.mad-vault-window button.mad-vault-close {
+position: absolute !important;
+top: 16px !important;
+left: 16px !important;
+width: 34px !important;
+height: 34px !important;
+border-radius: 50% !important;
+border: 1px solid #e1e3e1 !important;
+background: #f2f4f2 !important;
+color: #3f4947 !important;
+font-size: 20px !important;
+line-height: 1 !important;
+cursor: pointer !important;
+display: flex !important;
+align-items: center !important;
+justify-content: center !important;
+padding: 0 !important;
+transition: all 0.2s ease !important;
+}
+
+.mad-vault-close:hover,
+.mad-vault-close:focus {
+background: #ffdad6 !important;
+color: #93000a !important;
+border-color: #ffdad6 !important;
+outline: none !important;
+}
+
+/* ==========================================================================
+3. هدر و تب‌های ورود / ثبت‌نام در مودال
+========================================================================== */
+.mad-vault-header {
+text-align: center;
+margin-bottom: 16px;
+}
+
+.mad-vault-badge {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background: #c2e7e2;
+color: #0f5650;
+font-size: 11.5px;
+font-weight: 800;
+padding: 5px 12px;
+border-radius: 999px;
+margin-bottom: 10px;
+}
+
+.mad-vault-title {
+font-size: 19px !important;
+font-weight: 900 !important;
+color: #191c1c !important;
+margin: 0 0 6px 0 !important;
+line-height: 1.4 !important;
+}
+
+.mad-vault-desc {
+font-size: 12.5px !important;
+color: #3f4947 !important;
+line-height: 1.7 !important;
+margin: 0 !important;
+}
+
+.mad-vault-auth-tabs {
+display: grid;
+grid-template-columns: 1fr 1fr;
+background: #f2f4f2;
+padding: 4px;
+border-radius: 12px;
+margin-bottom: 18px;
+border: 1px solid #e1e3e1;
+}
+
+.mad-vault-auth-tab,
+.mad-vault-window button.mad-vault-auth-tab {
+background: transparent !important;
+border: none !important;
+padding: 9px 10px !important;
+font-family: inherit !important;
+font-size: 13px !important;
+font-weight: 800 !important;
+color: #3f4947 !important;
+border-radius: 9px !important;
+cursor: pointer !important;
+transition: all 0.2s ease !important;
+box-shadow: none !important;
+}
+
+.mad-vault-auth-tab.active,
+.mad-vault-window button.mad-vault-auth-tab.active {
+background: #ffffff !important;
+color: #0f5650 !important;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ==========================================================================
+4. کارت‌های انتخاب جنسیت (آقا و خانم)
+========================================================================== */
+.mad-vault-gender-selector {
+margin-bottom: 14px;
+}
+
+.mad-vault-gender-selector > label {
+display: block;
+font-size: 12.5px;
+font-weight: 800;
+color: #191c1c;
+margin-bottom: 8px;
+}
+
+.mad-vault-gender-options {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+}
+
+.mad-vault-gender-card {
+border: 2px solid #e1e3e1;
+background: #f8faf8;
+border-radius: 16px;
+padding: 12px 10px;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 6px;
+cursor: pointer;
+transition: all 0.22s ease;
+position: relative;
+}
+
+.mad-vault-gender-card .avatar-render {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.25s ease;
+}
+
+.mad-vault-gender-card:hover .avatar-render {
+transform: scale(1.06);
+}
+
+.mad-vault-gender-card .gender-title {
+font-size: 13px;
+font-weight: 800;
+color: #3f4947;
+}
+
+.mad-vault-gender-card.selected {
+border-color: #0f5650;
+background: #effaf8;
+box-shadow: 0 6px 16px rgba(15, 86, 80, 0.12);
+}
+
+.mad-vault-gender-card.selected .gender-title {
+color: #0f5650;
+}
+
+/* ==========================================================================
+5. فیلدها و دکمه‌های مودال
+========================================================================== */
+.mad-vault-input-group {
+margin-bottom: 14px;
+}
+
+.mad-vault-input-group label {
+display: block;
+font-size: 12.5px;
+font-weight: 800;
+color: #191c1c;
+margin-bottom: 6px;
+}
+
+.mad-vault-input-wrapper {
+position: relative;
+display: flex;
+align-items: center;
+}
+
+.mad-vault-input-wrapper i {
+position: absolute;
+right: 14px;
+color: #0f5650;
+font-size: 15px;
+pointer-events: none;
+}
+
+.mad-vault-input-wrapper input {
+width: 100% !important;
+height: 46px !important;
+background: #f2f4f2 !important;
+border: 1.5px solid #bfc9c6 !important;
+border-radius: 12px !important;
+padding: 0 40px 0 14px !important;
+font-family: inherit !important;
+font-size: 14px !important;
+font-weight: 700 !important;
+color: #191c1c !important;
+transition: all 0.2s ease !important;
+box-sizing: border-box !important;
+}
+
+.mad-vault-input-wrapper input:focus {
+outline: none !important;
+background: #ffffff !important;
+border-color: #0f5650 !important;
+box-shadow: 0 0 0 3px rgba(15, 86, 80, 0.12) !important;
+}
+
+#mad-vault-code-input {
+text-align: center !important;
+letter-spacing: 10px !important;
+font-size: 20px !important;
+font-weight: 900 !important;
+padding-right: 14px !important;
+}
+
+.mad-vault-error-msg {
+display: block;
+color: #ba1a1a;
+font-size: 11.5px;
+font-weight: 700;
+margin-top: 5px;
+min-height: 16px;
+}
+
+.mad-vault-btn-primary,
+button.mad-vault-btn-primary,
+a.mad-vault-btn-primary {
+width: 100%;
+height: 48px;
+background: #0f5650 !important;
+color: #ffffff !important;
+border: none !important;
+border-radius: 12px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 14px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+gap: 8px !important;
+transition: background 0.2s ease, transform 0.15s ease !important;
+text-decoration: none !important;
+box-shadow: none !important;
+}
+
+.mad-vault-btn-primary:hover,
+.mad-vault-btn-primary:focus,
+.mad-vault-btn-primary:active {
+background: #093c37 !important;
+color: #ffffff !important;
+outline: none !important;
+}
+
+.mad-vault-notice {
+margin-top: 14px;
+padding: 10px 12px;
+background: #f8faf8;
+border: 1px dashed #bfc9c6;
+border-radius: 10px;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 11.5px;
+color: #3f4947;
+line-height: 1.6;
+}
+
+.mad-vault-notice i {
+color: #d97706;
+font-size: 15px;
+flex-shrink: 0;
+}
+
+/* ==========================================================================
+6. ویجت دکمه ورود و پروفایل در هدر سایت + بج شمارنده نوتیفیکیشن
+========================================================================== */
+.mad-vault-header-auth-wrap {
+display: inline-flex;
+align-items: center;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+direction: rtl;
+}
+
+a.mad-vault-header-login-btn,
+button.mad-vault-header-login-btn {
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+gap: 8px !important;
+background-color: #0f5650 !important;
+color: #ffffff !important;
+border: none !important;
+border-radius: 12px !important;
+padding: 9px 16px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 13px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+transition: all 0.2s ease !important;
+text-decoration: none !important;
+line-height: 1.4 !important;
+box-shadow: none !important;
+}
+
+a.mad-vault-header-login-btn:hover,
+a.mad-vault-header-login-btn:focus,
+a.mad-vault-header-login-btn:active {
+background-color: #093c37 !important;
+color: #ffffff !important;
+outline: none !important;
+text-decoration: none !important;
+}
+
+a.mad-vault-header-user-btn {
+position: relative !important;
+display: inline-flex !important;
+align-items: center !important;
+gap: 9px !important;
+background-color: #f8faf8 !important;
+border: 1.5px solid #bfc9c6 !important;
+border-radius: 999px !important;
+padding: 4px 6px 4px 14px !important;
+text-decoration: none !important;
+color: #191c1c !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 13px !important;
+font-weight: 800 !important;
+transition: all 0.2s ease !important;
+}
+
+a.mad-vault-header-user-btn:hover,
+a.mad-vault-header-user-btn:focus {
+border-color: #0f5650 !important;
+background-color: #effaf8 !important;
+color: #0f5650 !important;
+text-decoration: none !important;
+}
+
+.mad-vault-header-avatar {
+width: 34px;
+height: 34px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+flex-shrink: 0;
+}
+
+.mad-vault-header-badge {
+position: absolute;
+top: -5px;
+right: -4px;
+min-width: 19px;
+height: 19px;
+padding: 0 5px;
+background: #e11d48;
+color: #ffffff;
+font-size: 10.5px;
+font-weight: 900;
+border-radius: 999px;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+border: 2px solid #ffffff;
+box-shadow: 0 2px 6px rgba(225, 29, 72, 0.4);
+line-height: 1;
+z-index: 3;
+}
+
+.mad-vault-header-badge.is-hidden,
+.mad-vault-header-badge:empty {
+display: none !important;
+visibility: hidden !important;
+opacity: 0 !important;
+}
+
+/* ==========================================================================
+7. داشبورد پرونده کاربری و تب‌های دسته‌بندی
+========================================================================== */
+.mad-vault-dashboard-wrapper {
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+direction: rtl;
+color: #191c1c;
+max-width: 1140px;
+margin: 0 auto;
+}
+
+.mad-vault-db-header {
+background: #ffffff;
+border: 1px solid #bfc9c6;
+border-radius: 20px;
+padding: 22px 24px;
+margin-bottom: 20px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-wrap: wrap;
+gap: 16px;
+}
+
+.mad-vault-db-stats-actions {
+display: flex;
+flex-direction: column;
+align-items: stretch;
+gap: 8px;
+min-width: 145px;
+}
+
+a.mad-vault-logout-btn {
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+gap: 6px !important;
+padding: 7px 12px !important;
+border-radius: 10px !important;
+background: #fff1f2 !important;
+color: #be123c !important;
+border: 1px solid #fecdd3 !important;
+font-size: 12px !important;
+font-weight: 800 !important;
+text-decoration: none !important;
+transition: all 0.2s ease !important;
+}
+
+a.mad-vault-logout-btn:hover {
+background: #ffe4e6 !important;
+color: #9f1239 !important;
+}
+
+.mad-vault-main-tabs-row {
+display: flex;
+gap: 10px;
+margin-bottom: 18px;
+flex-wrap: wrap;
+}
+
+.mad-vault-main-tab,
+.mad-vault-dashboard-wrapper button.mad-vault-main-tab {
+background: #f2f4f2 !important;
+color: #3f4947 !important;
+border: 1px solid #bfc9c6 !important;
+padding: 10px 18px !important;
+border-radius: 12px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 13px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+gap: 8px !important;
+transition: all 0.2s ease !important;
+box-shadow: none !important;
+}
+
+.mad-vault-main-tab.active,
+.mad-vault-dashboard-wrapper button.mad-vault-main-tab.active {
+background: #0f5650 !important;
+color: #ffffff !important;
+border-color: #0f5650 !important;
+}
+
+.mad-vault-parent-cats-bar {
+display: flex;
+align-items: center;
+gap: 8px;
+overflow-x: auto;
+padding-bottom: 8px;
+margin-bottom: 14px;
+scrollbar-width: thin;
+}
+
+.mad-vault-cat-pill,
+.mad-vault-dashboard-wrapper button.mad-vault-cat-pill {
+background: #ffffff !important;
+color: #3f4947 !important;
+border: 1px solid #bfc9c6 !important;
+border-radius: 999px !important;
+padding: 8px 16px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 12.5px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+gap: 7px !important;
+white-space: nowrap !important;
+transition: all 0.2s ease !important;
+flex-shrink: 0;
+}
+
+.mad-vault-cat-pill.active,
+.mad-vault-dashboard-wrapper button.mad-vault-cat-pill.active {
+background: #0f5650 !important;
+color: #ffffff !important;
+border-color: #0f5650 !important;
+box-shadow: 0 4px 12px rgba(15, 86, 80, 0.18) !important;
+}
+
+.mad-vault-filters-bar {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+background: #f8faf8;
+border: 1px solid #e1e3e1;
+border-radius: 14px;
+padding: 12px 14px;
+margin-bottom: 16px;
+}
+
+.mad-vault-filter-item {
+display: flex;
+flex-direction: column;
+gap: 5px;
+}
+
+.mad-vault-filter-item label {
+font-size: 11.5px;
+font-weight: 800;
+color: #3f4947;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.mad-vault-filter-select {
+height: 40px !important;
+border-radius: 10px !important;
+border: 1px solid #bfc9c6 !important;
+background: #ffffff !important;
+padding: 0 12px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 12.5px !important;
+font-weight: 700 !important;
+color: #191c1c !important;
+width: 100% !important;
+}
+
+/* ==========================================================================
+8. لیست خلاصه سوابق و کارت‌های کم‌جا + صفحه‌بندی ۱۲تایی
+========================================================================== */
+.mad-vault-history-list {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.mad-vault-history-row {
+background: #ffffff;
+border: 1px solid #bfc9c6;
+border-radius: 16px;
+padding: 14px 18px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 14px;
+transition: all 0.2s ease;
+}
+
+.mad-vault-history-row.mad-vault-row-hidden {
+display: none !important;
+}
+
+.mad-vault-history-row:hover {
+border-color: #0f5650;
+box-shadow: 0 6px 18px rgba(15, 86, 80, 0.06);
+}
+
+.mad-vault-history-info {
+display: flex;
+align-items: center;
+gap: 14px;
+min-width: 0;
+flex: 1;
+}
+
+.mad-vault-history-icon {
+width: 46px;
+height: 46px;
+border-radius: 13px;
+background: #e6f4f1;
+color: #0f5650;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 19px;
+flex-shrink: 0;
+}
+
+.mad-vault-history-texts {
+min-width: 0;
+flex: 1;
+}
+
+.mad-vault-history-title-row {
+display: flex;
+align-items: center;
+gap: 8px;
+flex-wrap: wrap;
+margin-bottom: 4px;
+}
+
+.mad-vault-history-title {
+margin: 0 !important;
+font-size: 14.5px !important;
+font-weight: 900 !important;
+color: #191c1c !important;
+}
+
+.mad-vault-subcat-badge {
+display: inline-flex;
+align-items: center;
+background: #e6f4f1;
+color: #0f5650;
+font-size: 11px;
+font-weight: 800;
+padding: 2px 9px;
+border-radius: 999px;
+}
+
+.mad-vault-attempt-badge {
+display: inline-flex;
+align-items: center;
+background: #fef3c7;
+color: #b45309;
+font-size: 10.5px;
+font-weight: 800;
+padding: 2px 8px;
+border-radius: 999px;
+}
+
+.mad-vault-history-meta {
+display: flex;
+align-items: center;
+gap: 12px;
+font-size: 12px;
+color: #64748b;
+font-weight: 600;
+}
+
+.mad-vault-history-actions {
+display: flex;
+align-items: center;
+gap: 8px;
+flex-shrink: 0;
+}
+
+button.mad-vault-view-result-btn {
+background: #0f5650 !important;
+color: #ffffff !important;
+border: none !important;
+border-radius: 10px !important;
+padding: 8px 14px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 12.5px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+gap: 6px !important;
+transition: background 0.2s ease !important;
+}
+
+button.mad-vault-view-result-btn:hover {
+background: #093c37 !important;
+}
+
+a.mad-vault-retry-tool-btn {
+background: #f2f4f2 !important;
+color: #3f4947 !important;
+border: 1px solid #bfc9c6 !important;
+border-radius: 10px !important;
+padding: 7px 12px !important;
+font-size: 12px !important;
+font-weight: 800 !important;
+text-decoration: none !important;
+display: inline-flex !important;
+align-items: center !important;
+gap: 5px !important;
+transition: all 0.2s ease !important;
+}
+
+a.mad-vault-retry-tool-btn:hover {
+background: #e1e3e1 !important;
+color: #191c1c !important;
+}
+
+button.mad-vault-delete-record-btn {
+background: transparent !important;
+color: #94a3b8 !important;
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+padding: 6px 8px !important;
+font-size: 15px !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+transition: color 0.2s ease, transform 0.15s ease !important;
+flex-shrink: 0;
+}
+
+button.mad-vault-delete-record-btn:hover,
+button.mad-vault-delete-record-btn:focus {
+background: transparent !important;
+border: none !important;
+box-shadow: none !important;
+color: #dc2626 !important;
+transform: scale(1.12);
+}
+
+.mad-vault-pagination-bar {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+margin-top: 18px;
+padding-top: 10px;
+flex-wrap: wrap;
+}
+
+.mad-vault-page-btn,
+.mad-vault-dashboard-wrapper button.mad-vault-page-btn {
+min-width: 36px !important;
+height: 36px !important;
+padding: 0 10px !important;
+border-radius: 10px !important;
+border: 1px solid #bfc9c6 !important;
+background: #ffffff !important;
+color: #3f4947 !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 12.5px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+transition: all 0.2s ease !important;
+}
+
+.mad-vault-page-btn.active,
+.mad-vault-dashboard-wrapper button.mad-vault-page-btn.active {
+background: #0f5650 !important;
+color: #ffffff !important;
+border-color: #0f5650 !important;
+}
+
+.mad-vault-page-btn:disabled {
+opacity: 0.45 !important;
+cursor: not-allowed !important;
+}
+
+/* ==========================================================================
+9. مودال عریض نمایش نتیجه در پروفایل (با عرض ۱۱۴۰ در دسکتاپ و هدر غیراستیکی در موبایل)
+========================================================================== */
+#mad-vault-result-preview-modal.mad-vault-result-modal-overlay {
+position: fixed !important;
+top: 0 !important;
+right: 0 !important;
+bottom: 0 !important;
+left: 0 !important;
+width: 100vw !important;
+height: 100vh !important;
+background: rgba(15, 23, 42, 0.76) !important;
+backdrop-filter: blur(6px) !important;
+-webkit-backdrop-filter: blur(6px) !important;
+z-index: 9999998 !important;
+display: none;
+align-items: center !important;
+justify-content: center !important;
+padding: 20px !important;
+direction: rtl !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+box-sizing: border-box !important;
+}
+
+.mad-vault-result-modal-dialog {
+background: #f8faf8;
+width: 100%;
+max-width: 1140px;
+max-height: 92vh;
+border-radius: 22px;
+border: 1px solid #bfc9c6;
+box-shadow: 0 25px 60px rgba(0, 0, 0, 0.32);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+margin: auto;
+}
+
+.mad-vault-result-modal-header {
+background: #ffffff;
+padding: 14px 22px;
+border-bottom: 1px solid #e1e3e1;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+flex-wrap: wrap;
+flex-shrink: 0;
+}
+
+.mad-vault-result-modal-meta {
+display: flex;
+align-items: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.mad-vault-result-modal-top-actions {
+display: flex;
+align-items: center;
+gap: 8px;
+flex-wrap: wrap;
+}
+
+.mad-res-modal-action-btn,
+button.mad-res-modal-action-btn,
+a.mad-res-modal-action-btn {
+background: #f2f4f2 !important;
+color: #191c1c !important;
+border: 1px solid #bfc9c6 !important;
+border-radius: 10px !important;
+padding: 7px 13px !important;
+font-family: 'Vazirmatn', Tahoma, sans-serif !important;
+font-size: 12px !important;
+font-weight: 800 !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+gap: 6px !important;
+text-decoration: none !important;
+transition: all 0.2s ease !important;
+}
+
+.mad-res-modal-action-btn.primary,
+a.mad-res-modal-action-btn.primary {
+background: #0f5650 !important;
+color: #ffffff !important;
+border-color: #0f5650 !important;
+}
+
+.mad-vault-result-modal-close {
+width: 34px !important;
+height: 34px !important;
+border-radius: 50% !important;
+border: 1px solid #bfc9c6 !important;
+background: #ffffff !important;
+color: #3f4947 !important;
+font-size: 20px !important;
+cursor: pointer !important;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+}
+
+.mad-vault-result-modal-body {
+padding: 22px;
+overflow-y: auto;
+flex: 1;
+direction: rtl;
+position: relative;
+background: #f8faf8;
+}
+
+.mad-vault-result-modal-body [id*="modal" i]:not(.hidden),
+.mad-vault-result-modal-body [role="dialog"]:not(.hidden) {
+z-index: 99999999 !important;
+}
+
+.mad-vault-recommend-card {
+background: #ffffff;
+border: 1px solid #bfc9c6;
+border-radius: 16px;
+padding: 18px 20px;
+margin-bottom: 12px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+flex-wrap: wrap;
+}
+
+.mad-vault-empty-state {
+text-align: center;
+padding: 44px 20px;
+background: #f8faf8;
+border-radius: 18px;
+border: 1px dashed #bfc9c6;
+color: #3f4947;
+}
+
+/* ==========================================================================
+10. واکنش‌گرایی کامل موبایل (Mobile Responsive)
+========================================================================== */
+@media (max-width: 768px) {
+.mad-vault-db-header {
+padding: 16px;
+}
+.mad-vault-db-stats-actions {
+width: 100%;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+}
+.mad-vault-filters-bar {
+grid-template-columns: 1fr;
+}
+.mad-vault-history-row {
+flex-direction: column;
+align-items: stretch;
+padding: 14px;
+}
+.mad-vault-history-actions {
+width: 100%;
+justify-content: flex-end;
+padding-top: 10px;
+border-top: 1px dashed #e1e3e1;
+}
+button.mad-vault-view-result-btn,
+a.mad-vault-retry-tool-btn {
+flex: 1;
+justify-content: center !important;
+}
+#mad-vault-result-preview-modal.mad-vault-result-modal-overlay {
+padding: 8px !important;
+}
+.mad-vault-result-modal-dialog {
+max-height: 95vh;
+border-radius: 16px;
+overflow-y: auto;
+display: block;
+}
+.mad-vault-result-modal-header {
+position: static !important;
+padding: 10px 12px;
+gap: 8px;
+}
+.mad-vault-result-modal-meta h3 {
+font-size: 13.5px !important;
+}
+.mad-vault-result-modal-body {
+padding: 12px;
+overflow-y: visible;
+}
+}
