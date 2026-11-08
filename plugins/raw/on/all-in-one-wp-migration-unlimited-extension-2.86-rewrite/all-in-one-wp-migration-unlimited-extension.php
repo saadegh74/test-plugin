@@ -79,7 +79,7 @@ require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'loader.php';
 // ==========================================
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'plugin-update-checker' . DIRECTORY_SEPARATOR . 'plugin-update-checker.php';
 $ai1wmueUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/all-in-one-wp-migration-unlimited-extension/staging/info.json',
+	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/all-in-one-wp-migration-unlimited-extension/info.json',
 	__FILE__,
 	'all-in-one-wp-migration-unlimited-extension'
 );

@@ -418,7 +418,7 @@ if ( ! class_exists( 'Puc_v4_Factory' ) ) {
 	require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'plugin-update-checker' . DIRECTORY_SEPARATOR . 'plugin-update-checker.php';
 }
 $jetblocksUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/jet-blocks/staging/info.json',
+	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-blocks/info.json',
 	__FILE__,
 	'jet-blocks'
 );
