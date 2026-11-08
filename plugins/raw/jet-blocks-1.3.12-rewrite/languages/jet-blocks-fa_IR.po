@@ -1,0 +1,144 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: JetBlocks For Elementor\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-08 01:00+0000\n"
+"PO-Revision-Date: 2026-11-08 01:00+0000\n"
+"Last-Translator: برند تست <info@test-brand.com>\n"
+"Language-Team: Persian <fa@li.org>\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "JetBlocks For Elementor"
+msgstr "جت‌بلاکز برای المنتور"
+
+msgid "JetBlocks"
+msgstr "جت‌بلاکز"
+
+msgid "Site Logo"
+msgstr "لوگوی سایت"
+
+msgid "Auth Links"
+msgstr "پیوندهای احراز هویت"
+
+msgid "Hamburger Panel"
+msgstr "پنل همبرگری"
+
+msgid "Login"
+msgstr "ورود"
+
+msgid "Login Form"
+msgstr "فرم ورود"
+
+msgid "Register"
+msgstr "ثبت‌نام"
+
+msgid "Register Form"
+msgstr "فرم ثبت‌نام"
+
+msgid "Reset Password"
+msgstr "تغییر رمز عبور"
+
+msgid "Search"
+msgstr "جستجو"
+
+msgid "Breadcrumbs"
+msgstr "مسیر راهنما (بردکرامب)"
+
+msgid "Nav Menu"
+msgstr "فهرست ناوبری"
+
+msgid "WooCommerce Cart"
+msgstr "سبد خرید ووکامرس"
+
+msgid "Cart"
+msgstr "سبد خرید"
+
+msgid "Sticky Section"
+msgstr "بخش چسبان"
+
+msgid "Available Widgets"
+msgstr "ابزارک‌های در دسترس"
+
+msgid "General Settings"
+msgstr "تنظیمات عمومی"
+
+msgid "Integrations"
+msgstr "ادغام‌ها"
+
+msgid "reCAPTCHA"
+msgstr "ریکپچا"
+
+msgid "Site Key"
+msgstr "کلید سایت"
+
+msgid "Secret Key"
+msgstr "کلید امنیتی"
+
+msgid "Enable"
+msgstr "فعال‌سازی"
+
+msgid "Disable"
+msgstr "غیرفعال‌سازی"
+
+msgid "Save"
+msgstr "ذخیره تغییرات"
+
+msgid "Settings saved"
+msgstr "تنظیمات ذخیره شد"
+
+msgid "Go to settings"
+msgstr "رفتن به تنظیمات"
+
+msgid "JetBlocks requires Elementor to be activated."
+msgstr "افزونه جت‌بلاکز نیازمند فعال بودن المنتور است."
+
+msgid "Activate Elementor Now"
+msgstr "هم‌اکنون المنتور را فعال کنید"
+
+msgid "JetBlocks requires Elementor to be installed."
+msgstr "افزونه جت‌بلاکز نیازمند نصب المنتور است."
+
+msgid "Install Elementor Now"
+msgstr "هم‌اکنون المنتور را نصب کنید"
+
+msgid "Column Order"
+msgstr "ترتیب ستون‌ها"
+
+msgid "Show on Mobile"
+msgstr "نمایش در موبایل"
+
+msgid "Show on Tablet"
+msgstr "نمایش در تبلت"
+
+msgid "Show on Desktop"
+msgstr "نمایش در دسکتاپ"
+
+msgid "Username or Email Address"
+msgstr "نام کاربری یا نشانی ایمیل"
+
+msgid "Password"
+msgstr "رمز عبور"
+
+msgid "Remember Me"
+msgstr "مرا به خاطر بسپار"
+
+msgid "Log In"
+msgstr "ورود به سایت"
+
+msgid "Register Now"
+msgstr "ثبت نام در سایت"
+
+msgid "Lost your password?"
+msgstr "رمز عبور خود را فراموش کرده‌اید؟"
+
+msgid "Check for updates"
+msgstr "بررسی برای به‌روزرسانی‌ها"
+
+msgid "There is no changelog available."
+msgstr "توضیحاتی برای تغییرات این نسخه ثبت نشده است."
+
