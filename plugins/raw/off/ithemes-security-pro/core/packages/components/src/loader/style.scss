@@ -1,0 +1,13 @@
+.itsec-loader {
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    .components-spinner {
+        width: 200px;
+        height: 200px;
+        color: #1145C9;
+    }
+}

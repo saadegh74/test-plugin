@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "ithemes-security/passwordless-login-settings",
+  "title": "Kadence Security Passwordless Settings",
+  "category": "widgets",
+  "editorScript": "itsec-passwordless-login-block",
+  "editorStyle": "itsec-passwordless-login-block",
+  "supports": {
+    "inserter": false
+  }
+}

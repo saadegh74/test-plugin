@@ -1,0 +1,36 @@
+#itsec-profile-root, .itsec-apply-css-vars {
+	--wp-components-color-accent: #{$kadence-primary-base};
+	--wp-components-color-foreground: #{$kadence-text-color-dark};
+	--wp-admin-theme-color: #{$kadence-primary-base};
+	--wp-admin-theme-color-darker-10: #{$kadence-primary-darker10};
+	--wp-admin-theme-color-darker-20: #{$kadence-primary-darker20};
+}
+
+button.has-icon:hover {
+	color: #1145C9;
+}
+
+button.has-icon:focus {
+	box-shadow: 0 0 0 2px #1145c9 !important;
+}
+
+.components-datetime__date {
+	& button.is-tertiary {
+		color: #1145C9;
+	};
+
+	& .components-button:focus:not(:disabled) {
+		box-shadow: 0 0 0 2px #1145c9;
+	}
+
+	& button.components-datetime__date__day:not(:disabled):not([tabindex="0"]):hover {
+		color: #1145c9;
+	}
+
+	& button[tabindex="0"].components-datetime__date__day {
+		background: #1145C9;
+		& :hover {
+			color: white;
+		}
+	}
+}

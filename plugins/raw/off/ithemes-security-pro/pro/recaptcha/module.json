@@ -1,0 +1,1092 @@
+{
+  "id": "recaptcha",
+  "status": "default-inactive",
+  "type": "lockout",
+  "onboard": true,
+  "title": "CAPTCHA",
+  "description": "Protect your site from bots by verifying that the person submitting comments or logging in is indeed human.",
+  "help": "CAPTCHA challenges help keep bad bots from engaging in abusive activities on your website, such as attempting to break into your website using compromised passwords, posting spam, or fraudulently triggering password reset requests.<br>Legitimate users will be able to log in, make purchases, view pages, or create accounts. CAPTCHA APIs use advanced risk analysis techniques to tell humans and bots apart.",
+  "keywords": [
+    "recaptcha",
+    "turnstile",
+    "hcaptcha",
+    "cloudflare"
+  ],
+  "settings": {
+    "type": "object",
+    "properties": {
+      "provider": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "google"
+            ],
+            "title": "Google"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "cloudflare"
+            ],
+            "title": "CloudFlare"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "hcaptcha"
+            ],
+            "title": "hCaptcha"
+          }
+        ],
+        "title": "Provider",
+        "description": "Select the CAPTCHA API you’d like to use.",
+        "default": "google"
+      },
+      "type": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "v2"
+            ],
+            "title": "reCAPTCHA v2",
+            "description": "Validate users with the “I’m not a robot” checkbox."
+          },
+          {
+            "type": "string",
+            "enum": [
+              "invisible"
+            ],
+            "title": "Invisible reCAPTCHA",
+            "description": "Validate users in the background."
+          },
+          {
+            "type": "string",
+            "enum": [
+              "v3"
+            ],
+            "title": "reCAPTCHA v3",
+            "description": "Monitor visitors in the background on all pages."
+          }
+        ],
+        "default": "v3",
+        "title": "Type",
+        "description": "Only select the type associated with the generated keys. If you are unsure which type was selected when generating the keys, you should [generate new keys](https://www.google.com/recaptcha/admin). For details about the different types, see [Google’s documentation](https://developers.google.com/recaptcha/docs/versions)."
+      },
+      "site_key": {
+        "type": "string",
+        "default": "",
+        "title": "Site Key",
+        "description": "The generated site key from the [Google reCAPTCHA dashboard](https://www.google.com/recaptcha/admin)."
+      },
+      "secret_key": {
+        "type": "string",
+        "default": "",
+        "title": "Secret Key",
+        "description": "The generated secret key from the [Google reCAPTCHA dashboard](https://www.google.com/recaptcha/admin)."
+      },
+      "cf_site_key": {
+        "type": "string",
+        "default": "",
+        "title": "Site Key",
+        "description": "The generated site key from the [CloudFlare Turnstile dashboard](https://dash.cloudflare.com/?to=/:account/turnstile)."
+      },
+      "cf_secret_key": {
+        "type": "string",
+        "default": "",
+        "title": "Secret Key",
+        "description": "The generated secret key from the [CloudFlare Turnstile dashboard](https://dash.cloudflare.com/?to=/:account/turnstile)."
+      },
+      "hc_site_key": {
+        "type": "string",
+        "default": "",
+        "title": "Site Key",
+        "description": "The generated site key from the [hCaptcha site dashboard](https://dashboard.hcaptcha.com/)."
+      },
+      "hc_secret_key": {
+        "type": "string",
+        "default": "",
+        "title": "Secret Key",
+        "description": "Your account’s secret key from the [hCaptcha account settings](https://dashboard.hcaptcha.com/settings)."
+      },
+      "login": {
+        "type": "boolean",
+        "default": false,
+        "title": "Use on Login"
+      },
+      "register": {
+        "type": "boolean",
+        "default": false,
+        "title": "Use on New User Registration"
+      },
+      "reset_pass": {
+        "type": "boolean",
+        "default": false,
+        "title": "Use on Reset Password"
+      },
+      "comments": {
+        "type": "boolean",
+        "default": false,
+        "title": "Use on Comments"
+      },
+      "v3_include_location": {
+        "type": "string",
+        "oneOf": [
+          {
+            "enum": [
+              "everywhere"
+            ],
+            "title": "On All Pages"
+          },
+          {
+            "enum": [
+              "required"
+            ],
+            "title": "Only Required Pages"
+          }
+        ],
+        "default": "required",
+        "title": "Include Script",
+        "description": "Specify where the reCAPTCHA script should be loaded. Google recommends including the script on all pages to increase accuracy."
+      },
+      "language": {
+        "type": "string",
+        "oneOf": [
+          {
+            "enum": [
+              ""
+            ],
+            "title": "Detect"
+          },
+          {
+            "enum": [
+              "ar"
+            ],
+            "title": "Arabic"
+          },
+          {
+            "enum": [
+              "af"
+            ],
+            "title": "Afrikaans"
+          },
+          {
+            "enum": [
+              "am"
+            ],
+            "title": "Amharic"
+          },
+          {
+            "enum": [
+              "hy"
+            ],
+            "title": "Armenian"
+          },
+          {
+            "enum": [
+              "az"
+            ],
+            "title": "Azerbaijani"
+          },
+          {
+            "enum": [
+              "eu"
+            ],
+            "title": "Basque"
+          },
+          {
+            "enum": [
+              "bn"
+            ],
+            "title": "Bengali"
+          },
+          {
+            "enum": [
+              "bg"
+            ],
+            "title": "Bulgarian"
+          },
+          {
+            "enum": [
+              "ca"
+            ],
+            "title": "Catalan"
+          },
+          {
+            "enum": [
+              "zh-HK"
+            ],
+            "title": "Chinese (Hong Kong)"
+          },
+          {
+            "enum": [
+              "zh-CN"
+            ],
+            "title": "Chinese (Simplified)"
+          },
+          {
+            "enum": [
+              "zh-TW"
+            ],
+            "title": "Chinese (Traditional)"
+          },
+          {
+            "enum": [
+              "hr"
+            ],
+            "title": "Croatian"
+          },
+          {
+            "enum": [
+              "cs"
+            ],
+            "title": "Czech"
+          },
+          {
+            "enum": [
+              "da"
+            ],
+            "title": "Danish"
+          },
+          {
+            "enum": [
+              "nl"
+            ],
+            "title": "Dutch"
+          },
+          {
+            "enum": [
+              "en-GB"
+            ],
+            "title": "English (UK)"
+          },
+          {
+            "enum": [
+              "en"
+            ],
+            "title": "English (US)"
+          },
+          {
+            "enum": [
+              "et"
+            ],
+            "title": "Estonian"
+          },
+          {
+            "enum": [
+              "fil"
+            ],
+            "title": "Filipino"
+          },
+          {
+            "enum": [
+              "fi"
+            ],
+            "title": "Finnish"
+          },
+          {
+            "enum": [
+              "fr"
+            ],
+            "title": "French"
+          },
+          {
+            "enum": [
+              "fr-CA"
+            ],
+            "title": "French (Canadian)"
+          },
+          {
+            "enum": [
+              "gl"
+            ],
+            "title": "Galician"
+          },
+          {
+            "enum": [
+              "ka"
+            ],
+            "title": "Georgian"
+          },
+          {
+            "enum": [
+              "de"
+            ],
+            "title": "German"
+          },
+          {
+            "enum": [
+              "de-AT"
+            ],
+            "title": "German (Austria)"
+          },
+          {
+            "enum": [
+              "de-CH"
+            ],
+            "title": "German (Switzerland)"
+          },
+          {
+            "enum": [
+              "el"
+            ],
+            "title": "Greek"
+          },
+          {
+            "enum": [
+              "gu"
+            ],
+            "title": "Gujarati"
+          },
+          {
+            "enum": [
+              "iw"
+            ],
+            "title": "Hebrew"
+          },
+          {
+            "enum": [
+              "hi"
+            ],
+            "title": "Hindi"
+          },
+          {
+            "enum": [
+              "hu"
+            ],
+            "title": "Hungarain"
+          },
+          {
+            "enum": [
+              "is"
+            ],
+            "title": "Icelandic"
+          },
+          {
+            "enum": [
+              "id"
+            ],
+            "title": "Indonesian"
+          },
+          {
+            "enum": [
+              "it"
+            ],
+            "title": "Italian"
+          },
+          {
+            "enum": [
+              "ja"
+            ],
+            "title": "Japanese"
+          },
+          {
+            "enum": [
+              "kn"
+            ],
+            "title": "Kannada"
+          },
+          {
+            "enum": [
+              "ko"
+            ],
+            "title": "Korean"
+          },
+          {
+            "enum": [
+              "lo"
+            ],
+            "title": "Laothian"
+          },
+          {
+            "enum": [
+              "lv"
+            ],
+            "title": "Latvian"
+          },
+          {
+            "enum": [
+              "lt"
+            ],
+            "title": "Lithuanian"
+          },
+          {
+            "enum": [
+              "ms"
+            ],
+            "title": "Malay"
+          },
+          {
+            "enum": [
+              "ml"
+            ],
+            "title": "Malayalam"
+          },
+          {
+            "enum": [
+              "mr"
+            ],
+            "title": "Marathi"
+          },
+          {
+            "enum": [
+              "mn"
+            ],
+            "title": "Mongolian"
+          },
+          {
+            "enum": [
+              "no"
+            ],
+            "title": "Norwegian"
+          },
+          {
+            "enum": [
+              "fa"
+            ],
+            "title": "Persian"
+          },
+          {
+            "enum": [
+              "pl"
+            ],
+            "title": "Polish"
+          },
+          {
+            "enum": [
+              "pt"
+            ],
+            "title": "Portuguese"
+          },
+          {
+            "enum": [
+              "pt-BR"
+            ],
+            "title": "Portuguese (Brazil)"
+          },
+          {
+            "enum": [
+              "pt-PT"
+            ],
+            "title": "Portuguese (Portugal)"
+          },
+          {
+            "enum": [
+              "ro"
+            ],
+            "title": "Romanian"
+          },
+          {
+            "enum": [
+              "ru"
+            ],
+            "title": "Russian"
+          },
+          {
+            "enum": [
+              "sr"
+            ],
+            "title": "Serbian"
+          },
+          {
+            "enum": [
+              "si"
+            ],
+            "title": "Sinhalese"
+          },
+          {
+            "enum": [
+              "sk"
+            ],
+            "title": "Slovak"
+          },
+          {
+            "enum": [
+              "sl"
+            ],
+            "title": "Slovenian"
+          },
+          {
+            "enum": [
+              "es"
+            ],
+            "title": "Spanish"
+          },
+          {
+            "enum": [
+              "es-419"
+            ],
+            "title": "Spanish (Latin America)"
+          },
+          {
+            "enum": [
+              "sw"
+            ],
+            "title": "Swahili"
+          },
+          {
+            "enum": [
+              "sv"
+            ],
+            "title": "Swedish"
+          },
+          {
+            "enum": [
+              "ta"
+            ],
+            "title": "Tamil"
+          },
+          {
+            "enum": [
+              "te"
+            ],
+            "title": "Telugu"
+          },
+          {
+            "enum": [
+              "th"
+            ],
+            "title": "Thai"
+          },
+          {
+            "enum": [
+              "tr"
+            ],
+            "title": "Turkish"
+          },
+          {
+            "enum": [
+              "uk"
+            ],
+            "title": "Ukrainian"
+          },
+          {
+            "enum": [
+              "ur"
+            ],
+            "title": "Urdu"
+          },
+          {
+            "enum": [
+              "vi"
+            ],
+            "title": "Vietnamese"
+          },
+          {
+            "enum": [
+              "zu"
+            ],
+            "title": "Zulu"
+          }
+        ],
+        "default": "",
+        "title": "Force Language",
+        "description": "Force the reCAPTCHA to render in the selected language."
+      },
+      "theme": {
+        "type": "boolean",
+        "default": false,
+        "title": "Use Dark Theme"
+      },
+      "invis_position": {
+        "type": "string",
+        "oneOf": [
+          {
+            "enum": [
+              "bottomleft"
+            ],
+            "title": "Bottom Left"
+          },
+          {
+            "enum": [
+              "bottomright"
+            ],
+            "title": "Bottom Right"
+          }
+        ],
+        "default": "bottomright",
+        "title": "reCAPTCHA Position"
+      },
+      "cf_theme": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "auto"
+            ],
+            "title": "Use Browser Theme"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "light"
+            ],
+            "title": "Light"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "dark"
+            ],
+            "title": "Dark"
+          }
+        ],
+        "default": "light",
+        "title": "Widget Theme",
+        "description": "Select the Turnstile widget style."
+      },
+      "cf_size": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "normal"
+            ],
+            "title": "Normal"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "compact"
+            ],
+            "title": "Compact"
+          }
+        ],
+        "default": "normal",
+        "title": "Widget Size",
+        "description": "Select the Turnstile widget size."
+      },
+      "hc_theme": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "light"
+            ],
+            "title": "Light"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "dark"
+            ],
+            "title": "Dark"
+          }
+        ],
+        "default": "light",
+        "title": "Widget Theme",
+        "description": "Select the hCaptcha widget style."
+      },
+      "hc_size": {
+        "type": "string",
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "normal"
+            ],
+            "title": "Normal"
+          },
+          {
+            "type": "string",
+            "enum": [
+              "compact"
+            ],
+            "title": "Compact"
+          }
+        ],
+        "default": "normal",
+        "title": "Widget Size",
+        "description": "Select the hCaptcha widget size."
+      },
+      "gdpr": {
+        "type": "boolean",
+        "default": true,
+        "title": "Enable GDPR Opt-In",
+        "description": "To assist with GDPR compliance, Kadence Security can prompt the user to accept the CAPTCHA provider’s Privacy Policy and Terms of Service before loading the challenge."
+      },
+      "on_page_opt_in": {
+        "type": "boolean",
+        "default": true,
+        "title": "On Page Opt-in",
+        "description": "Allow users to opt-in to CAPTCHA without refreshing the page."
+      },
+      "v3_threshold": {
+        "type": "number",
+        "minimum": 0.0,
+        "maximum": 1.0,
+        "default": 0.5,
+        "title": "Block Threshold",
+        "description": "Google reCAPTCHA assigns a score between 0 and 1 describing the legitimacy of the request. A score of 1 is most likely a human, and a score of 0 is most likely a bot. Google recommends using a default value of 0.5 and to adjust the threshold based off the score distribution."
+      },
+      "error_threshold": {
+        "type": "integer",
+        "minimum": 0,
+        "default": 7,
+        "title": "Lockout Error Threshold",
+        "description": "The numbers of failed CAPTCHA entries that will trigger a lockout. Set to zero (0) to record errors without locking out users. This can be useful for troubleshooting. The default is 7."
+      },
+      "check_period": {
+        "type": "integer",
+        "minimum": 1,
+        "default": 5,
+        "title": "Lockout Check Period",
+        "description": "How long the plugin will remember a bad CAPTCHA entry and count it towards a lockout."
+      },
+      "validated": {
+        "type": "boolean",
+        "default": false,
+        "readonly": true
+      },
+      "last_error": {
+        "type": "string",
+        "default": "",
+        "readonly": true
+      }
+    },
+    "uiSchema": {
+      "ui:sections": [
+        {
+          "title": "API Keys",
+          "fields": [
+            "type",
+            "site_key",
+            "secret_key",
+            "cf_site_key",
+            "cf_secret_key",
+            "hc_site_key",
+            "hc_secret_key"
+          ]
+        },
+        {
+          "title": "Protected Actions",
+          "fields": [
+            "login",
+            "register",
+            "reset_pass",
+            "comments",
+            "v3_include_location"
+          ]
+        },
+        {
+          "title": "Appearance",
+          "fields": [
+            "language",
+            "theme",
+            "invis_position",
+            "cf_theme",
+            "cf_size",
+            "hc_theme",
+            "hc_size",
+            "gdpr",
+            "on_page_opt_in"
+          ]
+        },
+        {
+          "title": "Lockout",
+          "fields": [
+            "v3_threshold",
+            "error_threshold",
+            "check_period"
+          ]
+        }
+      ]
+    }
+  },
+  "conditional-settings": {
+    "type": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          }
+        }
+      }
+    },
+    "site_key": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          }
+        }
+      }
+    },
+    "secret_key": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          }
+        }
+      }
+    },
+    "v3_threshold": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "v3"
+            ]
+          }
+        }
+      }
+    },
+    "v3_include_location": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "v3"
+            ]
+          }
+        }
+      }
+    },
+    "theme": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "v2"
+            ]
+          }
+        }
+      }
+    },
+    "invis_position": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "invisible"
+            ]
+          }
+        }
+      }
+    },
+    "language": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "google"
+            ]
+          }
+        }
+      }
+    },
+    "on_page_opt_in": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "gdpr": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          }
+        }
+      }
+    },
+    "cf_site_key": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "cloudflare"
+            ]
+          }
+        }
+      }
+    },
+    "cf_secret_key": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "cloudflare"
+            ]
+          }
+        }
+      }
+    },
+    "cf_theme": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "cloudflare"
+            ]
+          }
+        }
+      }
+    },
+    "cf_size": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "cloudflare"
+            ]
+          }
+        }
+      }
+    },
+    "hc_site_key": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "hcaptcha"
+            ]
+          }
+        }
+      }
+    },
+    "hc_secret_key": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "hcaptcha"
+            ]
+          }
+        }
+      }
+    },
+    "hc_theme": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "hcaptcha"
+            ]
+          }
+        }
+      }
+    },
+    "hc_size": {
+      "settings": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": [
+              "hcaptcha"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "onboard-settings": [
+    "provider",
+    "type",
+    "site_key",
+    "secret_key",
+    "cf_site_key",
+    "cf_secret_key",
+    "login",
+    "register",
+    "reset_pass",
+    "comments"
+  ],
+  "import-export": {
+    "import-settings": [
+      "provider",
+      "type",
+      "site_key",
+      "secret_key",
+      "cf_site_key",
+      "cf_secret_key"
+    ]
+  },
+  "telemetry-settings": {
+    "provider": true,
+    "type": true,
+    "login": true,
+    "register": true,
+    "reset_pass": true,
+    "comments": true,
+    "v3_include_location": true,
+    "language": true,
+    "theme": true,
+    "invis_position": true,
+    "cf_theme": true,
+    "cf_size": true,
+    "hc_theme": true,
+    "hc_size": true,
+    "gdpr": true,
+    "on_page_opt_in": true,
+    "v3_threshold": true,
+    "error_threshold": true,
+    "check_period": true
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "id": "security-headers",
+  "status": "default-inactive",
+  "type": "advanced",
+  "title": "Security Headers",
+  "description": "Secure your site and visitors by enforcing essential HTTP security headers.",
+  "scheduling": {
+    "security-headers-check" : {
+      "type": "recurring",
+      "schedule": "daily"
+    }
+  },
+  "settings": {
+    "type": "object",
+    "properties": {
+      "use_server_config": {
+        "type": "boolean",
+        "default": false,
+        "title": "Use server configuration to send headers",
+        "description": "By default, security headers are sent via PHP. Enable this to inject headers directly into your server configuration (NGINX/Apache)."
+      },
+      "x_frame_options": {
+        "type": "string",
+        "enum": [
+          "",
+          "DENY",
+          "SAMEORIGIN"
+        ],
+        "default": "",
+        "title": "X-Frame-Options",
+        "description": "Prevent your site from being displayed inside another website using frames, helping protect against clickjacking attacks. <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Frame-Options' target='_blank'>Learn more</a>."
+      },
+      "x_content_type_options": {
+        "type": "string",
+        "enum": [
+          "",
+          "nosniff"
+        ],
+        "default": "",
+        "title": "X-Content-Type-Options",
+        "description": "Tell browsers not to guess file types, helping block malicious files from being run as something they’re not. <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Content-Type-Options' target='_blank'>Learn more</a>."
+      },
+      "referrer_policy": {
+        "type": "string",
+        "enum": [
+          "",
+          "no-referrer",
+          "no-referrer-when-downgrade",
+          "origin",
+          "origin-when-cross-origin",
+          "same-origin",
+          "strict-origin",
+          "strict-origin-when-cross-origin",
+          "unsafe-url"
+        ],
+        "default": "",
+        "title": "Referrer-Policy",
+        "description": "Controls how much information about your visitors’ previous pages is shared when they follow links. <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy' target='_blank'>Learn more</a>."
+      },
+      "content_security_policy": {
+        "type": "string",
+        "default": "",
+        "title": "Content-Security-Policy",
+        "description": "Adds strong protection by limiting which domains browsers can load scripts, styles, and other content from. <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy' target='_blank'>Learn more</a>.<br>Use <a href='https://report-uri.com/home/generate' target='_blank'>report-uri.com</a> to create your policy, then paste it here."
+      }
+    },
+    "uiSchema": {
+      "ui:sections": [
+        {
+          "title": "Clickjacking",
+          "fields": [
+            "x_frame_options"
+          ]
+        },
+        {
+          "title": "Response Headers",
+          "fields": [
+            "x_content_type_options",
+            "referrer_policy"
+          ]
+        },
+        {
+          "title": "Resource Control",
+          "fields": [
+            "content_security_policy"
+          ]
+        }
+      ],
+      "x_frame_options": {
+        "ui:warning": "Enabling this setting can block your site from being embedded via iframes on other sites — make sure this is what you intend."
+      },
+      "x_content_type_options": {
+        "ui:warning": "Ensure your server uses correct MIME types — files or scripts with incorrect types may not work as expected after enabling this setting."
+      },
+      "referrer_policy": {
+        "ui:warning": "Stricter policies may limit referrer information shared with other sites — this can affect analytics or integrations that rely on it."
+      },
+      "content_security_policy": {
+        "ui:warning": "Be careful when creating your policy — overly strict rules can block scripts, styles, or other content your site needs to function properly."
+      }
+    }
+  }
+}

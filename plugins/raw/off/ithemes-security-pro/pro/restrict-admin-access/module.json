@@ -1,0 +1,41 @@
+{
+  "id": "restrict-admin-access",
+  "status": "default-inactive",
+  "type": "login",
+  "title": "Restrict Admin Access by Country",
+  "description": "Only allow administrator logins from approved geographic locations to prevent unauthorized access.",
+  "help": "To prevent a lockout, add your IP and country to the Authorized IPs list before enabling this feature. This restriction applies to all users with administrator capabilities. Note: Magic Links and other bypass mechanisms may still allow access.",
+  "keywords": [
+    "restrict",
+    "admin",
+    "country",
+    "ip"
+  ],
+  "settings": {
+    "type": "object",
+    "properties": {
+      "authorized_countries": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true,
+        "default": [],
+        "title": "Authorized Administrator Countries",
+        "description": "Select which countries administrators are permitted to login from. This restriction only applies to users with administrator capabilities and requires a configured geolocation provider."
+      }
+    },
+    "removed_settings": [
+      "authorized_administrator_ips"
+    ],
+    "uiSchema": {
+      "authorized_countries": {
+        "ui:field": "ApiSelectField",
+        "ui:options": {
+          "path": "/ithemes-security/v1/restrict-admin-access/countries",
+          "placeholder": "Select countries..."
+        }
+      }
+    }
+  }
+}

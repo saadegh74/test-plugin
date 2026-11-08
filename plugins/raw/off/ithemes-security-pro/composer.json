@@ -1,0 +1,124 @@
+{
+  "name": "ithemes/ithemes-security-pro",
+  "description": "Take the guesswork out of WordPress security. Solid Security offers 30+ ways to lock down WordPress in an easy-to-use WordPress security plugin.",
+  "type": "wordpress-plugin",
+  "require-dev": {
+    "lucatume/wp-browser": "^3.1.6",
+    "codeception/module-asserts": "^1.3.1",
+    "codeception/module-phpbrowser": "^1.0.3",
+    "codeception/module-webdriver": "^1.4.1",
+    "codeception/module-db": "^1.2",
+    "codeception/module-filesystem": "^1.0.3",
+    "codeception/module-cli": "^1.1.1",
+    "codeception/util-universalframework": "^1.0",
+    "rawr/cross-data-providers": "^1.0",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+    "phpcompatibility/phpcompatibility-wp": "*",
+    "wp-cli/wp-config-transformer": "^1.3",
+    "wp-cli/wp-cli-bundle": "^2.6",
+    "dms/phpunit-arraysubset-asserts": "^0.4.0"
+  },
+  "license": "GPL-2.0-or-later",
+  "authors": [
+    {
+      "name": "Timothy Jacobs",
+      "email": "timothy@ithemes.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "require": {
+    "php": "^7.3 | ^8.0",
+    "pimple/pimple": "^3.5",
+    "web-auth/cose-lib": "^3.3.12",
+    "paragonie/constant_time_encoding": "^2.6.3",
+    "spomky-labs/cbor-php": "^2.1",
+    "symfony/polyfill-uuid": "^1.26",
+    "bjeavons/zxcvbn-php": "^1.3",
+    "deliciousbrains/wp-background-processing": "^1.1",
+    "patchstack/firewall": "dev-master",
+    "stellarwp/telemetry": "^2.4",
+    "stellarwp/harbor": "^2.0.2"
+  },
+  "repositories": [
+    {
+      "name": "patchstack/firewall",
+      "type": "vcs",
+      "url": "https://bitbucket.org/solid-wp/firewall-engine.git"
+    }
+  ],
+  "autoload": {
+    "classmap": [
+      "core/Exception/",
+      "core/Contracts/",
+      "core/modules/",
+      "core/lib",
+      "pro/",
+      "vendor-prod"
+    ]
+  },
+  "autoload-dev": {
+    "files": [
+      "tests/constants.php"
+    ],
+    "classmap": [
+      "tests/_support",
+      "tests/wpunit"
+    ]
+  },
+  "config": {
+    "platform": {
+      "php": "7.4"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    },
+    "store-auths": false,
+    "autoloader-suffix": "SolidSecurityDev"
+  },
+  "scripts": {
+    "strauss": [
+      "@php vendor/stellarwp/harbor/bin/stellar-harbor domain=LION",
+      "[ -f ./bin/phar/strauss.phar ] || curl -o bin/phar/strauss.phar -fL -C - https://github.com/BrianHenryIE/strauss/releases/download/0.27.2/strauss.phar",
+      "@php bin/phar/strauss.phar",
+      "@php bin/strauss-workaround-fixes.php"
+    ],
+    "post-install-cmd": [
+      "@strauss"
+    ],
+    "post-update-cmd": [
+      "@strauss"
+    ]
+  },
+  "extra": {
+    "strauss": {
+      "target_directory": "vendor-prod",
+      "namespace_prefix": "iThemesSecurity\\Strauss",
+      "classmap_output": true,
+      "packages": [],
+      "exclude_from_copy": {
+        "packages": [
+        ]
+      },
+      "exclude_from_prefix": {
+        "packages": [
+          "symfony/polyfill-uuid"
+        ],
+        "file_patterns": [
+          "/harbor/src/Harbor/global-functions\\.php$"
+        ]
+      },
+      "override_autoload": {
+        "pimple/pimple": {
+          "classmap": [
+            "src/"
+          ]
+        }
+      },
+      "include_modified_date": false,
+      "include_author": false
+    }
+  }
+}
