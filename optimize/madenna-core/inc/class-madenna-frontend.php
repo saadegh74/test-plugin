@@ -40,13 +40,22 @@ class Madenna_Frontend {
             $cats = wp_get_post_terms(get_the_ID(), 'madenna_cat');
             $cat_slug = (!empty($cats) && !is_wp_error($cats)) ? $cats[0]->slug : '';
 
+             = get_current_user_id();
+             = is_user_logged_in() ? wp_get_current_user() : null;
+             =  ? ->display_name : '';
+             =  ? (get_user_meta(, 'madenna_gender', true) ?: 'male') : 'male';
+             =  ? (get_user_meta(, 'madenna_birthdate', true) ?: '') : '';
+
             wp_localize_script('madenna-vault-js', 'madennaVaultConfig', [
-                'rest_url'      => esc_url_raw(rest_url('madenna/v1/vault/')),
-                'is_logged_in'  => is_user_logged_in(),
-                'user_id'       => get_current_user_id(),
-                'tool_id'       => get_the_ID(),
-                'category_slug' => $cat_slug,
-                'nonce'         => wp_create_nonce('wp_rest'),
+                'rest_url'       => esc_url_raw(rest_url('madenna/v1/vault/')),
+                'is_logged_in'   => is_user_logged_in(),
+                'user_id'        => ,
+                'user_name'      => ,
+                'user_gender'    => ,
+                'user_birthdate' => ,
+                'tool_id'        => get_the_ID(),
+                'category_slug'  => ,
+                'nonce'          => wp_create_nonce('wp_rest'),
             ]);
         }
     }

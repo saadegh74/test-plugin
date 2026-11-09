@@ -632,6 +632,7 @@ class Madenna_User_Vault {
             'user_id'         => $user_id,
             'user_name'       => $u_obj ? $u_obj->display_name : $full_name,
             'gender'          => $final_gender,
+            'birthdate'       => get_user_meta($user_id, 'madenna_birthdate', true) ?: '',
             'avatar_svg'      => self::get_avatar_svg($final_gender, 36),
             'unseen_count'    => self::get_unseen_badge_count($user_id),
             'is_new_user'     => $is_new_user,
@@ -641,10 +642,35 @@ class Madenna_User_Vault {
     }
 
     public function ajax_update_profile() {
-        $user_id = get_current_user_id();
-        if (!$user_id) {
+         = get_current_user_id();
+        if (!) {
             wp_send_json_error(['message' => 'ابتدا وارد حساب خود شوید.']);
         }
+
+              = sanitize_text_field(['full_name'] ?? '');
+            = in_array(['gender'] ?? '', ['male', 'female'], true) ? ['gender'] : 'male';
+         = sanitize_text_field(['birthdate'] ?? '');
+
+        if (!empty()) {
+            wp_update_user([
+                'ID'           => ,
+                'display_name' => ,
+                'first_name'   => ,
+            ]);
+        }
+        update_user_meta(, 'madenna_gender', );
+        if (isset(['birthdate'])) {
+            update_user_meta(, 'madenna_birthdate', );
+        }
+
+        wp_send_json_success([
+            'name'              => ,
+            'gender'            => ,
+            'birthdate'         => ,
+            'avatar_svg'        => self::get_avatar_svg(, 64),
+            'header_avatar_svg' => self::get_avatar_svg(, 36),
+        ]);
+    }
 
         $name   = sanitize_text_field($_POST['full_name'] ?? '');
         $gender = in_array($_POST['gender'] ?? '', ['male', 'female'], true) ? $_POST['gender'] : 'male';
@@ -673,8 +699,9 @@ class Madenna_User_Vault {
             return new WP_REST_Response(['success' => false, 'message' => 'ابتدا وارد شوید.'], 401);
         }
 
-        $name   = sanitize_text_field($params['full_name'] ?? '');
-        $gender = in_array($params['gender'] ?? '', ['male', 'female'], true) ? $params['gender'] : 'male';
+        $name      = sanitize_text_field($params['full_name'] ?? '');
+        $gender    = in_array($params['gender'] ?? '', ['male', 'female'], true) ? $params['gender'] : 'male';
+        $birthdate = sanitize_text_field($params['birthdate'] ?? '');
 
         if (!empty($name)) {
             wp_update_user([
@@ -684,11 +711,15 @@ class Madenna_User_Vault {
             ]);
         }
         update_user_meta($user_id, 'madenna_gender', $gender);
+        if (isset($params['birthdate'])) {
+            update_user_meta($user_id, 'madenna_birthdate', $birthdate);
+        }
 
         return new WP_REST_Response([
             'success'           => true,
             'name'              => $name,
             'gender'            => $gender,
+            'birthdate'         => $birthdate,
             'avatar_svg'        => self::get_avatar_svg($gender, 64),
             'header_avatar_svg' => self::get_avatar_svg($gender, 36),
         ], 200);

@@ -15,6 +15,7 @@
         user_id: 0,
         user_name: '',
         user_gender: 'male',
+        user_birthdate: '',
         tool_id: 0,
         page_id: 0,
         category_slug: '',
@@ -118,28 +119,252 @@
         }
     }
 
-    function autoPopulateToolUserFields(customName) {
-        const activeName = customName || config.user_name || '';
-        if (!activeName) return;
+    function autoPopulateToolUserFields(customData) {
+        let activeName = config.user_name || '';
+        let activeGender = config.user_gender || '';
+        let activeBirthdate = config.user_birthdate || '';
+
+        if (typeof customData === 'string') {
+            activeName = customData;
+        } else if (customData && typeof customData === 'object') {
+            if (customData.name) activeName = customData.name;
+            if (customData.gender) activeGender = customData.gender;
+            if (customData.birthdate) activeBirthdate = customData.birthdate;
+        }
+
+        const isFemale = (activeGender === 'female');
+        const genderFa = isFemale ? 'خانم' : 'آقا';
+        const genderFaAlt = isFemale ? 'زن' : 'مرد';
+
+        // محاسبه سن و اجزای تاریخ تولد
+        let birthYear = '', birthMonth = '', birthDay = '', calculatedAge = '';
+        if (activeBirthdate) {
+            const cleanBdate = activeBirthdate.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+            const parts = cleanBdate.split(/[\/\-\.\s]/).map(p => p.trim()).filter(Boolean);
+            if (parts.length >= 1) {
+                if (parts[0].length === 4) {
+                    birthYear = parts[0];
+                    birthMonth = parts[1] || '';
+                    birthDay = parts[2] || '';
+                } else if (parts[2] && parts[2].length === 4) {
+                    birthYear = parts[2];
+                    birthMonth = parts[1] || '';
+                    birthDay = parts[0] || '';
+                }
+                if (birthYear) {
+                    const yNum = parseInt(birthYear, 10);
+                    if (yNum > 1300 && yNum < 1420) {
+                        calculatedAge = String(Math.max(1, 1403 - yNum));
+                    } else if (yNum > 1920 && yNum < 2030) {
+                        calculatedAge = String(Math.max(1, new Date().getFullYear() - yNum));
+                    }
+                }
+            }
+        }
+
+        // پل ارتباطی سراسری برای همکاران و کدهای ابزار جمینی بدون نیاز به دیتابیس
+        window.MadennaUser = {
+            isLoggedIn: !!config.is_logged_in,
+            id: parseInt(config.user_id, 10) || 0,
+            name: activeName,
+            gender: activeGender,
+            genderLabel: genderFa,
+            genderText: genderFaAlt,
+            birthdate: activeBirthdate,
+            birthYear: birthYear,
+            birthMonth: birthMonth,
+            birthDay: birthDay,
+            age: calculatedAge ? parseInt(calculatedAge, 10) : '',
+            mobile: userMobile || ''
+        };
+        try {
+            window.dispatchEvent(new CustomEvent('madenna_user_ready', { detail: window.MadennaUser }));
+        } catch (e) {}
 
         const toolWrap = getLiveToolContainer();
         if (!toolWrap) return;
 
-        const nameInputs = toolWrap.querySelectorAll(
-            'input[name*="name" i], input[id*="name" i], input[placeholder*="نام شما"], input[placeholder*="نام و نام خانوادگی"], input[data-user-name-input]'
-        );
-        nameInputs.forEach(inp => {
-            if (!inp.value || inp.value.trim() === '') {
-                inp.value = activeName;
-                inp.dispatchEvent(new Event('input', { bubbles: true }));
-                inp.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        });
+        // ۱. پر کردن خودکار فیلدهای نام کاربر
+        if (activeName) {
+            const nameInputs = toolWrap.querySelectorAll(
+                'input[name*="name" i], input[id*="name" i], input[placeholder*="نام شما"], input[placeholder*="نام و نام خانوادگی"], input[placeholder*="نام"], input[data-user-name-input], input[data-user-name]'
+            );
+            nameInputs.forEach(inp => {
+                const n = (inp.name || '').toLowerCase();
+                const id = (inp.id || '').toLowerCase();
+                if (n.includes('username') || n.includes('file') || id.includes('username') || id.includes('file')) return;
 
-        const namePlaceholders = toolWrap.querySelectorAll('.madenna-user-name, [data-madenna-user-name]');
-        namePlaceholders.forEach(el => {
-            el.textContent = activeName;
-        });
+                if (!inp.value || inp.value.trim() === '') {
+                    inp.value = activeName;
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                    inp.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+
+            const namePlaceholders = toolWrap.querySelectorAll('.madenna-user-name, [data-madenna-user-name]');
+            namePlaceholders.forEach(el => {
+                el.textContent = activeName;
+            });
+        }
+
+        // ۲. پر کردن خودکار فیلدهای جنسیت (Select, Radio, Cards)
+        if (activeGender) {
+            // منوهای کشویی Select
+            const genderSelects = toolWrap.querySelectorAll(
+                'select[name*="gender" i], select[id*="gender" i], select[name*="sex" i], select[id*="sex" i], select[data-user-gender], select[data-gender]'
+            );
+            genderSelects.forEach(sel => {
+                Array.from(sel.options).forEach(opt => {
+                    const val = (opt.value || '').toLowerCase().trim();
+                    const txt = (opt.textContent || '').trim();
+                    if (isFemale) {
+                        if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر'].includes(val) || txt.includes('خانم') || txt.includes('زن')) {
+                            sel.value = opt.value;
+                            sel.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    } else {
+                        if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر'].includes(val) || txt.includes('آقا') || txt.includes('مرد')) {
+                            sel.value = opt.value;
+                            sel.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                });
+            });
+
+            // رادیوباتن‌ها Radio
+            const genderRadios = toolWrap.querySelectorAll(
+                'input[type="radio"][name*="gender" i], input[type="radio"][name*="sex" i], input[type="radio"][id*="gender" i], input[type="radio"][id*="sex" i], input[type="radio"][data-user-gender], input[type="radio"][data-gender]'
+            );
+            genderRadios.forEach(radio => {
+                const val = (radio.value || '').toLowerCase().trim();
+                const label = radio.closest('label') || toolWrap.querySelector(`label[for="${radio.id}"]`);
+                const labelText = label ? label.textContent.trim() : '';
+
+                let matches = false;
+                if (isFemale) {
+                    if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر'].includes(val) || labelText.includes('خانم') || labelText.includes('زن')) {
+                        matches = true;
+                    }
+                } else {
+                    if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر'].includes(val) || labelText.includes('آقا') || labelText.includes('مرد')) {
+                        matches = true;
+                    }
+                }
+
+                if (matches) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('input', { bubbles: true }));
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+
+            // کارت‌ها یا دکمه‌های استایل‌دار سفارشی جمینی
+            const genderCards = toolWrap.querySelectorAll(
+                '[data-gender], .gender-card, .gender-option, .gender-btn, [data-value="male"], [data-value="female"]'
+            );
+            genderCards.forEach(card => {
+                const val = (card.getAttribute('data-gender') || card.getAttribute('data-value') || card.className || '').toLowerCase();
+                const txt = card.textContent.trim();
+                let matches = false;
+                if (isFemale) {
+                    if (val.includes('female') || val.includes('woman') || txt.includes('خانم') || txt.includes('زن')) matches = true;
+                } else {
+                    if (val.includes('male') || val.includes('man') || txt.includes('آقا') || txt.includes('مرد')) matches = true;
+                }
+                if (matches && !card.classList.contains('active') && !card.classList.contains('selected')) {
+                    try { card.click(); } catch (e) {}
+                }
+            });
+
+            // تگ‌های متنی نگهدارنده جنسیت
+            const genderPlaceholders = toolWrap.querySelectorAll('.madenna-user-gender, [data-madenna-user-gender]');
+            genderPlaceholders.forEach(el => {
+                el.textContent = genderFa;
+            });
+        }
+
+        // ۳. پر کردن خودکار تاریخ تولد و سن
+        if (activeBirthdate) {
+            // فیلد کامل تاریخ تولد
+            const bdateInputs = toolWrap.querySelectorAll(
+                'input[name*="birth" i], input[id*="birth" i], input[name*="bdate" i], input[id*="bdate" i], input[placeholder*="تاریخ تولد"], input[data-user-birthdate], input[data-birthdate]'
+            );
+            bdateInputs.forEach(inp => {
+                if (!inp.value || inp.value.trim() === '') {
+                    inp.value = activeBirthdate;
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                    inp.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+
+            // سال تولد مجزا
+            if (birthYear) {
+                const yearInputs = toolWrap.querySelectorAll(
+                    'input[name*="birth_year" i], input[id*="birth_year" i], select[name*="birth_year" i], select[id*="birth_year" i], input[name*="byear" i], input[id*="byear" i], input[placeholder*="سال تولد"], select[placeholder*="سال تولد"], [data-user-birth-year]'
+                );
+                yearInputs.forEach(el => {
+                    if (!el.value || el.value.trim() === '' || el.value === '0') {
+                        el.value = birthYear;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            }
+
+            // ماه تولد مجزا
+            if (birthMonth) {
+                const mNum = parseInt(birthMonth, 10);
+                const monthInputs = toolWrap.querySelectorAll(
+                    'input[name*="birth_month" i], input[id*="birth_month" i], select[name*="birth_month" i], select[id*="birth_month" i], input[name*="bmonth" i], input[id*="bmonth" i], input[placeholder*="ماه تولد"], select[placeholder*="ماه تولد"], [data-user-birth-month]'
+                );
+                monthInputs.forEach(el => {
+                    if (!el.value || el.value.trim() === '' || el.value === '0') {
+                        el.value = (el.tagName === 'SELECT' && el.querySelector(`option[value="${mNum}"]`)) ? mNum : birthMonth;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            }
+
+            // روز تولد مجزا
+            if (birthDay) {
+                const dNum = parseInt(birthDay, 10);
+                const dayInputs = toolWrap.querySelectorAll(
+                    'input[name*="birth_day" i], input[id*="birth_day" i], select[name*="birth_day" i], select[id*="birth_day" i], input[name*="bday" i], input[id*="bday" i], input[placeholder*="روز تولد"], select[placeholder*="روز تولد"], [data-user-birth-day]'
+                );
+                dayInputs.forEach(el => {
+                    if (!el.value || el.value.trim() === '' || el.value === '0') {
+                        el.value = (el.tagName === 'SELECT' && el.querySelector(`option[value="${dNum}"]`)) ? dNum : birthDay;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            }
+
+            // سن
+            if (calculatedAge) {
+                const ageInputs = toolWrap.querySelectorAll(
+                    'input[name*="age" i], input[id*="age" i], input[placeholder*="سن شما"], input[placeholder*="سن"], [data-user-age]'
+                );
+                ageInputs.forEach(inp => {
+                    const n = (inp.name || '').toLowerCase();
+                    const id = (inp.id || '').toLowerCase();
+                    if (n.includes('message') || id.includes('message') || n.includes('page') || id.includes('page')) return;
+
+                    if (!inp.value || inp.value.trim() === '') {
+                        inp.value = calculatedAge;
+                        inp.dispatchEvent(new Event('input', { bubbles: true }));
+                        inp.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            }
+
+            const bdatePlaceholders = toolWrap.querySelectorAll('.madenna-user-birthdate, [data-madenna-user-birthdate]');
+            bdatePlaceholders.forEach(el => { el.textContent = activeBirthdate; });
+
+            const agePlaceholders = toolWrap.querySelectorAll('.madenna-user-age, [data-madenna-user-age]');
+            agePlaceholders.forEach(el => { el.textContent = calculatedAge; });
+        }
     }
 
     function createModalMarkup() {
@@ -887,8 +1112,14 @@
                 config.user_id = data.user_id;
                 if (data.user_name) {
                     config.user_name = data.user_name;
-                    autoPopulateToolUserFields(data.user_name);
                 }
+                if (data.gender) {
+                    config.user_gender = data.gender;
+                }
+                if (data.birthdate) {
+                    config.user_birthdate = data.birthdate;
+                }
+                autoPopulateToolUserFields();
                 if (data.new_nonce) {
                     config.nonce = data.new_nonce;
                 }

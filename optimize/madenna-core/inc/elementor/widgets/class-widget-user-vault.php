@@ -75,8 +75,9 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
         $user_id = get_current_user_id();
         $user    = wp_get_current_user();
         $mobile  = get_user_meta($user_id, 'madenna_mobile', true) ?: $user->user_login;
-        $gender  = get_user_meta($user_id, 'madenna_gender', true) ?: 'male';
-        $name    = $user->display_name;
+        $gender    = get_user_meta($user_id, 'madenna_gender', true) ?: 'male';
+        $birthdate = get_user_meta($user_id, 'madenna_birthdate', true) ?: '';
+        $name      = $user->display_name;
 
         if (class_exists('Madenna_User_Vault')) {
             Madenna_User_Vault::mark_vault_as_seen($user_id);
@@ -345,6 +346,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                         </div>
                         <span style="font-size: 12.5px; color: #3f4947; display: block; margin-top: 4px;">
                             شماره همراه: <strong dir="ltr"><?php echo esc_html($mobile); ?></strong>
+                            <span style="margin-right: 14px;">تاریخ تولد: <strong id="mad-vault-display-birthdate"><?php echo !empty($birthdate) ? esc_html($birthdate) : 'ثبت‌نشده'; ?></strong></span>
                         </span>
 
                         <div id="mad-vault-edit-profile-box" style="display: none; margin-top: 12px; background: #f8faf8; padding: 12px; border-radius: 12px; border: 1px solid #bfc9c6;">
@@ -354,6 +356,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                                     <option value="male" <?php selected($gender, 'male'); ?>>آقا</option>
                                     <option value="female" <?php selected($gender, 'female'); ?>>خانم</option>
                                 </select>
+                                <input type="text" id="mad-vault-edit-birthdate-input" value="<?php echo esc_attr($birthdate); ?>" placeholder="تاریخ تولد (مثال: 1375/04/12)" style="height: 36px; border-radius: 8px; border: 1px solid #bfc9c6; padding: 0 10px; font-size: 13px; font-family: inherit; width: 175px;">
                                 <button type="button" id="mad-vault-save-profile-btn" style="height: 36px; background: #0f5650 !important; color: #fff !important; border: none !important; border-radius: 8px; padding: 0 14px; font-size: 12.5px; font-weight: 800; cursor: pointer;">ذخیره تغییرات</button>
                                 <button type="button" id="mad-vault-cancel-profile-btn" style="height: 36px; background: #e2e8f0 !important; color: #334155 !important; border: none !important; border-radius: 8px; padding: 0 10px; font-size: 12px; font-weight: 700; cursor: pointer;">انصراف</button>
                             </div>
@@ -672,8 +675,9 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
             }
             if (saveProfBtn) {
                 saveProfBtn.addEventListener('click', async function() {
-                    const newName   = document.getElementById('mad-vault-edit-name-input').value.trim();
-                    const newGender = document.getElementById('mad-vault-edit-gender-select').value;
+                    const newName      = document.getElementById('mad-vault-edit-name-input').value.trim();
+                    const newGender    = document.getElementById('mad-vault-edit-gender-select').value;
+                    const newBirthdate = document.getElementById('mad-vault-edit-birthdate-input') ? document.getElementById('mad-vault-edit-birthdate-input').value.trim() : '';
                     if (!newName) return;
 
                     const origText = saveProfBtn.textContent;
@@ -685,6 +689,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                         fd.append('action', 'madenna_vault_update_profile');
                         fd.append('full_name', newName);
                         fd.append('gender', newGender);
+                        fd.append('birthdate', newBirthdate);
 
                         const res  = await fetch(ajaxUrl, { method: 'POST', body: fd, credentials: 'same-origin' });
                         const json = await res.json();
@@ -698,6 +703,10 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                             if (headerName) headerName.textContent = json.data.name;
                             if (headerAvatar && json.data.header_avatar_svg) {
                                 headerAvatar.innerHTML = json.data.header_avatar_svg;
+                            }
+                            const dispBdate = document.getElementById('mad-vault-display-birthdate');
+                            if (dispBdate) {
+                                dispBdate.textContent = json.data.birthdate || 'ثبت‌نشده';
                             }
                             editBox.style.display = 'none';
                         }
