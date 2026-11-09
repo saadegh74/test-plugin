@@ -642,38 +642,14 @@ class Madenna_User_Vault {
     }
 
     public function ajax_update_profile() {
-         = get_current_user_id();
-        if (!) {
+        $user_id = get_current_user_id();
+        if (!$user_id) {
             wp_send_json_error(['message' => 'ابتدا وارد حساب خود شوید.']);
         }
 
-              = sanitize_text_field(['full_name'] ?? '');
-            = in_array(['gender'] ?? '', ['male', 'female'], true) ? ['gender'] : 'male';
-         = sanitize_text_field(['birthdate'] ?? '');
-
-        if (!empty()) {
-            wp_update_user([
-                'ID'           => ,
-                'display_name' => ,
-                'first_name'   => ,
-            ]);
-        }
-        update_user_meta(, 'madenna_gender', );
-        if (isset(['birthdate'])) {
-            update_user_meta(, 'madenna_birthdate', );
-        }
-
-        wp_send_json_success([
-            'name'              => ,
-            'gender'            => ,
-            'birthdate'         => ,
-            'avatar_svg'        => self::get_avatar_svg(, 64),
-            'header_avatar_svg' => self::get_avatar_svg(, 36),
-        ]);
-    }
-
-        $name   = sanitize_text_field($_POST['full_name'] ?? '');
-        $gender = in_array($_POST['gender'] ?? '', ['male', 'female'], true) ? $_POST['gender'] : 'male';
+        $name      = sanitize_text_field($_POST['full_name'] ?? '');
+        $gender    = in_array($_POST['gender'] ?? '', ['male', 'female'], true) ? $_POST['gender'] : 'male';
+        $birthdate = sanitize_text_field($_POST['birthdate'] ?? '');
 
         if (!empty($name)) {
             wp_update_user([
@@ -683,10 +659,14 @@ class Madenna_User_Vault {
             ]);
         }
         update_user_meta($user_id, 'madenna_gender', $gender);
+        if (isset($_POST['birthdate'])) {
+            update_user_meta($user_id, 'madenna_birthdate', $birthdate);
+        }
 
         wp_send_json_success([
             'name'              => $name,
             'gender'            => $gender,
+            'birthdate'         => $birthdate,
             'avatar_svg'        => self::get_avatar_svg($gender, 64),
             'header_avatar_svg' => self::get_avatar_svg($gender, 36),
         ]);

@@ -40,21 +40,21 @@ class Madenna_Frontend {
             $cats = wp_get_post_terms(get_the_ID(), 'madenna_cat');
             $cat_slug = (!empty($cats) && !is_wp_error($cats)) ? $cats[0]->slug : '';
 
-             = get_current_user_id();
-             = is_user_logged_in() ? wp_get_current_user() : null;
-             =  ? ->display_name : '';
-             =  ? (get_user_meta(, 'madenna_gender', true) ?: 'male') : 'male';
-             =  ? (get_user_meta(, 'madenna_birthdate', true) ?: '') : '';
+            $uid = get_current_user_id();
+            $u = is_user_logged_in() ? wp_get_current_user() : null;
+            $current_user_name = $u ? $u->display_name : '';
+            $current_user_gender = $uid ? (get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
+            $current_user_birthdate = $uid ? (get_user_meta($uid, 'madenna_birthdate', true) ?: '') : '';
 
             wp_localize_script('madenna-vault-js', 'madennaVaultConfig', [
                 'rest_url'       => esc_url_raw(rest_url('madenna/v1/vault/')),
                 'is_logged_in'   => is_user_logged_in(),
-                'user_id'        => ,
-                'user_name'      => ,
-                'user_gender'    => ,
-                'user_birthdate' => ,
+                'user_id'        => $uid,
+                'user_name'      => $current_user_name,
+                'user_gender'    => $current_user_gender,
+                'user_birthdate' => $current_user_birthdate,
                 'tool_id'        => get_the_ID(),
-                'category_slug'  => ,
+                'category_slug'  => $cat_slug,
                 'nonce'          => wp_create_nonce('wp_rest'),
             ]);
         }
