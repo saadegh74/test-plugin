@@ -12,6 +12,11 @@ class Madenna_AI_Wizard {
 
     private static $worker_endpoint = 'https://plugin-insert-ai-madenna.raihankhan200423.workers.dev/';
 
+    public static function get_worker_endpoint() {
+        $endpoint = get_option('madenna_ai_worker_endpoint');
+        return !empty($endpoint) ? esc_url_raw($endpoint) : self::$worker_endpoint;
+    }
+
     public static function init() {
         add_action('admin_menu', [__CLASS__, 'register_admin_menu']);
         add_action('wp_ajax_madenna_ai_generate_action', [__CLASS__, 'handle_ajax_generation']);
@@ -686,6 +691,12 @@ class Madenna_AI_Wizard {
 
         $context = sanitize_textarea_field($_POST['site_context'] ?? '');
         update_option('madenna_ai_site_context', $context);
+        if (!empty($_POST['worker_endpoint'])) {
+            $ep = esc_url_raw(trim($_POST['worker_endpoint']));
+            if (!empty($ep)) {
+                update_option('madenna_ai_worker_endpoint', $ep);
+            }
+        }
         wp_send_json_success();
     }
 
@@ -855,7 +866,7 @@ class Madenna_AI_Wizard {
         }
 
         // ۴. ارسال داده به ورکر کلودفلر با مهلت ۳۰۰ ثانیه‌ای
-        $response = wp_remote_post(self::$worker_endpoint, [
+        $response = wp_remote_post(self::get_worker_endpoint(), [
             'headers' => ['Content-Type' => 'application/json; charset=utf-8'],
             'body'    => wp_json_encode([
                 'action_mode'     => $operation_mode,

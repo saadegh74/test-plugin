@@ -18,19 +18,17 @@ class Madenna_Setup {
         add_filter('request', [$this, 'handle_flat_parent_category_query']);
         add_filter('template_include', [$this, 'load_custom_templates']);
         add_action('rest_after_insert_tools', [$this, 'compile_rest_tool_assets'], 10, 2);
-        
-        
     }
-    
+
     public function compile_rest_tool_assets($post, $request) {
-    $post_id = $post->ID;
-    $css = get_post_meta($post_id, '_tool_css', true);
-    $js  = get_post_meta($post_id, '_tool_js', true);
-    $dir = wp_upload_dir()['basedir'] . '/madenna-tools';
-    if (!file_exists($dir)) wp_mkdir_p($dir);
-    if (!empty($css)) @file_put_contents("$dir/tool-{$post_id}.css", Madenna_Helpers::minify_code($css, 'css'));
-    if (!empty($js))  @file_put_contents("$dir/tool-{$post_id}.js", "(function(){\n" . Madenna_Helpers::minify_code($js, 'js') . "\n})();");
-}
+        $post_id = $post->ID;
+        $css = get_post_meta($post_id, '_tool_css', true);
+        $js  = get_post_meta($post_id, '_tool_js', true);
+        $dir = wp_upload_dir()['basedir'] . '/madenna-tools';
+        if (!file_exists($dir)) wp_mkdir_p($dir);
+        if (!empty($css)) @file_put_contents("$dir/tool-{$post_id}.css", Madenna_Helpers::minify_code($css, 'css'));
+        if (!empty($js))  @file_put_contents("$dir/tool-{$post_id}.js", "(function(){\n" . Madenna_Helpers::minify_code($js, 'js') . "\n})();");
+    }
 
     public function register_post_types_and_taxonomies() {
         register_post_type('articles', [
@@ -54,8 +52,13 @@ class Madenna_Setup {
             'show_ui'           => true, 'show_admin_column' => true, 'show_in_rest' => true,
             'query_var'         => true, 'rewrite' => false,
         ]);
-        
-// ثبت فیلدهای متادیتا در REST API برای همگام‌سازی از گوگل شیت
+
+        // تعریف callback امنیتی احراز هویت متادیتاهای REST
+        $auth_cb = function() {
+            return current_user_can('edit_posts');
+        };
+
+        // ثبت فیلدهای متادیتا در REST API برای همگام‌سازی از گوگل شیت
         $tool_metas = [
             '_tool_subtitle', '_tool_html', '_tool_css', '_tool_js', 
             '_tool_force_site_font', '_tool_icon_class', '_tool_color_primary', 
@@ -66,15 +69,17 @@ class Madenna_Setup {
                 'show_in_rest' => true,
                 'single'       => true,
                 'type'         => 'string',
-                'auth_callback' => '__return_true',
+                'auth_callback' => $auth_cb,
             ]);
         }
+
         register_post_meta('tools', '_tool_libraries', [
             'show_in_rest' => [
                 'schema' => ['type' => 'array', 'items' => ['type' => 'string']]
             ],
-            'single' => true, 'type' => 'array', 'auth_callback' => '__return_true',
+            'single' => true, 'type' => 'array', 'auth_callback' => $auth_cb,
         ]);
+
         register_post_meta('tools', '_tool_faqs', [
             'show_in_rest' => [
                 'schema' => [
@@ -85,7 +90,7 @@ class Madenna_Setup {
                     ]
                 ]
             ],
-            'single' => true, 'type' => 'array', 'auth_callback' => '__return_true',
+            'single' => true, 'type' => 'array', 'auth_callback' => $auth_cb,
         ]);
 
         // متادیتاهای مقالات در REST API
@@ -98,12 +103,14 @@ class Madenna_Setup {
                 'show_in_rest' => true,
                 'single'       => true,
                 'type'         => 'string',
-                'auth_callback' => '__return_true',
+                'auth_callback' => $auth_cb,
             ]);
         }
+
         register_post_meta('articles', '_article_reading_time', [
-            'show_in_rest' => true, 'single' => true, 'type' => 'integer', 'auth_callback' => '__return_true',
+            'show_in_rest' => true, 'single' => true, 'type' => 'integer', 'auth_callback' => $auth_cb,
         ]);
+
         register_post_meta('articles', '_article_faqs', [
             'show_in_rest' => [
                 'schema' => [
@@ -114,18 +121,16 @@ class Madenna_Setup {
                     ]
                 ]
             ],
-            'single' => true, 'type' => 'array', 'auth_callback' => '__return_true',
+            'single' => true, 'type' => 'array', 'auth_callback' => $auth_cb,
         ]);
-        
-        
+                        
         // اجازه ذخیره متادیتاهای دارای آندرلاین در REST API
-add_filter('is_protected_meta', function ($protected, $meta_key) {
-    if (strpos($meta_key, '_tool_') === 0 || strpos($meta_key, '_article_') === 0 || strpos($meta_key, '_yoast_') === 0) {
-        return false;
-    }
-    return $protected;
-}, 10, 2);
-
+        add_filter('is_protected_meta', function ($protected, $meta_key) {
+            if (strpos($meta_key, '_tool_') === 0 || strpos($meta_key, '_article_') === 0 || strpos($meta_key, '_yoast_') === 0) {
+                return false;
+            }
+            return $protected;
+        }, 10, 2);
     }
 
     public function add_rewrite_rules() {
@@ -145,8 +150,16 @@ add_filter('is_protected_meta', function ($protected, $meta_key) {
             $page_check = get_page_by_path($potential_slug, OBJECT, 'page');
             if ($page_check) return $query_vars;
 
-            $term = get_term_by('slug', $potential_slug, 'madenna_cat');
-            if ($term && !is_wp_error($term) && $term->parent == 0) {
+            // بهینه‌سازی: استفاده از کش شیء وردپرس جهت جلوگیری از اجرای کوئری مکرر دیتابیس در هر لود صفحه
+            $cache_key = 'madenna_flat_cat_' . md5($potential_slug);
+            $term = wp_cache_get($cache_key, 'madenna_terms');
+
+            if (false === $term) {
+                $term = get_term_by('slug', $potential_slug, 'madenna_cat');
+                wp_cache_set($cache_key, $term ?: 0, 'madenna_terms', HOUR_IN_SECONDS);
+            }
+
+            if (is_object($term) && !is_wp_error($term) && $term->parent == 0) {
                 unset($query_vars['pagename'], $query_vars['name']);
                 $query_vars['madenna_cat'] = $term->slug;
             }

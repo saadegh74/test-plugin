@@ -774,8 +774,23 @@ class Madenna_Admin {
         register_rest_route('madenna/v1', '/sync-item', [
             'methods'             => 'POST',
             'callback'            => [$this, 'handle_sheet_sync_endpoint'],
-            'permission_callback' => '__return_true', // امنیت بر اساس توکن داخلی
+            'permission_callback' => [$this, 'check_sync_permissions'],
         ]);
+    }
+
+    /**
+     * اعتبارسنجی امنیتی دسترسی به اندپوینت همگام‌سازی
+     */
+    public function check_sync_permissions($request) {
+        if (current_user_can('edit_posts')) {
+            return true;
+        }
+        $configured_token = get_option('madenna_sync_secret_token');
+        if (!empty($configured_token)) {
+            $provided_token = $request->get_header('x_madenna_token') ?: ($request->get_param('token') ?: '');
+            return hash_equals($configured_token, $provided_token);
+        }
+        return true;
     }
 
     public function handle_sheet_sync_endpoint($request) {
