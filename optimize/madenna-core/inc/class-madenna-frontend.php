@@ -42,13 +42,15 @@ class Madenna_Frontend {
 
             $uid = get_current_user_id();
             $u = is_user_logged_in() ? wp_get_current_user() : null;
-            $current_user_name = $u ? $u->display_name : '';
-            $current_user_gender = $uid ? (get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
+            $current_user_name      = $u ? $u->display_name : '';
+            $current_user_gender    = $uid ? (get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
             $current_user_birthdate = $uid ? (get_user_meta($uid, 'madenna_birthdate', true) ?: '') : '';
 
             wp_localize_script('madenna-vault-js', 'madennaVaultConfig', [
+                'ajax_url'       => admin_url('admin-ajax.php'),
                 'rest_url'       => esc_url_raw(rest_url('madenna/v1/vault/')),
                 'is_logged_in'   => is_user_logged_in(),
+                'is_tool_page'   => true,
                 'user_id'        => $uid,
                 'user_name'      => $current_user_name,
                 'user_gender'    => $current_user_gender,

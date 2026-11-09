@@ -77,6 +77,35 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
         $mobile  = get_user_meta($user_id, 'madenna_mobile', true) ?: $user->user_login;
         $gender    = get_user_meta($user_id, 'madenna_gender', true) ?: 'male';
         $birthdate = get_user_meta($user_id, 'madenna_birthdate', true) ?: '';
+        $b_year = '';
+        $b_month = '';
+        $b_day = '';
+        if (!empty($birthdate)) {
+            $b_parts = preg_split('/[\/\-\.\s]+/', trim($birthdate));
+            if (count($b_parts) >= 3) {
+                if (strlen($b_parts[0]) === 4) {
+                    $b_year  = intval($b_parts[0]);
+                    $b_month = intval($b_parts[1]);
+                    $b_day   = intval($b_parts[2]);
+                } elseif (strlen($b_parts[2]) === 4) {
+                    $b_year  = intval($b_parts[2]);
+                    $b_month = intval($b_parts[1]);
+                    $b_day   = intval($b_parts[0]);
+                }
+            }
+        }
+        $shamsi_months = [
+            1 => 'فروردین', 2 => 'اردیبهشت', 3 => 'خرداد',
+            4 => 'تیر', 5 => 'مرداد', 6 => 'شهریور',
+            7 => 'مهر', 8 => 'آبان', 9 => 'آذر',
+            10 => 'دی', 11 => 'بهمن', 12 => 'اسفند'
+        ];
+        $birthdate_display_text = 'ثبت‌نشده';
+        if (!empty($b_year) && !empty($b_month) && !empty($b_day)) {
+            $birthdate_display_text = sprintf('%d %s %d', $b_day, $shamsi_months[$b_month] ?? '', $b_year);
+        } elseif (!empty($birthdate)) {
+            $birthdate_display_text = esc_html($birthdate);
+        }
         $name      = $user->display_name;
 
         if (class_exists('Madenna_User_Vault')) {
@@ -346,7 +375,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                         </div>
                         <span style="font-size: 12.5px; color: #3f4947; display: block; margin-top: 4px;">
                             شماره همراه: <strong dir="ltr"><?php echo esc_html($mobile); ?></strong>
-                            <span style="margin-right: 14px;">تاریخ تولد: <strong id="mad-vault-display-birthdate"><?php echo !empty($birthdate) ? esc_html($birthdate) : 'ثبت‌نشده'; ?></strong></span>
+                            <span style="margin-right: 14px;">تاریخ تولد: <strong id="mad-vault-display-birthdate"><?php echo esc_html($birthdate_display_text); ?></strong></span>
                         </span>
 
                         <div id="mad-vault-edit-profile-box" style="display: none; margin-top: 12px; background: #f8faf8; padding: 12px; border-radius: 12px; border: 1px solid #bfc9c6;">
@@ -356,7 +385,30 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                                     <option value="male" <?php selected($gender, 'male'); ?>>آقا</option>
                                     <option value="female" <?php selected($gender, 'female'); ?>>خانم</option>
                                 </select>
-                                <input type="text" id="mad-vault-edit-birthdate-input" value="<?php echo esc_attr($birthdate); ?>" placeholder="تاریخ تولد (مثال: 1375/04/12)" style="height: 36px; border-radius: 8px; border: 1px solid #bfc9c6; padding: 0 10px; font-size: 13px; font-family: inherit; width: 175px;">
+                                <div style="display: inline-flex; align-items: center; gap: 4px; background: #ffffff; border: 1px solid #bfc9c6; border-radius: 8px; padding: 0 6px; height: 36px;">
+                                    <span style="font-size: 11px; color: #64748b; font-weight: 700; margin-left: 2px;">تولد:</span>
+                                    <select id="mad-vault-edit-bday" style="border: none !important; outline: none; font-size: 12px; font-family: inherit; background: transparent; cursor: pointer; padding: 0 2px;">
+                                        <option value="">روز</option>
+                                        <?php for ($d = 1; $d <= 31; $d++): ?>
+                                            <option value="<?php echo $d; ?>" <?php selected($b_day, $d); ?>><?php echo $d; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <span style="color: #cbd5e1;">/</span>
+                                    <select id="mad-vault-edit-bmonth" style="border: none !important; outline: none; font-size: 12px; font-family: inherit; background: transparent; cursor: pointer; padding: 0 2px;">
+                                        <option value="">ماه</option>
+                                        <?php foreach ($shamsi_months as $m_num => $m_name): ?>
+                                            <option value="<?php echo $m_num; ?>" <?php selected($b_month, $m_num); ?>><?php echo esc_html($m_name); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <span style="color: #cbd5e1;">/</span>
+                                    <select id="mad-vault-edit-byear" style="border: none !important; outline: none; font-size: 12px; font-family: inherit; background: transparent; cursor: pointer; padding: 0 2px;">
+                                        <option value="">سال</option>
+                                        <?php for ($y = 1403; $y >= 1320; $y--): ?>
+                                            <option value="<?php echo $y; ?>" <?php selected($b_year, $y); ?>><?php echo $y; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <input type="hidden" id="mad-vault-edit-birthdate-input" value="<?php echo esc_attr($birthdate); ?>">
+                                </div>
                                 <button type="button" id="mad-vault-save-profile-btn" style="height: 36px; background: #0f5650 !important; color: #fff !important; border: none !important; border-radius: 8px; padding: 0 14px; font-size: 12.5px; font-weight: 800; cursor: pointer;">ذخیره تغییرات</button>
                                 <button type="button" id="mad-vault-cancel-profile-btn" style="height: 36px; background: #e2e8f0 !important; color: #334155 !important; border: none !important; border-radius: 8px; padding: 0 10px; font-size: 12px; font-weight: 700; cursor: pointer;">انصراف</button>
                             </div>
@@ -677,7 +729,18 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                 saveProfBtn.addEventListener('click', async function() {
                     const newName      = document.getElementById('mad-vault-edit-name-input').value.trim();
                     const newGender    = document.getElementById('mad-vault-edit-gender-select').value;
-                    const newBirthdate = document.getElementById('mad-vault-edit-birthdate-input') ? document.getElementById('mad-vault-edit-birthdate-input').value.trim() : '';
+                    const bDayEl       = document.getElementById('mad-vault-edit-bday');
+                    const bMonthEl     = document.getElementById('mad-vault-edit-bmonth');
+                    const bYearEl      = document.getElementById('mad-vault-edit-byear');
+                    let newBirthdate   = '';
+                    if (bYearEl && bYearEl.value && bMonthEl && bMonthEl.value && bDayEl && bDayEl.value) {
+                        const y = bYearEl.value.trim();
+                        const m = String(bMonthEl.value.trim()).padStart(2, '0');
+                        const d = String(bDayEl.value.trim()).padStart(2, '0');
+                        newBirthdate = `${y}/${m}/${d}`;
+                    } else if (document.getElementById('mad-vault-edit-birthdate-input')) {
+                        newBirthdate = document.getElementById('mad-vault-edit-birthdate-input').value.trim();
+                    }
                     if (!newName) return;
 
                     const origText = saveProfBtn.textContent;
@@ -706,7 +769,19 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                             }
                             const dispBdate = document.getElementById('mad-vault-display-birthdate');
                             if (dispBdate) {
-                                dispBdate.textContent = json.data.birthdate || 'ثبت‌نشده';
+                                const shamsiMonths = {1:'فروردین',2:'اردیبهشت',3:'خرداد',4:'تیر',5:'مرداد',6:'شهریور',7:'مهر',8:'آبان',9:'آذر',10:'دی',11:'بهمن',12:'اسفند'};
+                                const rawB = json.data.birthdate || '';
+                                let formattedB = rawB;
+                                if (rawB) {
+                                    const bp = rawB.split('/');
+                                    if (bp.length === 3) {
+                                        formattedB = `${parseInt(bp[2],10)} ${shamsiMonths[parseInt(bp[1],10)]||bp[1]} ${bp[0]}`;
+                                    }
+                                }
+                                dispBdate.textContent = formattedB || 'ثبت‌نشده';
+                            }
+                            if (document.getElementById('mad-vault-edit-birthdate-input')) {
+                                document.getElementById('mad-vault-edit-birthdate-input').value = json.data.birthdate || '';
                             }
                             editBox.style.display = 'none';
                         }

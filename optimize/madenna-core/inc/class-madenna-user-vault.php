@@ -184,27 +184,31 @@ class Madenna_User_Vault {
             $tool_tag = (!empty($t_tags) && !is_wp_error($t_tags)) ? $t_tags[0]->slug : '';
         }
 
-        $current_user_name   = '';
-        $current_user_gender = 'male';
+        $current_user_name      = '';
+        $current_user_gender    = 'male';
+        $current_user_birthdate = '';
         if (is_user_logged_in()) {
+            $uid = get_current_user_id();
             $u = wp_get_current_user();
-            $current_user_name   = $u ? $u->display_name : '';
-            $current_user_gender = get_user_meta(get_current_user_id(), 'madenna_gender', true) ?: 'male';
+            $current_user_name      = $u ? $u->display_name : '';
+            $current_user_gender    = get_user_meta($uid, 'madenna_gender', true) ?: 'male';
+            $current_user_birthdate = get_user_meta($uid, 'madenna_birthdate', true) ?: '';
         }
 
         wp_localize_script('madenna-vault-js', 'madennaVaultConfig', [
-            'ajax_url'      => admin_url('admin-ajax.php'),
-            'rest_url'      => esc_url_raw(rest_url('madenna/v1/vault/')),
-            'is_logged_in'  => is_user_logged_in(),
-            'is_tool_page'  => (bool) $is_tool_page,
-            'user_id'       => get_current_user_id(),
-            'user_name'     => $current_user_name,
-            'user_gender'   => $current_user_gender,
-            'tool_id'       => (int) $tool_id,
-            'tool_tag'      => $tool_tag,
-            'page_id'       => 0,
-            'category_slug' => $cat_slug,
-            'nonce'         => wp_create_nonce('wp_rest'),
+            'ajax_url'       => admin_url('admin-ajax.php'),
+            'rest_url'       => esc_url_raw(rest_url('madenna/v1/vault/')),
+            'is_logged_in'   => is_user_logged_in(),
+            'is_tool_page'   => (bool) $is_tool_page,
+            'user_id'        => get_current_user_id(),
+            'user_name'      => $current_user_name,
+            'user_gender'    => $current_user_gender,
+            'user_birthdate' => $current_user_birthdate,
+            'tool_id'        => (int) $tool_id,
+            'tool_tag'       => $tool_tag,
+            'page_id'        => 0,
+            'category_slug'  => $cat_slug,
+            'nonce'          => wp_create_nonce('wp_rest'),
         ]);
     }
 
