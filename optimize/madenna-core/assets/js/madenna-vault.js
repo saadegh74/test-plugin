@@ -7,7 +7,7 @@
 (function () {
     'use strict';
 
-    let config = Object.assign({
+    const config = Object.assign({
         ajax_url: '/wp-admin/admin-ajax.php',
         rest_url: '/wp-json/madenna/v1/vault/',
         is_logged_in: false,
@@ -25,6 +25,21 @@
     function syncVaultConfig() {
         if (window.madennaVaultConfig) {
             Object.assign(config, window.madennaVaultConfig);
+        }
+        // خواندن پشتیبان از تگ کانتینر ابزار (در صورتی که کش یا اسکریپت کانفیگ به هر دلیلی خالی باشد)
+        const wrapperEl = document.querySelector('.madenna-tool-wrapper[data-user-name], .madenna-tool-renderer-wrap[data-user-name]');
+        if (wrapperEl) {
+            const wrapName = wrapperEl.getAttribute('data-user-name');
+            const wrapGender = wrapperEl.getAttribute('data-user-gender');
+            const wrapBirthdate = wrapperEl.getAttribute('data-user-birthdate');
+            const wrapLoggedIn = wrapperEl.getAttribute('data-is-logged-in') === 'true';
+            const wrapUid = parseInt(wrapperEl.getAttribute('data-user-id'), 10) || 0;
+
+            if (wrapLoggedIn) config.is_logged_in = true;
+            if (wrapUid > 0 && !config.user_id) config.user_id = wrapUid;
+            if (wrapName && (!config.user_name || config.user_name === '')) config.user_name = wrapName;
+            if (wrapGender && (!config.user_gender || config.user_gender === '')) config.user_gender = wrapGender;
+            if (wrapBirthdate && (!config.user_birthdate || config.user_birthdate === '')) config.user_birthdate = wrapBirthdate;
         }
     }
 
@@ -120,15 +135,16 @@
         syncVaultConfig();
         createModalMarkup();
         bindEvents();
-        
-        // اجرای سریع و مکرر برای ابزارهای داینامیک یا ساخته‌شده با جمینی
+
+        // اجرای آنی پر کردن فیلدها
         autoPopulateToolUserFields();
+
         if (getLiveToolContainer()) {
             setupUniversalToolResultWatcher();
         }
 
-        // بررسی مکرر المان‌های ابزار تا ۳ ثانیه پس از لود صفحه
-        [150, 400, 800, 1500, 2500].forEach(delay => {
+        // تکرار پر کردن برای ابزارهای داینامیک یا ساخته‌شده با جمینی که با تاخیر لود می‌شوند
+        [80, 250, 600, 1200, 2500, 4000].forEach(delay => {
             setTimeout(() => {
                 syncVaultConfig();
                 autoPopulateToolUserFields();
@@ -138,6 +154,7 @@
 
     function autoPopulateToolUserFields(customData) {
         syncVaultConfig();
+
         let activeName = config.user_name || '';
         let activeGender = config.user_gender || '';
         let activeBirthdate = config.user_birthdate || '';
@@ -181,7 +198,7 @@
             }
         }
 
-        // پل ارتباطی سراسری برای همکاران و کدهای ابزار جمینی بدون نیاز به دیتابیس
+        // پل سراسری MadennaUser برای همکار شما و ابزارهای ساخته‌شده با جمینی
         window.MadennaUser = {
             isLoggedIn: !!config.is_logged_in,
             id: parseInt(config.user_id, 10) || 0,
@@ -201,23 +218,31 @@
             window.dispatchEvent(new CustomEvent('madenna_user_ready', { detail: window.MadennaUser }));
         } catch (e) {}
 
-        const toolWrap = getLiveToolContainer() || document.querySelector('.madenna-tool-wrapper, .madenna-tool-renderer-wrap, [id^="madenna-tool-"]');
+        // جستجو در کانتینر ابزار یا کل صفحه (در صورتی که کانتینر اختصاصی تعریف نشده باشد)
+        const toolWrap = getLiveToolContainer() || document.querySelector('.madenna-tool-wrapper, .madenna-tool-renderer-wrap, [id^="madenna-tool-"]') || document.body;
         if (!toolWrap) return;
 
-        // ۱. پر کردن خودکار فیلدهای نام کاربر (حفظ رفتار اولیه دقیق و اضافه کردن سلکتورهای گسترده)
+        // تابع کمکی برای مقداردهی مطمئن به فیلدها و شلیک رویدادهای input و change
+        function setFieldValue(input, val) {
+            if (!input || !val) return;
+            if (!input.value || input.value.trim() === '') {
+                input.value = val;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        // ۱. پر کردن خودکار فیلدهای نام کاربر (همان سلکتورهای نسخه اصلی به علاوه سلکتورهای گسترده جمینی)
         if (activeName) {
             const nameInputs = toolWrap.querySelectorAll(
                 'input[name*="name" i], input[id*="name" i], input[placeholder*="نام شما"], input[placeholder*="نام و نام خانوادگی"], input[placeholder*="نام"], input[data-user-name-input], input[data-user-name], input[name="user_name"], input[name="fullname"], input[id="user_name"], input[id="fullname"]'
             );
+
             nameInputs.forEach(inp => {
                 const n = (inp.name || '').toLowerCase();
                 const id = (inp.id || '').toLowerCase();
-                if (n.includes('username') || n.includes('file') || id.includes('username') || id.includes('file')) return;
-                if (!inp.value || inp.value.trim() === '') {
-                    inp.value = activeName;
-                    inp.dispatchEvent(new Event('input', { bubbles: true }));
-                    inp.dispatchEvent(new Event('change', { bubbles: true }));
-                }
+                if (n.includes('username') || n.includes('file') || id.includes('username') || id.includes('file') || inp.type === 'file' || inp.type === 'hidden') return;
+                setFieldValue(inp, activeName);
             });
 
             const namePlaceholders = toolWrap.querySelectorAll('.madenna-user-name, [data-madenna-user-name], #user-name-display, .user-name-display');
@@ -228,7 +253,7 @@
 
         // ۲. پر کردن خودکار فیلدهای جنسیت (Select, Radio, Cards, Buttons)
         if (activeGender) {
-            // منوهای کشویی Select
+            // منوهای کشویی جنسیت
             const genderSelects = toolWrap.querySelectorAll(
                 'select[name*="gender" i], select[id*="gender" i], select[name*="sex" i], select[id*="sex" i], select[data-user-gender], select[data-gender], select[name="gender"], select[id="gender"]'
             );
@@ -255,7 +280,7 @@
                 }
             });
 
-            // رادیوباتن‌ها Radio
+            // دکمه‌های رادیویی جنسیت
             const genderRadios = toolWrap.querySelectorAll(
                 'input[type="radio"][name*="gender" i], input[type="radio"][name*="sex" i], input[type="radio"][id*="gender" i], input[type="radio"][id*="sex" i], input[type="radio"][data-user-gender], input[type="radio"][data-gender], input[type="radio"][name="gender"]'
             );
@@ -314,11 +339,7 @@
                 'input[name*="birth" i], input[id*="birth" i], input[name*="bdate" i], input[id*="bdate" i], input[placeholder*="تاریخ تولد"], input[data-user-birthdate], input[data-birthdate]'
             );
             bdateInputs.forEach(inp => {
-                if (!inp.value || inp.value.trim() === '') {
-                    inp.value = activeBirthdate;
-                    inp.dispatchEvent(new Event('input', { bubbles: true }));
-                    inp.dispatchEvent(new Event('change', { bubbles: true }));
-                }
+                setFieldValue(inp, activeBirthdate);
             });
 
             // سال تولد مجزا
@@ -374,11 +395,7 @@
                     const n = (inp.name || '').toLowerCase();
                     const id = (inp.id || '').toLowerCase();
                     if (n.includes('message') || id.includes('message') || n.includes('page') || id.includes('page')) return;
-                    if (!inp.value || inp.value.trim() === '') {
-                        inp.value = calculatedAge;
-                        inp.dispatchEvent(new Event('input', { bubbles: true }));
-                        inp.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
+                    setFieldValue(inp, calculatedAge);
                 });
             }
 

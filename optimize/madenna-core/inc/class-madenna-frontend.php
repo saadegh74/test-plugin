@@ -93,7 +93,24 @@ class Madenna_Frontend {
         
         $this->enqueue_tool_files($tool_id);
         $font_style = get_post_meta($tool_id, '_tool_force_site_font', true) === 'yes' ? "<style>#madenna-tool-{$tool_id} * { font-family: inherit !important; }</style>" : '';
-        return sprintf('<div class="madenna-tool-wrapper" id="madenna-tool-%d">%s%s</div>', $tool_id, $font_style, get_post_meta($tool_id, '_tool_html', true));
+                $u = is_user_logged_in() ? wp_get_current_user() : null;
+        $uid = get_current_user_id();
+        $user_name = $u ? esc_attr($u->display_name) : '';
+        $user_gender = $uid ? esc_attr(get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
+        $user_birthdate = $uid ? esc_attr(get_user_meta($uid, 'madenna_birthdate', true) ?: '') : '';
+        $is_logged_in = is_user_logged_in() ? 'true' : 'false';
+
+        return sprintf(
+            '<div class="madenna-tool-wrapper" id="madenna-tool-%d" data-is-logged-in="%s" data-user-id="%d" data-user-name="%s" data-user-gender="%s" data-user-birthdate="%s">%s%s</div>',
+            $tool_id,
+            $is_logged_in,
+            $uid,
+            $user_name,
+            $user_gender,
+            $user_birthdate,
+            $font_style,
+            get_post_meta($tool_id, '_tool_html', true)
+        );
     }
 
     public function append_tool_content($content) {
