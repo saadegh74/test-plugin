@@ -136,38 +136,34 @@
         createModalMarkup();
         bindEvents();
 
-        // اجرای آنی پر کردن فیلدها
-        autoPopulateToolUserFields();
-
-        if (getLiveToolContainer()) {
+        const liveContainer = getLiveToolContainer();
+        if (liveContainer) {
+            // پر کردن آنی فیلدهای ابزار فقط زمانی که ابزار در صفحه حضور دارد
+            autoPopulateToolUserFields();
             setupUniversalToolResultWatcher();
-        }
 
-        // تکرار پر کردن برای ابزارهای داینامیک یا ساخته‌شده با جمینی که با تاخیر لود می‌شوند
-        [50, 150, 300, 600, 1000, 1800, 2800, 4500].forEach(delay => {
-            setTimeout(() => {
-                syncVaultConfig();
-                autoPopulateToolUserFields();
-            }, delay);
-        });
-
-        // رصد تغییرات DOM برای ابزارهای چند مرحله‌ای (Multi-step)
-        if (window.MutationObserver && !window._madennaToolObserverInit) {
-            window._madennaToolObserverInit = true;
-            let observerTimeout = null;
-            const observer = new MutationObserver(() => {
-                if (observerTimeout) clearTimeout(observerTimeout);
-                observerTimeout = setTimeout(() => {
+            // تکرار پر کردن برای ابزارهای داینامیک یا ساخته‌شده با جمینی که با تاخیر لود می‌شوند
+            [50, 150, 300, 600, 1000, 1800, 2800, 4500].forEach(delay => {
+                setTimeout(() => {
                     syncVaultConfig();
                     autoPopulateToolUserFields();
-                }, 50);
+                }, delay);
             });
-            const obsTarget = getLiveToolContainer() || document.body;
-            if (obsTarget) {
-                observer.observe(obsTarget, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+
+            // رصد تغییرات DOM فقط روی کانتینر ابزار (جلوگیری از هرگونه رصد یا پرش در صفحات دیگر سایت)
+            if (window.MutationObserver && !window._madennaToolObserverInit) {
+                window._madennaToolObserverInit = true;
+                let observerTimeout = null;
+                const observer = new MutationObserver(() => {
+                    if (observerTimeout) clearTimeout(observerTimeout);
+                    observerTimeout = setTimeout(() => {
+                        syncVaultConfig();
+                        autoPopulateToolUserFields();
+                    }, 50);
+                });
+                observer.observe(liveContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
             }
         }
-
     }
 
     function autoPopulateToolUserFields(customData) {
@@ -257,8 +253,8 @@
             window.dispatchEvent(new CustomEvent('madenna_user_ready', { detail: window.MadennaUser }));
         } catch (e) {}
 
-        // جستجو در کانتینر ابزار یا تگ بدنه
-        const toolWrap = getLiveToolContainer() || document.querySelector('.madenna-tool-wrapper, .madenna-tool-renderer-wrap, [id^="madenna-tool-"]') || (document.body && typeof document.body.querySelectorAll === 'function' ? document.body : document);
+        // جستجو منحصراً در کانتینر ابزار جاری (مطلقاً نباید روی بدنه یا سایر صفحات اجرا شود)
+        const toolWrap = getLiveToolContainer();
         if (!toolWrap) return;
 
         function setFieldValue(input, val) {
@@ -317,80 +313,132 @@
             });
         }
         // ==========================================
-        // ۲. پر کردن خودکار جنسیت (دکمه‌ها، کارت‌ها، رادیوها، سلکت‌ها)
+        // ۲. پر کردن خودکار جنسیت و کارت‌های کاراکتر (پسر/دختر، آقا/خانم، رادیوها، سلکت‌ها)
         // ==========================================
         if (activeGender && (isFemale || isMale)) {
-            // الف) دکمه‌ها و المان‌های کلیک‌پذیر (مانند تصویر ۱ و ۲: دکمه‌های آقا/خانم و کاراکتر پسر/کاراکتر دختر)
-            const allClickables = toolWrap.querySelectorAll('button, [role="button"], .gender-card, .gender-option, .gender-btn, [data-gender], [data-sex], [data-value], div, label');
-            allClickables.forEach(el => {
-                // اگر المان حاوی فرزندان زیاد است، فقط المان‌های نهایی یا المان‌های مشخص‌شده را هدف قرار می‌دهیم
-                if (el.tagName === 'DIV' && el.children.length > 5 && !el.classList.contains('gender-card') && !el.classList.contains('gender-option')) return;
-                
-                const valAttr  = (el.getAttribute('data-gender') || el.getAttribute('data-sex') || el.getAttribute('data-value') || '').toLowerCase().trim();
-                const clsAttr  = (typeof el.className === 'string' ? el.className : '').toLowerCase();
-                const idAttr   = (el.id || '').toLowerCase();
-                const txt      = (el.innerText || el.textContent || '').trim().toLowerCase();
+            function hasFemaleKeyword(str) {
+                return str.includes('کاراکتر دختر') || str.includes('دختر') || str.includes('خانم') || str.includes('زن') || str.includes('girl') || str.includes('female') || str.includes('woman');
+            }
+            function hasMaleKeyword(str) {
+                return str.includes('کاراکتر پسر') || str.includes('پسر') || str.includes('آقا') || str.includes('مرد') || str.includes('boy') || str.includes('male') || str.includes('man');
+            }
 
-                let isTargetFemale = false;
-                let isTargetMale   = false;
+            // الف) یافتن مستقیم کارت‌ها و دکمه‌های کاراکتر (مانند کارت‌های پرتره پسر/دختر یا آقا/خانم)
+            const candidateElements = toolWrap.querySelectorAll('button, [role="button"], label, div, [onclick], [data-gender], [data-value]');
+            let targetCard = null;
 
-                // تطبیق خانم / دختر
-                if (valAttr === 'female' || valAttr === 'woman' || valAttr === 'girl' || valAttr === 'f' || valAttr === 'زن' || valAttr === 'خانم' || valAttr === 'دختر') {
-                    isTargetFemale = true;
-                } else if (txt === 'خانم' || txt === 'زن' || txt.includes('کاراکتر دختر') || txt.includes('دختر') || clsAttr.includes('female')) {
-                    // اطمینان از اینکه همزمان حاوی کلمه آقا/پسر نیست
-                    if (!txt.includes('آقا') && !txt.includes('پسر') && !txt.includes('مرد')) {
-                        isTargetFemale = true;
+            for (let i = 0; i < candidateElements.length; i++) {
+                const el = candidateElements[i];
+                // جلوگیری اکید از لمس المان‌های هدر یا مودال ورود
+                if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) continue;
+                if (el.tagName === 'A' && el.getAttribute('href')) continue;
+
+                const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
+                if (!txt || txt.length > 80) continue;
+
+                const isMatchFemale = hasFemaleKeyword(txt) && !hasMaleKeyword(txt);
+                const isMatchMale   = hasMaleKeyword(txt) && !hasFemaleKeyword(txt);
+
+                if ((isFemale && isMatchFemale) || (isMale && isMatchMale)) {
+                    let card = el;
+                    let p = el.parentElement;
+                    while (p && p !== toolWrap && p !== document.body) {
+                        const pTxt = (p.innerText || p.textContent || '').trim().toLowerCase();
+                        // اگر والد شامل هر دو متن است یعنی والد گرید هر دو گزینه است؛ متوقف شو
+                        if ((isFemale && hasMaleKeyword(pTxt)) || (isMale && hasFemaleKeyword(pTxt))) {
+                            break;
+                        }
+                        const pCls = (typeof p.className === 'string' ? p.className : '').toLowerCase();
+                        if (p.tagName === 'BUTTON' || p.tagName === 'LABEL' || p.getAttribute('role') === 'button' || p.hasAttribute('onclick') || pCls.includes('card') || pCls.includes('option') || pCls.includes('border') || pCls.includes('rounded') || pCls.includes('cursor') || pCls.includes('btn') || p.hasAttribute('data-gender')) {
+                            card = p;
+                        }
+                        p = p.parentElement;
                     }
+                    targetCard = card;
+                    break;
                 }
+            }
 
-                // تطبیق آقا / پسر
-                if (valAttr === 'male' || valAttr === 'man' || valAttr === 'boy' || valAttr === 'm' || valAttr === 'مرد' || valAttr === 'آقا' || valAttr === 'پسر') {
-                    isTargetMale = true;
-                } else if (txt === 'آقا' || txt === 'مرد' || txt.includes('کاراکتر پسر') || txt.includes('پسر') || clsAttr.includes('male')) {
-                    if (!txt.includes('خانم') && !txt.includes('دختر') && !txt.includes('زن')) {
-                        isTargetMale = true;
-                    }
+            if (targetCard) {
+                const isAlreadySelected = (targetCard.classList && (targetCard.classList.contains('selected') || targetCard.classList.contains('active'))) || targetCard.getAttribute('aria-pressed') === 'true' || targetCard.querySelector('input:checked');
+                if (!isAlreadySelected) {
+                    try {
+                        targetCard.click();
+                        targetCard.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                        targetCard.dispatchEvent(new Event('click', { bubbles: true }));
+
+                        const rad = targetCard.querySelector('input[type="radio"], input[type="checkbox"]');
+                        if (rad && !rad.checked) {
+                            rad.checked = true;
+                            rad.click();
+                            rad.dispatchEvent(new Event('input', { bubbles: true }));
+                            rad.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+
+                        const ind = targetCard.querySelector('.radio-indicator, [class*="radio"], [class*="circle"], [class*="rounded-full"]');
+                        if (ind) {
+                            ind.click();
+                            ind.dispatchEvent(new Event('click', { bubbles: true }));
+                        }
+
+                        const avt = targetCard.querySelector('img, svg, h3, h4, span, .avatar-render, [class*="avatar"]');
+                        if (avt) {
+                            avt.click();
+                        }
+
+                        targetCard.classList.add('selected', 'active');
+                    } catch (e) {}
                 }
+            }
 
-                let shouldSelect = (isFemale && isTargetFemale) || (isMale && isTargetMale);
-                if (shouldSelect) {
-                    // بررسی وضعیت فعال بودن فعلی
-                    const isAlreadyActive = (el.classList && (el.classList.contains('active') || el.classList.contains('selected'))) || el.getAttribute('aria-pressed') === 'true' || (typeof el.className === 'string' && (el.className.includes('active') || el.className.includes('selected')));
+            // ب) اجرای توابع سراسری ابزار در صورت تعریف بودن توسط جمینی
+            try {
+                const targetVal = isMale ? 'boy' : 'girl';
+                const targetGenderVal = isMale ? 'male' : 'female';
+                if (typeof window.selectCharacter === 'function') window.selectCharacter(targetVal);
+                if (typeof window.selectPortrait === 'function') window.selectPortrait(targetVal);
+                if (typeof window.chooseCharacter === 'function') window.chooseCharacter(targetVal);
+                if (typeof window.setGender === 'function') window.setGender(targetGenderVal);
+                if (typeof window.selectGender === 'function') window.selectGender(targetGenderVal);
+                window.selectedCharacter = targetVal;
+                window.selectedGender = targetGenderVal;
+            } catch (e) {}
+
+            // ج) جستجوی المان‌های دارای data-gender یا data-value
+            const dataElements = toolWrap.querySelectorAll('[data-gender], [data-sex], [data-value="male"], [data-value="female"], [data-value="boy"], [data-value="girl"], [data-value="man"], [data-value="woman"]');
+            dataElements.forEach(el => {
+                if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
+                if (el.tagName === 'A' && el.getAttribute('href')) return;
+                const val = (el.getAttribute('data-gender') || el.getAttribute('data-sex') || el.getAttribute('data-value') || '').toLowerCase().trim();
+                let matches = false;
+                if (isFemale && (val === 'female' || val === 'woman' || val === 'girl' || val === 'f' || val === 'زن' || val === 'خانم' || val === 'دختر')) matches = true;
+                if (isMale && (val === 'male' || val === 'man' || val === 'boy' || val === 'm' || val === 'مرد' || val === 'آقا' || val === 'پسر')) matches = true;
+                if (matches) {
+                    const isAlreadyActive = (el.classList && (el.classList.contains('active') || el.classList.contains('selected'))) || (typeof el.className === 'string' && (el.className.includes('active') || el.className.includes('selected')));
                     if (!isAlreadyActive) {
                         try {
                             el.click();
                             el.dispatchEvent(new Event('click', { bubbles: true }));
                         } catch (e) {}
                     }
-                    // اگر داخل این المان دکمه رادیو یا چک‌باکس وجود دارد
-                    const innerRadio = el.querySelector('input[type="radio"], input[type="checkbox"]');
-                    if (innerRadio && !innerRadio.checked) {
-                        innerRadio.checked = true;
-                        innerRadio.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
                 }
             });
 
-            // ب) رادیوباتن‌ها
+            // د) رادیوباتن‌ها
             const genderRadios = toolWrap.querySelectorAll('input[type="radio"]');
             genderRadios.forEach(radio => {
+                if (radio.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
                 const val   = (radio.value || '').toLowerCase().trim();
-                const name  = (radio.name || '').toLowerCase();
-                const id    = (radio.id || '').toLowerCase();
                 const label = radio.closest('label') || (radio.id ? toolWrap.querySelector(`label[for="${radio.id}"]`) : null);
                 const txt   = label ? label.textContent.toLowerCase() : '';
-
                 let isTargetFemale = false;
                 let isTargetMale   = false;
-
-                if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر', '2'].includes(val) || txt.includes('خانم') || txt.includes('دختر') || txt.includes('زن')) {
+                if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر', '2', 'girl'].includes(val) || txt.includes('خانم') || txt.includes('دختر') || txt.includes('زن')) {
                     isTargetFemale = true;
                 }
-                if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر', '1'].includes(val) || txt.includes('آقا') || txt.includes('پسر') || txt.includes('مرد')) {
+                if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر', '1', 'boy'].includes(val) || txt.includes('آقا') || txt.includes('پسر') || txt.includes('مرد')) {
                     isTargetMale = true;
                 }
-
                 if ((isFemale && isTargetFemale) || (isMale && isTargetMale)) {
                     if (!radio.checked) {
                         radio.checked = true;
@@ -400,47 +448,44 @@
                 }
             });
 
-            // ج) منوهای کشویی Select
+            // ه) منوهای کشویی Select
             const genderSelects = toolWrap.querySelectorAll('select');
             genderSelects.forEach(sel => {
+                if (sel.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
                 const name = (sel.name || '').toLowerCase();
                 const id   = (sel.id || '').toLowerCase();
-                let isGenderSelect = (name.includes('gender') || name.includes('sex') || id.includes('gender') || id.includes('sex'));
-                
-                // بررسی گزینه‌های داخل سلکت برای تشخیص فیلد جنسیت
+                let isGenderSelect = (name.includes('gender') || name.includes('sex') || name.includes('character') || id.includes('gender') || id.includes('sex') || id.includes('character'));
                 let foundMatch = false;
                 Array.from(sel.options).forEach(opt => {
                     const val = (opt.value || '').toLowerCase().trim();
                     const txt = (opt.textContent || '').trim().toLowerCase();
-                    if (txt.includes('خانم') || txt.includes('آقا') || txt.includes('مرد') || txt.includes('زن') || val === 'male' || val === 'female') {
+                    if (txt.includes('خانم') || txt.includes('آقا') || txt.includes('مرد') || txt.includes('زن') || txt.includes('پسر') || txt.includes('دختر') || val === 'male' || val === 'female' || val === 'boy' || val === 'girl') {
                         isGenderSelect = true;
                     }
                     if (isFemale) {
-                        if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر', '2'].includes(val) || txt.includes('خانم') || txt.includes('زن') || txt.includes('دختر')) {
+                        if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر', '2', 'girl'].includes(val) || txt.includes('خانم') || txt.includes('زن') || txt.includes('دختر')) {
                             sel.value = opt.value;
                             foundMatch = true;
                         }
                     } else if (isMale) {
-                        if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر', '1'].includes(val) || txt.includes('آقا') || txt.includes('مرد') || txt.includes('پسر')) {
+                        if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر', '1', 'boy'].includes(val) || txt.includes('آقا') || txt.includes('مرد') || txt.includes('پسر')) {
                             sel.value = opt.value;
                             foundMatch = true;
                         }
                     }
                 });
-
                 if (isGenderSelect && foundMatch) {
                     sel.dispatchEvent(new Event('change', { bubbles: true }));
                     sel.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             });
 
-            // تگ‌های متنی
+            // و) تگ‌های متنی نمایش جنسیت
             const genderPlaceholders = toolWrap.querySelectorAll('.madenna-user-gender, [data-madenna-user-gender]');
             genderPlaceholders.forEach(el => { el.textContent = genderFa; });
         }
 
-        // ==========================================
-        // ۳. پر کردن خودکار تاریخ تولد (روز، ماه، سال) و سن
+                // ۳. پر کردن خودکار تاریخ تولد (روز، ماه، سال) و سن
         // ==========================================
         if (activeBirthdate) {
             // الف) منوهای کشویی Select (مانند تصویر ۱ و ۲: روز تولد، ماه تولد، سال تولد)
@@ -1337,7 +1382,8 @@
                         await saveResultSnapshot(cachedResultElement);
                     }
                 } else {
-                    location.reload();
+                    // بروزرسانی بی‌درنگ وضعیت هدر بدون نیاز به لود مجدد صفحه
+                    updateHeaderAuthWidgetLive(data);
                 }
             } else {
                 errCode.textContent = data.message || 'کد واردشده نادرست است.';

@@ -38,6 +38,8 @@ class Madenna_User_Vault {
         add_action('admin_menu', [$this, 'register_leads_admin_menu']);
         add_action('admin_init', [$this, 'handle_admin_actions']);
         add_action('wp_login', [$this, 'record_user_login'], 10, 2);
+        add_filter('wp_redirect', [$this, 'prevent_unwanted_vault_redirect'], 999, 2);
+        add_filter('login_redirect', [$this, 'filter_user_login_redirect'], 999, 3);
         add_shortcode('madenna_user_vault', [$this, 'render_user_vault_shortcode']);
     }
 
@@ -315,6 +317,41 @@ class Madenna_User_Vault {
         if ($user_id) {
             update_user_meta($user_id, 'madenna_vault_last_seen', current_time('mysql'));
         }
+    }
+
+    public function prevent_unwanted_vault_redirect($location, $status) {
+        if (!is_user_logged_in() || is_admin() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+            return $location;
+        }
+
+        $current_uri = $_SERVER['REQUEST_URI'] ?? '';
+        $vault_slugs = ['my-vault', 'user-vault', 'profile', 'dashboard'];
+
+        $is_visiting_vault = false;
+        foreach ($vault_slugs as $slug) {
+            if (strpos($current_uri, '/' . $slug) !== false) {
+                $is_visiting_vault = true;
+                break;
+            }
+        }
+
+        // اگر کاربر مستقیماً به آدرس پرونده نرفته بود، هیچ افزونه‌ای نباید او را به صورت اجباری از صفحات سایت به پرونده ببرد
+        if (!$is_visiting_vault && is_string($location)) {
+            foreach ($vault_slugs as $slug) {
+                if (strpos($location, '/' . $slug) !== false) {
+                    return false;
+                }
+            }
+        }
+
+        return $location;
+    }
+
+    public function filter_user_login_redirect($redirect_to, $requested_redirect_to, $user) {
+        if (!empty($requested_redirect_to)) {
+            return $requested_redirect_to;
+        }
+        return home_url('/');
     }
 
     public function record_user_login($user_login, $user) {
