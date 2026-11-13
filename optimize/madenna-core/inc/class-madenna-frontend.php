@@ -34,8 +34,9 @@ class Madenna_Frontend {
         
 // لود سیستم Madenna Vault برای ابزارها
         if (is_singular('tools')) {
-            wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '8.2.0');
-            wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '8.2.0', true);
+            $vault_ver = defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0';
+            wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], $vault_ver);
+            wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], $vault_ver, true);
 
             $cats = wp_get_post_terms(get_the_ID(), 'madenna_cat');
             $cat_slug = (!empty($cats) && !is_wp_error($cats)) ? $cats[0]->slug : '';
@@ -43,7 +44,7 @@ class Madenna_Frontend {
             $uid = get_current_user_id();
             $u = is_user_logged_in() ? wp_get_current_user() : null;
             $current_user_name      = $u ? $u->display_name : '';
-            $current_user_gender    = $uid ? (get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
+            $current_user_gender    = $uid ? (get_user_meta($uid, 'madenna_gender', true) ?: '') : '';
             $current_user_birthdate = $uid ? (get_user_meta($uid, 'madenna_birthdate', true) ?: '') : '';
 
             wp_localize_script('madenna-vault-js', 'madennaVaultConfig', [
@@ -96,7 +97,7 @@ class Madenna_Frontend {
                 $u = is_user_logged_in() ? wp_get_current_user() : null;
         $uid = get_current_user_id();
         $user_name = $u ? esc_attr($u->display_name) : '';
-        $user_gender = $uid ? esc_attr(get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
+        $user_gender = $uid ? esc_attr(get_user_meta($uid, 'madenna_gender', true) ?: '') : '';
         $user_birthdate = $uid ? esc_attr(get_user_meta($uid, 'madenna_birthdate', true) ?: '') : '';
         $is_logged_in = is_user_logged_in() ? 'true' : 'false';
 

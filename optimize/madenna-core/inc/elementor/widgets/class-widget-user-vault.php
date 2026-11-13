@@ -49,8 +49,9 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
 
     public function render_vault_dashboard_content($settings = []) {
         wp_enqueue_style('madenna-vault-fa6', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
-        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', ['madenna-vault-fa6'], '8.1.0');
-        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '8.1.0', true);
+        $vault_ver = defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0';
+        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', ['madenna-vault-fa6'], $vault_ver);
+        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], $vault_ver, true);
 
         if (!is_user_logged_in()) {
             ?>
@@ -75,8 +76,10 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
         $user_id = get_current_user_id();
         $user    = wp_get_current_user();
         $mobile  = get_user_meta($user_id, 'madenna_mobile', true) ?: $user->user_login;
-        $gender    = get_user_meta($user_id, 'madenna_gender', true) ?: 'male';
-        $birthdate = get_user_meta($user_id, 'madenna_birthdate', true) ?: '';
+        $raw_gender       = trim((string) get_user_meta($user_id, 'madenna_gender', true));
+        $has_valid_gender = in_array($raw_gender, ['male', 'female'], true);
+        $gender           = $has_valid_gender ? $raw_gender : 'male';
+        $birthdate        = trim((string) get_user_meta($user_id, 'madenna_birthdate', true));
         $b_year = '';
         $b_month = '';
         $b_day = '';
@@ -100,8 +103,10 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
             7 => 'مهر', 8 => 'آبان', 9 => 'آذر',
             10 => 'دی', 11 => 'بهمن', 12 => 'اسفند'
         ];
+        $has_valid_birthdate = (!empty($b_year) && !empty($b_month) && !empty($b_day));
+        $is_profile_complete = ($has_valid_gender && $has_valid_birthdate);
         $birthdate_display_text = 'ثبت‌نشده';
-        if (!empty($b_year) && !empty($b_month) && !empty($b_day)) {
+        if ($has_valid_birthdate) {
             $birthdate_display_text = sprintf('%d %s %d', $b_day, $shamsi_months[$b_month] ?? '', $b_year);
         } elseif (!empty($birthdate)) {
             $birthdate_display_text = esc_html($birthdate);
@@ -354,7 +359,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
             }
         </script>
 
-        <div class="mad-vault-dashboard-wrapper" data-ajax-url="<?php echo esc_url(admin_url('admin-ajax.php')); ?>">
+        <div class="mad-vault-dashboard-wrapper" data-ajax-url="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" data-profile-complete="<?php echo $is_profile_complete ? 'true' : 'false'; ?>" data-user-gender="<?php echo esc_attr($has_valid_gender ? $raw_gender : ''); ?>" data-user-birthdate="<?php echo esc_attr($birthdate); ?>">
             
             <!-- ۱. هدر پروفایل و ویرایش آنی نام و جنسیت + دکمه خروج زیر باکس سوابق -->
             <div class="mad-vault-db-header">
@@ -382,8 +387,9 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                                 <input type="text" id="mad-vault-edit-name-input" value="<?php echo esc_attr($name); ?>" placeholder="نام و نام خانوادگی" style="height: 36px; border-radius: 8px; border: 1px solid #bfc9c6; padding: 0 10px; font-size: 13px; font-family: inherit;">
                                 <select id="mad-vault-edit-gender-select" style="height: 36px; border-radius: 8px; border: 1px solid #bfc9c6; padding: 0 10px; font-size: 13px; font-family: inherit;">
-                                    <option value="male" <?php selected($gender, 'male'); ?>>آقا</option>
-                                    <option value="female" <?php selected($gender, 'female'); ?>>خانم</option>
+                                    <option value="" <?php selected($has_valid_gender, false); ?>>جنسیت...</option>
+                                    <option value="male" <?php selected($raw_gender, 'male'); ?>>آقا</option>
+                                    <option value="female" <?php selected($raw_gender, 'female'); ?>>خانم</option>
                                 </select>
                                 <div style="display: inline-flex; align-items: center; gap: 4px; background: #ffffff; border: 1px solid #bfc9c6; border-radius: 8px; padding: 0 6px; height: 36px;">
                                     <span style="font-size: 11px; color: #64748b; font-weight: 700; margin-left: 2px;">تولد:</span>
@@ -659,7 +665,63 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                         <button type="button" id="mad-res-modal-close-btn" class="mad-vault-result-modal-close" aria-label="بستن">&times;</button>
                     </div>
                 </div>
-                <div id="mad-vault-result-modal-body" class="mad-vault-result-modal-body"></div>
+                <div id="mad-vault-result-modal-body-wrap" class="mad-vault-result-modal-body-wrap">
+                    <div id="mad-vault-result-modal-body" class="mad-vault-result-modal-body"></div>
+                    <div id="mad-vault-profile-gate-overlay" class="mad-vault-profile-gate-overlay" style="display: none;">
+                        <div class="mad-vault-profile-gate-card">
+                            <div class="mad-vault-gate-icon">
+                                <i class="fa-solid fa-user-lock"></i>
+                            </div>
+                            <h4 class="mad-vault-gate-title">تکمیل جنسیت و تاریخ تولد برای مشاهده نتیجه</h4>
+                            <p class="mad-vault-gate-desc">برای مشاهده کامل کارنامه و تحلیل‌های ثبت‌شده در پرونده (و پر شدن خودکار ابزارهای بعدی)، لطفاً جنسیت و تاریخ تولد خود را مشخص کنید.</p>
+
+                            <div class="mad-vault-gate-field">
+                                <label class="mad-vault-gate-label">جنسیت شما:</label>
+                                <div class="mad-vault-gate-gender-options" id="mad-vault-gate-gender-options">
+                                    <button type="button" class="mad-vault-gate-gender-btn <?php echo ($raw_gender === 'male') ? 'active' : ''; ?>" data-gate-gender="male">
+                                        <i class="fa-solid fa-mars"></i>
+                                        <span>آقا</span>
+                                    </button>
+                                    <button type="button" class="mad-vault-gate-gender-btn <?php echo ($raw_gender === 'female') ? 'active' : ''; ?>" data-gate-gender="female">
+                                        <i class="fa-solid fa-venus"></i>
+                                        <span>خانم</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mad-vault-gate-field">
+                                <label class="mad-vault-gate-label">تاریخ تولد (شمسی):</label>
+                                <div class="mad-vault-gate-bdate-grid">
+                                    <select id="mad-vault-gate-bday" class="mad-vault-gate-select">
+                                        <option value="">روز</option>
+                                        <?php for ($d = 1; $d <= 31; $d++): ?>
+                                            <option value="<?php echo $d; ?>" <?php selected($b_day, $d); ?>><?php echo $d; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                    <select id="mad-vault-gate-bmonth" class="mad-vault-gate-select">
+                                        <option value="">ماه</option>
+                                        <?php foreach ($shamsi_months as $m_num => $m_name): ?>
+                                            <option value="<?php echo $m_num; ?>" <?php selected($b_month, $m_num); ?>><?php echo esc_html($m_name); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <select id="mad-vault-gate-byear" class="mad-vault-gate-select">
+                                        <option value="">سال</option>
+                                        <?php for ($y = 1403; $y >= 1320; $y--): ?>
+                                            <option value="<?php echo $y; ?>" <?php selected($b_year, $y); ?>><?php echo $y; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <span id="mad-vault-gate-error" class="mad-vault-gate-error"></span>
+
+                            <button type="button" id="mad-vault-gate-save-btn" class="mad-vault-gate-submit-btn">
+                                <i class="fa-solid fa-unlock-keyhole"></i>
+                                <span>ثبت اطلاعات و نمایش نتیجه</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -672,6 +734,18 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
             if (!wrapper) return;
 
             const ajaxUrl = wrapper.getAttribute('data-ajax-url') || '/wp-admin/admin-ajax.php';
+            let isProfileComplete   = wrapper.getAttribute('data-profile-complete') === 'true';
+            let currentUserGender   = wrapper.getAttribute('data-user-gender') || '';
+            let currentUserBirthdate = wrapper.getAttribute('data-user-birthdate') || '';
+            const resModalBodyWrap  = document.getElementById('mad-vault-result-modal-body-wrap');
+            const gateOverlay       = document.getElementById('mad-vault-profile-gate-overlay');
+            const gateSaveBtn       = document.getElementById('mad-vault-gate-save-btn');
+            const gateErrorEl       = document.getElementById('mad-vault-gate-error');
+            const gateGenderBtns    = document.querySelectorAll('.mad-vault-gate-gender-btn');
+            const gateDaySel        = document.getElementById('mad-vault-gate-bday');
+            const gateMonthSel      = document.getElementById('mad-vault-gate-bmonth');
+            const gateYearSel       = document.getElementById('mad-vault-gate-byear');
+            let gateSelectedGender  = (currentUserGender === 'male' || currentUserGender === 'female') ? currentUserGender : '';
             const ITEMS_PER_PAGE = 12;
             let historyCurrentPage = 1;
             let offersCurrentPage  = 1;
@@ -757,6 +831,17 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                         const res  = await fetch(ajaxUrl, { method: 'POST', body: fd, credentials: 'same-origin' });
                         const json = await res.json();
                         if (json.success && json.data) {
+                            if (json.data.gender === 'male' || json.data.gender === 'female') {
+                                currentUserGender = json.data.gender;
+                                gateSelectedGender = json.data.gender;
+                                wrapper.setAttribute('data-user-gender', json.data.gender);
+                            }
+                            if (json.data.birthdate !== undefined) {
+                                currentUserBirthdate = json.data.birthdate || '';
+                                wrapper.setAttribute('data-user-birthdate', currentUserBirthdate);
+                            }
+                            isProfileComplete = ((currentUserGender === 'male' || currentUserGender === 'female') && currentUserBirthdate.trim() !== '');
+                            wrapper.setAttribute('data-profile-complete', isProfileComplete ? 'true' : 'false');
                             document.getElementById('mad-vault-display-name').textContent = json.data.name;
                             if (json.data.avatar_svg && avatarBox) {
                                 avatarBox.innerHTML = json.data.avatar_svg;
@@ -1419,6 +1504,132 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                 });
             }
 
+            function syncGateFormInputs() {
+                gateGenderBtns.forEach(btn => {
+                    const g = btn.getAttribute('data-gate-gender');
+                    btn.classList.toggle('active', g === gateSelectedGender);
+                });
+                if (currentUserBirthdate) {
+                    const bp = currentUserBirthdate.split('/');
+                    if (bp.length === 3) {
+                        if (gateYearSel) gateYearSel.value = String(parseInt(bp[0], 10) || '');
+                        if (gateMonthSel) gateMonthSel.value = String(parseInt(bp[1], 10) || '');
+                        if (gateDaySel) gateDaySel.value = String(parseInt(bp[2], 10) || '');
+                    }
+                }
+                if (gateErrorEl) gateErrorEl.textContent = '';
+            }
+
+            function applyProfileGateStateInModal() {
+                if (!resModalBody) return;
+                if (!isProfileComplete) {
+                    resModalBody.classList.add('mad-vault-result-locked-blur');
+                    if (resModalBodyWrap) resModalBodyWrap.classList.add('is-locked');
+                    if (gateOverlay) gateOverlay.style.display = 'flex';
+                    if (resPrintBtn) resPrintBtn.style.display = 'none';
+                    syncGateFormInputs();
+                } else {
+                    resModalBody.classList.remove('mad-vault-result-locked-blur');
+                    if (resModalBodyWrap) resModalBodyWrap.classList.remove('is-locked');
+                    if (gateOverlay) gateOverlay.style.display = 'none';
+                    if (resPrintBtn) resPrintBtn.style.display = '';
+                }
+            }
+
+            gateGenderBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    gateSelectedGender = this.getAttribute('data-gate-gender') || '';
+                    gateGenderBtns.forEach(b => b.classList.toggle('active', b === this));
+                    if (gateErrorEl) gateErrorEl.textContent = '';
+                });
+            });
+
+            if (gateSaveBtn) {
+                gateSaveBtn.addEventListener('click', async function() {
+                    if (gateErrorEl) gateErrorEl.textContent = '';
+                    const dVal = gateDaySel ? gateDaySel.value.trim() : '';
+                    const mVal = gateMonthSel ? gateMonthSel.value.trim() : '';
+                    const yVal = gateYearSel ? gateYearSel.value.trim() : '';
+
+                    if (gateSelectedGender !== 'male' && gateSelectedGender !== 'female') {
+                        if (gateErrorEl) gateErrorEl.textContent = 'لطفاً جنسیت خود (آقا یا خانم) را انتخاب کنید.';
+                        return;
+                    }
+                    if (!dVal || !mVal || !yVal) {
+                        if (gateErrorEl) gateErrorEl.textContent = 'لطفاً روز، ماه و سال تولد خود را به صورت کامل انتخاب کنید.';
+                        return;
+                    }
+
+                    const newBirthdate = `${yVal}/${String(mVal).padStart(2, '0')}/${String(dVal).padStart(2, '0')}`;
+                    const currentNameEl = document.getElementById('mad-vault-display-name');
+                    const currentName = currentNameEl ? currentNameEl.textContent.trim() : '';
+
+                    const origHtml = gateSaveBtn.innerHTML;
+                    gateSaveBtn.disabled = true;
+                    gateSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال ثبت اطلاعات...</span>';
+
+                    try {
+                        const fd = new FormData();
+                        fd.append('action', 'madenna_vault_update_profile');
+                        fd.append('full_name', currentName);
+                        fd.append('gender', gateSelectedGender);
+                        fd.append('birthdate', newBirthdate);
+
+                        const res = await fetch(ajaxUrl, { method: 'POST', body: fd, credentials: 'same-origin' });
+                        const json = await res.json();
+                        if (json && json.success && json.data) {
+                            currentUserGender = json.data.gender || gateSelectedGender;
+                            currentUserBirthdate = json.data.birthdate || newBirthdate;
+                            isProfileComplete = true;
+                            wrapper.setAttribute('data-profile-complete', 'true');
+                            wrapper.setAttribute('data-user-gender', currentUserGender);
+                            wrapper.setAttribute('data-user-birthdate', currentUserBirthdate);
+
+                            if (window.madennaVaultConfig) {
+                                window.madennaVaultConfig.user_gender = currentUserGender;
+                                window.madennaVaultConfig.user_birthdate = currentUserBirthdate;
+                            }
+
+                            if (json.data.avatar_svg && avatarBox) {
+                                avatarBox.innerHTML = json.data.avatar_svg;
+                            }
+                            const headerAvatar = document.querySelector('.mad-vault-header-avatar');
+                            if (headerAvatar && json.data.header_avatar_svg) {
+                                headerAvatar.innerHTML = json.data.header_avatar_svg;
+                            }
+
+                            if (genderSelect) genderSelect.value = currentUserGender;
+                            const editDayEl = document.getElementById('mad-vault-edit-bday');
+                            const editMonthEl = document.getElementById('mad-vault-edit-bmonth');
+                            const editYearEl = document.getElementById('mad-vault-edit-byear');
+                            const editHiddenBdate = document.getElementById('mad-vault-edit-birthdate-input');
+                            if (editDayEl) editDayEl.value = String(parseInt(dVal, 10));
+                            if (editMonthEl) editMonthEl.value = String(parseInt(mVal, 10));
+                            if (editYearEl) editYearEl.value = String(parseInt(yVal, 10));
+                            if (editHiddenBdate) editHiddenBdate.value = currentUserBirthdate;
+
+                            const dispBdate = document.getElementById('mad-vault-display-birthdate');
+                            if (dispBdate) {
+                                const shamsiMonths = {1:'فروردین',2:'اردیبهشت',3:'خرداد',4:'تیر',5:'مرداد',6:'شهریور',7:'مهر',8:'آبان',9:'آذر',10:'دی',11:'بهمن',12:'اسفند'};
+                                dispBdate.textContent = `${parseInt(dVal, 10)} ${shamsiMonths[parseInt(mVal, 10)] || mVal} ${yVal}`;
+                            }
+
+                            applyProfileGateStateInModal();
+                            setTimeout(() => {
+                                restoreChartsInContainer(resModalBody);
+                            }, 50);
+                        } else {
+                            if (gateErrorEl) gateErrorEl.textContent = (json && json.data && json.data.message) ? json.data.message : 'خطا در ثبت اطلاعات. مجدداً تلاش کنید.';
+                        }
+                    } catch (err) {
+                        if (gateErrorEl) gateErrorEl.textContent = 'خطا در برقراری ارتباط با سرور.';
+                    }
+
+                    gateSaveBtn.disabled = false;
+                    gateSaveBtn.innerHTML = origHtml;
+                });
+            }
+
             function openResultPreviewModal(row) {
                 if (!row || !resModal || !resModalBody) return;
                 const recId      = row.getAttribute('data-record-id');
@@ -1499,6 +1710,8 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
 
                     isolateResultViewInModal(toolRoot);
                 }
+
+                applyProfileGateStateInModal();
 
                 resModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
@@ -1743,6 +1956,9 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
                 if (!resModal) return;
                 resModal.style.display = 'none';
                 resModalBody.innerHTML = '';
+                resModalBody.classList.remove('mad-vault-result-locked-blur');
+                if (resModalBodyWrap) resModalBodyWrap.classList.remove('is-locked');
+                if (gateOverlay) gateOverlay.style.display = 'none';
                 document.body.style.overflow = '';
             }
 
@@ -1755,7 +1971,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
 
             if (resPrintBtn) {
                 resPrintBtn.addEventListener('click', function() {
-                    if (!resModalBody) return;
+                    if (!resModalBody || !isProfileComplete) return;
 
                     const cloneForPrint = resModalBody.cloneNode(true);
                     cloneForPrint.querySelectorAll('[data-vault-hidden-step="true"], [id*="modal" i].hidden, [role="dialog"].hidden, script').forEach(m => m.remove());

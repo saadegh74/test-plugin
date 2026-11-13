@@ -36,6 +36,8 @@ class Madenna_User_Vault {
         add_action('wp_ajax_madenna_vault_delete_record', [$this, 'ajax_delete_user_record']);
 
         add_action('admin_menu', [$this, 'register_leads_admin_menu']);
+        add_action('admin_init', [$this, 'block_wp_admin_for_non_admins'], 1);
+        add_action('login_init', [$this, 'block_wp_login_for_non_admins'], 1);
         add_action('admin_init', [$this, 'handle_admin_actions']);
         add_action('wp_login', [$this, 'record_user_login'], 10, 2);
         add_filter('wp_redirect', [$this, 'prevent_unwanted_vault_redirect'], 999, 2);
@@ -165,8 +167,9 @@ class Madenna_User_Vault {
     }
 
     public function enqueue_global_vault_assets() {
-        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '8.2.0');
-        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '8.2.0', true);
+        $vault_ver = defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0';
+        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], $vault_ver);
+        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], $vault_ver, true);
 
         $queried_id   = get_queried_object_id() ?: get_the_ID();
         $is_tool_page = (is_singular('tools') && $queried_id);
@@ -187,13 +190,13 @@ class Madenna_User_Vault {
         }
 
         $current_user_name      = '';
-        $current_user_gender    = 'male';
+        $current_user_gender    = '';
         $current_user_birthdate = '';
         if (is_user_logged_in()) {
             $uid = get_current_user_id();
             $u = wp_get_current_user();
             $current_user_name      = $u ? $u->display_name : '';
-            $current_user_gender    = get_user_meta($uid, 'madenna_gender', true) ?: 'male';
+            $current_user_gender    = get_user_meta($uid, 'madenna_gender', true) ?: '';
             $current_user_birthdate = get_user_meta($uid, 'madenna_birthdate', true) ?: '';
         }
 
@@ -347,7 +350,54 @@ class Madenna_User_Vault {
         return $location;
     }
 
+    public static function get_vault_dashboard_url() {
+        foreach (['my-vault', 'profile', 'dashboard', 'user-vault'] as $slug) {
+            $page = get_page_by_path($slug);
+            if ($page && $page->post_status === 'publish') {
+                return get_permalink($page->ID);
+            }
+        }
+        return home_url('/');
+    }
+
+    public function block_wp_admin_for_non_admins() {
+        if (!is_admin()) {
+            return;
+        }
+        if (wp_doing_ajax() || (defined('DOING_AJAX') && DOING_AJAX)) {
+            return;
+        }
+        if (defined('DOING_CRON') && DOING_CRON) {
+            return;
+        }
+        if (!is_user_logged_in()) {
+            return;
+        }
+        if (!current_user_can('edit_posts')) {
+            wp_safe_redirect(self::get_vault_dashboard_url());
+            exit;
+        }
+    }
+
+    public function block_wp_login_for_non_admins() {
+        if (!is_user_logged_in() || current_user_can('edit_posts')) {
+            return;
+        }
+        $action = isset($_REQUEST['action']) ? sanitize_key($_REQUEST['action']) : '';
+        if ($action === 'logout') {
+            return;
+        }
+        wp_safe_redirect(self::get_vault_dashboard_url());
+        exit;
+    }
+
     public function filter_user_login_redirect($redirect_to, $requested_redirect_to, $user) {
+        if ($user instanceof WP_User && !user_can($user, 'edit_posts')) {
+            if (!empty($requested_redirect_to) && strpos($requested_redirect_to, 'wp-admin') === false) {
+                return $requested_redirect_to;
+            }
+            return self::get_vault_dashboard_url();
+        }
         if (!empty($requested_redirect_to)) {
             return $requested_redirect_to;
         }
@@ -579,7 +629,7 @@ class Madenna_User_Vault {
         $mobile    = self::clean_mobile_number($params['mobile'] ?? '');
         $code      = preg_replace('/[^0-9]/', '', $params['code'] ?? '');
         $full_name = sanitize_text_field($params['full_name'] ?? '');
-        $gender    = in_array($params['gender'] ?? '', ['male', 'female'], true) ? $params['gender'] : 'male';
+        $gender    = in_array($params['gender'] ?? '', ['male', 'female'], true) ? $params['gender'] : '';
         $tool_id   = intval($params['tool_id'] ?? 0);
         $cat_slug  = sanitize_text_field($params['category_slug'] ?? '');
 
@@ -626,7 +676,9 @@ class Madenna_User_Vault {
             ]);
 
             update_user_meta($user_id, 'madenna_mobile', $mobile);
-            update_user_meta($user_id, 'madenna_gender', $gender);
+            if (!empty($gender)) {
+                update_user_meta($user_id, 'madenna_gender', $gender);
+            }
             update_user_meta($user_id, 'madenna_first_tool_id', $tool_id);
             update_user_meta($user_id, 'madenna_first_category', $cat_slug);
             update_user_meta($user_id, 'madenna_joined_at', $now);
@@ -644,7 +696,7 @@ class Madenna_User_Vault {
                     'first_name'   => $full_name,
                 ]);
             }
-            if (!empty($params['gender'])) {
+            if (!empty($gender)) {
                 update_user_meta($user_id, 'madenna_gender', $gender);
             }
             if (!get_user_meta($user_id, 'madenna_first_login', true)) {
@@ -666,7 +718,8 @@ class Madenna_User_Vault {
         }
 
         $u_obj = get_userdata($user_id);
-        $final_gender = get_user_meta($user_id, 'madenna_gender', true) ?: 'male';
+        $final_gender = get_user_meta($user_id, 'madenna_gender', true) ?: '';
+        $avatar_gender = !empty($final_gender) ? $final_gender : 'male';
 
         return new WP_REST_Response([
             'success'         => true,
@@ -674,7 +727,7 @@ class Madenna_User_Vault {
             'user_name'       => $u_obj ? $u_obj->display_name : $full_name,
             'gender'          => $final_gender,
             'birthdate'       => get_user_meta($user_id, 'madenna_birthdate', true) ?: '',
-            'avatar_svg'      => self::get_avatar_svg($final_gender, 36),
+            'avatar_svg'      => self::get_avatar_svg($avatar_gender, 36),
             'unseen_count'    => self::get_unseen_badge_count($user_id),
             'is_new_user'     => $is_new_user,
             'new_nonce'       => wp_create_nonce('wp_rest'),
@@ -689,7 +742,8 @@ class Madenna_User_Vault {
         }
 
         $name      = sanitize_text_field($_POST['full_name'] ?? '');
-        $gender    = in_array($_POST['gender'] ?? '', ['male', 'female'], true) ? $_POST['gender'] : 'male';
+        $raw_g     = sanitize_text_field($_POST['gender'] ?? '');
+        $gender    = in_array($raw_g, ['male', 'female'], true) ? $raw_g : '';
         $birthdate = sanitize_text_field($_POST['birthdate'] ?? '');
 
         if (!empty($name)) {
@@ -699,17 +753,22 @@ class Madenna_User_Vault {
                 'first_name'   => $name,
             ]);
         }
-        update_user_meta($user_id, 'madenna_gender', $gender);
+        if (!empty($gender)) {
+            update_user_meta($user_id, 'madenna_gender', $gender);
+        } else {
+            $gender = get_user_meta($user_id, 'madenna_gender', true) ?: '';
+        }
         if (isset($_POST['birthdate'])) {
             update_user_meta($user_id, 'madenna_birthdate', $birthdate);
         }
 
+        $avatar_g = !empty($gender) ? $gender : 'male';
         wp_send_json_success([
             'name'              => $name,
             'gender'            => $gender,
             'birthdate'         => $birthdate,
-            'avatar_svg'        => self::get_avatar_svg($gender, 64),
-            'header_avatar_svg' => self::get_avatar_svg($gender, 36),
+            'avatar_svg'        => self::get_avatar_svg($avatar_g, 64),
+            'header_avatar_svg' => self::get_avatar_svg($avatar_g, 36),
         ]);
     }
 

@@ -27,7 +27,7 @@ class Madenna_Elementor_Init {
             'madenna-vault-css',
             MADENNA_CORE_URL . 'assets/css/madenna-vault.css',
             [],
-            '3.0.0'
+            defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0'
         );
     }
 

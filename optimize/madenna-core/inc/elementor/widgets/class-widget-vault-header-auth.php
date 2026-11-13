@@ -218,8 +218,9 @@ class Madenna_Vault_Header_Auth_Widget extends \Elementor\Widget_Base {
         $dash_url   = !empty($s['dashboard_url']['url']) ? esc_url($s['dashboard_url']['url']) : esc_url(home_url('/my-vault/'));
         $show_badge = ($s['show_badge'] ?? 'yes') === 'yes';
 
-        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '5.6.0');
-        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '5.6.0', true);
+        $vault_ver = defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0';
+        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], $vault_ver);
+        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], $vault_ver, true);
 
         echo '<div class="mad-vault-header-auth-wrap" data-dashboard-url="' . esc_attr($dash_url) . '" data-show-badge="' . ($show_badge ? 'yes' : 'no') . '">';
 

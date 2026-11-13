@@ -124,7 +124,7 @@ class Madenna_Tool_Renderer_Elementor_Widget extends \Elementor\Widget_Base {
         $u = is_user_logged_in() ? wp_get_current_user() : null;
         $uid = get_current_user_id();
         $user_name = $u ? esc_attr($u->display_name) : '';
-        $user_gender = $uid ? esc_attr(get_user_meta($uid, 'madenna_gender', true) ?: 'male') : 'male';
+        $user_gender = $uid ? esc_attr(get_user_meta($uid, 'madenna_gender', true) ?: '') : '';
         $user_birthdate = $uid ? esc_attr(get_user_meta($uid, 'madenna_birthdate', true) ?: '') : '';
         $is_logged_in = is_user_logged_in() ? 'true' : 'false';
 
