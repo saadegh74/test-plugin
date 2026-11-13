@@ -77,6 +77,9 @@ plugins/updates/
 │   │   ├── advanced-custom-fields-pro/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── advanced-custom-fields-pro-v6.8.11.zip <-- فایل فشرده با نام استاندارد جهت تست
+│   │   ├── wp-rocket/
+│   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
+│   │   │   └── wp-rocket-v3.23.5.1.zip     <-- فایل فشرده با نام استاندارد جهت تست
 │   │   ├── jet-blocks/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── jet-blocks-v1.3.12.zip      <-- فایل فشرده با نام استاندارد جهت تست
@@ -117,6 +120,16 @@ plugins/updates/
 ---
 
 ## ۳. لیست افزونه‌های فعال و آدرس‌های اندپوینت (Endpoints)
+
+### افزونه WP Rocket (نسخه 3.23.5.1)
+
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/wp-rocket-v3.23.5.1.zip`
+* **کانال پایدار (Production):**
+  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **نسخه مرجع:**
+  * نسخه موجود در `plugins/raw/on/old/wp-rocket/` از ابتدا روی آخرین نسخه (`3.23.5.1`) قرار داشت و بدون تغییر به عنوان مرجع نگهداری می‌شود.
 
 ### افزونه Advanced Custom Fields PRO (نسخه 6.8.11)
 

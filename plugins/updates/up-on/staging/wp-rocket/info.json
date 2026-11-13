@@ -1,0 +1,20 @@
+{
+  "name": "WP Rocket [کانال آزمایشی - Staging]",
+  "slug": "wp-rocket",
+  "version": "3.23.5.1",
+  "tested": "6.8",
+  "requires": "5.8",
+  "requires_php": "7.4",
+  "last_updated": "2026-10-14 01:00:00",
+  "author": "WP Media",
+  "author_homepage": "https://wp-rocket.me",
+  "sections": {
+    "description": "افزونه تخصصی افزایش سرعت و بهینه‌سازی عملکرد وردپرس (WP Rocket) با قابلیت کش صفحات، فشرده‌سازی فایل‌ها، تاخیر در اجرای اسکریپت‌ها و بهینه‌سازی Core Web Vitals.",
+    "changelog": "<h4>3.23.5.1</h4><ul><li>بهینه‌سازی عملکرد هسته کش و سازگاری با نسخه‌های جدید وردپرس و PHP</li><li>حذف کامل فایل منوی اضافی سایت واسطه (management-menus.php)</li><li>حذف دامنه واسطه gpltimes از کلاس AbstractAPIClient و هوک درخواست‌های داخلی</li><li>پاک‌سازی پیام تبلیغاتی سایت واسطه از فایل ترجمه فارسی</li><li>حذف فایل‌های زائد مخزن گیت و اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 960,
+  "downloaded": 5100,
+  "active_installs": 5100,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/wp-rocket-v3.23.5.1.zip"
+}
