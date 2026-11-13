@@ -3,7 +3,7 @@
  * Plugin Name: Madenna Core
  * Plugin URI: https://madenna.ir
  * Description: افزونه هسته مادنا برای مدیریت اختصاصی مقالات، ابزارها، دسته‌بندی‌های فلت، همگام‌سازی دوطرفه، و المان‌های پیشرفته المنتور.
- * Version: 4.3.2
+ * Version: 4.3.3
  * Author: Madenna Team
  * Text Domain: madenna-core
  * Location: /madenna-core.php
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 
 define('MADENNA_CORE_DIR', plugin_dir_path(__FILE__));
 define('MADENNA_CORE_URL', plugin_dir_url(__FILE__));
-define('MADENNA_CORE_VERSION', '8.3.0');
+define('MADENNA_CORE_VERSION', '8.3.1');
 
 // بارگذاری فایل‌های اصلی و حیاتی
 require_once MADENNA_CORE_DIR . 'inc/class-madenna-user-vault.php';

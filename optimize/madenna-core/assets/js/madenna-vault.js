@@ -1,5 +1,5 @@
 /**
- * Madenna Vault Frontend Controller (نسخه نهایی ۸.۳)
+ * Madenna Vault Frontend Controller (نسخه نهایی ۸.۳.۱)
  * ثبت کامل ساختار ابزار در حالت نتیجه با مخفی‌سازی مراحل سوالات (data-vault-hidden-step)
  * Location: /assets/js/madenna-vault.js
  */
@@ -190,9 +190,19 @@
             .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660));
     }
 
+    function extractCleanNumbers(str) {
+        const clean = toEnglishDigits(str || '')
+            .replace(/[\u200c\u200f\u200e\u0640]/g, '')
+            .replace(/(\d)[٬،,\u066C\u060C]+(?=\d)/g, '$1');
+        const matches = clean.match(/\d+/g);
+        return matches ? matches.map(n => parseInt(n, 10)).filter(n => !isNaN(n)) : [];
+    }
+
     function normalizeFaText(str) {
         return toEnglishDigits(str || '')
             .replace(/[\u200c\u200f\u200e\u0640]/g, ' ')
+            .replace(/[٬،\u066C\u060C]/g, ',')
+            .replace(/(\d),(?=\d)/g, '$1')
             .replace(/ي/g, 'ی')
             .replace(/ك/g, 'ک')
             .replace(/[آأإ]/g, 'ا')
@@ -275,7 +285,7 @@
         let shamsiYearNum = 0, shamsiMonthNum = 0, shamsiDayNum = 0;
         if (activeBirthdate) {
             const cleanBdate = toEnglishDigits(activeBirthdate);
-            const parts = cleanBdate.split(/[\/\-\.\s]+/).map(p => p.trim()).filter(Boolean);
+            const parts = cleanBdate.split(/[\/\-\.\s،,]+/).map(p => p.trim()).filter(Boolean);
             if (parts.length >= 3) {
                 if (parts[0].length === 4) {
                     birthYear = parts[0];
@@ -413,26 +423,28 @@
                 // ۲. پر کردن خودکار جنسیت و کارت‌های کاراکتر
                 // ==========================================
                 if (activeGender && (isFemale || isMale)) {
-                    const femaleTokens = ['female', 'woman', 'girl', 'f', 'زن', 'خانم', 'دختر'];
-                    const maleTokens   = ['male', 'man', 'boy', 'm', 'مرد', 'آقا', 'پسر'];
-                    const femaleWordRe = /(?:^|[\s\u200c.,:;!?\-_()\/|])(?:کاراکتر\s*دختر|دختر|خانم|زن|girl|female|woman)(?=$|[\s\u200c.,:;!?\-_()\/|])/i;
-                    const maleWordRe   = /(?:^|[\s\u200c.,:;!?\-_()\/|])(?:کاراکتر\s*پسر|پسر|آقا|مرد|boy|male|man)(?=$|[\s\u200c.,:;!?\-_()\/|])/i;
+                    const femaleTokens = ['female', 'woman', 'girl', 'f', 'زن', 'خانم', 'خانوم', 'دختر', 'بانو', 'khanom', 'lady'];
+                    const maleTokens   = ['male', 'man', 'boy', 'm', 'مرد', 'آقا', 'اقا', 'پسر', 'agha', 'gentleman'];
+                    const femaleWordRe = /(?:^|[\s\u200c.,:;!?\-_()\/|])(?:کاراکتر\s*دختر|دختر|خانوم|خانم|بانو|زن|girl|female|woman|lady)(?=$|[\s\u200c.,:;!?\-_()\/|])/i;
+                    const maleWordRe   = /(?:^|[\s\u200c.,:;!?\-_()\/|])(?:کاراکتر\s*پسر|پسر|آقا|اقا|مرد|boy|male|man|gentleman)(?=$|[\s\u200c.,:;!?\-_()\/|])/i;
 
                     function hasFemaleKeyword(str) {
-                        if (!str) return false;
-                        return str.includes('کاراکتر دختر') || femaleWordRe.test(str);
+                        const n = normalizeFaText(str);
+                        if (!n) return false;
+                        return n.includes('کاراکتر دختر') || femaleWordRe.test(n);
                     }
                     function hasMaleKeyword(str) {
-                        if (!str) return false;
-                        return str.includes('کاراکتر پسر') || maleWordRe.test(str);
+                        const n = normalizeFaText(str);
+                        if (!n) return false;
+                        return n.includes('کاراکتر پسر') || maleWordRe.test(n);
                     }
 
                     function isCardVisuallySelected(card) {
                         if (!card) return false;
-                        if (card.classList && (card.classList.contains('selected') || card.classList.contains('active'))) return true;
-                        if (card.getAttribute('aria-pressed') === 'true' || card.getAttribute('aria-checked') === 'true') return true;
+                        if (card.classList && (card.classList.contains('selected') || card.classList.contains('active') || card.classList.contains('is-selected') || card.classList.contains('is-active'))) return true;
+                        if (card.getAttribute('aria-pressed') === 'true' || card.getAttribute('aria-checked') === 'true' || card.getAttribute('aria-selected') === 'true') return true;
                         if (card.querySelector('input:checked')) return true;
-                        const chkSvg = card.querySelector('[id*="check-svg"], .mdn-avatar-check svg');
+                        const chkSvg = card.querySelector('[id*="check-svg"], .mdn-avatar-check svg, [class*="check"] svg');
                         if (chkSvg) {
                             const cls = (chkSvg.getAttribute('class') || '');
                             if (cls.includes('opacity-100') || (!cls.includes('opacity-0') && chkSvg.style.opacity === '1')) {
@@ -443,23 +455,27 @@
                     }
 
                     const hiddenGenderInputs = Array.from(
-                        toolWrap.querySelectorAll('input[type="hidden"][id*="gender" i], input[type="hidden"][name*="gender" i], input[type="hidden"][id*="sex" i], input[type="hidden"][name*="sex" i], input[type="hidden"][id*="char" i][id*="val" i]')
+                        toolWrap.querySelectorAll('input[type="hidden"][id*="gender" i], input[type="hidden"][name*="gender" i], input[type="hidden"][id*="sex" i], input[type="hidden"][name*="sex" i], input[type="hidden"][id*="char" i], input[type="hidden"][name*="char" i]')
                     );
-                    const hasHiddenGenderVal = hiddenGenderInputs.some(inp => (inp.value || '').trim() !== '');
+                    const hasMatchingHiddenGenderVal = hiddenGenderInputs.some(inp => {
+                        const v = normalizeFaText(inp.value || '');
+                        if (!v) return false;
+                        return isFemale ? femaleTokens.includes(v) : maleTokens.includes(v);
+                    });
 
                     const structuredCards = Array.from(
-                        toolWrap.querySelectorAll('[data-mdn-gender], [data-gender], [data-sex], [data-char], [data-character], [data-value="male"], [data-value="female"], [data-value="boy"], [data-value="girl"], [data-value="man"], [data-value="woman"], .avatar-select-card, .mdn-char-card-box, [id*="char-female"], [id*="char-male"], [id*="char-girl"], [id*="char-boy"]')
+                        toolWrap.querySelectorAll('[data-mdn-gender], [data-gender], [data-sex], [data-char], [data-character], [data-value="male"], [data-value="female"], [data-value="boy"], [data-value="girl"], [data-value="man"], [data-value="woman"], .avatar-select-card, .mdn-char-card-box, [id*="char-female"], [id*="char-male"], [id*="char-girl"], [id*="char-boy"], [id*="gender-female"], [id*="gender-male"], [id*="gender-girl"], [id*="gender-boy"]')
                     ).filter(el => !el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper') && !(el.tagName === 'A' && el.getAttribute('href')));
 
                     const anyStructuredSelected = structuredCards.some(isCardVisuallySelected);
 
-                    if (!userManuallySelectedGender && !hasHiddenGenderVal && !anyStructuredSelected) {
+                    if (!userManuallySelectedGender && !anyStructuredSelected) {
                         let targetCard = null;
 
                         // الف) اولویت اول: کارت‌های دارای صفت صریح جنسیت
                         for (let i = 0; i < structuredCards.length; i++) {
                             const el = structuredCards[i];
-                            const attrVal = (
+                            const attrVal = normalizeFaText(
                                 el.getAttribute('data-mdn-gender') ||
                                 el.getAttribute('data-gender') ||
                                 el.getAttribute('data-sex') ||
@@ -467,9 +483,9 @@
                                 el.getAttribute('data-character') ||
                                 el.getAttribute('data-value') ||
                                 ''
-                            ).toLowerCase().trim();
+                            );
                             const elId = (el.id || '').toLowerCase();
-                            const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
+                            const txt = (el.innerText || el.textContent || '').trim();
 
                             const matchByAttrFemale = femaleTokens.includes(attrVal) || elId.includes('female') || elId.includes('girl');
                             const matchByAttrMale   = maleTokens.includes(attrVal) || (elId.includes('male') && !elId.includes('female')) || elId.includes('boy');
@@ -486,17 +502,18 @@
 
                         // ب) اولویت دوم: جستجوی متنی امن
                         if (!targetCard) {
-                            const interactiveEls = Array.from(toolWrap.querySelectorAll('button, [role="button"], label, [onclick], [tabindex]'));
-                            const divEls = Array.from(toolWrap.querySelectorAll('div'));
+                            const interactiveEls = Array.from(toolWrap.querySelectorAll('button, [role="button"], [role="radio"], [role="option"], label, [onclick], [tabindex], [class*="card"], [class*="option"], [class*="gender"], [class*="sex"], [class*="char"]'));
+                            const divEls = Array.from(toolWrap.querySelectorAll('div, span'));
                             const candidateElements = interactiveEls.concat(divEls);
 
                             for (let i = 0; i < candidateElements.length; i++) {
                                 const el = candidateElements[i];
-                                if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) continue;
+                                if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper, .madenna-dd-menu, .mdn-dd-menu')) continue;
                                 if (el.tagName === 'A' && el.getAttribute('href')) continue;
+                                if (el.tagName === 'SELECT' || el.tagName === 'OPTION') continue;
 
-                                const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
-                                if (!txt || txt.length > 80) continue;
+                                const txt = (el.innerText || el.textContent || '').trim();
+                                if (!txt || txt.length > 220) continue;
 
                                 const isMatchFemale = hasFemaleKeyword(txt) && !hasMaleKeyword(txt);
                                 const isMatchMale   = hasMaleKeyword(txt) && !hasFemaleKeyword(txt);
@@ -505,7 +522,7 @@
                                     let card = el;
                                     let p = el.parentElement;
                                     while (p && p !== toolWrap && p !== document.body) {
-                                        const pTxt = (p.innerText || p.textContent || '').trim().toLowerCase();
+                                        const pTxt = (p.innerText || p.textContent || '').trim();
                                         if ((isFemale && hasMaleKeyword(pTxt)) || (isMale && hasFemaleKeyword(pTxt))) {
                                             break;
                                         }
@@ -524,13 +541,19 @@
                         if (targetCard && !isCardVisuallySelected(targetCard)) {
                             try {
                                 targetCard.click();
-                                const changedAfterClick = isCardVisuallySelected(targetCard) || hiddenGenderInputs.some(inp => (inp.value || '').trim() !== '');
+                                const changedAfterClick = isCardVisuallySelected(targetCard) || hiddenGenderInputs.some(inp => {
+                                    const v = normalizeFaText(inp.value || '');
+                                    return isFemale ? femaleTokens.includes(v) : maleTokens.includes(v);
+                                });
                                 if (!changedAfterClick) {
                                     dispatchPointerClickSequence(targetCard);
                                     targetCard.click();
                                 }
-                                const changedAfterPointer = isCardVisuallySelected(targetCard) || hiddenGenderInputs.some(inp => (inp.value || '').trim() !== '');
-                                if (!changedAfterPointer && targetCard.getAttribute('role') === 'button') {
+                                const changedAfterPointer = isCardVisuallySelected(targetCard) || hiddenGenderInputs.some(inp => {
+                                    const v = normalizeFaText(inp.value || '');
+                                    return isFemale ? femaleTokens.includes(v) : maleTokens.includes(v);
+                                });
+                                if (!changedAfterPointer && (targetCard.getAttribute('role') === 'button' || targetCard.hasAttribute('tabindex'))) {
                                     targetCard.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
                                 }
                                 const rad = targetCard.querySelector('input[type="radio"], input[type="checkbox"]');
@@ -543,8 +566,11 @@
                         }
 
                         // ج) اجرای توابع سراسری ابزار در صورت نیاز
-                        const stillEmptyHiddenGender = hiddenGenderInputs.length === 0 || hiddenGenderInputs.every(inp => (inp.value || '').trim() === '');
-                        if (stillEmptyHiddenGender && (!targetCard || !isCardVisuallySelected(targetCard))) {
+                        const stillMissingHiddenGender = hiddenGenderInputs.length === 0 || !hiddenGenderInputs.some(inp => {
+                            const v = normalizeFaText(inp.value || '');
+                            return isFemale ? femaleTokens.includes(v) : maleTokens.includes(v);
+                        });
+                        if (stillMissingHiddenGender && (!targetCard || !isCardVisuallySelected(targetCard)) && !hasMatchingHiddenGenderVal) {
                             try {
                                 const targetVal = isMale ? 'boy' : 'girl';
                                 const targetGenderVal = isMale ? 'male' : 'female';
@@ -558,17 +584,29 @@
                             } catch (e) {}
                         }
 
-                        // د) رادیوباتن‌ها
+                        // د) رادیوباتن‌ها (شامل لیبل‌دار و بدون لیبل مستقیم)
                         const genderRadios = toolWrap.querySelectorAll('input[type="radio"]');
                         genderRadios.forEach(radio => {
                             if (radio.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
-                            const val   = (radio.value || '').toLowerCase().trim();
+                            const val   = normalizeFaText(radio.value || '');
+                            const rId   = (radio.id || '').toLowerCase();
+                            const rName = (radio.name || '').toLowerCase();
                             const label = radio.closest('label') || (radio.id ? toolWrap.querySelector(`label[for="${radio.id}"]`) : null);
-                            const txt   = label ? label.textContent.toLowerCase() : '';
-                            let isTargetFemale = femaleTokens.concat(['2']).includes(val) || hasFemaleKeyword(txt);
-                            let isTargetMale   = maleTokens.concat(['1']).includes(val) || hasMaleKeyword(txt);
+                            let txt = label ? label.textContent : '';
+                            if (!txt && radio.parentElement) {
+                                const pRadios = radio.parentElement.querySelectorAll('input[type="radio"]');
+                                if (pRadios.length === 1) {
+                                    txt = radio.parentElement.textContent || '';
+                                }
+                            }
+                            const isGenderRadioGroup = rName.includes('gender') || rName.includes('sex') || rName.includes('char') || rId.includes('gender') || rId.includes('sex') || femaleTokens.includes(val) || maleTokens.includes(val) || hasFemaleKeyword(txt) || hasMaleKeyword(txt);
+                            if (!isGenderRadioGroup) return;
+
+                            const isTargetFemale = (femaleTokens.includes(val) || val === '2' || (hasFemaleKeyword(txt) && !hasMaleKeyword(txt)));
+                            const isTargetMale   = (maleTokens.includes(val) || val === '1' || (hasMaleKeyword(txt) && !hasFemaleKeyword(txt)));
                             if ((isFemale && isTargetFemale) || (isMale && isTargetMale)) {
                                 if (!radio.checked) {
+                                    try { radio.click(); } catch (e) {}
                                     radio.checked = true;
                                     radio.dispatchEvent(new Event('input', { bubbles: true }));
                                     radio.dispatchEvent(new Event('change', { bubbles: true }));
@@ -583,29 +621,64 @@
                             const name = (sel.name || '').toLowerCase();
                             const id   = (sel.id || '').toLowerCase();
                             let isGenderSelect = (name.includes('gender') || name.includes('sex') || name.includes('character') || id.includes('gender') || id.includes('sex') || id.includes('character'));
+                            const optList = Array.from(sel.options);
+                            if (!isGenderSelect) {
+                                isGenderSelect = optList.some(opt => {
+                                    const val = normalizeFaText(opt.value || '');
+                                    const txt = (opt.textContent || '').trim();
+                                    return femaleTokens.includes(val) || maleTokens.includes(val) || hasFemaleKeyword(txt) || hasMaleKeyword(txt);
+                                });
+                            }
+                            if (!isGenderSelect) return;
+
                             let foundMatch = false;
-                            Array.from(sel.options).forEach(opt => {
-                                const val = (opt.value || '').toLowerCase().trim();
-                                const txt = (opt.textContent || '').trim().toLowerCase();
-                                if (femaleTokens.includes(val) || maleTokens.includes(val) || hasFemaleKeyword(txt) || hasMaleKeyword(txt)) {
-                                    isGenderSelect = true;
-                                }
-                                if (isFemale && (femaleTokens.concat(['2']).includes(val) || hasFemaleKeyword(txt))) {
+                            optList.forEach(opt => {
+                                const val = normalizeFaText(opt.value || '');
+                                const txt = (opt.textContent || '').trim();
+                                if (isFemale && (femaleTokens.includes(val) || val === '2' || (hasFemaleKeyword(txt) && !hasMaleKeyword(txt)))) {
                                     sel.value = opt.value;
                                     foundMatch = true;
-                                } else if (isMale && (maleTokens.concat(['1']).includes(val) || hasMaleKeyword(txt))) {
+                                } else if (isMale && (maleTokens.includes(val) || val === '1' || (hasMaleKeyword(txt) && !hasFemaleKeyword(txt)))) {
                                     sel.value = opt.value;
                                     foundMatch = true;
                                 }
                             });
-                            if (isGenderSelect && foundMatch) {
+                            if (foundMatch) {
                                 sel.dispatchEvent(new Event('change', { bubbles: true }));
                                 sel.dispatchEvent(new Event('input', { bubbles: true }));
                             }
                         });
                     }
 
-                    // و) تگ‌های متنی نمایش جنسیت
+                    // و) دراپ‌داون‌های کاستوم جنسیت (در صورت وجود)
+                    if (!userManuallySelectedGender) {
+                        const genderCustomDds = Array.from(toolWrap.querySelectorAll('.madenna-custom-dd, .mdn-custom-dd, [class*="custom-dd"], [data-dd-type="gender"], [data-dd-type="sex"]'));
+                        genderCustomDds.forEach(dd => {
+                            if (dd.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
+                            const tr = dd.querySelector('.madenna-dd-trigger, .mdn-dd-trigger, [class*="dd-trigger"], button, [role="button"]');
+                            const trTxt = normalizeFaText(tr ? tr.textContent : '');
+                            const key = ((dd.id || '') + ' ' + (dd.getAttribute('data-dd-type') || '') + ' ' + trTxt).toLowerCase();
+                            const isGenderDd = key.includes('gender') || key.includes('sex') || trTxt === 'جنسیت' || trTxt.includes('انتخاب جنسیت');
+                            if (!isGenderDd || hasFemaleKeyword(trTxt) || hasMaleKeyword(trTxt)) return;
+                            const menu = dd.querySelector('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [role="listbox"], ul');
+                            if (!menu) return;
+                            const opts = Array.from(menu.querySelectorAll('[data-value], [data-val], [role="option"], .madenna-dd-item, .mdn-dd-item, [class*="dd-item"], [class*="dd-opt"], button, li, div'));
+                            const matchOpt = opts.find(opt => {
+                                if (opt.children && opt.children.length > 3) return false;
+                                const ov = normalizeFaText(opt.getAttribute('data-value') || opt.getAttribute('data-val') || '');
+                                const ot = (opt.textContent || '').trim();
+                                if (isFemale) return femaleTokens.includes(ov) || (hasFemaleKeyword(ot) && !hasMaleKeyword(ot));
+                                return maleTokens.includes(ov) || (hasMaleKeyword(ot) && !hasFemaleKeyword(ot));
+                            });
+                            if (matchOpt) {
+                                try {
+                                    matchOpt.click();
+                                } catch (e) {}
+                            }
+                        });
+                    }
+
+                    // ز) تگ‌های متنی نمایش جنسیت
                     const genderPlaceholders = toolWrap.querySelectorAll('.madenna-user-gender, [data-madenna-user-gender]');
                     genderPlaceholders.forEach(el => { el.textContent = genderFa; });
                 }
@@ -614,46 +687,68 @@
                 // ۳. پر کردن خودکار تاریخ تولد (روز، ماه، سال) و سن
                 // ==========================================
                 if (activeBirthdate) {
-                    const ddPlaceholders = ['روز تولد', 'ماه تولد', 'سال (شمسی)', 'سال تولد', 'روز', 'ماه', 'سال', 'انتخاب کنید', 'انتخاب'];
+                    const ddPlaceholders = ['روز تولد', 'ماه تولد', 'سال (شمسی)', 'سال تولد', 'روز', 'ماه', 'سال', 'انتخاب روز', 'انتخاب ماه', 'انتخاب سال', 'انتخاب کنید', 'انتخاب'];
 
                     function isPlaceholderLabel(lblText) {
-                        const clean = (lblText || '').trim();
-                        if (clean === '' || ddPlaceholders.includes(clean)) return true;
-                        if (/^(انتخاب|روز|ماه|سال)\b/.test(clean)) return true;
+                        const clean = normalizeFaText(lblText || '');
+                        if (clean === '' || ddPlaceholders.some(ph => normalizeFaText(ph) === clean)) return true;
+                        if (/^(انتخاب|روز|ماه|سال)\b/.test(clean) && !/\d/.test(clean)) return true;
                         if (clean.includes('تولد') || clean.includes('شمسی')) return true;
                         return false;
                     }
 
                     function detectDateFieldType(el, firstOptText, optSampleText) {
-                        const explicitType = ((el.getAttribute && el.getAttribute('data-dd-type')) || '').trim().toLowerCase();
+                        const explicitType = ((el && el.getAttribute && (el.getAttribute('data-dd-type') || el.getAttribute('data-dd') || el.getAttribute('data-field'))) || '').trim().toLowerCase();
                         if (explicitType === 'year' || explicitType === 'month' || explicitType === 'day') return explicitType;
 
-                        const attrStr = ((el.name || '') + ' ' + (el.id || '') + ' ' + (el.getAttribute ? (el.getAttribute('aria-label') || '') : '')).replace(/birthday/gi, 'birth');
+                        const attrStr = (
+                            ((el && el.name) || '') + ' ' +
+                            ((el && el.id) || '') + ' ' +
+                            ((el && typeof el.className === 'string') ? el.className : '') + ' ' +
+                            ((el && el.getAttribute) ? (el.getAttribute('aria-label') || '') : '')
+                        ).replace(/birthday/gi, 'birth');
                         const lowAttr = attrStr.toLowerCase();
-                        const lowFirst = toEnglishDigits(firstOptText || '').trim().toLowerCase();
-                        const lowSample = toEnglishDigits(optSampleText || '').trim().toLowerCase();
+                        const lowFirst = normalizeFaText(firstOptText || '');
+                        const lowSample = normalizeFaText(optSampleText || '');
 
                         if (lowAttr.includes('year') || lowAttr.includes('byear') || lowFirst.includes('سال')) return 'year';
                         if (lowAttr.includes('month') || lowAttr.includes('bmonth') || lowFirst.includes('ماه')) return 'month';
                         if (lowAttr.includes('day') || lowAttr.includes('bday') || lowFirst.includes('روز')) return 'day';
 
                         if (lowSample.includes('فروردین') || lowSample.includes('اردیبهشت') || lowSample.includes('اسفند')) return 'month';
-                        if (/\b13[3-9]\d\b/.test(lowSample)) return 'year';
+                        if (/\b13[3-9]\d\b/.test(lowSample) || /سال\s*13\d\d/.test(lowSample)) return 'year';
+                        if (lowSample.includes('روز 1') && lowSample.includes('روز 2')) return 'day';
                         return '';
                     }
 
                     function collectMenuCandidates(menu) {
                         if (!menu) return [];
-                        const explicit = Array.from(menu.querySelectorAll('[data-value], [data-val], [data-option], [role="option"], .madenna-dd-item, .madenna-dd-opt, .madenna-dd-option, .dd-item, .dd-option, button, li, a'));
+                        const explicit = Array.from(menu.querySelectorAll('[data-value], [data-val], [data-option], [data-num], [role="option"], .madenna-dd-item, .madenna-dd-opt, .madenna-dd-option, .mdn-dd-item, .mdn-dd-opt, .mdn-dd-option, [class*="dd-item"], [class*="dd-opt"], .dd-item, .dd-option, button, li, a'));
                         if (explicit.length > 0) return explicit;
 
-                        let direct = Array.from(menu.children);
-                        if (direct.length === 1 && direct[0].children && direct[0].children.length > 1) {
-                            direct = Array.from(direct[0].children);
+                        let container = menu;
+                        for (let depth = 0; depth < 3; depth++) {
+                            const children = Array.from(container.children).filter(c => !['STYLE', 'SCRIPT'].includes(c.tagName));
+                            if (children.length === 1 && children[0].children && children[0].children.length > 1) {
+                                container = children[0];
+                            } else {
+                                break;
+                            }
                         }
-                        if (direct.length > 0) return direct;
+                        const direct = Array.from(container.children).filter(c => !['STYLE', 'SCRIPT', 'INPUT'].includes(c.tagName));
+                        if (direct.length >= 6) return direct;
 
-                        return Array.from(menu.querySelectorAll('div, span, p')).filter(d => d.children.length === 0);
+                        const richListContainer = Array.from(menu.querySelectorAll('div, ul')).find(box => {
+                            const kids = Array.from(box.children).filter(c => !['STYLE', 'SCRIPT'].includes(c.tagName));
+                            return kids.length >= 10 && !kids[0].querySelector('ul, div > div > div');
+                        });
+                        if (richListContainer) {
+                            return Array.from(richListContainer.children).filter(c => !['STYLE', 'SCRIPT'].includes(c.tagName));
+                        }
+
+                        if (direct.length > 0 && direct.every(d => d.children.length <= 2)) return direct;
+
+                        return Array.from(menu.querySelectorAll('div, span, p')).filter(d => d.children.length === 0 && (d.textContent || '').trim().length > 0);
                     }
 
                     function findMenuOptionMatch(menu, ddType) {
@@ -665,44 +760,118 @@
                             const opt = candidates[i];
                             if (opt.children && opt.children.length > 4 && opt.querySelector('[data-value], [data-val], [role="option"], button, li')) continue;
 
-                            const rawVal = opt.getAttribute('data-value') || opt.getAttribute('data-val') || opt.getAttribute('data-option') || opt.getAttribute('value') || '';
+                            const rawVal = opt.getAttribute('data-value') || opt.getAttribute('data-val') || opt.getAttribute('data-option') || opt.getAttribute('data-num') || opt.getAttribute('value') || '';
                             const rawTxt = (opt.textContent || '').trim();
                             if (!rawTxt && !rawVal) continue;
-                            if (ddPlaceholders.includes(rawTxt)) continue;
+                            if (isPlaceholderLabel(rawTxt) && !rawVal) continue;
 
                             const cleanVal = normalizeFaText(rawVal);
                             const cleanTxt = normalizeFaText(rawTxt);
-                            const valInt = /^\d+$/.test(cleanVal) ? parseInt(cleanVal, 10) : NaN;
-                            const txtMatch = cleanTxt.match(/\d+/);
-                            const txtInt = txtMatch ? parseInt(txtMatch[0], 10) : NaN;
+                            const valNums  = extractCleanNumbers(rawVal);
+                            const txtNums  = extractCleanNumbers(rawTxt);
 
                             if (ddType === 'year' && bYearNum > 0) {
-                                if (valInt === bYearNum || txtInt === bYearNum) return opt;
+                                if (valNums.includes(bYearNum) || txtNums.includes(bYearNum)) return opt;
                             } else if (ddType === 'day' && bDayNum > 0) {
-                                if (valInt === bDayNum || txtInt === bDayNum) return opt;
+                                if (valNums.includes(bDayNum) || txtNums.includes(bDayNum)) return opt;
                             } else if (ddType === 'month' && bMonthNum > 0) {
-                                if (valInt === bMonthNum || txtInt === bMonthNum) return opt;
+                                if (valNums.includes(bMonthNum) || txtNums.includes(bMonthNum)) return opt;
                                 for (let tIdx = 0; tIdx < validMonthTokens.length; tIdx++) {
                                     const token = normalizeFaText(validMonthTokens[tIdx]);
-                                    if (token && (cleanVal === token || cleanTxt.includes(token))) return opt;
+                                    if (token && !/^\d+$/.test(token) && (cleanVal === token || cleanTxt.includes(token))) return opt;
                                 }
                             }
                         }
                         return null;
                     }
 
-                    // الف) دراپ‌داون‌های کاستوم (.madenna-custom-dd و data-dd-type) به ترتیب سال -> ماه -> روز
-                    const customDropdowns = Array.from(
-                        toolWrap.querySelectorAll('.madenna-custom-dd, [data-dd-type="day"], [data-dd-type="month"], [data-dd-type="year"]')
+                    function findDropdownTrigger(dd) {
+                        const t = dd.querySelector('.madenna-dd-trigger, .mdn-dd-trigger, [class*="dd-trigger"], [id*="dd-trigger"], [role="combobox"]');
+                        if (t) return t;
+                        if (dd.matches && dd.matches('button, [role="button"], [role="combobox"]')) return dd;
+                        const candidates = Array.from(dd.querySelectorAll('button, [role="button"]')).filter(b => !b.closest('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [id*="dd-menu"], [role="listbox"]'));
+                        return candidates[0] || null;
+                    }
+
+                    function findDropdownTriggerVal(dd, triggerBtn) {
+                        const explicitVal = dd.querySelector('.madenna-dd-Trigger-val, .madenna-dd-trigger-val, .mdn-dd-trigger-val, [class*="trigger-val"], [class*="dd-val"], [class*="dd-label"], [id*="dd-label"], [id*="dd-val"], [id*="lbl-day"], [id*="lbl-month"], [id*="lbl-year"], [id*="day-label"], [id*="month-label"], [id*="year-label"]');
+                        if (explicitVal) return explicitVal;
+                        if (triggerBtn) {
+                            const innerSpan = Array.from(triggerBtn.querySelectorAll('span, div, p')).find(s => (s.textContent || '').trim().length > 0 && !s.querySelector('svg'));
+                            return innerSpan || triggerBtn;
+                        }
+                        return null;
+                    }
+
+                    function findDropdownMenu(dd, triggerBtn, ddType) {
+                        const isMenuCandidate = (m) => m && m !== triggerBtn && !m.contains(triggerBtn);
+                        let menu = Array.from(dd.querySelectorAll('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [id*="dd-menu"], [id*="-menu"], [id*="menu-"], [role="listbox"], ul, [class*="dropdown-menu"], [class*="dd-list"], [class*="dd-options"]')).find(isMenuCandidate);
+                        if (menu) return menu;
+
+                        if (triggerBtn) {
+                            const ctrlId = triggerBtn.getAttribute('aria-controls') || triggerBtn.getAttribute('data-target') || '';
+                            if (ctrlId) {
+                                const byCtrl = document.getElementById(ctrlId.replace(/^#/, ''));
+                                if (byCtrl && toolWrap.contains(byCtrl)) return byCtrl;
+                            }
+                        }
+
+                        if (ddType) {
+                            menu = toolWrap.querySelector(`#enn-dd-menu-${ddType}, #mdn-enn-dd-menu-${ddType}, #mdn-enn-menu-${ddType}, [data-dd-menu="${ddType}"], [id*="menu"][id*="${ddType}"], [class*="menu"][id*="${ddType}"]`);
+                            if (menu && isMenuCandidate(menu)) return menu;
+                        }
+
+                        if (triggerBtn && triggerBtn.parentElement) {
+                            const sibMenu = Array.from(triggerBtn.parentElement.children).find(ch => ch !== triggerBtn && !ch.contains(triggerBtn) && collectMenuCandidates(ch).length >= 6);
+                            if (sibMenu) return sibMenu;
+                        }
+                        return null;
+                    }
+
+                    // الف) دراپ‌داون‌های کاستوم (پشتیبانی کامل از madenna-custom-dd، mdn-custom-dd و الگوهای عمومی)
+                    const ddSelectorMatches = Array.from(
+                        toolWrap.querySelectorAll('.madenna-custom-dd, .mdn-custom-dd, .mdn-dd, [class*="custom-dd"], [class*="dd-wrap"], [class*="dropdown-wrap"], [data-dd-type="day"], [data-dd-type="month"], [data-dd-type="year"], [data-dd="day"], [data-dd="month"], [data-dd="year"], [id*="dd-day"], [id*="dd-month"], [id*="dd-year"], [id*="day-dd"], [id*="month-dd"], [id*="year-dd"]')
                     );
+                    const genericDdTriggers = Array.from(
+                        toolWrap.querySelectorAll('button, [role="button"], [role="combobox"], [class*="dd-trigger"], [id*="dd-trigger"], [id*="btn-day"], [id*="btn-month"], [id*="btn-year"]')
+                    ).filter(el => !el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper, .madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [role="listbox"]'));
+
+                    genericDdTriggers.forEach(tr => {
+                        const tTxt = normalizeFaText(tr.textContent || '');
+                        const isDateBtn = isPlaceholderLabel(tTxt) && (tTxt.includes('روز') || tTxt.includes('ماه') || tTxt.includes('سال'));
+                        const trType = detectDateFieldType(tr, tTxt, '');
+                        if (!isDateBtn && !trType) return;
+                        let wrapper = tr.parentElement;
+                        if (wrapper && wrapper !== toolWrap) {
+                            const alreadyTracked = ddSelectorMatches.some(existing => existing === wrapper || existing.contains(tr));
+                            if (!alreadyTracked) {
+                                ddSelectorMatches.push(wrapper);
+                            }
+                        }
+                    });
+
+                    const customDropdowns = ddSelectorMatches.filter((el, idx) => {
+                        if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return false;
+                        return !ddSelectorMatches.some((other, oIdx) => oIdx !== idx && other.contains(el));
+                    });
+
                     if (customDropdowns.length > 0) {
                         const ddByType = { year: [], month: [], day: [] };
                         customDropdowns.forEach(dd => {
-                            const triggerVal = dd.querySelector('.madenna-dd-Trigger-val, .madenna-dd-trigger-val, .madenna-dd-trigger span, .madenna-dd-trigger div, [id*="dd-label"]');
-                            const triggerTxt = triggerVal ? triggerVal.textContent : '';
-                            const ddType = detectDateFieldType(dd, triggerTxt, '');
+                            const triggerBtn = findDropdownTrigger(dd);
+                            const triggerVal = findDropdownTriggerVal(dd, triggerBtn);
+                            const triggerTxt = triggerVal ? triggerVal.textContent : (triggerBtn ? triggerBtn.textContent : '');
+                            let ddType = detectDateFieldType(dd, triggerTxt, '');
+                            if (!ddType && triggerBtn) {
+                                ddType = detectDateFieldType(triggerBtn, triggerTxt, '');
+                            }
+                            let menu = findDropdownMenu(dd, triggerBtn, ddType);
+                            if (!ddType && menu) {
+                                const menuSample = Array.from(collectMenuCandidates(menu)).slice(0, 8).map(o => (o.textContent || '').trim()).join(' ');
+                                ddType = detectDateFieldType(menu, triggerTxt, menuSample);
+                            }
                             if (ddType && ddByType[ddType]) {
-                                ddByType[ddType].push({ dd, triggerVal, triggerTxt });
+                                ddByType[ddType].push({ dd, triggerBtn, triggerVal, triggerTxt, menu });
                             }
                         });
 
@@ -712,11 +881,15 @@
                             if (!targetNum || targetNum <= 0) return;
 
                             ddByType[ddType].forEach(item => {
-                                const { dd, triggerVal, triggerTxt } = item;
+                                const { dd, triggerBtn, triggerVal, triggerTxt } = item;
+                                let menu = item.menu || findDropdownMenu(dd, triggerBtn, ddType);
                                 const isPlaceholderLbl = isPlaceholderLabel(triggerTxt);
                                 const matchingHidden = Array.from(toolWrap.querySelectorAll('input[type="hidden"]')).find(inp => {
-                                    const key = ((inp.id || '') + ' ' + (inp.name || '')).replace(/birthday/gi, 'birth').toLowerCase();
-                                    return new RegExp(`(?:^|[-_])${ddType}(?:$|[-_])`).test(key) || key.includes(`-${ddType}`) || key.includes(`_${ddType}`);
+                                    const key = ((inp.id || '') + ' ' + (inp.name || '') + ' ' + (inp.getAttribute('data-field') || '')).replace(/birthday/gi, 'birth').toLowerCase();
+                                    if (ddType === 'day') return /(?:^|[-_])day(?:$|[-_])|bday|dd-val-day|val-day/.test(key) || key.includes('-day') || key.includes('_day');
+                                    if (ddType === 'month') return /(?:^|[-_])month(?:$|[-_])|bmonth|dd-val-month|val-month/.test(key) || key.includes('-month') || key.includes('_month');
+                                    if (ddType === 'year') return /(?:^|[-_])year(?:$|[-_])|byear|dd-val-year|val-year/.test(key) || key.includes('-year') || key.includes('_year');
+                                    return false;
                                 });
                                 const hiddenVal = matchingHidden ? (matchingHidden.value || '').trim() : '';
 
@@ -724,26 +897,27 @@
                                     return;
                                 }
 
-                                let menu = dd.querySelector('.madenna-dd-menu, [id*="dd-menu"], [role="listbox"]');
-                                if (!menu) {
-                                    menu = toolWrap.querySelector(`#enn-dd-menu-${ddType}, [id*="dd-menu"][id*="${ddType}"]`);
-                                }
                                 if (!menu) return;
 
+                                const hadHiddenClass = menu.classList.contains('hidden');
                                 let matchedOpt = findMenuOptionMatch(menu, ddType);
+                                let weOpenedMenu = false;
 
                                 if (!matchedOpt && collectMenuCandidates(menu).length === 0) {
                                     const openTries = parseInt(dd.getAttribute('data-madenna-open-tries') || '0', 10);
-                                    if (openTries < 4) {
+                                    if (openTries < 4 && triggerBtn) {
                                         dd.setAttribute('data-madenna-open-tries', String(openTries + 1));
-                                        const triggerBtn = dd.querySelector('.madenna-dd-trigger, [role="button"]');
-                                        if (triggerBtn) {
+                                        triggerBtn.click();
+                                        weOpenedMenu = true;
+                                        menu = findDropdownMenu(dd, triggerBtn, ddType) || menu;
+                                        matchedOpt = findMenuOptionMatch(menu, ddType);
+                                        if (!matchedOpt && collectMenuCandidates(menu).length === 0) {
                                             dispatchPointerClickSequence(triggerBtn);
                                             triggerBtn.click();
                                             matchedOpt = findMenuOptionMatch(menu, ddType);
-                                            if (!matchedOpt) {
-                                                scheduledRetry = true;
-                                            }
+                                        }
+                                        if (!matchedOpt) {
+                                            scheduledRetry = true;
                                         }
                                     }
                                 }
@@ -756,8 +930,22 @@
                                         const afterHidden = matchingHidden ? (matchingHidden.value || '').trim() : '';
                                         const afterLbl = triggerVal ? (triggerVal.textContent || '').trim() : '';
                                         if (afterHidden === beforeHidden && afterLbl === beforeLbl) {
+                                            if (!weOpenedMenu && triggerBtn) {
+                                                triggerBtn.click();
+                                                weOpenedMenu = true;
+                                            }
                                             dispatchPointerClickSequence(matchedOpt);
                                             matchedOpt.click();
+                                        }
+                                        if (weOpenedMenu && menu) {
+                                            const mStyle = window.getComputedStyle(menu);
+                                            if (mStyle.display !== 'none' && !menu.classList.contains('hidden')) {
+                                                dd.classList.remove('open', 'is-open', 'active');
+                                                menu.classList.remove('open', 'is-open', 'active');
+                                                if (hadHiddenClass) {
+                                                    menu.classList.add('hidden');
+                                                }
+                                            }
                                         }
                                     } catch (e) {}
                                 }
@@ -787,9 +975,9 @@
                             let matched = false;
                             if (selType === 'day' && bDayNum > 0) {
                                 Array.from(sel.options).forEach(opt => {
-                                    const valNum = parseInt(toEnglishDigits(opt.value), 10);
-                                    const txtNum = parseInt(toEnglishDigits(opt.textContent), 10);
-                                    if (valNum === bDayNum || txtNum === bDayNum) {
+                                    const valNums = extractCleanNumbers(opt.value);
+                                    const txtNums = extractCleanNumbers(opt.textContent);
+                                    if (valNums.includes(bDayNum) || txtNums.includes(bDayNum)) {
                                         sel.value = opt.value;
                                         matched = true;
                                     }
@@ -799,14 +987,15 @@
                                 Array.from(sel.options).forEach(opt => {
                                     const v = normalizeFaText(opt.value || '');
                                     const t = normalizeFaText(opt.textContent || '');
-                                    const vNum = parseInt(v, 10);
-                                    if (vNum === bMonthNum) {
+                                    const vNums = extractCleanNumbers(opt.value);
+                                    const tNums = extractCleanNumbers(opt.textContent);
+                                    if (vNums.includes(bMonthNum) || tNums.includes(bMonthNum)) {
                                         sel.value = opt.value;
                                         matched = true;
                                     } else {
                                         for (let token of validMonthTokens) {
                                             const enToken = normalizeFaText(token);
-                                            if (enToken && (v === enToken || t.includes(enToken))) {
+                                            if (enToken && !/^\d+$/.test(enToken) && (v === enToken || t.includes(enToken))) {
                                                 sel.value = opt.value;
                                                 matched = true;
                                                 break;
@@ -816,9 +1005,9 @@
                                 });
                             } else if (selType === 'year' && bYearNum > 0) {
                                 Array.from(sel.options).forEach(opt => {
-                                    const vNum = parseInt(toEnglishDigits(opt.value), 10);
-                                    const tNum = parseInt(toEnglishDigits(opt.textContent), 10);
-                                    if (vNum === bYearNum || tNum === bYearNum) {
+                                    const valNums = extractCleanNumbers(opt.value);
+                                    const txtNums = extractCleanNumbers(opt.textContent);
+                                    if (valNums.includes(bYearNum) || txtNums.includes(bYearNum)) {
                                         sel.value = opt.value;
                                         matched = true;
                                     }
@@ -1040,7 +1229,7 @@
                     if (e.target.closest('[data-mdn-gender], [data-gender], [data-sex], [data-char], [data-character], .avatar-select-card, .mdn-char-card-box, input[type="radio"]')) {
                         userManuallySelectedGender = true;
                     }
-                    const ddTarget = e.target.closest('.madenna-custom-dd, select');
+                    const ddTarget = e.target.closest('.madenna-custom-dd, .mdn-custom-dd, .mdn-dd, [class*="custom-dd"], [data-dd-type], [data-dd], select');
                     if (ddTarget) {
                         const ddType = (ddTarget.getAttribute('data-dd-type') || ddTarget.id || ddTarget.name || '').toLowerCase();
                         if (ddType.includes('year')) userManuallySelectedBirthdate.year = true;

@@ -189,7 +189,7 @@ class Madenna_Categories_Elementor_Widget extends \Elementor\Widget_Base {
                 echo "</div>";
             }
             echo "<div class='mad-cat-head-text'>";
-            if (($s['show_title'] ?? 'yes') === 'yes') echo "<h3 class='mad-cat-title'>" . esc_html($all_title) . "</h3>";
+            if (in_array($s['show_title'] ?? 'yes', ['yes', 'true', '1', 1, true], true)) echo "<h3 class='mad-cat-title'>" . esc_html($all_title) . "</h3>";
             if (($s['show_subtitle'] ?? 'yes') === 'yes' && !empty($all_sub)) echo "<span class='mad-cat-subtitle'>" . esc_html($all_sub) . "</span>";
             echo "</div></div>";
             if (($s['show_link_button'] ?? 'yes') === 'yes') echo "<div class='mad-cat-btn'>" . esc_html($s['button_text'] ?? 'مشاهده دسته ←') . "</div>";
@@ -232,7 +232,7 @@ class Madenna_Categories_Elementor_Widget extends \Elementor\Widget_Base {
             }
             
             echo "<div class='mad-cat-head-text'>";
-            if (($s['show_title'] ?? 'yes') === 'yes') echo "<h3 class='mad-cat-title'>".esc_html($t->name)."</h3>";
+            if (in_array($s['show_title'] ?? 'yes', ['yes', 'true', '1', 1, true], true)) echo "<h3 class='mad-cat-title'>".esc_html($t->name)."</h3>";
             if (($s['show_subtitle'] ?? 'yes') === 'yes' && $sub=get_term_meta($t->term_id,'cat_subtitle',true)) echo "<span class='mad-cat-subtitle'>".esc_html($sub)."</span>";
             echo "</div></div>";
             

@@ -301,6 +301,8 @@ class Madenna_Tools_Elementor_Widget extends \Elementor\Widget_Base {
             ],
             'selectors' => [
                 '{{WRAPPER}} .mad-tool-content-wrap' => 'text-align: {{VALUE}};',
+                '{{WRAPPER}} .mad-tool-title' => 'text-align: {{VALUE}};',
+                '{{WRAPPER}} .mad-tool-reading' => 'text-align: {{VALUE}};',
                 '{{WRAPPER}} .mad-tool-excerpt' => 'text-align: {{VALUE}};',
                 '{{WRAPPER}} .mad-tool-subtitle' => 'text-align: {{VALUE}};'
             ]
@@ -449,8 +451,8 @@ class Madenna_Tools_Elementor_Widget extends \Elementor\Widget_Base {
         $this->end_controls_section();
 
         $this->start_controls_section('sec_style_title', ['label' => 'عنوان', 'tab' => \Elementor\Controls_Manager::TAB_STYLE, 'condition' => ['show_title' => 'yes']]);
-        $this->add_responsive_control('title_order', ['label' => 'اولویت (Order)', 'type' => \Elementor\Controls_Manager::NUMBER, 'default' => 3, 'selectors' => ['{{WRAPPER}} .mad-tool-title' => 'order: {{VALUE}};']]);
-        $this->add_control('title_full', ['label' => 'شکستن خط (100% عرض)', 'type' => \Elementor\Controls_Manager::SWITCHER, 'selectors' => ['{{WRAPPER}} .mad-tool-title' => 'flex-basis: 100%;']]);
+        $this->add_responsive_control('title_order', ['label' => 'اولویت (Order)', 'type' => \Elementor\Controls_Manager::NUMBER, 'default' => 3, 'selectors' => ['{{WRAPPER}} .mad-tool-head-text' => 'order: {{VALUE}};', '{{WRAPPER}} .mad-tool-title' => 'order: {{VALUE}};']]);
+        $this->add_control('title_full', ['label' => 'شکستن خط (100% عرض)', 'type' => \Elementor\Controls_Manager::SWITCHER, 'selectors' => ['{{WRAPPER}} .mad-tool-head-text' => 'flex-basis: 100%; width: 100%;', '{{WRAPPER}} .mad-tool-title' => 'width: 100%;']]);
         $this->add_group_control(\Elementor\Group_Control_Typography::get_type(), ['name' => 'title_typography', 'selector' => '{{WRAPPER}} .mad-tool-title']);
         $this->add_control('title_color', ['label' => 'رنگ عنوان', 'type' => \Elementor\Controls_Manager::COLOR, 'selectors' => ['{{WRAPPER}} .mad-tool-title' => 'color: {{VALUE}};']]);
         $this->add_responsive_control('title_lines', ['label' => 'محدودیت خطوط', 'type' => \Elementor\Controls_Manager::NUMBER, 'min' => 1, 'max' => 10, 'selectors' => ['{{WRAPPER}} .mad-tool-title' => 'display: -webkit-box; -webkit-line-clamp: {{VALUE}}; -webkit-box-orient: vertical; overflow: hidden;']]);
@@ -459,7 +461,7 @@ class Madenna_Tools_Elementor_Widget extends \Elementor\Widget_Base {
 
         $this->start_controls_section('sec_style_subtitle', ['label' => 'زیرعنوان', 'tab' => \Elementor\Controls_Manager::TAB_STYLE, 'condition' => ['show_subtitle' => 'yes']]);
         $this->add_responsive_control('sub_order', ['label' => 'اولویت (Order)', 'type' => \Elementor\Controls_Manager::NUMBER, 'default' => 4, 'selectors' => ['{{WRAPPER}} .mad-tool-subtitle' => 'order: {{VALUE}};']]);
-        $this->add_control('sub_full', ['label' => 'شکستن خط (100% عرض)', 'type' => \Elementor\Controls_Manager::SWITCHER, 'selectors' => ['{{WRAPPER}} .mad-tool-subtitle' => 'flex-basis: 100%;']]);
+        $this->add_control('sub_full', ['label' => 'شکستن خط (100% عرض)', 'type' => \Elementor\Controls_Manager::SWITCHER, 'selectors' => ['{{WRAPPER}} .mad-tool-subtitle' => 'width: 100%;']]);
         
         $this->add_control('sub_chars', [
             'label' => 'محدودیت تعداد کاراکتر',
@@ -849,10 +851,10 @@ class Madenna_Tools_Elementor_Widget extends \Elementor\Widget_Base {
             }
             
             echo "<div class='mad-tool-content-wrap' style='display:flex; flex-direction:column; flex:1;'>";
-            echo "<div class='mad-tool-content-head' style='display:flex; flex-wrap:wrap;'>";
+            echo "<div class='mad-tool-content-head' style='display:flex; flex-wrap:wrap; width:100%; box-sizing:border-box;'>";
             
             if ($actual_pt === 'articles' && ($s['show_reading_time'] ?? 'yes') === 'yes' && !empty($reading)) {
-                echo "<span class='mad-tool-reading' style='display:block; flex-basis:100%; font-size:11px; color:#64748b; margin-bottom:8px; order:0;'>⏱️ زمان مطالعه: {$reading} دقیقه</span>";
+                echo "<span class='mad-tool-reading' style='display:block; width:100%; flex:0 0 auto; font-size:11px; color:#64748b; margin-bottom:8px; order:0;'>⏱️ زمان مطالعه: {$reading} دقیقه</span>";
             }
 
             if (($s['show_svg'] ?? 'yes') === 'yes' && !empty($svg)) {
@@ -867,11 +869,15 @@ class Madenna_Tools_Elementor_Widget extends \Elementor\Widget_Base {
                 echo "</div>";
             }
             
-            // رفع مشکل سقوط عنوان زیر آیکون
-            echo "<div class='mad-tool-head-text' style='flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;'>";
+            // رفع مشکل سقوط و مخفی‌شدن عنوان در چیدمان‌های مختلف
+            echo "<div class='mad-tool-head-text' style='flex:1 1 auto; min-width:0; display:flex; flex-direction:column; justify-content:center;'>";
             
-            $title = get_the_title();
-            if (($s['show_title'] ?? 'yes') === 'yes' && !empty($title)) {
+            $title = get_the_title($id);
+            if ($title === '' || $title === null) {
+                $title = get_post_field('post_title', $id);
+            }
+            $show_title_val = $s['show_title'] ?? 'yes';
+            if (in_array($show_title_val, ['yes', 'true', '1', 1, true], true) && !empty($title)) {
                 echo "<h3 class='mad-tool-title' style='margin:0; font-weight:800;'>".esc_html($title)."</h3>";
             }
             

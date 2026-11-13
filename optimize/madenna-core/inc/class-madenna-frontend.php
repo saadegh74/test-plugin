@@ -135,7 +135,14 @@ class Madenna_Frontend {
 
     public function handle_live_search() {
         $keyword = isset($_POST['keyword']) ? sanitize_text_field($_POST['keyword']) : '';
-        $settings = isset($_POST['settings']) ? json_decode(stripslashes($_POST['settings']), true) : [];
+        $raw_settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : '';
+        $settings = $raw_settings !== '' ? json_decode($raw_settings, true) : [];
+        if (!is_array($settings) && isset($_POST['settings'])) {
+            $settings = json_decode($_POST['settings'], true);
+        }
+        if (!is_array($settings)) {
+            $settings = [];
+        }
         $filters_json = isset($_POST['filters']) ? stripslashes($_POST['filters']) : '{}';
         $filters = json_decode($filters_json, true) ?: [];
         $term_id = isset($_POST['term_id']) ? intval($_POST['term_id']) : 0;
@@ -305,10 +312,10 @@ class Madenna_Frontend {
             }
             
             echo "<div class='mad-tool-content-wrap' style='display:flex; flex-direction:column; flex:1;'>";
-            echo "<div class='mad-tool-content-head' style='display:flex; flex-wrap:wrap;'>";
+            echo "<div class='mad-tool-content-head' style='display:flex; flex-wrap:wrap; width:100%; box-sizing:border-box;'>";
             
             if ($actual_pt === 'articles' && ($s['show_reading_time'] ?? 'yes') === 'yes' && !empty($reading)) {
-                echo "<span class='mad-tool-reading' style='display:block; flex-basis:100%; font-size:11px; color:#64748b; margin-bottom:8px; order:0;'>⏱️ زمان مطالعه: {$reading} دقیقه</span>";
+                echo "<span class='mad-tool-reading' style='display:block; width:100%; flex:0 0 auto; font-size:11px; color:#64748b; margin-bottom:8px; order:0;'>⏱️ زمان مطالعه: {$reading} دقیقه</span>";
             }
 
             if (($s['show_svg'] ?? 'yes') === 'yes' && !empty($svg)) {
@@ -323,10 +330,14 @@ class Madenna_Frontend {
                 echo "</div>";
             }
             
-            echo "<div class='mad-tool-head-text' style='flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;'>";
+            echo "<div class='mad-tool-head-text' style='flex:1 1 auto; min-width:0; display:flex; flex-direction:column; justify-content:center;'>";
             
-            $title = get_the_title();
-            if (($s['show_title'] ?? 'yes') === 'yes' && !empty($title)) {
+            $title = get_the_title($id);
+            if ($title === '' || $title === null) {
+                $title = get_post_field('post_title', $id);
+            }
+            $show_title_val = $s['show_title'] ?? 'yes';
+            if (in_array($show_title_val, ['yes', 'true', '1', 1, true], true) && !empty($title)) {
                 echo "<h3 class='mad-tool-title' style='margin:0; font-weight:800;'>".esc_html($title)."</h3>";
             }
             

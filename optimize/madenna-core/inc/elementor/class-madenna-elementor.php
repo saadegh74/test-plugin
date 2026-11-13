@@ -21,13 +21,13 @@ class Madenna_Elementor_Init {
             'madenna-elementor-widgets',
             MADENNA_CORE_URL . 'assets/css/elementor-widgets.css',
             [],
-            '4.3.0'
+            defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.1'
         );
         wp_register_style(
             'madenna-vault-css',
             MADENNA_CORE_URL . 'assets/css/madenna-vault.css',
             [],
-            defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0'
+            defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.1'
         );
     }
 

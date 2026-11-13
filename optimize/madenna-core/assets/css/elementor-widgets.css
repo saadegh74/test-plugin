@@ -77,6 +77,16 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mad-cat-head-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .mad-cat-icon {
@@ -104,9 +114,15 @@
 }
 
 .mad-cat-title {
+    display: block;
+    width: 100%;
     font-size: 17px;
     font-weight: 800;
+    line-height: 1.5;
+    color: #0f172a;
     margin: 0;
+    visibility: visible;
+    opacity: 1;
 }
 
 .mad-cat-subtitle {
@@ -174,6 +190,16 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mad-tool-head-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .mad-tool-icon {
@@ -189,9 +215,26 @@
 }
 
 .mad-tool-title {
+    display: block;
+    width: 100%;
     font-size: 16px;
     font-weight: 800;
+    line-height: 1.5;
+    color: #0f172a;
     margin: 0;
+    visibility: visible;
+    opacity: 1;
+}
+
+.mad-loop-title {
+    display: block;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.5;
+    color: #0f172a;
+    margin: 0;
+    visibility: visible;
+    opacity: 1;
 }
 
 .mad-tool-subtitle {
