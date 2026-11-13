@@ -1,0 +1,20 @@
+{
+  "name": "Advanced Custom Fields PRO [کانال آزمایشی - Staging]",
+  "slug": "advanced-custom-fields-pro",
+  "version": "6.8.11",
+  "tested": "6.8",
+  "requires": "6.2",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-03 01:00:00",
+  "author": "WP Engine",
+  "author_homepage": "https://www.advancedcustomfields.com",
+  "sections": {
+    "description": "افزونه تخصصی Advanced Custom Fields PRO جهت ساخت و مدیریت فیلدهای سفارشی پیشرفته، بلوک‌های گوتنبرگ، صفحات تنظیمات و فیلدهای تکرارشونده در وردپرس.",
+    "changelog": "<h4>6.8.11</h4><ul><li>بهبودهای امنیتی گسترده در اعتبارسنجی مقادیر سفارشی، پاک‌سازی تنظیمات فیلدها و جلوگیری از دستکاری متا و حملات XSS</li><li>محدودسازی نمایش مقادیر فیلد نوشته‌های رمزدار و اطلاعات کاربری حساس در شورت‌کدها، Block Bindings و REST API</li><li>بهبود اعتبارسنجی نانس آپلودر و روابط فیلدها بر اساس سطح دسترسی خواندن و ویرایش کاربر</li><li>رفع خطای PHP 8 در شورت‌کد [acf] و Block Bindings هنگام بازگرداندن آبجکت و رفع باگ کاراکترهای HTML در تنظیمات فیلد</li><li>پاک‌سازی فایل‌های زائد و اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 850,
+  "downloaded": 4200,
+  "active_installs": 4200,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/advanced-custom-fields-pro/advanced-custom-fields-pro-v6.8.11.zip"
+}
