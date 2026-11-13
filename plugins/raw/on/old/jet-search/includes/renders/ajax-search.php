@@ -12,6 +12,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+use Jet_Search\Search_Sources\Manager;
+
 /**
  * Define Jet_Search_Render class
  */
@@ -24,7 +26,7 @@ class Jet_Search_Render {
 	public $current_query  = null;
 
 	public function __construct( $settings = array(), $id = null ) {
-		$this->settings = $settings;
+		$this->settings = $this->sanitize_terms_ids_settings( $settings );
 
 		if ( $id ) {
 			$this->id = $id;
@@ -73,10 +75,27 @@ class Jet_Search_Render {
 
 	}
 
+	// phpcs:disable WordPress.Security.NonceVerification
 	public function preview_results() {
-		$preview = ! empty( $_GET['previewResults'] ) ? filter_var( $_GET['previewResults'], FILTER_VALIDATE_BOOLEAN ) : false;
+		$preview = ! empty( $_GET['previewResults'] ) ? filter_var( wp_unslash( $_GET['previewResults'] ), FILTER_VALIDATE_BOOLEAN ) : false;
 		return ( ! empty( $_GET['context'] ) && 'edit' === $_GET['context'] && $preview );
 	}
+
+	public function preview_results_suggestions() {
+		$preview = ! empty( $_GET['previewResultsSuggestionsItems'] ) ? filter_var( wp_unslash( $_GET['previewResultsSuggestionsItems'] ), FILTER_VALIDATE_BOOLEAN ) : false;
+		return ( ! empty( $_GET['context'] ) && 'edit' === $_GET['context'] && $preview );
+	}
+
+	public function preview_focus_suggestions() {
+		$preview = ! empty( $_GET['previewFocusSuggestionsItems'] ) ? filter_var( wp_unslash( $_GET['previewFocusSuggestionsItems'] ), FILTER_VALIDATE_BOOLEAN ) : false;
+		return ( ! empty( $_GET['context'] ) && 'edit' === $_GET['context'] && $preview );
+	}
+
+	public function preview_inline_suggestions() {
+		$preview = ! empty( $_GET['previewInlineSuggestions'] ) ? filter_var( wp_unslash( $_GET['previewInlineSuggestions'] ), FILTER_VALIDATE_BOOLEAN ) : false;
+		return ( ! empty( $_GET['context'] ) && 'edit' === $_GET['context'] && $preview );
+	}
+	// phpcs:enable WordPress.Security.NonceVerification
 
 	public function preview_navigation_template( $position ) {
 		if ( ! $this->preview_results() ) {
@@ -86,8 +105,8 @@ class Jet_Search_Render {
 		$settings = $this->settings;
 
 		if ( 'in_header' === $settings['navigation_arrows'] || 'in_footer' === $settings['navigation_arrows'] || 'both' === $settings['navigation_arrows'] ) {
-			$prev_button = apply_filters( 'jet-search/ajax-search/prev-button-html', '<div role=button class="jet-ajax-search__prev-button jet-ajax-search__arrow-button jet-ajax-search__navigate-button jet-ajax-search__navigate-button-disable" data-direction="-1">%s</div>' );
-			$next_button = apply_filters( 'jet-search/ajax-search/next-button-html', '<div role=button class="jet-ajax-search__next-button jet-ajax-search__arrow-button jet-ajax-search__navigate-button" data-direction="1">%s</div>' );
+			$prev_button = apply_filters( 'jet-search/ajax-search/prev-button-html', '<button role=button class="jet-ajax-search__prev-button jet-ajax-search__arrow-button jet-ajax-search__navigate-button jet-ajax-search__navigate-button-disable" data-direction="-1">%s</button>' );
+			$next_button = apply_filters( 'jet-search/ajax-search/next-button-html', '<button role=button class="jet-ajax-search__next-button jet-ajax-search__arrow-button jet-ajax-search__navigate-button" data-direction="1">%s</button>' );
 			$arrow       = Jet_Search_Tools::get_svg_arrows( $settings['navigation_arrows_type'] );
 			$output_html = sprintf( $prev_button . $next_button, $arrow['left'], $arrow['right'] );
 		}
@@ -95,51 +114,64 @@ class Jet_Search_Render {
 		if ( 'top' === $position ) {
 			if ( 'in_header' === $settings['bullet_pagination'] || 'both' === $settings['bullet_pagination'] ) {
 				echo '<div class="jet-ajax-search__navigation-container">
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button jet-ajax-search__active-button" data-number="1"></div>
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button" data-number="2"></div>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button jet-ajax-search__active-button" data-number="1"></button>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button" data-number="2"></button>
 				</div>';
 			}
 
 			if ( 'in_header' === $settings['number_pagination'] || 'both' === $settings['number_pagination'] ) {
 				echo '<div class="jet-ajax-search__navigation-container">
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button jet-ajax-search__active-button" data-number="1"></div>
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button" data-number="2"></div>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button jet-ajax-search__active-button" data-number="1"></button>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button" data-number="2"></button>
 				</div>';
 			}
 
+			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 			if ( 'in_header' === $settings['navigation_arrows'] || 'both' === $settings['navigation_arrows'] ) {
 				echo '<div class="jet-ajax-search__navigation-container">
 						' . $output_html . '
 				</div>';
 			}
+			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		if ( 'bottom' === $position ) {
 			if ( 'in_footer' === $settings['bullet_pagination'] || 'both' === $settings['bullet_pagination'] ) {
 				echo '<div class="jet-ajax-search__navigation-container">
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button jet-ajax-search__active-button" data-number="1"></div>
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button" data-number="2"></div>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button jet-ajax-search__active-button" data-number="1"></button>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__bullet-button" data-number="2"></button>
 				</div>';
 			}
 
 			if ( 'in_footer' === $settings['number_pagination'] || 'both' === $settings['number_pagination'] ) {
 				echo '<div class="jet-ajax-search__navigation-container">
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button jet-ajax-search__active-button" data-number="1"></div>
-					<div role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button" data-number="2"></div>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button jet-ajax-search__active-button" data-number="1"></button>
+					<button role=button class="jet-ajax-search__navigate-button jet-ajax-search__number-button" data-number="2"></button>
 				</div>';
 			}
 
+			// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 			if ( 'in_footer' === $settings['navigation_arrows'] || 'both' === $settings['navigation_arrows'] ) {
 				echo '<div class="jet-ajax-search__navigation-container">
 					' . $output_html . '
 				</div>';
 			}
+			// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 
 	public function preview_template() {
 
 		if ( ! $this->preview_results() ) {
+			return;
+		}
+
+		$settings = $this->settings;
+
+		if ( '' != $settings['listing_id'] ) {
+			echo '<div class="jet-ajax-search__results-slide">';
+			echo '<p class="jet-ajax-search__demo-template-notice">' . esc_html__( 'The results item template will be rendered on the front end.', 'jet-search' ) . '</p>';
+			echo '</div>';
 			return;
 		}
 
@@ -160,6 +192,7 @@ class Jet_Search_Render {
 				'{{{data.after_content}}}'    => '',
 				'{{{data.rating}}}'           => '',
 				'{{{data.price}}}'            => '',
+				'{{{data.add_to_cart}}}'      => '',
 			),
 			array(
 				'{{{data.link}}}'             => '#',
@@ -173,15 +206,143 @@ class Jet_Search_Render {
 				'{{{data.after_content}}}'    => '',
 				'{{{data.rating}}}'           => '',
 				'{{{data.price}}}'            => '',
+				'{{{data.add_to_cart}}}'      => '',
 			),
 		);
 
+		if( isset( $settings['results_area_columns'] ) ) {
+			$columns               = ! empty( $settings['results_area_columns'] ) ? (int) $settings['results_area_columns'] : 1;
+			$additional_demo_items = ( $columns * 2 ) - 2;
+
+			for ( $i=2; $i < $additional_demo_items + 2; $i++ ) {
+				$preview_items[] = array(
+					'{{{data.link}}}'             => '#',
+					'{{{data.link_target_attr}}}' => '_self',
+					'{{{data.thumbnail}}}'        => '<div class="jet-ajax-search__item-thumbnail"><img src="data:image/png;base64,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"></div>',
+					'{{{data.before_title}}}'     => '',
+					'{{{data.title}}}'            => 'Preview title #' . ( $i + 1 ),
+					'{{{data.after_title}}}'      => '',
+					'{{{data.before_content}}}'   => '',
+					'{{{data.content}}}'          => 'Content of the preview item #' . ( $i + 1 ),
+					'{{{data.after_content}}}'    => '',
+					'{{{data.rating}}}'           => '',
+					'{{{data.price}}}'            => '',
+					'{{{data.add_to_cart}}}'      => '',
+				);
+			}
+		}
+
+		$show_add_to_cart          = in_array( $this->settings['show_add_to_cart'] ?? '', array( true, 'true', 'yes' ), true );
+		$show_add_to_cart_quantity = in_array( $this->settings['show_add_to_cart_quantity'] ?? '', array( true, 'true', 'yes' ), true );
+
+		if ( $show_add_to_cart ) {
+
+			$quantity_input = '';
+
+			if ( $show_add_to_cart_quantity ) {
+				$quantity_input = '<input type="number" class="jet-ajax-search__results-item-quantity-input qty" min="1" step="1" value="1" inputmode="numeric" aria-label="Quantity">';
+			}
+
+			$preview_items[0]['{{{data.add_to_cart}}}'] = '<div class="jet-ajax-search__item-add-to-cart">' . $quantity_input . '<button type="button" data-quantity="1" class="jet-ajax-search__results-item-cart-button add_to_cart_button ajax_add_to_cart add-to-cart-button" data-product_id="" data-product_sku="" aria-label="" data-product_url="">Add to cart</button></div>';
+
+			$preview_items[1]['{{{data.add_to_cart}}}'] = '<div class="jet-ajax-search__item-add-to-cart"><button type="button" data-quantity="1" class="jet-ajax-search__results-item-cart-button select-options-button" data-product_id="" data-product_sku="" aria-label="" data-product_url="">Select options</button></div>';
+		}
+
 		echo '<div class="jet-ajax-search__results-slide">';
 		foreach ( $preview_items as $item_data ) {
-			echo str_replace( array_keys( $item_data ), array_values( $item_data ), $item );
+			echo str_replace( array_keys( $item_data ), array_values( $item_data ), $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 		echo '</div>';
 
+	}
+
+	public function preview_source_template( $position = 'before' ) {
+		if ( ! $this->preview_results() ) {
+			return;
+		}
+
+		if ( 'after' != $position && 'before' != $position ) {
+			return;
+		}
+
+		if ( class_exists( 'Jet_Search\Search_Sources\Manager' ) ) {
+			$settings        = $this->settings;
+			$sources_manager = jet_search()->search_sources;
+			$sources         = $sources_manager->get_sources();
+
+			foreach ( $sources as $key => $source ) {
+				$preview_source_items = array();
+				$priority             = $source->get_priority();
+
+				if ( 'before' === $position && 0 < $priority ) {
+					continue;
+				} else if ( 'after' === $position && 0 > $priority ) {
+					continue;
+				}
+
+				$limit = isset( $settings['search_source_' . $key . '_limit'] ) ? $settings['search_source_' . $key . '_limit'] : 5;
+
+				for ( $i = 1; $i <= $limit ; $i++ ) {
+					$preview_source_items[] = array(
+						'name' => 'Preview title #' . $i,
+						'url'  => '#'
+					);
+				}
+
+				$source->set_args( $settings );
+				$source->set_items_list( $preview_source_items );
+
+				echo $source->render(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+		}
+	}
+
+	public function preview_inline_suggestions_template() {
+		if ( ! $this->preview_inline_suggestions() ) {
+			return;
+		}
+
+		$preview_items = array();
+
+		ob_start();
+		include jet_search()->get_template( 'jet-ajax-search/global/inline-suggestion-item.php' );
+		$item = ob_get_clean();
+
+		$items_quantity = ! empty( $_GET['previewSuggestionsNumber'] ) ? absint( wp_unslash( $_GET['previewSuggestionsNumber'] ) ) : 5; // phpcs:ignore WordPress.Security.NonceVerification
+
+		for ( $i=0; $i < $items_quantity; $i++ ) {
+			$preview_items[] = array(
+				'{{{data.name}}}' => 'suggestion title #' . ( $i + 1 ),
+			);
+		}
+
+		foreach ( $preview_items as $item_data ) {
+			echo str_replace( array_keys( $item_data ), array_values( $item_data ), $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	public function preview_results_suggestions_template() {
+		if ( ! $this->preview_results() && ! $this->preview_results_suggestions() ) {
+			return;
+		}
+
+		$preview_items = array();
+
+		ob_start();
+		include jet_search()->get_template( 'jet-ajax-search/global/results-suggestion-item.php' );
+		$item = ob_get_clean();
+
+		$items_quantity = ! empty( $_GET['previewSuggestionsNumber'] ) ? absint( wp_unslash( $_GET['previewSuggestionsNumber'] ) ) : 5; // phpcs:ignore WordPress.Security.NonceVerification
+
+		for ( $i=0; $i < $items_quantity; $i++ ) {
+			$preview_items[] = array(
+				'{{{data}}}' => 'suggestion title #' . ( $i + 1 ),
+			);
+		}
+
+		foreach ( $preview_items as $item_data ) {
+			echo str_replace( array_keys( $item_data ), array_values( $item_data ), $item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
 	}
 
 	/**
@@ -213,7 +374,7 @@ class Jet_Search_Render {
 			return;
 		}
 
-		echo implode( ' ', array_map( function( $attr, $value ) {
+		echo implode( ' ', array_map( function( $attr, $value ) { // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			return $attr . '="' . esc_attr( $value ) . '"';
 		}, array_keys( $this->attributes[ $slug ] ), array_values( $this->attributes[ $slug ] ) ) );
 
@@ -251,7 +412,7 @@ class Jet_Search_Render {
 			}
 
 			if ( $icon_src ) {
-				printf( $format, $icon_src );
+				printf( $format, $icon_src ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				return;
 			}
 
@@ -285,7 +446,7 @@ class Jet_Search_Render {
 				$icon_class .= ' ' . $settings[ $setting ];
 			}
 
-			$icon_html = sprintf( '<i class="%s" aria-hidden="true"></i>', $icon_class );
+			$icon_html = sprintf( '<i class="%s" aria-hidden="true"></i>', esc_attr( $icon_class ) );
 		}
 
 		if ( empty( $icon_html ) ) {
@@ -296,7 +457,7 @@ class Jet_Search_Render {
 			return sprintf( $format, $icon_html );
 		}
 
-		printf( $format, $icon_html );
+		printf( $format, $icon_html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	}
 
@@ -317,7 +478,7 @@ class Jet_Search_Render {
 		$val = $this->get_settings_for_display( $setting );
 
 		if ( ! is_array( $val ) && '0' === $val ) {
-			printf( $format, $val );
+			printf( $format, esc_html( $val ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		if ( is_array( $val ) && empty( $val[ $key ] ) ) {
@@ -329,9 +490,9 @@ class Jet_Search_Render {
 		}
 
 		if ( is_array( $val ) ) {
-			printf( $format, $val[ $key ] );
+			printf( $format, esc_html( $val[ $key ] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		} else {
-			printf( $format, $val );
+			printf( $format, esc_html( $val ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 	}
@@ -382,8 +543,18 @@ class Jet_Search_Render {
 
 		$allowed = apply_filters( 'jet-search/ajax-search/data-settings', array(
 
+			//Form
+			'symbols_for_start_searching',
+			'search_by_empty_value',
+			'submit_on_enter',
+			'show_search_in_popup',
+			'full_screen_popup',
+			'popup_show_effect',
+
 			// Query
 			'search_source',
+			'search_logging',
+			'search_results_url',
 			'search_taxonomy',
 			'include_terms_ids',
 			'exclude_terms_ids',
@@ -403,6 +574,10 @@ class Jet_Search_Render {
 			'results_area_width_by',
 			'results_area_custom_width',
 			'results_area_custom_position',
+			'results_area_columns',
+			'results_area_columns_tablet',
+			'results_area_columns_mobile',
+			'results_area_columns_mobile_portrait',
 			'thumbnail_visible',
 			'thumbnail_size',
 			'thumbnail_placeholder',
@@ -411,10 +586,11 @@ class Jet_Search_Render {
 			'post_content_length',
 			'show_product_price',
 			'show_product_rating',
+			'show_add_to_cart',
+			'show_add_to_cart_quantity',
 			'show_result_new_tab',
 			'highlight_searched_text',
-			'symbols_for_start_searching',
-			'search_by_empty_value',
+			'listing_id',
 
 			// Navigations
 			'bullet_pagination',
@@ -432,8 +608,32 @@ class Jet_Search_Render {
 
 			// Notification
 			'negative_search',
-			'server_error'
+			'server_error',
+
+			//Suggestions
+			'show_search_suggestions',
+			'search_suggestions_position',
+			'search_suggestions_source',
+			'search_suggestions_limits',
+			'search_suggestions_item_title_length'
 		), $settings );
+
+		if ( class_exists( 'Jet_Search\Search_Sources\Manager' ) ) {
+			$sources_manager = jet_search()->search_sources;
+			$sources         = $sources_manager->get_sources();
+
+			if ( ! empty( $sources ) ) {
+				foreach ( $sources as $source ) {
+					$controls = $source->editor_general_controls();
+
+					foreach ( $controls as $key => $position ) {
+						foreach ( $position as $key => $setting ) {
+							$allowed[] = $key;
+						}
+					}
+				}
+			}
+		}
 
 		$result = array();
 
@@ -441,10 +641,21 @@ class Jet_Search_Render {
 			$result[ $setting ] = isset( $settings[ $setting ] ) ? $settings[ $setting ] : '';
 		}
 
+		if ( ! function_exists( 'jet_engine' ) && isset( $settings[ 'listing_id' ] ) ) {
+			unset( $result[ 'listing_id' ] );
+		}
+
+		$lang = jet_search_compatibility()->get_current_lang();
+
+		if ( '' != $lang ) {
+			$result['lang'] = $lang;
+		}
+
 		$result['search_source'] = ! empty( $result['search_source'] ) ? $result['search_source'] : 'any';
 
 		$this->set_current_query_args( $result );
 
+		$result['meta_settings'] = \Jet_Search_Tools::sign_public_meta_settings( $result );
 
 		return esc_attr( json_encode( $result ) );
 	}
@@ -457,6 +668,7 @@ class Jet_Search_Render {
 		$settings = $this->get_settings_for_display();
 
 		$allowed = apply_filters( 'jet-search/ajax-search/query-settings', array(
+			'current_query',
 			'search_source',
 			'search_taxonomy',
 			'include_terms_ids',
@@ -468,6 +680,7 @@ class Jet_Search_Render {
 			'sentence',
 			'search_in_taxonomy',
 			'search_in_taxonomy_source',
+			'search_results_target_widget_id',
 		), $settings );
 
 		$result = array();
@@ -488,9 +701,65 @@ class Jet_Search_Render {
 			$result['search_source'] = $result['search_source'][0];
 		}
 
+		$result = \Jet_Search_Tools::prepared_settings( $result );
+
+		$default_query_settings = get_option( 'jet_ajax_search_query_settings' );
+
+		if ( false != $default_query_settings ) {
+			$widget_current_query = ! empty( $settings['current_query'] ) ? $settings['current_query'] : '';
+
+			$default_query_settings = \Jet_Search_Tools::prepared_default_search_query_settings( $default_query_settings, $widget_current_query );
+
+			// For compatibility with Product Search Page created with Elementor Pro
+			if ( isset( $default_query_settings['search_source'] ) && is_array( $default_query_settings['search_source'] ) && 1 === count( $default_query_settings['search_source'] ) ) {
+				$default_query_settings['search_source'] = $default_query_settings['search_source'][0];
+			}
+		} else {
+			$default_query_settings = array();
+		}
+
 		$this->set_current_query_args( $result );
 
-		return esc_attr( json_encode( $result ) );
+		if ( ! empty( $result ) ) {
+			$settings_result = array();
+
+			foreach ( $result as $key => $value ) {
+				if ( isset( $default_query_settings[$key] ) && $default_query_settings[$key] !== $value ) {
+					$settings_result[$key] = $value;
+				}
+			}
+
+			if ( empty( $settings_result ) ) {
+				$settings_result = $this->recursive_array_diff_assoc( $result, $default_query_settings );
+			}
+
+			if ( isset( $settings_result['search_source'] ) && is_array( $settings_result['search_source'] ) ) {
+				$settings_result['search_source'] = array_values( $settings_result['search_source'] );
+			}
+		} else {
+			$settings_result = array();
+		}
+
+		if ( isset( $result['search_results_target_widget_id'] ) ) {
+			$settings_result['search_results_target_widget_id'] = $result['search_results_target_widget_id'];
+		}
+
+		return esc_attr( json_encode( $settings_result ) );
+	}
+
+	public function recursive_array_diff_assoc( $array1, $array2 ) {
+		$diff = array();
+		foreach ( $array1 as $key => $value ) {
+			if ( is_array( $value ) && isset( $array2[$key] ) && is_array( $array2[$key] ) ) {
+				$recursive_diff = $this->recursive_array_diff_assoc( $value, $array2[$key] );
+				if ( !empty( $recursive_diff ) ) {
+					$diff[$key] = $recursive_diff;
+				}
+			} elseif ( !array_key_exists( $key, $array2 ) || $array2[$key] !== $value ) {
+				$diff[$key] = $value;
+			}
+		}
+		return $diff;
 	}
 
 	/**
@@ -504,6 +773,10 @@ class Jet_Search_Render {
 		$post_types = $this->get_settings( 'search_source' );
 
 		if ( empty( $post_types ) ) {
+			return '';
+		}
+
+		if ( ! in_array( 'product', $post_types) ) {
 			return '';
 		}
 
@@ -547,7 +820,7 @@ class Jet_Search_Render {
 			'name'            => 'jet_ajax_search_categories',
 			'class'           => 'jet-ajax-search__categories-select',
 			'echo'            => 0,
-			'show_option_all' => $placeholder,
+			'show_option_all' => esc_attr( $placeholder ),
 			'hierarchical'    => 1,
 			'hide_if_empty'   => true,
 			'include'         => $include_categories,
@@ -562,7 +835,7 @@ class Jet_Search_Render {
 			return '';
 		}
 
-		$categories_list = str_replace( 'name=\'jet_ajax_search_categories\'', 'name="jet_ajax_search_categories" data-placeholder="' . $placeholder . '"' , $categories_list );
+		$categories_list = str_replace( 'name=\'jet_ajax_search_categories\'', 'name="jet_ajax_search_categories" data-placeholder="' . esc_attr( $placeholder ) . '"' , $categories_list );
 
 		return sprintf( $select_wrapper_html, $categories_list, $select_icon_html );
 	}
@@ -604,6 +877,31 @@ class Jet_Search_Render {
 		}
 
 		return $this->current_query;
+	}
+
+	private function sanitize_terms_ids_settings( $settings ) {
+
+		foreach ( array( 'include_terms_ids', 'exclude_terms_ids' ) as $key ) {
+
+			if ( empty( $settings[ $key ] ) ) {
+				continue;
+			}
+
+			$ids = wp_parse_id_list( (array) $settings[ $key ] );
+
+			$ids = array_values( array_filter( $ids, static function( $id ) {
+				$exists = term_exists( (int) $id );
+				return ( $id && $exists && ! is_wp_error( $exists ) );
+			} ) );
+
+			if ( empty( $ids ) ) {
+				unset( $settings[ $key ] );
+			} else {
+				$settings[ $key ] = $ids;
+			}
+		}
+
+		return $settings;
 	}
 
 }

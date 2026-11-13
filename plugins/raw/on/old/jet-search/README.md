@@ -4,6 +4,256 @@ The best tool for adding complex search functionality to pages built with Elemen
 
 # ChangeLog
 
+# 3.6.3.1
+* FIX: Sanitize post meta values in JetSearch search results;
+
+# 3.6.3
+* ADD: [Crocoblock/suggestions#7873](https://github.com/Crocoblock/suggestions/issues/7873);
+* ADD: Only force block library styles for rendered block listings;
+* FIX: current query search results on archive pages;
+* FIX: allow Kava site overflow for JetSearch;
+
+# 3.6.2.1
+* FIX: prevent execution of SVG attachment files;
+
+# 3.6.2
+* ADD: support fuzzy matching for search queries;
+* ADD: reserved query parameter warning for custom search results URL;
+* UPD: JetDashboard module 2.2.3;
+
+# 3.6.1.3
+* FIX: Sensitive Data Exposure via Ajax Search.
+
+# 3.6.1.2
+* FIX: critical error when JetSearch target widget uses CSS ID;
+* UPD: JetDashboard module
+
+# 3.6.1.1
+* FIX: strict mode syntax error in JetSearch script;
+
+# 3.6.1
+* ADD: accessible name attributes to Ajax Search categories input;
+* FIX: Bricks style specificity for Ajax Search;
+* FIX: relevance order for custom search results URL;
+* FIX: undefined array key warning for post_content_custom_field_key;
+
+# 3.6.0
+* ADD: Show Search Form in Popup option for Ajax Search;
+* ADD: Show Quantity Input option for Add to Cart in Ajax Search results;
+* ADD: Blocks Style Manager module for block styling;
+* FIX: missing accessible labels for search inputs;
+* FIX: JetWooBuilder Archive Add to Cart assets in Ajax Search listing results.
+
+# 3.5.17.2
+* FIX: harden AJAX search queries against security vulnerabilities.
+
+# 3.5.17.1
+* FIX: harden SQL queries against injection.
+
+# 3.5.17
+* UPD: Blocks apiVersion 3;
+* UPD: add alternative way to store modules data;
+* UPD: rename option to 'Open Result Items in New Tab' in Ajax Search;
+* FIX: correct query string separator for custom results URL in Ajax Search widget;
+* FIX: handle WooCommerce add-to-cart correctly in Ajax Search results area.
+
+# 3.5.16.1
+* FIX: WP Security Standards.
+
+# 3.5.16
+* ADD: Current JetSearch Results macros for JetEngine Query Builder integration;
+* ADD: Bulk delete support for Suggestions;
+* FIX: Show All Results Button ignores toggle state in Bricks;
+* FIX: improve accessibility for Ajax Search and Search Suggestions widgets.
+
+# 3.5.15
+* FIX: display all terms and posts in Ajax Search widget for Bricks editor;
+* FIX: add post_type parameter to AJAX request in block editor to load terms based on selected source in Ajax Search widget;
+* FIX: prevent double initialization of JetForm inside tabs;
+
+# 3.5.14
+* ADD: Weglot compatibility for custom search results redirect;
+* FIX: add validation for include/exclude term IDs in settings;
+* FIX: recalculate results list height on resize and orientation change to prevent hidden results;
+* FIX: pause Slick slider autoplay during search typing, resume after leaving input field;
+* FIX: sync validation between Custom Search Results URL and Search Query Param in default Ajax Search settings.
+
+# 3.5.13
+* FIX: prevent fatal error on incorrect JSON in Jet_Search_Ajax_Handlers;
+* FIX: replace _stock_status meta_query with product_visibility taxonomy to improve query performance;
+* FIX: show custom attributes in “Taxonomies” selector ( global settings ).
+
+# 3.5.12
+* FIX: WP Security Standards.
+
+# 3.5.11
+* ADD: jet-search/tools/get-post-types filter to modify the CPT list;
+* UPD: jet-search/ajax-search/thumbnail-html and jet-search/ajax-search/thumbnail-placeholder-html hooks;
+* FIX: apply escaping to dynamic classes and attributes for proper HTML output;
+* FIX: minor issues.
+
+# 3.5.10.1
+* ADD: sanitize user input and escape output to prevent potential XSS in Search Suggestions widget;
+* FIX: sanitize and typecast term and post ID filters as arrays in Ajax Search Tax Query.
+
+# 3.5.10
+* ADD: trigger 'jet-ajax-search/show-results/listing' for compatibility;
+* UPD: support 'jet-search/ajax-search/query-args' filter on Results and Custom Results pages;
+* FIX: apply focus to search field when popup entrance animation is active.
+
+# 3.5.9
+* ADD: `Target Widget ID ( optional )` compatibility for Archive Templates;
+* ADD: support for custom attributes in 'Search in taxonomy terms' for Bricks and Gutenberg;
+* ADD: trigger 'added_to_cart' event for plugins compatibility.
+
+# 3.5.8
+* ADD: filters to allow including custom attributes in the Ajax Search widget;
+* ADD: `Target Widget ID ( optional )` option to limit search results to specific Listing Grid on custom results page;
+* UPD: package.json;
+* UPD: language files;
+* FIX: exclude `accordion.default` widget from initialization;
+* FIX: handle wide space characters in Ajax Search widget.
+
+# 3.5.7.1
+* FIX: Sanitize and validate input data to prevent XSS in results-area;
+
+# 3.5.7
+* FIX: Bricks. Convert `symbols_for_start_searching` option to an integer in the Ajax Search widget;
+* FIX: Filter out empty values in ajaxSendData before sending request in the Ajax Search widget;
+* UPD: Compatibility with Elementor 3.26.
+
+# 3.5.6
+* ADD: 'X-WP-Nonce' header for REST API requests in Ajax Search widget;
+* ADD: excluded the GallerySlider widget from initialization in JetSearch;
+* UPD: Compatibility with Elementor 3.24;
+* FIX: dynamic content handling in popups for listing templates in Ajax Search widget;
+* FIX: SQL condition handling for Ajax Search widget.
+
+# 3.5.5.1
+* FIX: Compatibility with JetSmartFilters 3.6.0.
+
+# 3.5.5
+* FIX: Bricks builder Listing templates styles;
+* FIX: Issues with preview templates and options in the Blocks editor;
+* FIX: Compatibility with Elementor 3.26;
+* ADD: Added compatibility with Custom Meta Storage
+* FIX: Minor issues.
+
+# 3.5.4
+* ADD: Add suggestions after selecting a post from the results area in AJAX search;
+* FIX: Fix product variations appearing in search results when the product is hidden from search;
+* FIX: TranslatePress compatibility;
+* FIX: minor issues.
+
+# 3.5.3
+* ADD: The `jet-search/custom-url-handler/allow-merge-queries-post-types` filter;
+* ADD: The `Request type` setting allows switching the search request type between REST API and AJAX;
+* ADD: The `Maximum Word Length for Suggestion Item Titles` option allows trimming suggestion titles by a specified number of words;
+* FIX: Resolved an issue where suggestions with special characters were duplicated;
+* ADD: `jet-search/ajax-search/before-search-sources` hook;
+* FIX: minor issues.
+
+# 3.5.2.1
+* FIX: security issue.
+
+# 3.5.2
+* ADD: [Crocoblock/suggestions#7640](https://github.com/Crocoblock/suggestions/issues/7640);
+* ADD: `jet-ajax-search/assets/localize-data/use-legacy-ajax` filter to determine whether to use the legacy AJAX method or REST API for search functionality.
+
+# 3.5.1
+* FIX: Better sanitize parameters before use in DB queries.
+
+# 3.5.0
+* ADD: [Crocoblock/suggestions#6938](https://github.com/Crocoblock/suggestions/issues/6938);
+* ADD: [Crocoblock/suggestions#6896](https://github.com/Crocoblock/suggestions/issues/6896);
+* ADD: `jet-search/ajax-search/search-by-post-id` filter to add the ability to search by post ID;
+* ADD: `Additional Results` section with terms and user search sources;
+* FIX: Better TranslatePress compatibility;
+
+# 3.4.4
+* ADD: `jet-search/ajax-search/show-product-variations` filter to show/hide product variations from the search result;
+* UPD: JetDashboard to v2.2.0;
+* FIX: minor issues.
+
+# 3.4.3
+* FIX: Exclude Terms option in the Ajax Search widget;
+* FIX: URL params duplication in the Ajax Search widget;
+* FIX: minor issues.
+
+# 3.4.2
+* FIX: improved compatibility with JetSmartFilters in the Ajax Search widget;
+* FIX: search functionality with custom fields in the Ajax Search widget;
+* FIX: minor issues.
+
+# 3.4.1
+* FIX: security issue;
+* FIX: minor issues.
+
+# 3.4.0
+* ADD: [Crocoblock/suggestions#6926](https://github.com/Crocoblock/suggestions/issues/6926);
+* ADD: [Crocoblock/suggestions#2559](https://github.com/Crocoblock/suggestions/issues/2559);
+* ADD: Ability to display search suggestions or user search history in the Ajax Search widget;
+* FIX: minor issues.
+
+# 3.3.2
+* FIX: Better WPML compatibility
+* ADD: option to disable saving search suggestions via JetSearch widgets/blocks.
+* FIX: minor issues.
+
+# 3.3.1
+* FIX: select searched category in the search category dropdown on the search results page;
+* FIX: SmartFilters compatibility with the `Search in taxonomy terms` option.
+
+# 3.3.0
+* ADD: Settings page for Ajax Search widget, enabling customization of default Ajax Search settings;
+* ADD: `Search Query Save to Search Suggestions` control in the Ajax Search widget;
+* ADD: `Disable Submit on Enter` control in the Ajax Search widget;
+* ADD: `jet-search/query/set-search-query` hook, allow to filter search query;
+* ADD: `Custom Search Results URL` control in the Ajax Search widget for page link where search results will be displayed;
+* ADD: Allow specific tags for Notifications;
+* FIX: minor issues.
+
+# 3.2.3
+* FIX: Blocks editor `Divider` and `Enable Scrolling` styles.
+
+# 3.2.2
+* FIX: Resolved Ajax Search widget issue within Jet Popup during ajax loading;
+* FIX: Resolved the issue with the `Highlight Searched Text` option in the block editor when the option was turned off;
+* FIX: Minor bug fixes.
+
+# 3.2.1
+* FIX: accessibility in the widgets.
+
+# 3.2.0.1
+* ADD: Check for the presence of sessions table in the database;
+* ADD: Disable token clearing when the session usage option is turned off.
+
+# 3.2.0
+* ADD: Bricks Builder сompatibility;
+* ADD: Added a new validation mechanism for adding new suggestions via the Search Suggestions widget;
+* FIX: rest api urls;
+* FIX: Search in taxonomy terms issue;
+* FIX: minor issues.
+
+# 3.1.3.1
+* FIX: js issue.
+
+# 3.1.3
+* FIX: compatibility with Polylang/WPML;
+* FIX: Fixed the issue for searching by category and terms;
+* FIX: security issue;
+* FIX: minor issues.
+
+# 3.1.2.1
+* FIX: security issue.
+
+# 3.1.2
+* FIX: Ajax Search blocks issue with custom fields;
+* ADD: `Session usage settings` setting for Suggestions to resolve caching issues
+* ADD: `jet-ajax-search/form/post-types` filter hook
+* FIX: Ajax Search incorrect notifications issue
+* UPD: JetDashboard Module to v2.1.4
+
 # 3.1.1
 * FIX: [Crocoblock/suggestions#6933](https://github.com/Crocoblock/suggestions/issues/6933);
 * FIX: Include / Exclude terms issue

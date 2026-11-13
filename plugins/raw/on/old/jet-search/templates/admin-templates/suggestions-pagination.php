@@ -1,6 +1,21 @@
 <div
         class="jet-search-suggestions-pagination-wrapper"
 >
+    <div class="jet-search-suggestions-toolbar">
+        <select v-model="bulkActionLocal" name="select" class="cx-vui-select">
+            <option value=""><?php esc_html_e( 'Bulk actions', 'jet-search' ); ?></option>
+            <option value="trash"><?php esc_html_e( 'Move to Trash', 'jet-search' ); ?></option>
+        </select>
+
+        <cx-vui-button
+                size="mini"
+                :disabled="!canApply"
+                @click="onApplyBulk"
+        >
+            <template slot="label"><?php esc_html_e( 'Apply', 'jet-search' ); ?></template>
+        </cx-vui-button>
+    </div>
+
     <h4 class="jet-search-suggestions-prepage-count">
         {{perPageInfo()}}
     </h4>

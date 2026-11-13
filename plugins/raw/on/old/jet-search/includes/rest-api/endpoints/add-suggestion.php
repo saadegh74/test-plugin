@@ -26,7 +26,11 @@ class Jet_Search_Rest_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 	 */
 	public function callback( $request ) {
 
-		$suggestion = $request->get_params();
+		$params = $request->get_params();
+
+		$suggestion = $params['content'];
+		$suggestion = stripcslashes( $suggestion );
+		$suggestion = json_decode( $suggestion, true );
 
 		if ( empty( $suggestion ) || ! $suggestion['name'] ) {
 			return rest_ensure_response( array(
@@ -35,15 +39,14 @@ class Jet_Search_Rest_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 			) );
 		}
 
-		unset( $suggestion['_locale'] );
-
 		global $wpdb;
 
-		$prefix          = 'jet_';
-		$table_name      = $wpdb->prefix . $prefix . 'search_suggestions';
-		$suggestion_name = esc_sql( $suggestion['name'] );
+		$prefix     = 'jet_';
+		$table_name = $wpdb->prefix . $prefix . 'search_suggestions';
 
-		$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE name = %s ", $suggestion_name );
+		$suggestion['name'] = trim( $suggestion['name'] );
+
+		$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE name = %s ", $suggestion['name'] );
 
 		$get_request = $wpdb->get_row( $query, ARRAY_A );
 
@@ -59,7 +62,7 @@ class Jet_Search_Rest_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 
 			$wpdb->insert( $table_name, $suggestion, '%s' );
 
-			if ($wpdb->insert_id) {
+			if ( $wpdb->insert_id ) {
 				$success_text = sprintf( esc_html__( 'Success! New suggestion: %s has been added', 'jet-search' ), $suggestion['name'] );
 			} else {
 				$success_text = esc_html__( 'Error!', 'jet-search' );

@@ -32,7 +32,7 @@ abstract class Jet_Search_Rest_Base_Route {
 	 * @return [type] [description]
 	 */
 	public function permission_callback( $request ) {
-		return true;
+		return false;
 	}
 
 	/**

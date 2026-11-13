@@ -30,6 +30,30 @@
 				"src": "\u003csvg xmlns=\u0022http://www.w3.org/2000/svg\u0022 width=\u002224\u0022 height=\u002224\u0022 viewBox=\u00220 0 24 24\u0022\u003e\u003cpath d=\u0022M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z\u0022/\u003e\u003c/svg\u003e"
 			}
 		},
+		"show_search_in_popup": {
+			"type": "boolean",
+			"default": false
+		},
+		"full_screen_popup": {
+			"type": "boolean",
+			"default": false
+		},
+		"selected_search_popup_trigger_icon": {
+			"type": "object",
+			"default": {
+				"src": "\u003csvg xmlns=\u0022http://www.w3.org/2000/svg\u0022 width=\u002224\u0022 height=\u002224\u0022 viewBox=\u00220 0 24 24\u0022\u003e\u003cpath d=\u0022M23.809 21.646l-6.205-6.205c1.167-1.605 1.857-3.579 1.857-5.711 0-5.365-4.365-9.73-9.731-9.73-5.365 0-9.73 4.365-9.73 9.73 0 5.366 4.365 9.73 9.73 9.73 2.034 0 3.923-.627 5.487-1.698l6.238 6.238 2.354-2.354zm-20.955-11.916c0-3.792 3.085-6.877 6.877-6.877s6.877 3.085 6.877 6.877-3.085 6.877-6.877 6.877c-3.793 0-6.877-3.085-6.877-6.877z\u0022/\u003e\u003c/svg\u003e"
+			}
+		},
+		"selected_search_close_icon": {
+			"type": "object",
+			"default": {
+				"src": "\u003csvg xmlns=\u0022http://www.w3.org/2000/svg\u0022 width=\u002224\u0022 height=\u002224\u0022 viewBox=\u00220 0 24 24\u0022\u003e\u003cpath d=\u0022M18.3 5.71a.996.996 0 0 0-1.41 0L12 10.59 7.11 5.7A.996.996 0 1 0 5.7 7.11L10.59 12 5.7 16.89a.996.996 0 1 0 1.41 1.41L12 13.41l4.89 4.89a.996.996 0 1 0 1.41-1.41L13.41 12l4.89-4.89a.996.996 0 0 0 0-1.4z\u0022/\u003e\u003c/svg\u003e"
+			}
+		},
+		"popup_show_effect": {
+			"type": "string",
+			"default": "move-up"
+		},
 		"show_search_category_list": {
 			"type": "boolean",
 			"default": false
@@ -54,9 +78,21 @@
 			"type": "boolean",
 			"default": false
 		},
+		"submit_on_enter": {
+			"type": "boolean",
+			"default": false
+		},
 		"current_query": {
 			"type": "boolean",
 			"default": false
+		},
+		"search_results_url": {
+			"type": "string",
+			"default": ""
+		},
+		"search_results_target_widget_id": {
+			"type": "string",
+			"default": ""
 		},
 		"search_source_list": {
 			"type": "array",
@@ -65,6 +101,10 @@
 		"search_source": {
 			"type": "array",
 			"default": []
+		},
+		"search_logging": {
+			"type": "boolean",
+			"default": false
 		},
 		"include_terms_ids_list": {
 			"type": "array",
@@ -110,6 +150,10 @@
 			"type": "array",
 			"default": []
 		},
+		"catalog_visibility": {
+			"type": "boolean",
+			"default": false
+		},
 		"results_order_by": {
 			"type": "string",
 			"default": ""
@@ -122,9 +166,21 @@
 			"type": "number",
 			"default": 5
 		},
+		"limit_query_tablet": {
+			"type": "number",
+			"default": 5
+		},
+		"limit_query_mobile": {
+			"type": "number",
+			"default": 5
+		},
 		"limit_query_in_result_area": {
 			"type": "number",
 			"default": 25
+		},
+		"listing_id": {
+			"type": "string",
+			"default": ""
 		},
 		"results_area_width_by": {
 			"type": "string",
@@ -133,6 +189,18 @@
 		"results_area_custom_width": {
 			"type": "number"
 		},
+		"results_area_columns": {
+			"type": "string",
+			"default": "1"
+		},
+		"results_area_columns_tablet": {
+			"type": "string",
+			"default": "1"
+		},
+		"results_area_columns_mobile": {
+			"type": "string",
+			"default": "1"
+		},
 		"results_area_custom_position": {
 			"type": "string",
 			"default": ""
@@ -140,6 +208,10 @@
 		"thumbnail_visible": {
 			"type": "boolean",
 			"default": true
+		},
+		"thumbnail_size": {
+			"type": "string",
+			"default": "thumbnail"
 		},
 		"thumbnail_placeholder": {
 			"type": "object",
@@ -169,6 +241,14 @@
 			"default": false
 		},
 		"show_product_rating": {
+			"type": "boolean",
+			"default": false
+		},
+		"show_add_to_cart": {
+			"type": "boolean",
+			"default": false
+		},
+		"show_add_to_cart_quantity": {
 			"type": "boolean",
 			"default": false
 		},
@@ -239,6 +319,30 @@
 		"server_error": {
 			"type": "string",
 			"default": "Sorry, but we cannot handle your search query now. Please, try again later!"
+		},
+		"show_search_suggestions": {
+			"type": "boolean",
+			"default": false
+		},
+		"search_suggestions_position": {
+			"type": "string",
+			"default": "under_form"
+		},
+		"search_suggestions_source": {
+			"type": "string",
+			"default": "popular"
+		},
+		"search_suggestions_limits": {
+			"type": "number",
+			"default": 20
+		},
+		"search_suggestions_title": {
+			"type": "string",
+			"default": ""
+		},
+		"search_suggestions_item_title_length": {
+			"type": "number",
+			"default": 0
 		},
 		"className": {
 			"type": "string",

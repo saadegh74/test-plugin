@@ -29,6 +29,8 @@ Vue.component( 'jet-search-suggestions-settings', {
 			settings: window.JetSearchSettingsConfig,
 			generalSettings: {
 				records_limit: "5",
+				use_session: false,
+				widget_suggestion_save_permission: true,
 			},
 			isLoading: true,
 			itemsList: [],
@@ -38,9 +40,9 @@ Vue.component( 'jet-search-suggestions-settings', {
 			perPage: 30,
 			onPage: 0,
 			pageNumber: 1,
-			//currentQueryByName: '',
 			currentFilterQuery: {},
 			columnsIDs: [
+				'bulk',
 				'id',
 				'type',
 				'name',
@@ -48,6 +50,7 @@ Vue.component( 'jet-search-suggestions-settings', {
 				'actions'
 			],
 			labels: {
+				bulk: '',
 				id: 'ID',
 				type: 'Type',
 				name : 'Name',
@@ -60,13 +63,16 @@ Vue.component( 'jet-search-suggestions-settings', {
 				order: 'ASC',
 			},
 			notSortable: [
+				'bulk',
 				'type',
 				'actions',
 			],
 			popUpState: '',
 			popUpContent: {},
 			popUpShow: false,
-			nameError: false
+			nameError: false,
+			selectedItems: [],
+			bulkAction: '',
 		};
 	},
 	methods: {
@@ -103,7 +109,9 @@ Vue.component( 'jet-search-suggestions-settings', {
 				per_page: this.perPage,
 				offset: this.offset,
 				sort: JSON.stringify( this.sortBy ),
-				filter: JSON.stringify( filterQuery )
+				filter: JSON.stringify( filterQuery ),
+				action: encodeURIComponent( 'jet_search_get_suggestion' ),
+				nonce: this.settings.nonce,
 			} ),
 			queryPath = `${this.settings.getSuggestionsUrl}?${query}`;
 
@@ -120,6 +128,14 @@ Vue.component( 'jet-search-suggestions-settings', {
 				this.itemsList   = item_list;
 				this.totalItems  = response.total;
 				this.onPage      = response.on_page;
+
+				const idsOnPage = this.itemsList.map( function ( item ) {
+					return item.id;
+				} );
+
+				this.selectedItems = this.selectedItems.filter( function ( id ) {
+					return idsOnPage.includes( id );
+				} );
 
 				if ( 0 < response.parents_list.length && response.success ) {
 					this.parentsList.push( ...response.parents_list );
@@ -141,11 +157,19 @@ Vue.component( 'jet-search-suggestions-settings', {
 
 			this.isLoading = true;
 
+			let query = buildQuery( {
+					action: encodeURIComponent( 'jet_search_add_suggestion' ),
+					nonce: this.settings.nonce,
+					content: JSON.stringify( content ),
+				} ),
+				queryPath = `${this.settings.addSuggestionUrl}?${query}`;
+
 			wp.apiFetch( {
 				method: 'POST',
-				url: this.settings.addSuggestionUrl,
-				data: content,
+				url: queryPath,
 			} ).then( response => {
+
+				console.log(response);
 				let message = response.data,
 					type = !response.success ? 'error' : 'success';
 
@@ -175,10 +199,16 @@ Vue.component( 'jet-search-suggestions-settings', {
 		updateItem: function ( content ) {
 			this.isLoading = true;
 
+			let query = buildQuery( {
+					action: encodeURIComponent( 'jet_search_update_suggestion' ),
+					nonce: this.settings.nonce,
+					content: JSON.stringify( content ),
+				} ),
+				queryPath = `${this.settings.updateSuggestionUrl}?${query}`;
+
 			wp.apiFetch( {
 				method: 'POST',
-				url: this.settings.updateSuggestionUrl,
-				data: content,
+				url: queryPath,
 			} ).then( response => {
 				let message = response.data,
 					type    = !response.success ? 'error' : 'success';
@@ -211,10 +241,16 @@ Vue.component( 'jet-search-suggestions-settings', {
 		deleteItem: function ( content ) {
 			this.isLoading = true;
 
+			let query = buildQuery( {
+					action: encodeURIComponent( 'jet_search_delete_suggestion' ),
+					nonce: this.settings.nonce,
+					content: JSON.stringify( content ),
+				} ),
+				queryPath = `${this.settings.deleteSuggestionUrl}?${query}`;
+
 			wp.apiFetch( {
 				method: 'POST',
-				url: this.settings.deleteSuggestionUrl,
-				data: content,
+				url: queryPath,
 			} ).then( response => {
 				let message = response.data,
 					type    = !response.success ? 'error' : 'success';
@@ -225,7 +261,9 @@ Vue.component( 'jet-search-suggestions-settings', {
 					duration: 7000,
 				} );
 
-				this.getItems();
+				this.adjustPageAfterDelete( 1 );
+
+				this.getItems( this.currentFilterQuery );
 
 			} ).catch( function ( e ) {
 				eventHub.$CXNotice.add( {
@@ -279,12 +317,11 @@ Vue.component( 'jet-search-suggestions-settings', {
 				case 'delete':
 					this.deleteItem( content );
 					break;
+				case 'bulk-delete':
+					this.bulkDeleteItems( content );
+					break;
 			}
 		},
-		// updateParentList: function( newList ) {
-		// 	this.parentList = newList;
-		// 	this.$emit('parentListUpdated', newList );
-		// },
 		clearFilter: function() {
 			this.currentFilterQuery = {};
 			this.getItems( this.currentFilterQuery );
@@ -310,11 +347,14 @@ Vue.component( 'jet-search-suggestions-settings', {
 				type: 'POST',
 				dataType: 'json',
 				data: {
-					action: 'suggestions_get_records_limit',
+					action: 'suggestions_get_settings',
 					nonce: nonce,
 				},
 			} ).done( function( response ) {
 				let settings = response.data.settings;
+
+				settings['use_session']                       = JSON.parse( settings['use_session'] );
+				settings['widget_suggestion_save_permission'] = JSON.parse( settings['widget_suggestion_save_permission'] );
 
 				$this.generalSettings = settings;
 
@@ -335,7 +375,7 @@ Vue.component( 'jet-search-suggestions-settings', {
 				type: 'POST',
 				dataType: 'json',
 				data: {
-					action: 'suggestions_save_records_limit',
+					action: 'suggestions_save_settings',
 					nonce: nonce,
 					settings: settings,
 				},
@@ -361,7 +401,136 @@ Vue.component( 'jet-search-suggestions-settings', {
 				} );
 			} );
 		},
+		fixSuggestionsDuplicates: function() {
+
+			let ajaxUrl = this.settings.ajaxUrl,
+				nonce   = this.settings.nonce,
+				$this   = this;
+
+			jQuery.ajax( {
+				url: ajaxUrl,
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'jet_search_suggestions_remove_duplicates',
+					nonce: nonce,
+				},
+			} ).done( function( response ) {
+				let message = response.data.message,
+					type    = !response.success ? 'error' : 'success';
+
+				eventHub.$CXNotice.add({
+					message: message,
+					type: type,
+					duration: 7000,
+				} );
+
+				$this.getItems( $this.currentFilterQuery );
+
+			} ).fail( function( jqXHR, textStatus, errorThrown ) {
+				eventHub.$CXNotice.add({
+					message: jqXHR.statusText,
+					type: 'error',
+					duration: 7000,
+				} );
+			} );
+		},
+		toggleSelectAll( e ) {
+			const checked   = e && e.target ? e.target.checked : false;
+
+			const idsOnPage = this.itemsList.map( function ( item ) {
+				return item.id;
+			} );
+
+			if ( checked ) {
+				const merged = [].concat( this.selectedItems, idsOnPage );
+				const unique = Array.from( new Set( merged ) );
+
+				this.selectedItems = unique;
+			} else {
+				this.selectedItems = this.selectedItems.filter( function ( id ) {
+					return ! idsOnPage.includes( id );
+				} );
+			}
+		},
+		adjustPageAfterDelete: function( deletedCount ) {
+			let newTotal = this.totalItems - deletedCount;
+
+			if ( newTotal < 0 ) {
+				newTotal = 0;
+			}
+
+			if ( 0 < newTotal && this.offset >= newTotal ) {
+				this.pageNumber = Math.ceil( newTotal / this.perPage );
+				this.offset     = this.perPage * ( this.pageNumber - 1 );
+			}
+		},
+		applyBulkAction( action ) {
+			this.bulkAction = action;
+
+			if ( action !== 'trash' || ! this.selectedItems.length ) {
+				return;
+			}
+			this.callPopup( 'delete', { bulk: true, ids: this.selectedItems } );
+		},
+		bulkDeleteItems: function( content ) {
+			if ( ! content || ! Array.isArray( content.ids ) || ! content.ids.length ) {
+				return;
+			}
+
+			this.isLoading = true;
+
+			const nonce = this.settings.nonce;
+
+			const query = buildQuery({
+				action: encodeURIComponent( 'jet_search_delete_suggestion' ),
+				nonce: nonce,
+				content: JSON.stringify({ ids: content.ids })
+			});
+
+			const queryPath = `${ this.settings.deleteSuggestionUrl }?${ query }`;
+
+			wp.apiFetch({
+				method: 'POST',
+				url: queryPath,
+			}).then( (response) => {
+				const message = response && response.data ? response.data : wp.i18n.__( 'Done', 'jet-search' );
+				const type    = response && response.success ? 'success' : 'error';
+
+				eventHub.$CXNotice.add({ message, type, duration: 7000 });
+
+				this.adjustPageAfterDelete( content.ids.length );
+
+				this.getItems( this.currentFilterQuery );
+				this.selectedItems = [];
+				this.bulkAction = '';
+			}).catch( (e) => {
+				eventHub.$CXNotice.add({
+					message: e && e.message ? e.message : wp.i18n.__( 'Request failed', 'jet-search' ),
+					type: 'error',
+					duration: 7000,
+				});
+			}).finally( () => {
+				this.isLoading = false;
+			});
+		},
 	},
+	computed: {
+		allSelectedOnPage() {
+			if ( ! this.itemsList || ! this.itemsList.length ) {
+				return false;
+			}
+
+			const idsOnPage = this.itemsList.map( function ( item ) {
+				return item.id;
+			} );
+
+			return idsOnPage.every( function ( id ) {
+				return this.selectedItems.includes( id );
+			}, this );
+		},
+	},
+
 	mounted: function() {
 		this.getSettings();
 		this.getItems();
@@ -413,7 +582,16 @@ Vue.component( 'jet-search-suggestions-pagination', {
 		},
 		onPage: {
 			type: Number
+		},
+		hasSelection: {
+			type: Boolean,
+			default: false
 		}
+	},
+	data() {
+		return {
+			bulkActionLocal: '',
+		};
 	},
 	computed: {
 		currentPerPage: {
@@ -432,7 +610,10 @@ Vue.component( 'jet-search-suggestions-pagination', {
 			get() {
 				return this.pageNumber;
 			}
-		}
+		},
+		canApply() {
+			return this.hasSelection && !! this.bulkActionLocal;
+		},
 	},
 	methods: {
 		perPageInfo: function () {
@@ -444,6 +625,9 @@ Vue.component( 'jet-search-suggestions-pagination', {
 		},
 		changePage: function ( value ) {
 			this.$emit( 'changePage', value );
+		},
+		onApplyBulk() {
+			this.$emit( 'apply-bulk', this.bulkActionLocal );
 		},
 	},
 } );
@@ -554,6 +738,10 @@ Vue.component( 'jet-search-suggestions-popup', {
 			this.$emit( 'popUpActions', action, this.content );
 			this.$emit( 'cancelPopup' );
 		},
+		bulkDelete: function () {
+			this.$emit( 'popUpActions', 'bulk-delete', { ids: this.popUpContent.ids } );
+			this.$emit( 'cancelPopup' );
+		},
 		updateItem: function () {
 			if ( ! this.checkEmptyFields() ) {
 				return;
@@ -562,7 +750,7 @@ Vue.component( 'jet-search-suggestions-popup', {
 			let action  = 'update',
 				content = Object.assign( this.content, this.preparedContent );
 
-			if ( '' === this.contentParentText ) {
+			if ( '' === this.preparedContent['parent'] ) {
 				content['parent'] = "0";
 			}
 
@@ -776,7 +964,9 @@ Vue.component( 'jet-search-suggestions-popup', {
 
 			queryPath = `${this.settings.getSuggestionsUrl}?` + buildQuery( {
 				query: query,
-				ids: ids
+				ids: ids,
+				action: encodeURIComponent( 'jet_search_get_suggestion' ),
+				nonce: this.settings.nonce,
 			} );
 
 			return wp.apiFetch( {
@@ -902,7 +1092,16 @@ Vue.component( 'jet-search-suggestions-popup', {
 
 			return false;
 		},
-	}
+	},
+	computed: {
+		isBulkDelete() {
+			return this.popUpState === 'delete'
+				&& this.popUpContent
+				&& this.popUpContent.bulk === true
+				&& Array.isArray( this.popUpContent.ids );
+		}
+	},
+
 } );
 
 //FILTERS
@@ -997,64 +1196,114 @@ Vue.component('jet-search-suggestions-config', {
 			configVisible: false,
 			settings: {},
 			currentSettings: {},
+			currentLimits: 'N',
 			preparedGeneralSettings: {},
 			generalSettingsLabels: {
 				records_limit: {
-					title: 'Suggestions limit settings',
+					title: 'Limit suggestions saved per user',
 					label: 'Set the limits',
-					desc: 'Limit on adding new entries submitted through a Ajax Search Suggestions widget per session.',
-					info: '<strong>Pay attention!</strong> If the limit is set to 0, there is no restriction on adding new suggestions.'
+					desc: '',
+					info: '',
+				},
+				use_session: {
+					title: '',
+					label: 'Limit suggestions saved per user',
+					desc: '',
+					info: '',
+				},
+				widget_suggestion_save_permission : {
+					title: '',
+					label: 'Save user searches as suggestions',
+					desc: 'If this option is enabled, all search requests made from JetSearch widgets/blocks will be saved as suggestions.',
+					info: '',
 				}
 			},
-			saveButtonDisabled: true
+			saveButtonDisabled: true,
 		}
 	},
 	watch: {
 		generalSettings( value ) {
-			this.settings = JSON.parse( JSON.stringify( value ) );
-			this.currentSettings = JSON.parse( JSON.stringify( value ) );
+			this.settings                = JSON.parse( JSON.stringify( value ) );
+			this.currentSettings         = JSON.parse( JSON.stringify( value ) );
+			this.preparedGeneralSettings = JSON.parse( JSON.stringify( value ) );
+		},
+		currentLimits: function() {
+			this.updateUseSessionDesc();
 		}
 	},
 	methods: {
+		updateUseSessionDesc: function() {
+			this.generalSettingsLabels.use_session.desc = 'If this option is enabled, the plugin will save only ' + this.currentLimits + ' suggestions from a single visitor. If disabled, all requests will be saved. This option will help to avoid suggestion spam.';
+		},
 		showPopUp: function() {
 			this.settings           = JSON.parse( JSON.stringify( this.generalSettings ) );
 			this.currentSettings    = JSON.parse( JSON.stringify( this.generalSettings ) );
 			this.saveButtonDisabled = true;
 			this.configVisible      = !this.configVisible;
+			this.currentLimits      = this.settings.records_limit;
 		},
 		hidePopUp: function () {
 			this.configVisible = false;
 		},
-		validationHandler: function( value, callback ) {
+		limitValidationHandler: function( value, callback ) {
 			let maxLength = 6;
 
-			value = !isNaN( value ) ? parseInt( value, 10 ).toString() : '0';
+			value = !isNaN( value ) ? parseInt( value, 10 ).toString() : '1';
 
 			if ( value.length  > maxLength ) {
 				value = JSON.parse( JSON.stringify( this.preparedGeneralSettings['records_limit'] ) );
-			} else if ( '' !== value && parseInt( value, 10 ) < 0 ) {
-				value = 0;
+			} else if ( '' !== value && parseInt( value, 10 ) < 1 ) {
+				value = 1;
 			} else if ( isNaN( value ) ) {
-				value = 0;
+				value = 1;
 			}
 
 			this.settings['records_limit']                = value;
 			this.preparedGeneralSettings['records_limit'] = value;
+			this.currentLimits = value;
 
 			callback( value );
 
-			if ( this.currentSettings['records_limit'] != this.preparedGeneralSettings['records_limit'] ) {
-				this.saveButtonDisabled = false;
-			} else {
-				this.saveButtonDisabled = true;
+			this.settingsChangeValidation();
+		},
+		limitBlurValidationHandler: function( value, callback ) {
+			if ( ! value ) {
+				this.settings['records_limit']                = '1';
+				this.preparedGeneralSettings['records_limit'] = '1';
+				callback( 1 );
 			}
 		},
-		blurValidationHandler: function( value, callback ) {
-			if ( ! value ) {
-				this.settings['records_limit']                = '0';
-				this.preparedGeneralSettings['records_limit'] = '0';
-				callback( 0 );
+		checkboxValidation: function( item ) {
+			let settingName = item.target.name;
+
+			this.preparedGeneralSettings[settingName] = item.target.checked;
+
+			this.settingsChangeValidation();
+		},
+		settingsChangeValidation: function() {
+			let isDiff = this.areObjectsDifferent( this.preparedGeneralSettings, this.currentSettings);
+
+			isDiff ? this.saveButtonDisabled = false : this.saveButtonDisabled = true;
+		},
+		areObjectsDifferent: function( obj1, obj2 ) {
+
+			if ( Object.keys( obj1 ).length !== Object.keys( obj2 ).length ) {
+				return true;
 			}
+
+			for ( let key in obj1 ) {
+				if ( ! obj2.hasOwnProperty( key ) || obj1[key] !== obj2[key] ) {
+					return true;
+				}
+			}
+
+			for ( let key in obj2 ) {
+				if ( ! obj1.hasOwnProperty( key ) ) {
+					return true;
+				}
+			}
+
+			return false;
 		},
 		saveSettings: function() {
 			this.$emit( 'saveSettings', this.preparedGeneralSettings );

@@ -26,9 +26,14 @@ class Jet_Search_Rest_Update_Suggestion extends Jet_Search_Rest_Base_Route {
 	 */
 	public function callback( $request ) {
 
-		$suggestion = $request->get_params();
+		$params = $request->get_params();
 
-		unset( $suggestion['_locale'] );
+		$suggestion = $params['content'];
+		$suggestion = stripcslashes( $suggestion );
+		$suggestion = json_decode( $suggestion, true );
+		//$suggestion = $request->get_params();
+
+		//unset( $suggestion['_locale'] );
 
 		global $wpdb;
 

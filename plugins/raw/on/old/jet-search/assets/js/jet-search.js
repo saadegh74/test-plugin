@@ -4,7 +4,15 @@
 
 	var JetSearch = {
 
+		addedScripts: [],
+		addedStyles: [],
+		addedPostCSS: [],
+		assetsPromises: [],
+		popupEventsInited: false,
+		chosenSearchInputId: 0,
+
 		initElementor: function() {
+			JetSearch.initPopupEvents();
 
 			var widgets = {
 				'jet-ajax-search.default': JetSearch.widgetAjaxSearch,
@@ -15,6 +23,48 @@
 				window.elementorFrontend.hooks.addAction( 'frontend/element_ready/' + widget, callback );
 			} );
 
+			// Re-init widgets in nested tabs
+			window.elementorFrontend.elements.$window.on(
+				'elementor/nested-tabs/activate',
+				( event, content ) => {
+
+					const $content = $( content );
+					JetSearch.reinitSlickSlider( $content );
+					JetSearch.initElementsHandlers( $content );
+				}
+			);
+
+			window.addEventListener( 'elementor/popup/show', ( event ) => {
+				const instance = event.detail.instance;
+
+				const interval = setInterval( () => {
+
+					if ( ! instance.keyboardHandler ) return;
+
+					const handler = instance.keyboardHandler;
+					const config  = handler.config;
+
+					if ( ! config || ! config.$modalElements ) return;
+
+					if ( handler.changeFocusAfterAnimation !== true ) {
+						clearInterval( interval );
+						return;
+					}
+
+					const $input = instance.$element.find('.jet-ajax-search__field');
+
+					if ( $input.length ) {
+						handler.firstFocusableElement = $input[0];
+					}
+
+					clearInterval( interval );
+
+				}, 50) ;
+
+				setTimeout( () => clearInterval( interval ), 1000 );
+
+			});
+
 			/*
 			// Example of usage AJAX success trigger
 			$( document ).on( 'jet-ajax-search/show-results', function( event, searchResults ) {
@@ -22,11 +72,42 @@
 			} );
 			*/
 
+			/*
+			* Example of usage `jet-ajax-search/results-area/listing-add-suggestion` trigger
+			*
+			* Parameters:
+			* - itemWrapper: A CSS selector that points to the element containing the wrapper of the search result item.
+			* - itemLink: Represents the element that contains the link of the search result item.
+			* - itemTitle: A CSS selector that points to the element containing the title of the search result item.
+			* - itemUrlAttr: Specifies the attribute used to extract the URL from the itemLink.
+			$( document ).on( "jet-ajax-search/results-area/listing-add-suggestion", function( event, itemWrapper, itemLink, itemTitle, itemUrlAttr ) {
+				itemWrapper = '.jet-ajax-search__results-item',
+				itemLink    = $( '.jet-listing-dynamic-image__link', itemWrapper );
+				itemTitle   = '.jet-ajax-search-item-title .jet-listing-dynamic-field__content';
+				itemUrlAttr = 'href';
+
+				window.JetSearch.addSuggestionFromResultAreaItem( itemWrapper, itemLink, itemTitle, itemUrlAttr );
+			} );
+			*/
+		},
+
+		initBricks: function( $scope ) {
+
+			if ( window.bricksIsFrontend ) {
+				return;
+			}
+
+			$scope = $scope || $( 'body' );
+
+			JetSearch.initPopupEvents();
+			JetSearch.initBlocks( $scope );
+
 		},
 
 		initBlocks: function( $scope ) {
 
 			$scope = $scope || $( 'body' );
+			JetSearch.initPopupEvents();
 
 			window.JetPlugins.init( $scope, [
 				{
@@ -40,37 +121,224 @@
 			] );
 		},
 
+		setChosenSearchInputLabel: function( $select ) {
+			$select.each( function( index ) {
+				var $currentSelect = $( this ),
+					label          = $currentSelect.attr( 'data-placeholder' ) || $currentSelect.find( 'option:first' ).text() || 'Search category',
+					selectId       = $currentSelect.attr( 'id' ),
+					$chosenInput   = $currentSelect
+						.next( '.chosen-container' )
+						.find( '.chosen-search-input' );
+
+				if ( ! $chosenInput.attr( 'id' ) ) {
+					if ( ! selectId ) {
+						JetSearch.chosenSearchInputId++;
+						selectId = 'jet-search-categories-select-' + JetSearch.chosenSearchInputId + '-' + index;
+					}
+
+					$chosenInput.attr( 'id', selectId + '__chosen_search' );
+				}
+
+				if ( ! $chosenInput.attr( 'aria-label' ) && ! $chosenInput.attr( 'aria-labelledby' ) ) {
+					$chosenInput.attr( 'aria-label', label );
+				}
+			} );
+		},
+
+		closeAjaxPopup: function( $widget, restoreFocus = false ) {
+
+			if ( ! $widget || ! $widget.length ) {
+				return;
+			}
+
+			const activeClass      = 'jet-ajax-search-popup-active',
+				transitionOutClass = 'jet-ajax-search-transition-out',
+				$trigger          = $widget.find( '.jet-ajax-search__popup-trigger' ),
+				$popup            = $widget.find( '.jet-ajax-search__popup' ),
+				$input            = $widget.find( '.jet-ajax-search__field' ),
+				$form             = $widget.find( '.jet-ajax-search__form' ),
+				$resultsArea      = $widget.find( '.jet-ajax-search__results-area' );
+
+			if ( ! $widget.hasClass( activeClass ) ) {
+				return;
+			}
+
+			$widget.removeClass( activeClass ).addClass( transitionOutClass );
+			$trigger.attr( 'aria-expanded', 'false' );
+			$popup.attr( 'aria-hidden', 'true' );
+			$form.removeClass( 'jet-ajax-search__form--focus' );
+			$resultsArea.removeClass( 'show' );
+			$widget.find( '.chosen-single' ).removeClass( 'focused' );
+			$input.trigger( 'blur' );
+
+			setTimeout( function() {
+				$widget.removeClass( transitionOutClass );
+			}, 300 );
+
+			if ( restoreFocus ) {
+				$trigger.trigger( 'focus' );
+			}
+		},
+
+		markPopupDropdownInteraction: function( $widget, timeout = 300 ) {
+
+			if ( ! $widget || ! $widget.length ) {
+				return;
+			}
+
+			const timer = $widget.data( 'jetSearchPopupDropdownTimer' );
+
+			if ( timer ) {
+				clearTimeout( timer );
+			}
+
+			$widget.data( 'jetSearchPopupDropdownInteraction', true );
+			$widget.data( 'jetSearchPopupDropdownTimer', setTimeout( function() {
+				$widget.removeData( 'jetSearchPopupDropdownInteraction' );
+				$widget.removeData( 'jetSearchPopupDropdownTimer' );
+			}, timeout ) );
+		},
+
+		syncAjaxPopupWidth: function( $widget ) {
+
+			if ( ! $widget || ! $widget.length ) {
+				return;
+			}
+
+			const $popupContent = $widget.find( '.jet-ajax-search__popup-content' );
+
+			if ( $popupContent.length ) {
+				$popupContent.css( 'min-width', '' );
+			}
+		},
+
+		openAjaxPopup: function( $widget ) {
+
+			if ( ! $widget || ! $widget.length ) {
+				return;
+			}
+
+			const activeClass     = 'jet-ajax-search-popup-active',
+				transitionInClass = 'jet-ajax-search-transition-in',
+				$trigger         = $widget.find( '.jet-ajax-search__popup-trigger' ),
+				$popup           = $widget.find( '.jet-ajax-search__popup' ),
+				$input           = $widget.find( '.jet-ajax-search__field' );
+
+			if ( $widget.hasClass( activeClass ) ) {
+				return;
+			}
+
+			$( '.jet-ajax-search.' + activeClass ).each( function() {
+				JetSearch.closeAjaxPopup( $( this ) );
+			} );
+
+			$widget.addClass( transitionInClass );
+			$trigger.attr( 'aria-expanded', 'true' );
+			$popup.attr( 'aria-hidden', 'false' );
+			JetSearch.syncAjaxPopupWidth( $widget );
+
+			setTimeout( function() {
+				JetSearch.syncAjaxPopupWidth( $widget );
+				$widget.removeClass( transitionInClass ).addClass( activeClass );
+				$input.trigger( 'focus' );
+			}, 300 );
+		},
+
+		toggleAjaxPopup: function( event ) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			const $trigger = $( event.currentTarget ),
+				$widget = $trigger.closest( '.jet-ajax-search' );
+
+			if ( $widget.hasClass( 'jet-ajax-search-popup-active' ) ) {
+				JetSearch.closeAjaxPopup( $widget, true );
+			} else {
+				JetSearch.openAjaxPopup( $widget );
+			}
+		},
+
+		initPopupEvents: function() {
+
+			if ( JetSearch.popupEventsInited ) {
+				return;
+			}
+
+			JetSearch.popupEventsInited = true;
+
+			$( document )
+				.on( 'click.jetSearchPopup', '.jet-ajax-search__popup-trigger, .jet-ajax-search__popup-close', JetSearch.toggleAjaxPopup )
+				.on( 'click.jetSearchPopup', function( event ) {
+					const $target = $( event.target ),
+						$activePopupWithDropdownInteraction = $( '.jet-ajax-search.jet-ajax-search-popup-active' ).filter( function() {
+							return !! $( this ).data( 'jetSearchPopupDropdownInteraction' );
+						} );
+
+					if ( $target.closest( '.jet-ajax-search__popup-trigger, .jet-ajax-search__popup-content, .chosen-container, .chosen-drop' ).length ) {
+						return;
+					}
+
+					if ( $activePopupWithDropdownInteraction.length ) {
+						return;
+					}
+
+					if (
+						$( '.jet-ajax-search.jet-ajax-search-popup-active .chosen-container.chosen-with-drop' ).length &&
+						! $target.closest( '.jet-ajax-search__popup-trigger, .jet-ajax-search__popup-close' ).length
+					) {
+						return;
+					}
+
+					$( '.jet-ajax-search.jet-ajax-search-popup-active' ).each( function() {
+						JetSearch.closeAjaxPopup( $( this ) );
+					} );
+				} )
+				.on( 'keydown.jetSearchPopup', function( event ) {
+					if ( 'Escape' !== event.key && 27 !== event.keyCode ) {
+						return;
+					}
+
+					$( '.jet-ajax-search.jet-ajax-search-popup-active' ).each( function() {
+						JetSearch.closeAjaxPopup( $( this ), true );
+					} );
+				} );
+		},
+
 		widgetAjaxSearch: function( $scope ) {
 
 			var settings = {
-				searchClass:        '.jet-ajax-search',
-				searchFormClass:    '.jet-ajax-search__form',
-				fieldsHolderClass:  '.jet-ajax-search__fields-holder',
-				inputClass:         '.jet-ajax-search__field',
-				settingsInput:      'input[name="jet_ajax_search_settings"]',
-				submitClass:        '.jet-ajax-search__submit',
-				chosenClass:        '.jet-ajax-search__categories select[name="jet_ajax_search_categories"]',
-				resultsAreaClass:   '.jet-ajax-search__results-area',
-				resultsHeaderClass: '.jet-ajax-search__results-header',
-				resultsFooterClass: '.jet-ajax-search__results-footer',
-				listHolderClass:    '.jet-ajax-search__results-holder',
-				listClass:          '.jet-ajax-search__results-list',
-				listInnerClass:     '.jet-ajax-search__results-list-inner',
-				listSlideClass:     '.jet-ajax-search__results-slide',
-				itemClass:          '.jet-ajax-search__results-item',
-				countClass:         '.jet-ajax-search__results-count',
-				messageHolderClass: '.jet-ajax-search__message',
-				fullResultsClass:   '.jet-ajax-search__full-results',
-				navigationClass:    '.jet-ajax-search__navigation-holder',
-				navButtonClass:     '.jet-ajax-search__navigate-button',
-				bulletClass:        '.jet-ajax-search__bullet-button',
-				numberClass:        '.jet-ajax-search__number-button',
-				prevClass:          '.jet-ajax-search__prev-button',
-				nextClass:          '.jet-ajax-search__next-button',
-				activeNavClass:     '.jet-ajax-search__active-button',
-				disableNavClass:    '.jet-ajax-search__navigate-button-disable',
-				spinnerClass:       '.jet-ajax-search__spinner-holder',
-				handlerId:          'jetSearchSettings',
+				searchClass:                 '.jet-ajax-search',
+				searchFormClass:             '.jet-ajax-search__form',
+				fieldsHolderClass:           '.jet-ajax-search__fields-holder',
+				inputClass:                  '.jet-ajax-search__field',
+				settingsInput:               'input[name="jet_ajax_search_settings"]',
+				submitClass:                 '.jet-ajax-search__submit',
+				chosenClass:                 '.jet-ajax-search__categories select[name="jet_ajax_search_categories"]',
+				resultsAreaClass:            '.jet-ajax-search__results-area',
+				resultsHeaderClass:          '.jet-ajax-search__results-header',
+				resultsFooterClass:          '.jet-ajax-search__results-footer',
+				listHolderClass:             '.jet-ajax-search__results-holder',
+				listClass:                   '.jet-ajax-search__results-list',
+				listInnerClass:              '.jet-ajax-search__results-list-inner',
+				listSlideClass:              '.jet-ajax-search__results-slide',
+				itemClass:                   '.jet-ajax-search__results-item',
+				inlineSuggestionsAreaClass:  '.jet-ajax-search__suggestions-inline-area',
+				inlineSuggestionsItemClass:  '.jet-ajax-search__suggestions-inline-area-item',
+				resultsSuggestionsAreaClass: '.jet-ajax-search__results-suggestions-area',
+				resultsSuggestionItemClass:  '.jet-ajax-search__results-suggestions-area-item',
+				countClass:                  '.jet-ajax-search__results-count',
+				messageHolderClass:          '.jet-ajax-search__message',
+				fullResultsClass:            '.jet-ajax-search__full-results',
+				navigationClass:             '.jet-ajax-search__navigation-holder',
+				navButtonClass:              '.jet-ajax-search__navigate-button',
+				bulletClass:                 '.jet-ajax-search__bullet-button',
+				numberClass:                 '.jet-ajax-search__number-button',
+				prevClass:                   '.jet-ajax-search__prev-button',
+				nextClass:                   '.jet-ajax-search__next-button',
+				activeNavClass:              '.jet-ajax-search__active-button',
+				disableNavClass:             '.jet-ajax-search__navigate-button-disable',
+				spinnerClass:                '.jet-ajax-search__spinner-holder',
+				handlerId:                   'jetSearchSettings',
 				isRtl:              ( window.elementorFrontend && window.elementorFrontend.config.is_rtl ) ? window.elementorFrontend.config.is_rtl : $( 'body' ).hasClass( 'rtl' )
 			};
 
@@ -106,6 +374,14 @@
 
 			$scope.find( settings.searchClass ).jetAjaxSearch( settings );
 
+			$scope.find( settings.inputClass )
+				.on( 'focus.jetSearchSlick input.jetSearchSlick', function() {
+					window.JetSearch.pauseAllSlick( $( document ) );
+				})
+				.on( 'blur.jetSearchSlick', function() {
+					window.JetSearch.playAllSlick( $( document ) );
+				});
+
 			var $chosenSelect = $scope.find( settings.chosenClass );
 
 			if ( $chosenSelect[0] ) {
@@ -114,6 +390,8 @@
 					placeholder_text: '',
 					placeholder_text_single: ''
 				} );
+
+				JetSearch.setChosenSearchInputLabel( $chosenSelect );
 			}
 		},
 
@@ -148,19 +426,22 @@
 					placeholder_text: '',
 					placeholder_text_single: ''
 				} );
+
+				JetSearch.setChosenSearchInputLabel( $chosenSelect );
 			}
 		},
 
-		setFormSuggestion: function( name, form, userId, url = '' ) {
+		setFormSuggestion: function( name, form, url = '' ) {
 			const ajaxSettings = window['jetSearchSettings']['searchSuggestions'] || {},
 				sendData       = {
-				name: name,
-				user_id: userId
-			};
+					name: name
+				},
+				nonce          = ajaxSettings.nonce_rest;
 
 			const ajaxData = {
-				action: ajaxSettings.set_action,
+				action: ajaxSettings.add_action,
 				data: sendData || {},
+				nonce: ajaxSettings.nonce
 			};
 
 			$.ajax( {
@@ -168,32 +449,62 @@
 				url: ajaxSettings.add_suggestions_rest_api_url,
 				data: ajaxData,
 				dataType: 'json',
+				beforeSend: function( jqXHR ) {
+					jqXHR.setRequestHeader( 'X-WP-Nonce', nonce );
+				},
 				complete: function() {
-					if ( '' != url ) {
-						url = JetSearch.getCustomResultUrl( form, url );
+					if ( false != form ) {
+						if ( '' != url ) {
+							url = JetSearch.getResultsUrl( form, url );
 
-						window.location.href = url;
+							window.location.href = url;
+						} else {
+							form.submit();
+						}
 					} else {
-						form.submit();
+						window.location.href = url;
 					}
 				}
 			} );
 		},
-		getCustomResultUrl: function( form, url ) {
+		getResultsUrl: function( form, url = '' ) {
+			let redirectUrl = '';
+
 			if ( '' != url ) {
-				let formData = {},
-					customUrl = '';
-
-				formData = form.serializeArray().reduce( function( obj, item ) {
-					obj[item.name] = item.value;
-
-					return obj;
-				}, {} );
-
-				customUrl = url + '?' + $.param(formData);
-
-				return customUrl;
+				redirectUrl = url;
+			} else {
+				redirectUrl = form.attr( 'action' );
 			}
+
+			if ( redirectUrl && ! redirectUrl.startsWith( 'http' ) && ! redirectUrl.startsWith( '/' ) ) {
+				const actionBase = ( form.attr( 'action' ) || '/' ).replace( /\/+$/, '' );
+
+				redirectUrl = actionBase + '/' + redirectUrl.replace( /^\/+/, '' );
+			}
+
+			let formData = {},
+				result   = '';
+
+			formData = form.serializeArray().reduce( function( obj, item ) {
+				if ( item.name === 's' ) {
+					item.value = item.value.replace(/\u3000/g, ' ');
+				}
+
+				obj[item.name] = item.value;
+
+				return obj;
+			}, {} );
+
+			if ( Object.keys( formData ).length > 0 ) {
+				const queryString = $.param( formData ).replace(/=&/g, '&').replace(/=$/, '' );
+				const separator   = redirectUrl.indexOf( '?' ) === -1 ? '?' : '&';
+
+				result = redirectUrl + separator + queryString;
+			} else {
+				result = redirectUrl;
+			}
+
+			return result;
 		},
 		suggestionsPreloader: function( is_active, state, preloader ) {
 			if ( ! is_active ) {
@@ -207,10 +518,373 @@
 					preloader.removeClass( 'show' );
 				}
 			}
+		},
+		getUrlParams: function() {
+			let params      = {},
+				queryString = window.location.search.slice(1);
+
+			if ( queryString ) {
+				let pairs = queryString.split( '&' );
+
+				for ( let i = 0; i < pairs.length; i++ ) {
+					let pair = pairs[i].split( '=' );
+
+					params[pair[0]] = decodeURIComponent( pair[1] || '' );
+				}
+			}
+
+			return params;
+		},
+		md5: function(str) {
+			let hash = '';
+
+			for (let i = 0; i < str.length; i++) {
+				let char = str.charCodeAt(i);
+				hash += char;
+			}
+			return hash;
+		},
+		generateHash: function( string, length = 6 ) {
+			let md5Hash = JetSearch.md5( string ),
+				hash = '';
+
+			for ( let i = 0; i < length; i++ ) {
+				hash += md5Hash.charAt( Math.floor( Math.random() * md5Hash.length ) );
+			}
+
+			hash = hash.toLowerCase();
+
+			return hash;
+		},
+		generateRandomId: function() {
+			let hash = JetSearch.generateHash( Math.random().toString() );
+
+			return hash;
+		},
+		initElementsHandlers: function( $selector ) {
+			// Actual init
+			window.JetPlugins.init( $selector );
+
+			// Legacy Elementor-only init
+			$selector.find( '[data-element_type]' ).each( function() {
+				var excludeWidgets = [
+					'jet-form-builder-form.default',
+					'nav-menu.default',
+					'jet-woo-product-gallery-slider.default',
+					'accordion.default'
+				];
+
+				var $this       = $( this ),
+					elementType = $this.data( 'element_type' );
+
+				if ( !elementType ) {
+					return;
+				}
+
+				if ( 'widget' === elementType ) {
+					elementType = $this.data( 'widget_type' );
+
+					if ( excludeWidgets.includes( elementType ) ) {
+						return;
+					}
+
+					window.elementorFrontend.hooks.doAction( 'frontend/element_ready/widget', $this, $ );
+				}
+
+				window.elementorFrontend.hooks.doAction( 'frontend/element_ready/global', $this, $ );
+				window.elementorFrontend.hooks.doAction( 'frontend/element_ready/' + elementType, $this, $ );
+			} );
+
+			if ( window.elementorFrontend ) {
+				const elementorLazyLoad = new Event( "elementor/lazyload/observe" );
+				document.dispatchEvent( elementorLazyLoad );
+			}
+
+			if ( window.JetPopupFrontend && window.JetPopupFrontend.initAttachedPopups ) {
+				window.JetPopupFrontend.initAttachedPopups( $selector );
+			}
+		},
+		reinitSlickSlider: function( $scope ) {
+			var $slider = $scope.find('.slick-initialized');
+
+			if ( $slider.length ) {
+
+				$slider.each( function() {
+					$( this ).slick('unslick');
+				} );
+			}
+		},
+
+		toggleSlickAutoplay: function( $root, shouldPlay ) {
+			const $slicks = $root ? $root.find( '.slick-initialized' ) : $( '.slick-initialized' );
+
+			$slicks.each( function(){
+				try {
+					$( this ).slick( shouldPlay ? 'slickPlay' : 'slickPause' );
+				} catch(e) {}
+			});
+		},
+
+		pauseAllSlick: function( $root ) {
+			this.toggleSlickAutoplay( $root || $( document ), false );
+		},
+
+		playAllSlick: function( $root ) {
+			setTimeout( () => this.toggleSlickAutoplay( $root || $( document ), true ), 60 );
+		},
+
+		enqueueAssetsFromResponse: function( response ) {
+			if ( response.data.scripts ) {
+				JetSearch.enqueueScripts( response.data.scripts );
+			}
+
+			if ( response.data.styles ) {
+				JetSearch.enqueueStyles( response.data.styles );
+			}
+		},
+
+		enqueueScripts: function( scripts ) {
+			$.each( scripts, function( handle, scriptHtml ) {
+				JetSearch.enqueueScript( handle, scriptHtml )
+			} );
+		},
+
+		enqueueStyles: function( styles ) {
+			$.each( styles, function( handle, styleHtml ) {
+				JetSearch.enqueueStyle( handle, styleHtml )
+			} );
+		},
+
+		enqueueScript: function( handle, scriptHtml ) {
+
+			if ( -1 !== JetSearch.addedScripts.indexOf( handle ) ) {
+				return;
+			}
+
+			if ( ! scriptHtml ) {
+				return;
+			}
+
+			var selector = 'script[id="' + handle + '-js"]';
+
+			if ( $( selector ).length ) {
+				return;
+			}
+
+			var scriptsTags = scriptHtml.match( /<script[\s\S]*?<\/script>/gm );
+
+			if ( scriptsTags.length ) {
+
+				for ( var i = 0; i < scriptsTags.length; i++ ) {
+
+					JetSearch.assetsPromises.push(
+						new Promise( function( resolve, reject ) {
+
+							var $tag = $( scriptsTags[i] );
+
+							if ( $tag[0].src ) {
+
+								var tag = document.createElement( 'script' );
+
+								tag.type   = $tag[0].type;
+								tag.src    = $tag[0].src;
+								tag.id     = $tag[0].id;
+								tag.async  = false;
+								tag.onload = function() {
+									resolve();
+								};
+
+								document.body.append( tag );
+							} else {
+								$( 'body' ).append( scriptsTags[i] );
+								resolve();
+							}
+						} )
+					);
+				}
+			}
+
+			JetSearch.addedScripts.push( handle );
+		},
+
+		enqueueStyle: function( handle, styleHtml ) {
+
+			if ( -1 !== handle.indexOf( 'google-fonts' ) ) {
+				JetSearch.enqueueGoogleFonts( handle, styleHtml );
+				return;
+			}
+
+			if ( -1 !== JetSearch.addedStyles.indexOf( handle ) ) {
+				return;
+			}
+
+			var selector = 'link[id="' + handle + '-css"],style[id="' + handle + '"]';
+
+			if ( $( selector ).length ) {
+				return;
+			}
+
+			$( 'head' ).append( styleHtml );
+
+			JetSearch.addedStyles.push( handle );
+
+			if ( -1 !== handle.indexOf( 'elementor-post' ) ) {
+				var postID = handle.replace( 'elementor-post-', '' );
+				JetSearch.addedPostCSS.push( postID );
+			}
+		},
+
+		enqueueGoogleFonts: function( handle, styleHtml ) {
+
+			var selector = 'link[id="' + handle + '-css"]';
+
+			if ( $( selector ).length ) {}
+
+			$( 'head' ).append( styleHtml );
+		},
+
+		reinitBricksScripts: function( _this ) {
+
+			if ( !$( 'body' ).hasClass( 'theme-bricks' ) && !$( 'body' ).hasClass( 'bricks-is-frontend') ) {
+				return;
+			}
+
+			const resultsArea   = $( '.jet-ajax-search__results-list', _this );
+			const sourcesHolder = $( '.jet-ajax-search__source-results-holder', _this );
+
+			//Results Area
+			resultsArea.find( '[data-script-id]' ).each( function() {
+				const newId = JetSearch.generateRandomId();
+
+				$( this ).attr( 'data-script-id', newId );
+			} );
+
+			resultsArea.find( '[id^="brxe-"]' ).each( function() {
+				var id = $( this ).attr( 'id' );
+
+				$( this ).addClass( id );
+			} );
+
+			const bricksScripts = {
+				".bricks-lightbox": 'bricksPhotoswipe',
+				".brxe-accordion, .brxe-accordion-nested": 'bricksAccordion',
+				".brxe-animated-typing": 'bricksAnimatedTyping',
+				".brxe-audio": 'bricksAudio',
+				".brxe-countdown": 'bricksCountdown',
+				".brxe-counter": 'bricksCounter',
+				".brxe-video": 'bricksVideo',
+				".bricks-lazy-hidden": 'bricksLazyLoad',
+				".brx-animated": 'bricksAnimation',
+				".brxe-pie-chart": 'bricksPieChart',
+				".brxe-progress-bar .bar span": 'bricksProgressBar',
+				".brxe-form": 'bricksForm',
+				".brx-query-trail": 'bricksInitQueryLoopInstances',
+				"[data-interactions]": 'bricksInteractions',
+				".brxe-alert svg": 'bricksAlertDismiss',
+				".brxe-tabs, .brxe-tabs-nested": 'bricksTabs',
+				".bricks-video-overlay, .bricks-video-overlay-icon, .bricks-video-preview-image": 'bricksVideoOverlayClickDetector',
+				".bricks-background-video-wrapper": 'bricksBackgroundVideoInit',
+				".brxe-toggle": 'bricksToggle',
+				".brxe-offcanvas": 'bricksOffcanvas',
+				'.brxe-slider': 'bricksSwiper',
+				'.brxe-slider-nested': 'bricksSplide',
+				'.brxe-image': 'bricksSwiper'
+			};
+
+			const contentWrapper = resultsArea[0];
+
+			//Result Area
+			for ( const key in bricksScripts ) {
+				const widget = contentWrapper.querySelector(key);
+
+				if ( widget && typeof window[bricksScripts[key]] === "function" && bricksScripts[key] ) {
+					window[bricksScripts[key]]();
+				}
+			}
+
+			//Sources Holder
+			if ( sourcesHolder.length ) {
+				sourcesHolder.find( '[data-script-id]' ).each( function() {
+					const newId = JetSearch.generateRandomId();
+
+					$( this ).attr( 'data-script-id', newId );
+				} );
+
+				sourcesHolder.find( '[id^="brxe-"]' ).each( function() {
+					var id = $( this ).attr( 'id' );
+
+					$( this ).addClass( id );
+				} );
+
+				const sourcesWrapper = sourcesHolder[0];
+
+				for ( const key in bricksScripts ) {
+					const widget = sourcesWrapper.querySelector( key );
+
+					if ( widget && typeof window[bricksScripts[key]] === "function" && bricksScripts[key] ) {
+						window[bricksScripts[key]]();
+					}
+				}
+			}
+		},
+
+		getCurrentDeviceMode: function() {
+			const width = window.innerWidth;
+
+			if ( width > 1024 ) {
+				return 'desktop';
+			} else if ( width <= 1024 && width > 767 ) {
+				return 'tablet';
+			} else {
+				return 'mobile';
+			}
+		},
+
+		trimString: function( str, numWords ) {
+			if ( typeof str !== 'string' ) {
+				return str;
+			}
+
+			let wordsArray = str.split( ' ' );
+
+			if ( wordsArray.length <= numWords ) {
+				return str;
+			}
+
+			let truncatedString = wordsArray.slice( 0, numWords ).join( ' ' );
+
+			return truncatedString + '...';
+		},
+
+		escapeHTML: function( str ) {
+			return str.replace(/[&<>"']/g, function ( match ) {
+				const escapeMap = {
+					'&': '&amp;',
+					'<': '&lt;',
+					'>': '&gt;',
+					'"': '&quot;',
+					"'": '&#039;'
+				};
+
+				return escapeMap[match];
+			} );
+		},
+
+		addSuggestionFromResultAreaItem: function( itemWrapper, itemLink, itemTitle, itemUrlAttr ) {
+			itemLink.on( 'click', function( e ) {
+				e.stopImmediatePropagation();
+				e.preventDefault();
+
+				let	item  = $( this ).closest( itemWrapper ),
+					value = $( itemTitle, item ).text(),
+					url   = $( this ).attr( itemUrlAttr );
+
+				JetSearch.setFormSuggestion( value, false, url );
+			} );
 		}
 	};
 
-	$.fn.getSuggestionsList = function( options, settings, showSpinner, hightlightText = false ) {
+	$.fn.getSuggestionsList = function( options, settings, showSpinner, hightlightText = false, callback = () => {} ) {
 		let self               = this[0],
 			outputHtml         = '',
 			listPosition       = options.list_position,
@@ -222,17 +896,17 @@
 		const ajaxSettings = window['jetSearchSettings']['searchSuggestions'] || {};
 
 		function highlightMatches( item ) {
-			let searched = options.value.trim();
+			let searched = options.value.trim().replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 
 			if ( searched !== "" ) {
-				let reg     = new RegExp("[\>][^\<\>.]*"+searched+"[^\<\>.]*[\<]","gi"),
+				let reg     = new RegExp("[\>][^\<]*"+searched+"[^\<]*[\<]","gi"),
 					reg2    = new RegExp( searched, "gi" ),
 					regHtml = new RegExp("<\/?[a-z](.*?)[\s\S]*>", "gi");
 
 				if ( reg.test( item ) ) {
 					item = item.replace( reg, function( item ) {
 						let subRegex = new RegExp( searched, "gi" );
-						return item.replace( subRegex,`<mark>${searched}</mark>` );
+						return item.replace( subRegex, str => `<mark>${str}</mark>` );
 					} );
 				}
 
@@ -252,7 +926,10 @@
 				let list = options['manual_list'].split( "," );
 
 				list.map( function( suggestion, i ) {
-					manualList[i] = { name: suggestion };
+					manualList[i] = {
+						name: JetSearch.escapeHTML( suggestion ),
+						fullName: JetSearch.escapeHTML( suggestion )
+					};
 				} );
 
 				if ( 'inline' === listPosition ) {
@@ -268,6 +945,10 @@
 
 					$( settings.focusHolderClass ,self ).html( outputHtml );
 
+					if ( typeof callback === 'function' ) {
+						callback();
+					}
+
 					JetSearch.suggestionsPreloader( showSpinner, 'hide', spinner );
 				}
 			}
@@ -282,7 +963,7 @@
 			},
 			ajaxData = {
 				action: ajaxSettings.get_action,
-				data: sendData || {}
+				data: sendData || {},
 			};
 
 		jQuery.ajax( {
@@ -297,6 +978,9 @@
 			},
 			success: function( response, textStatus, jqXHR ) {
 				successCallback( response );
+				if ( typeof callback === 'function' ) {
+					callback();
+				}
 			}
 		} );
 
@@ -307,6 +991,13 @@
 
 				if ( 'inline' === listPosition ) {
 					response.map( function( suggestion ) {
+						suggestion['name']     = JetSearch.escapeHTML( suggestion['name'] );
+						suggestion['fullName'] = JetSearch.escapeHTML( suggestion['name'] );
+
+						if ( 0 < options.maxLength ) {
+							suggestion['name'] = JetSearch.trimString( suggestion['name'], options.maxLength );
+						}
+
 						outputHtml += inlineItemTemplate( suggestion );
 					} );
 
@@ -314,6 +1005,13 @@
 				} else if ( 'focus' === listPosition ) {
 
 					response.map( function( suggestion ) {
+						suggestion['name']     = JetSearch.escapeHTML( suggestion['name'] );
+						suggestion['fullName'] = JetSearch.escapeHTML( suggestion['name'] );
+
+						if ( 0 < options.maxLength ) {
+							suggestion['name'] = JetSearch.trimString( suggestion['name'], options.maxLength );
+						}
+
 						if ( options.value && ( "yes" === hightlightText || true === hightlightText ) ) {
 							suggestion['name'] = highlightMatches( suggestion['name'] );
 						}
@@ -352,13 +1050,14 @@
 			focusLimit             = options['search_suggestions_list_on_focus_quantity'] || 5,
 			showSpinner            = options['show_search_suggestions_list_on_focus_preloader'] || '',
 			hightlightText         = options['highlight_searched_text'] || '',
-			spinner                = $( settings.spinnerClass, settings.focusClass ),
+			spinner                = $( settings.spinnerClass, self ),
 			formFocusClass         = settings.searchFormClass.replace( '.', '' ) + '--focus',
 			form                   = $( settings.searchFormClass, self ),
 			focusTarget            = $( settings.focusHolderClass, self ),
 			disableInputs          = false,
 			customResultUrl        = options['search_results_url'] || '',
-			userId                 = null;
+			useSession             = 'false',
+			focusItem;
 
 		if ( window.elementorFrontend ) {
 			var editMode = Boolean( window.elementorFrontend.isEditMode() )
@@ -375,47 +1074,86 @@
 			self.ajaxSettings = window[ settings.handlerId ]['searchSuggestions'] || {};
 
 			customResultUrl = $.trim( customResultUrl );
-
-			function getUserId() {
-				return new Promise(function( resolve, reject ) {
-					$.ajax( {
-						url: self.ajaxSettings.ajaxurl,
-						type: 'POST',
-						cache: false,
-						dataType: 'json',
-						data: {
-							action: 'suggestions_get_user_id'
-						},
-						success: function( response ) {
-							let user_id = response;
-							resolve( user_id );
-						},
-						error: function( jqXHR, textStatus, errorThrown ) {
-							console.log( jqXHR );
-						},
-					} );
-				} );
-			}
-
-			getUserId().then( function( user_id ) {
-				userId = user_id;
-			} );
+			useSession      = self.ajaxSettings.use_session;
 
 			self.selectSuggestion = function( event ) {
+				const keyCode = event.keyCode || event.which;
+				const $target = $( event.currentTarget );
+
+				let value = $target.attr( 'aria-label' );
+
+				if ( ! value ) {
+					return;
+				}
+
+				value = value.trim();
+
 				if ( false === disableInputs && !editMode ) {
-					disableInputs = true;
 
-					let value = event.target.innerText;
+					if ( 'keydown' === event.type ) {
+						if ( 13 === keyCode ) {
+							disableInputs = true;
 
-					$( settings.inputClass, self )[0].value = value;
+							$( settings.inputClass, self )[0].value = value;
 
-					if ( null != userId ) {
-						JetSearch.setFormSuggestion( value, form, userId, customResultUrl );
-					} else if ( '' != customResultUrl ) {
-						window.location.href = customResultUrl;
-					} else {
-						form.submit();
+							JetSearch.setFormSuggestion( value, form, customResultUrl );
+						}
+					} else if ( 'click' === event.type ) {
+						disableInputs = true;
+
+						$( settings.inputClass, self )[0].value = value;
+						JetSearch.setFormSuggestion( value, form, customResultUrl );
 					}
+				}
+			}
+
+			self.focusItemsNav = function() {
+				focusItem = $( '.jet-search-suggestions__focus-area-item', self );
+
+				if ( 0 < focusItem.length ) {
+					focusItem.on( 'keydown', function( e ) {
+						const keyCode = e.keyCode || e.which;
+
+						switch ( keyCode ) {
+						  	case 40: // Down arrow
+								e.preventDefault();
+
+								var next = $( this ).next();
+
+								if ( next.length > 0 ) {
+									focusItem.removeClass( 'focused' );
+									next.addClass( 'focused' );
+									next.focus();
+								}
+								break;
+
+							case 38: // Up arrow
+								e.preventDefault();
+
+								var prev = $( this ).prev();
+
+								if ( prev.length > 0 ) {
+									focusItem.removeClass( 'focused' );
+									prev.addClass( 'focused' );
+									prev.focus();
+								} else {
+									focusItem.removeClass( 'focused' );
+									$( settings.inputClass, self ).focus();
+								}
+								break;
+							case 13:
+								e.preventDefault();
+								let value = e.target.innerText.trim();
+								$( settings.inputClass, self )[0].value = value;
+
+								JetSearch.setFormSuggestion( value, form, customResultUrl );
+								break;
+						}
+
+						if ( $( this ).is( ':focus-visible' ) ) {
+							focusItem.removeClass( 'focused' );
+						}
+					} );
 				}
 			}
 
@@ -425,28 +1163,60 @@
 					let listOptions = {
 						list_position: 'inline',
 						list_type: formListType,
-						limit: inlineLimit
+						limit: inlineLimit,
+						maxLength: options.search_suggestions_list_inline_item_title_length,
 					};
 
 					if ( 'manual' === formListType ) {
 						listOptions.manual_list = options['search_suggestions_list_inline_manual'];
 					}
 
-					$( settings.inlineClass, self ).getSuggestionsList( listOptions, settings, showSpinner );
+					$( settings.inlineClass, self ).getSuggestionsList( listOptions, settings, showSpinner, false, () => {
+						let inlineItem = $( '.jet-search-suggestions__inline-area-item', self );
+
+						if ( 0 < inlineItem.length ) {
+							inlineItem.on( 'focus', function () {
+								if ( $( this ).is( ':focus-visible' ) ) {
+									self.hideList();
+								}
+							} );
+						}
+
+						inlineItem.on( 'keydown', function( e ) {
+							const keyCode = e.keyCode || e.which;
+
+							let value = $( this ).attr( 'aria-label' );
+
+							if ( ! value ) {
+								return;
+							}
+
+							value = value.trim();
+
+							if ( 13 === keyCode ) {
+								$( settings.inputClass, self )[0].value = value;
+
+								JetSearch.setFormSuggestion( value, form, customResultUrl );
+							}
+						} );
+					} );
 				}
 
 				if ( '' != focusListType && ( "yes" === showfocusList || true === showfocusList ) ) {
 					let listOptions = {
 						list_position: 'focus',
 						list_type: focusListType,
-						limit: focusLimit
+						limit: focusLimit,
+						maxLength: options.search_suggestions_list_on_focus_item_title_length || 0,
 					};
 
 					if ( 'manual' === focusListType ) {
 						listOptions.manual_list = options['search_suggestions_list_on_focus_manual'];
 					}
 
-					$( settings.focusClass, self ).getSuggestionsList( listOptions, settings, showSpinner );
+					$( settings.focusClass, self ).getSuggestionsList( listOptions, settings, showSpinner, false, () => {
+						self.focusItemsNav();
+					} );
 				}
 			}
 
@@ -456,7 +1226,8 @@
 					listOptions = {
 						list_position: 'focus',
 						value: value,
-						limit: searchSuggestionsLimit
+						limit: searchSuggestionsLimit,
+						maxLength: options.search_suggestions_list_on_focus_item_title_length || 0,
 					};
 
 				if ( '' != value ) {
@@ -466,12 +1237,14 @@
 
 					clearTimeout( timer );
 					timer = setTimeout( function() {
-						$( settings.focusClass, self ).getSuggestionsList( listOptions, settings, showSpinner, hightlightText );
+						$( settings.focusClass, self ).getSuggestionsList( listOptions, settings, showSpinner, hightlightText, () => {
+							self.focusItemsNav();
+						} );
 					}, 450 );
 				} else {
 					clearTimeout( timer );
 					focusTarget.empty();
-					JetSearch.suggestionsPreloader( showSpinner, 'shide', spinner );
+					JetSearch.suggestionsPreloader( showSpinner, 'hide', spinner );
 
 					if ( false != focusListType && ( "yes" === showfocusList || true === showfocusList ) ) {
 						JetSearch.suggestionsPreloader( showSpinner, 'show', spinner );
@@ -483,13 +1256,20 @@
 							listOptions.manual_list = options['search_suggestions_list_on_focus_manual'];
 						}
 
-						$( settings.focusClass, self ).getSuggestionsList( listOptions, settings, showSpinner );
+						$( settings.focusClass, self ).getSuggestionsList( listOptions, settings, showSpinner, false, () => {
+							self.focusItemsNav();
+						} );
 					}
 				}
 			};
 
 			self.hideList = function(event) {
 				$( settings.focusClass, self ).removeClass( 'show' );
+				$( '.chosen-single', self ).removeClass( 'focused' );
+
+				if ( focusItem && 0 < focusItem.length ) {
+					focusItem.removeClass( 'focused' );
+				}
 			};
 
 			self.showList = function() {
@@ -502,10 +1282,23 @@
 			};
 
 			self.chosenFocusHandler = function() {
+				JetSearch.markPopupDropdownInteraction( $( self ) );
 				self.hideList();
 			};
 
 			self.formClick = function( event ) {
+				if ( $( event.target ).closest( '.jet-ajax-search__popup-trigger, .jet-ajax-search__popup-close' ).length ) {
+					return;
+				}
+
+				if ( $( event.target ).closest( '.chosen-container, .chosen-drop' ).length ) {
+					return;
+				}
+
+				if ( $( event.target ).closest( '.jet-ajax-search__popup' ).length && ! $( event.target ).closest( '.jet-ajax-search__popup-content' ).length ) {
+					return;
+				}
+
 				event.stopPropagation();
 			};
 
@@ -525,21 +1318,25 @@
 			};
 
 			self.formSubmit = function( event ) {
+				let keyCode = event.keyCode || event.which;
 
 				if ( false === disableInputs ) {
 					let value = event.target.value;
 
-					if ( 13 === event.keyCode && value.length != 0 ) {
+					if ( 13 === keyCode && value.length != 0 ) {
 						disableInputs = true;
 						event.preventDefault();
 
-						if ( null != userId ) {
-							JetSearch.setFormSuggestion( value, form, userId, customResultUrl );
-						} else if ( '' != customResultUrl ) {
-							window.location.href = customResultUrl;
-						} else {
-							form.submit();
-						}
+						JetSearch.setFormSuggestion( value, form, customResultUrl );
+					}
+				}
+
+				if ( 40 === keyCode ) {
+					if ( focusItem && 0 < focusItem.length ) {
+						event.preventDefault();
+						focusItem.removeClass( 'focused' );
+						focusItem.first().addClass( 'focused' );
+						focusItem.first().focus();
 					}
 				}
 			}
@@ -557,13 +1354,7 @@
 
 					event.preventDefault();
 
-					if ( null != userId ) {
-						JetSearch.setFormSuggestion( value, form, userId, customResultUrl );
-					} else if ( '' != customResultUrl ) {
-						window.location.href = customResultUrl;
-					} else {
-						form.submit();
-					}
+					JetSearch.setFormSuggestion( value, form, customResultUrl );
 				}
 			};
 
@@ -571,17 +1362,46 @@
 				.on( 'input' + settings.searchClass, self.inputChangeHandler )
 				.on( 'focus' + settings.searchClass, self.focusHandler )
 				.on( 'blur' + settings.searchClass, self.blurHandler )
-				.on( 'keypress' + settings.searchClass, self.formSubmit );
+				.on( 'keydown' + settings.searchClass, self.formSubmit );
 
 			$( settings.submitClass, self ).on( 'click' + settings.searchClass, self.clickFullResults );
 
 			$( self )
 				.on( 'click' + settings.searchClass, settings.focusItemClass, self.selectSuggestion )
-				.on( 'click' + settings.searchClass, settings.inlineItemClass, self.selectSuggestion )
+				.on( 'click keydown' + settings.searchClass, settings.inlineItemClass, self.selectSuggestion )
+				.on( 'mousedown' + settings.searchClass, self.formClick )
 				.on( 'click' + settings.searchClass, self.formClick )
+				.on( 'touchstart' + settings.searchClass, self.formClick )
+				.on( 'mousedown' + settings.searchClass + ' touchstart' + settings.searchClass, '.chosen-container, .chosen-drop', function() {
+					JetSearch.markPopupDropdownInteraction( $( self ), 500 );
+				} )
 				.on( 'change', settings.chosenClass, self.changeHandler )
 				.on( 'touchend' + settings.searchClass, self.formClick )
 				.on( 'chosen:showing_dropdown', settings.chosenClass, self.chosenFocusHandler );
+
+			$( self ).on( 'keydown', function( e ) {
+				const keyCode = e.keyCode || e.which;
+
+				if ( 9 === keyCode ) {
+					setTimeout( () => {
+						const focusedElement = document.activeElement;
+
+						if ( $( focusedElement ).is( '.chosen-search-input' ) ) {
+							$( '.chosen-single', self ).addClass( 'focused' );
+						} else {
+							$( '.chosen-single', self ).removeClass( 'focused' );
+						}
+
+						if ( $( focusedElement ).is( '.jet-search-suggestions__inline-area-item' ) ) {
+							self.hideList();
+						}
+					}, 50 );
+				}
+			} );
+
+			$( settings.inputClass, self ).on( 'click' + settings.searchClass, () => {
+				$( '.chosen-single', self ).removeClass( 'focused' );
+			} );
 
 			$( 'body' )
 				.on( 'click' + settings.searchClass, self.hideList )
@@ -601,26 +1421,48 @@
 	 */
 	$.fn.jetAjaxSearch = function( args ) {
 
-		var self              = this[0],
-			settings          = args,
-			timer             = null,
-			itemTemplate      = null,
-			resultsArea       = $( settings.resultsAreaClass, self ),
-			resultsHolder     = $( settings.listHolderClass, resultsArea ),
-			resultsHeader     = $( settings.resultsHeaderClass, resultsArea ),
-			resultsFooter     = $( settings.resultsFooterClass, resultsArea ),
-			countHolder       = $( settings.countClass, resultsArea ),
-			fullResults       = $( settings.fullResultsClass, resultsArea ),
-			resultsList       = $( settings.listClass, resultsArea ),
-			resultsListInner  = $( settings.listInnerClass, resultsArea ),
-			resultsHeaderNav  = $( settings.navigationClass, resultsHeader ),
-			resultsFooterNav  = $( settings.navigationClass, resultsFooter ),
-			messageHolder     = $( settings.messageHolderClass, resultsArea ),
-			spinner           = $( settings.spinnerClass, resultsArea ),
-			data              = $( self ).data( 'settings' ) || [],
-			formFocusClass    = settings.searchFormClass.replace( '.', '' ) + '--focus',
-			currentPosition   = 1,
-			allowEmptyString  = false;
+		var self                    = this[0],
+			settings                = args,
+			timer                   = null,
+			itemTemplate            = null,
+			resultsArea             = $( settings.resultsAreaClass, self ),
+			resultsHolder           = $( settings.listHolderClass, resultsArea ),
+			resultsHeader           = $( settings.resultsHeaderClass, resultsArea ),
+			resultsFooter           = $( settings.resultsFooterClass, resultsArea ),
+			countHolder             = $( settings.countClass, resultsArea ),
+			fullResults             = $( settings.fullResultsClass, resultsArea ),
+			resultsList             = $( settings.listClass, resultsArea ),
+			resultsListInner        = $( settings.listInnerClass, resultsArea ),
+			resultsHeaderNav        = $( settings.navigationClass, resultsHeader ),
+			resultsFooterNav        = $( settings.navigationClass, resultsFooter ),
+			messageHolder           = $( settings.messageHolderClass, resultsArea ),
+			spinner                 = $( settings.spinnerClass, resultsArea ),
+			form                    = $( settings.searchFormClass, self ),
+			resultsSuggestions      = $( settings.resultsSuggestionsAreaClass, self ),
+			inlineSuggestions       = $( settings.inlineSuggestionsAreaClass, self ),
+			data                    = $( self ).data( 'settings' ) || [],
+			customResultUrl         = data['search_results_url'] || '',
+			hightlightText          = data['highlight_searched_text'] || '',
+			formFocusClass          = settings.searchFormClass.replace( '.', '' ) + '--focus',
+			searchLogging           = data['search_logging'] || '',
+			currentPosition         = 1,
+			lang                    = '',
+			disableInputs           = false,
+			allowEmptyString        = false,
+			allowSubmitOnEnter      = 1,
+			urlParams               = JetSearch.getUrlParams(),
+			listingID               = data['listing_id'] || '',
+			categoryIndex           = urlParams.jet_ajax_search_categories || '',
+			getResultsOnFocus       = true,
+			maxUserSearches         = 20,
+			showSearchSuggestions   = data['show_search_suggestions'] || false,
+			showAddToCartQuantity   = data['show_add_to_cart_quantity'] || false,
+			suggestionsTitle        = '',
+			suggestionsType         = data['search_suggestions_source'] || false,
+			suggestionsPosition     = data['search_suggestions_position'] || false,
+			searchSuggestionsLimits = data['search_suggestions_limits'] || 20,
+			storedUserSearches      = JSON.parse( localStorage.getItem('jetUserSearches') ) || [],
+			suggestionsList         = [];
 
 		if ( 'yes' === data.search_by_empty_value || true === data.search_by_empty_value ) {
 			allowEmptyString = true;
@@ -634,18 +1476,189 @@
 			 */
 			self.ajaxRequest = null;
 
+			self.suggestionsListLoaded = false;
+
+			if ( data.hasOwnProperty('lang') ) {
+				lang = data.lang;
+				delete data.lang;
+			}
+
 			/**
 			 * Ajax settings from localized global variable
 			 */
-			self.ajaxSettings = window[ settings.handlerId ] || {};
+			self.ajaxSettings        = window[ settings.handlerId ] || {};
+			self.suggestionsSettings = window['jetSearchSettings']['searchSuggestions'] || {};
+
+			if ( self.ajaxSettings['ajaxSearchSuggestionsLimits'] ) {
+				maxUserSearches = self.ajaxSettings['ajaxSearchSuggestionsLimits'];
+			}
+
+			if ( 'yes' === data.submit_on_enter || true === data.submit_on_enter ) {
+				allowSubmitOnEnter = false;
+			} else {
+				allowSubmitOnEnter = true;
+			}
+
+			if ( '' === self.ajaxSettings.sumbitOnEnter ) {
+				allowSubmitOnEnter = false;
+			}
+
+			if ( window.elementorFrontend ) {
+				var editMode = Boolean( window.elementorFrontend.isEditMode() )
+			} else {
+				var editMode = false;
+			}
+
+			self.suggestionsListHTML = function( suggestionsList ) {
+
+				let resultsSuggestionsTemplate = wp.template('jet-ajax-search-results-suggestion-item'),
+					inlineSuggestionsTemplate  = wp.template('jet-ajax-search-inline-suggestion-item'),
+					inlineOutputHtml           = '',
+					resultsOutputHtml          = '';
+
+
+				suggestionsList.forEach( item => {
+					let inlineListItemHtml  = '',
+						resultsListItemHtml = '',
+						maxLength           = data.search_suggestions_item_title_length || 0,
+						suggestionItem      = {};
+
+					suggestionItem['fullName'] = JetSearch.escapeHTML( item );
+					suggestionItem['name']     = JetSearch.escapeHTML( item );
+
+					if ( 0 < maxLength ) {
+						suggestionItem['name'] = JetSearch.trimString( suggestionItem['name'], maxLength );
+					}
+
+					if ( 'under_form' === suggestionsPosition ) {
+						inlineListItemHtml  = inlineSuggestionsTemplate( suggestionItem );
+					} else if ( 'inside_results_area' === suggestionsPosition ) {
+						resultsListItemHtml = resultsSuggestionsTemplate( suggestionItem );
+					}
+
+					inlineOutputHtml  += inlineListItemHtml;
+					resultsOutputHtml += resultsListItemHtml;
+				} );
+
+				if ( 'under_form' === suggestionsPosition ) {
+					suggestionsTitle = inlineSuggestions.html();
+
+					inlineSuggestions.html( inlineOutputHtml ).prepend( suggestionsTitle );
+				} else if ( 'inside_results_area' === suggestionsPosition ) {
+					suggestionsTitle = resultsSuggestions.html();
+
+					resultsSuggestions.html( resultsOutputHtml ).prepend( suggestionsTitle );
+				}
+			};
+
+			self.showSuggestions = function() {
+
+				if ( suggestionsType ) {
+					if ( 'popular' === suggestionsType ) {
+
+						if ( false === window.bricksIsFrontend ) {
+
+							let sendData = {
+								list_type: 'popular',
+								value: '',
+								limit: searchSuggestionsLimits
+							},
+							ajaxData = {
+								action: self.ajaxSettings['searchSuggestions'].get_action,
+								data: sendData || {},
+							};
+
+							$.ajax( {
+								type: 'GET',
+								url: self.ajaxSettings['searchSuggestions'].get_suggestions_rest_api_url,
+								data: ajaxData,
+								dataType: 'json',
+								cache: false,
+								processData: true,
+								error: function( jqXHR, textStatus, errorThrown ) {
+									errorCallback( jqXHR );
+								},
+								success: function( response, textStatus, jqXHR ) {
+									if ( response.length ) {
+										suggestionsList = $.map( response, function( obj ) {
+											return obj.name;
+										} );
+
+										self.suggestionsListLoaded = true;
+
+										if ( suggestionsList.length ) {
+											suggestionsList = suggestionsList.slice( 0, searchSuggestionsLimits );
+
+											self.suggestionsListHTML( suggestionsList );
+										} else {
+											resultsSuggestions.hide();
+											inlineSuggestions.hide();
+										}
+									}
+								}
+							} );
+						} else {
+							suggestionsList = self.ajaxSettings['ajaxSearchPopularSuggestions'] || [];
+
+							if ( suggestionsList.length ) {
+								suggestionsList = suggestionsList.slice( 0, searchSuggestionsLimits );
+
+								self.suggestionsListHTML( suggestionsList );
+							} else {
+								resultsSuggestions.hide();
+								inlineSuggestions.hide();
+							}
+						}
+					} else if ( 'user' === suggestionsType ) {
+						let userSearches = localStorage.getItem('jetUserSearches');
+
+						if ( userSearches ) {
+							suggestionsList = JSON.parse( userSearches ) || [];
+
+							suggestionsList.reverse();
+
+							suggestionsList = suggestionsList.slice( 0, searchSuggestionsLimits );
+
+							self.suggestionsListHTML( suggestionsList );
+						} else {
+							resultsSuggestions.hide();
+							inlineSuggestions.hide();
+						}
+					}
+				}
+			};
+
+			if ( 'yes' === showSearchSuggestions || true === showSearchSuggestions ) {
+				self.showSuggestions();
+			}
 
 			self.inputChangeHandler = function( event ) {
 				var value = $( event.target ).val(),
 					symbolNumberForStart = 'number' === $.type( data.symbols_for_start_searching ) ? data.symbols_for_start_searching : 2;
 
+				value = value.replace(/\u3000/g, ' ');
+
 				if ( 'number' === $.type( symbolNumberForStart ) && symbolNumberForStart > value.length ) {
-					self.hideList();
+					if ( 'inside_results_area' === suggestionsPosition && suggestionsList.length ) {
+						resultsHeader.hide();
+						resultsFooter.hide();
+						resultsList.hide();
+						resultsSuggestions.show();
+						resultsSuggestions.addClass( 'active' );
+						resultsHolder.addClass( 'show' );
+						self.showList();
+					} else {
+						self.hideList();
+					}
+
 					return false;
+				}
+
+				if ( 'inside_results_area' === suggestionsPosition && suggestionsList.length ) {
+					resultsSuggestions.removeClass( 'active' );
+					resultsHeader.show();
+					resultsFooter.show();
+					resultsList.show();
 				}
 
 				resultsHolder.removeClass( 'show' );
@@ -660,8 +1673,8 @@
 					clearTimeout( timer );
 					timer = setTimeout( function() {
 						data.value = value;
-						data.deviceMode = window.elementorFrontend && window.elementorFrontend.getCurrentDeviceMode() ? window.elementorFrontend.getCurrentDeviceMode() : false;
-						self.ajaxSendData( data );
+						data.deviceMode = window.elementorFrontend && window.elementorFrontend.getCurrentDeviceMode() ? window.elementorFrontend.getCurrentDeviceMode() : JetSearch.getCurrentDeviceMode();
+						self.ajaxSendData( data, lang );
 					}, 450 );
 				} else {
 					self.hideList();
@@ -669,41 +1682,131 @@
 			};
 
 			self.successCallback = function( response ) {
-				if ( ! response.success ) {
+
+				if ( response.error ) {
 					spinner.removeClass( 'show' );
 					self.outputMessage( data.server_error, 'error show' );
 					return;
 				}
 
-				var responseData = response.data,
-					error        = responseData.error,
-					message      = responseData.message,
-					posts        = responseData.posts,
-					post         = null,
-					outputHtml   = '',
-					listItemHtml = '',
-					listHtml     = '<div class="' + settings.listSlideClass.replace( '.', '' ) + '">%s</div>';
+				JetSearch.enqueueAssetsFromResponse( response );
+
+				var responseData             = response.data,
+					error                    = responseData.error,
+					message                  = responseData.message,
+					posts                    = responseData.posts,
+					listingItems             = responseData.listing_items,
+					post                     = null,
+					outputHtml               = '',
+					listItemHtml             = '',
+					listHtml                 = '<div class="' + settings.listSlideClass.replace( '.', '' ) + '">%s</div>',
+					searchSources            = responseData.sources,
+					searchSourcesBeforePosts = null,
+					searchSourcesAfterPosts  = null,
+					countAllResults          = null,
+					searchSourcesHolder      = $( '.jet-ajax-search__source-results-holder', self );
 
 				resultsHolder.removeClass( 'show' );
 				spinner.removeClass( 'show' );
 				currentPosition = 1;
 
+				searchSourcesHolder.remove();
+
 				resultsListInner.html( '' );
+				resultsHeaderNav.html( '' );
+				resultsFooterNav.html( '' );
+
+				searchSourcesBeforePosts = searchSources
+					.filter( item => item.priority < 0 && '' != item.content )
+					.sort( ( a, b ) => a.priority - b.priority );
+
+				searchSourcesAfterPosts = searchSources
+					.filter( item => item.priority > 0 && '' != item.content )
+					.sort( ( a, b ) => a.priority - b.priority );
+
+				if ( '' != listingID && 0 !== responseData.post_count && !error ) {
+					var outputHtml   = '',
+						listItemHtml = '',
+						listHtml     = '<div class="jet-listing-grid__items jet-listing-base ' + settings.listSlideClass.replace( '.', '' ) + '">%s</div>';
+
+					if ( listingItems.length ) {
+						$.each( listingItems, ( i, item ) => {
+							listItemHtml += item;
+
+							if ( ( parseInt( i ) + 1 ) % responseData.limit_query == 0 || parseInt( i ) === listingItems.length - 1 ) {
+								outputHtml += listHtml.replace( '%s', listItemHtml );
+								listItemHtml = '';
+							}
+						} );
+					}
+
+					messageHolder.removeClass( 'show' );
+
+					countAllResults = responseData.post_count;
+
+					if ( responseData.sources_results_count && 0 < responseData.sources_results_count ) {
+						countAllResults += responseData.sources_results_count;
+					}
+
+					$( 'span', countHolder ).html( countAllResults );
+					resultsListInner
+						.html( outputHtml )
+						.data( 'columns', responseData.columns );
+
+					Promise.all( JetSearch.assetsPromises ).then( function() {
+						JetSearch.initElementsHandlers( resultsListInner );
+						JetSearch.reinitBricksScripts( self );
+						JetSearch.assetsPromises = [];
+					} );
+
+					resultsHeaderNav.html( responseData.results_navigation.in_header );
+					resultsFooterNav.html( responseData.results_navigation.in_footer );
+
+					if ( !countHolder[0] && !responseData.results_navigation.in_header ) {
+						resultsHeader.addClass( 'is-empty' );
+					} else {
+						resultsHeader.removeClass( 'is-empty' );
+					}
+
+					if ( !fullResults[0] && !responseData.results_navigation.in_footer ) {
+						resultsFooter.addClass( 'is-empty' );
+					} else {
+						resultsFooter.removeClass( 'is-empty' );
+					}
+
+					resultsList.css( 'height', 'auto' );
+
+					$( document ).trigger( 'jet-ajax-search/show-results/listing', [ resultsListInner ] );
+
+					resultsHolder.addClass( 'show' );
+					self.syncResultsListHeightOnImagesLoaded();
+
+					if ( 'yes' === searchLogging || true === searchLogging ) {
+						let itemWrapper = settings.itemClass,
+							itemLink    = $( '.jet-engine-listing-overlay-wrap', itemWrapper ),
+							itemTitle   = '.jet-ajax-search-item-title .jet-listing-dynamic-field__content',
+							itemUrlAttr = 'data-url';
+
+						$( document ).trigger( 'jet-ajax-search/results-area/listing-add-suggestion', [ self, itemWrapper, itemLink, itemTitle, itemUrlAttr ] );
+
+						JetSearch.addSuggestionFromResultAreaItem( itemWrapper, itemLink, itemTitle, itemUrlAttr );
+					}
+				}
 
 				const allowedHighlightFields = [ 'title', 'after_content', 'after_title', 'before_content', 'before_title', 'content', 'price' ];
 
 				function highlightMatches( item ) {
-					let searched = responseData.search_value.trim();
+					let searched = responseData.search_value.trim().replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 
 					if ( searched !== "" ) {
-						let reg  = new RegExp("[\>][^\<\>.]*"+searched+"[^\<\>.]*[\<]","gi"),
-							reg2 = new RegExp( searched, "gi" ),
+						let reg     = new RegExp("[\>][^\<]*"+searched+"[^\<]*[\<]","gi"),
+							reg2    = new RegExp( searched, "gi" ),
 							regHtml = new RegExp("<\/?[a-z](.*?)[\s\S]*>", "gi");
 
 						if ( reg.test( item ) ) {
 							item = item.replace( reg, function( item ) {
 								let subRegex = new RegExp( searched, "gi" );
-								return item.replace( subRegex,`<mark>${searched}</mark>` );
+								return item.replace( subRegex, str => `<mark>${str}</mark>` );
 							} );
 						}
 
@@ -728,17 +1831,40 @@
 					return fields;
 				}
 
-				if ( 0 !== responseData.post_count && !error ) {
+				if ( 0 !== responseData.post_count && !error && '' === listingID) {
 
 					messageHolder.removeClass( 'show' );
 					itemTemplate = wp.template( 'jet-ajax-search-results-item' );
 
 					for ( post in posts ) {
 						if ( responseData.search_highlight && true === responseData.search_highlight ) {
-							highlightFields( posts[post], allowedHighlightFields );
+							if ( '' != hightlightText && ( "yes" === hightlightText || true === hightlightText ) ) {
+								highlightFields( posts[post], allowedHighlightFields );
+							}
 						}
 
-						listItemHtml += itemTemplate( posts[post] );
+						if ( posts[post].is_product ) {
+							let productSupportsAjax = !! posts[post].product_supports_ajax_add_to_cart,
+								productSoldIndividually = !! posts[post].product_sold_individually,
+								showQuantity = ( 'yes' === showAddToCartQuantity || true === showAddToCartQuantity ) && productSupportsAjax && ! productSoldIndividually,
+								productQtyMin = posts[post].product_qty_min || 1,
+								productQtyMax = posts[post].product_qty_max || '',
+								productQtyStep = posts[post].product_qty_step || 1,
+								productQtyValue = posts[post].product_qty_value || productQtyMin,
+								quantityInput = '',
+								productTypeClass = productSupportsAjax ? 'add-to-cart-button add_to_cart_button ajax_add_to_cart' : 'select-options-button';
+
+							if ( showQuantity ) {
+								const maxAttr = productQtyMax ? ' max="' + productQtyMax + '"' : '';
+								quantityInput = '<input type="number" class="jet-ajax-search__results-item-quantity-input qty" min="' + productQtyMin + '"' + maxAttr + ' step="' + productQtyStep + '" value="' + productQtyValue + '" inputmode="numeric" aria-label="Quantity">';
+							}
+
+							posts[post].add_to_cart = '<div class="jet-ajax-search__item-add-to-cart">' + quantityInput + '<button type="button" data-quantity="' + productQtyValue + '" class="jet-ajax-search__results-item-cart-button ' + productTypeClass + '" data-product_id="' + posts[post].product_id + '" data-product_sku="' + posts[post].product_sku + '" aria-label="' + posts[post].product_label + '" data-product_url="' + posts[post].product_url + '" rel="nofollow" target="_blank">' + posts[post].product_add_text + '</button></div>';
+						}
+
+						let templateResult = itemTemplate( posts[post] );
+
+						listItemHtml += templateResult;
 
 						if ( (parseInt( post ) + 1) % responseData.limit_query == 0 || parseInt( post ) === posts.length - 1 ) {
 							outputHtml += listHtml.replace( '%s', listItemHtml );
@@ -746,10 +1872,24 @@
 						}
 					}
 
-					$( 'span', countHolder ).html( responseData.post_count );
+					countAllResults = responseData.post_count;
+
+					if ( responseData.sources_results_count && 0 < responseData.sources_results_count ) {
+						countAllResults += responseData.sources_results_count;
+					}
+
+					$( 'span', countHolder ).html( countAllResults );
 					resultsListInner
 						.html( outputHtml )
 						.data( 'columns', responseData.columns );
+
+					$( '.jet-ajax-search__results-item-cart-button.select-options-button', self ).on( 'click', function( e ) {
+						e.preventDefault();
+
+						const productUrl = $( this ).data( 'product_url' );
+
+						window.open( productUrl, '_blank' );
+					} );
 
 					resultsHeaderNav.html( responseData.results_navigation.in_header );
 					resultsFooterNav.html( responseData.results_navigation.in_footer );
@@ -767,17 +1907,162 @@
 					}
 
 					resultsHolder.addClass( 'show' );
-					resultsListInner.imagesLoaded( function() {
-						resultsList.css( 'height', $( settings.listSlideClass, resultsListInner ).eq(0).outerHeight() );
-					} );
+					self.syncResultsListHeightOnImagesLoaded();
 
 					$( document ).trigger( 'jet-ajax-search/show-results', [ resultsHolder ] );
 
+					var inputField  = $( '.jet-ajax-search__field', self ),
+						resultsItem = $( '.jet-ajax-search__item-link', self ),
+						focusedItem = resultsItem.filter( ':focus' );
+
+					inputField.on( 'keydown', function( e ) {
+						const keyCode = e.keyCode || e.which;
+
+						if ( 40 === keyCode ) { // Down arrow
+							e.preventDefault();
+
+							var position    = currentPosition - 1,
+								activeSlide = $( settings.listSlideClass, resultsListInner ).eq( position ),
+								next        = activeSlide.find( '.jet-ajax-search__item-link' ).first();
+
+							if ( focusedItem.length === 0 ) {
+								setTimeout( () => {
+									resultsItem.removeClass( 'focused' );
+									next.addClass( 'focused' );
+									next.focus();
+								}, 0 );
+							}
+						}
+					} );
+
+					resultsItem.on( 'keydown', function( e ) {
+						const keyCode = e.keyCode || e.which;
+
+						switch ( keyCode ) {
+							case 40: // Down arrow
+								e.preventDefault();
+
+								var next = $( this ).parent().next().find( '.jet-ajax-search__item-link' ).first();
+
+								if ( 0 < next.length ) {
+									resultsItem.removeClass( 'focused' );
+									next.addClass( 'focused' );
+									next.focus();
+								}
+								break;
+
+							case 38: // Up arrow
+								e.preventDefault();
+
+								var prev = $( this ).parent().prev().find( '.jet-ajax-search__item-link' ).first();
+
+								if ( 0 < prev.length ) {
+									resultsItem.removeClass( 'focused' );
+									prev.addClass( 'focused' );
+									prev.focus();
+								} else {
+									resultsItem.removeClass( 'focused' );
+									inputField.focus();
+								}
+								break;
+
+							case 37: // Left arrow
+								var prevSlide = $( this ).closest( '.jet-ajax-search__results-slide' ).prev();
+
+								if ( 0 < prevSlide.length ) {
+
+									$( settings.prevClass + ':not( ' + settings.disableNavClass + ' )' ).click();
+
+									resultsItem.removeClass( 'focused' );
+
+									setTimeout( () => {
+										$( settings.listSlideClass, resultsListInner ).eq( currentPosition - 1 ).find( '.jet-ajax-search__item-link' ).first().focus().addClass( 'focused' );
+									}, 350 );
+								}
+								break;
+
+							case 39: // Right arrow
+								var nextSlide = $( this ).closest( '.jet-ajax-search__results-slide' ).next();
+
+								if ( 0 < nextSlide.length ) {
+
+									$( settings.nextClass + ':not( ' + settings.disableNavClass + ' )' ).click();
+
+									resultsItem.removeClass( 'focused' );
+
+									setTimeout( () => {
+										$( settings.listSlideClass, resultsListInner ).eq( currentPosition - 1 ).find( '.jet-ajax-search__item-link' ).first().focus().addClass( 'focused' );
+									}, 350 );
+								}
+								break;
+							case 9:
+								resultsItem.removeClass( 'focused' );
+								break;
+						}
+					} );
+
+					if ( 'yes' === searchLogging || true === searchLogging ) {
+						let	itemWrapper           = settings.itemClass,
+							resultAreaItemLink    = $( '.jet-ajax-search__item-link', itemWrapper ),
+							resultAreaItemTitle   = '.jet-ajax-search__item-title',
+							resultAreaItemUrlAttr = 'href';
+
+						JetSearch.addSuggestionFromResultAreaItem( itemWrapper, resultAreaItemLink, resultAreaItemTitle, resultAreaItemUrlAttr );
+					}
+
+					searchSourcesBeforePosts.forEach( function( item ) {
+						self.maybeHasListing( item );
+
+						resultsListInner.before( item.content );
+						resultsHolder.addClass( 'show' );
+					} );
+
+					searchSourcesAfterPosts.forEach( function( item ) {
+						self.maybeHasListing( item );
+
+						resultsListInner.after( item.content );
+						resultsHolder.addClass( 'show' );
+					} );
 				} else {
-					self.outputMessage( message, 'show' );
-					//self.hideList();
+
+					if ( searchSourcesBeforePosts.length || searchSourcesAfterPosts.length ) {
+						searchSourcesBeforePosts.forEach( function( item ) {
+							self.maybeHasListing( item );
+
+							resultsListInner.before( item.content );
+							resultsHolder.addClass( 'show' );
+						} );
+
+						searchSourcesAfterPosts.forEach( function( item ) {
+							self.maybeHasListing( item );
+
+							resultsListInner.after( item.content );
+							resultsHolder.addClass( 'show' );
+						} );
+
+						countAllResults = responseData.post_count;
+
+						if ( responseData.sources_results_count && 0 < responseData.sources_results_count ) {
+							countAllResults += responseData.sources_results_count;
+						}
+
+						$( 'span', countHolder ).html( countAllResults );
+
+					} else {
+						self.outputMessage( message, 'show' );
+					}
 				}
 			};
+
+			self.maybeHasListing = function( item ) {
+				if ( typeof item.listing_template !== 'undefined' && true === item.listing_template ) {
+					Promise.all( JetSearch.assetsPromises ).then( function() {
+						JetSearch.initElementsHandlers( resultsListInner );
+						JetSearch.reinitBricksScripts( self );
+						JetSearch.assetsPromises = [];
+					} );
+				}
+			}
 
 			self.errorCallback = function( jqXHR ) {
 				if ( 'abort' !== jqXHR.statusText ) {
@@ -786,12 +2071,31 @@
 				}
 			};
 
-			self.ajaxSendData = function( sendData ) {
+			self.ajaxSendData = function( sendData, lang = '' ) {
+				let filteredData = {};
+
+				Object.keys( sendData ).forEach( key => {
+					if (
+						sendData[key] !== '' &&
+						sendData[key] !== null &&
+						sendData[key] !== undefined &&
+						!( Array.isArray( sendData[key] ) && sendData[key].length === 0 )
+					) {
+						filteredData[key] = sendData[key];
+					}
+				} );
+
 				var ajaxData = {
 					action: self.ajaxSettings.action,
-					//nonce: self.ajaxSettings.nonce,
-					data: sendData || {}
+					nonce: self.ajaxSettings.nonce,
+					data: filteredData || {}
 				};
+
+				if ( '' != lang ) {
+					ajaxData.lang = lang;
+				}
+
+				const isRestAPI = self.ajaxSettings.rest_api_url && self.ajaxSettings.rest_api_url.includes( '/wp-json/' );
 
 				self.ajaxRequest = jQuery.ajax( {
 					type: 'GET',
@@ -801,9 +2105,15 @@
 					cache: false,
 					processData: true,
 					beforeSend: function( jqXHR, ajaxSettings ) {
+
 						if ( null !== self.ajaxRequest ) {
 							self.ajaxRequest.abort();
 						}
+
+						if ( isRestAPI ) {
+							jqXHR.setRequestHeader( 'X-WP-Nonce', self.ajaxSettings.nonce );
+						}
+
 					},
 					error: function( jqXHR, textStatus, errorThrown ) {
 						self.errorCallback( jqXHR );
@@ -816,6 +2126,7 @@
 
 			self.hideList = function() {
 				resultsArea.removeClass( 'show' );
+				$( '.chosen-single', self ).removeClass( 'focused' );
 			};
 
 			self.showList = function() {
@@ -827,6 +2138,28 @@
 					symbolNumberForStart = 'number' === $.type( data.symbols_for_start_searching ) ? data.symbols_for_start_searching : 2;
 
 				$( settings.searchFormClass, self ).addClass( formFocusClass );
+
+				if ( 'inside_results_area' === suggestionsPosition && suggestionsList.length ) {
+					if ( value && getResultsOnFocus ) {
+						spinner.addClass( 'show' );
+
+						data.value      = value;
+						data.deviceMode = window.elementorFrontend && window.elementorFrontend.getCurrentDeviceMode() ? window.elementorFrontend.getCurrentDeviceMode() : JetSearch.getCurrentDeviceMode();
+
+						self.ajaxSendData( data, lang );
+
+						getResultsOnFocus = false;
+					}
+
+					if ( '' === value ) {
+						resultsHeader.hide();
+						resultsFooter.hide();
+						resultsList.hide();
+						resultsSuggestions.addClass( 'active' );
+						resultsHolder.addClass( 'show' );
+						self.showList();
+					}
+				}
 
 				if ( 'number' === $.type( symbolNumberForStart ) && symbolNumberForStart > value.length ) {
 					return;
@@ -841,33 +2174,111 @@
 
 			self.outputMessage = function( message, messageClass ) {
 				message = message.replace( /\\/g, '' ); // remove slashes
-				message = $( "<div/>" ).html( message ).text();
+				//message = $( "<div/>" ).html( message ).text();
 				message = message.replace( /\\*"/g, '' );
 				messageHolder.removeClass( 'error show' ).addClass( messageClass ).html( message );
 			};
 
 			self.formClick = function( event ) {
+				if ( $( event.target ).closest( '.jet-ajax-search__popup-trigger, .jet-ajax-search__popup-close' ).length ) {
+					return;
+				}
+
+				if ( $( event.target ).closest( '.chosen-container, .chosen-drop' ).length ) {
+					return;
+				}
+
+				if ( $( event.target ).closest( '.jet-ajax-search__popup' ).length && ! $( event.target ).closest( '.jet-ajax-search__popup-content' ).length ) {
+					return;
+				}
+
 				event.stopPropagation();
 			};
 
 			self.clickFullResults = function( event ) {
-				var searchInput = $( settings.inputClass, self );
+
+				var searchInput = $( settings.inputClass, self ),
+					value       = searchInput.val(),
+					url         = JetSearch.getResultsUrl( form );
 
 				event.preventDefault();
 
-				if ( searchInput.val().length != 0 || true === allowEmptyString ) {
-					$( settings.searchFormClass, self ).submit();
+				if ( value.length != 0 || true === allowEmptyString ) {
+					if ( false === disableInputs ) {
+						disableInputs = true;
+
+						value = value.replace(/\u3000/g, ' ');
+
+						searchInput.val( value );
+
+						if ( '' != customResultUrl ) {
+							customResultUrl = $.trim( customResultUrl );
+
+							url = JetSearch.getResultsUrl( form, customResultUrl );
+						}
+
+						if ( 'yes' === showSearchSuggestions || true === showSearchSuggestions ) {
+							self.addUserSearch( value );
+						}
+
+						if ( 'yes' === searchLogging || true === searchLogging ) {
+							JetSearch.setFormSuggestion( value, form, url );
+						} else {
+							window.location.href = url;
+						}
+					}
 				}
+			};
+
+			self.syncResultsListHeight = function() {
+				if ( 'yes' === data.show_search_in_popup || true === data.show_search_in_popup || 'true' === data.show_search_in_popup ) {
+					var viewportHeight = Math.max( window.innerHeight || 0, document.documentElement ? document.documentElement.clientHeight : 0 ),
+						holderHeight   = Math.max( Math.min( Math.round( viewportHeight * 0.65 ), 720 ), 320 ),
+						headerHeight   = resultsHeader.is( ':visible' ) ? resultsHeader.outerHeight( true ) : 0,
+						footerHeight   = resultsFooter.is( ':visible' ) ? resultsFooter.outerHeight( true ) : 0,
+						listHeight     = Math.max( holderHeight - headerHeight - footerHeight, 160 );
+
+					resultsHolder.css( {
+						'height': '',
+						'max-height': holderHeight + 'px'
+					} );
+					resultsList.css( {
+						'height': 'auto',
+						'max-height': listHeight + 'px'
+					} );
+					resultsList.scrollTop( 0 );
+
+					return;
+				}
+
+				var activeSlide = $( settings.listSlideClass, resultsListInner ).eq( Math.max( currentPosition - 1, 0 ) ),
+					slideHeight = activeSlide.length ? activeSlide.outerHeight() : 0;
+
+				resultsHolder.css( {
+					'height': '',
+					'max-height': ''
+				} );
+				resultsList.css( {
+					'height': slideHeight > 0 ? slideHeight + 'px' : 'auto',
+					'max-height': ''
+				} );
+			};
+
+			self.syncResultsListHeightOnImagesLoaded = function() {
+				resultsListInner.imagesLoaded( function() {
+					self.syncResultsListHeight();
+				} );
 			};
 
 			self.changeSlide = function( number ) {
 				var currentSlide = $( settings.listSlideClass, resultsListInner ).eq( number ),
-					direction = settings.isRtl ? 1 : -1,
-					position = number * 100 * direction;
+					direction    = settings.isRtl ? 1 : -1,
+					position     = number * 100 * direction;
 
 				currentSlide.scrollTop( 0 );
+				resultsList.scrollTop( 0 );
 				resultsListInner.css( 'transform', 'translateX(' + position + '%)' );
-				resultsList.css( 'height', currentSlide.outerHeight() );
+				self.syncResultsListHeight();
 			};
 
 			self.clickBulletHandler = function( event ) {
@@ -909,38 +2320,56 @@
 			};
 
 			self.formSubmit = function( event ) {
-				var value = event.target.value;
+				var value = event.target.value,
+					url   = JetSearch.getResultsUrl( form );
 
 				if ( ( 1 > value.length && false === allowEmptyString ) && ( 13 === event.keyCode || 'click' === event.type ) ) {
 					return false;
 				} else {
-					if ( 13 === event.keyCode && self.ajaxSettings.sumbitOnEnter ) {
-						event.preventDefault();
-						$( settings.searchFormClass, self ).submit();
+					if ( 13 === event.keyCode && allowSubmitOnEnter ) {
+						if ( false === disableInputs ) {
+							disableInputs = true;
+
+							event.preventDefault();
+
+							if ( '' != customResultUrl ) {
+								customResultUrl = $.trim( customResultUrl );
+
+								url = JetSearch.getResultsUrl( form, customResultUrl );
+							}
+
+							self.addUserSearch( value );
+
+							if ( 'yes' === searchLogging || true === searchLogging ) {
+								JetSearch.setFormSuggestion( value, form, url );
+							} else {
+								window.location.href = url;
+							}
+						}
 					}
 				}
 			};
 
 			self.changeHandler = function( event ) {
 				var target              = $( event.target ),
-					settingsInput       = $( settings.settingsInput, self ),
-					querySettings       = JSON.parse( settingsInput.val() ),
 					globalQuerySettings = $( self ).data( 'settings' );
 
-				querySettings.category__in = target.val();
 				globalQuerySettings.category__in = target.val();
+				data.category__in                = target.val();
 
-				settingsInput.val( JSON.stringify( querySettings ) );
 				$( self ).data( 'settings', globalQuerySettings );
 
 				self.inputChangeHandler( { target: $( settings.inputClass, self ) } )
 			};
 
 			self.chosenFocusHandler = function() {
+				JetSearch.markPopupDropdownInteraction( $( self ) );
 				self.hideList();
 			};
 
 			self.setResultsAreaWidth = function() {
+
+				JetSearch.syncAjaxPopupWidth( $( self ) );
 
 				if ( 'fields_holder' !== data.results_area_width_by ) {
 					return;
@@ -949,27 +2378,423 @@
 				resultsArea.css( 'width', $( settings.fieldsHolderClass, self ).outerWidth() );
 			};
 
+			self.addUserSearch = function( newSearchRequest ) {
+				if ( 'user' === suggestionsType ) {
+					newSearchRequest = newSearchRequest.trim();
+
+					if ( ! storedUserSearches.some( search => search === newSearchRequest ) ) {
+						if ( storedUserSearches.length >= maxUserSearches ) {
+							storedUserSearches.shift();
+						}
+
+						storedUserSearches.push( newSearchRequest );
+
+						localStorage.setItem( 'jetUserSearches', JSON.stringify( storedUserSearches ) );
+					}
+				}
+			}
+
+			self.selectSuggestion = function( event ) {
+				const keyCode = event.keyCode || event.which;
+				const $target = $( event.currentTarget );
+
+				let value = $target.attr( 'aria-label' );
+
+				if ( ! value ) {
+					return;
+				}
+
+				value = value.trim();
+
+				let url = null;
+
+				if ( false === disableInputs && !editMode ) {
+
+					if ( 'keydown' === event.type ) {
+						if ( 13 === keyCode ) {
+							disableInputs = true;
+
+							$( settings.inputClass, self )[0].value = value;
+
+							self.addUserSearch( value );
+
+							url = JetSearch.getResultsUrl( form );
+
+							if ( '' != customResultUrl ) {
+								customResultUrl = $.trim( customResultUrl );
+
+								url = JetSearch.getResultsUrl( form, customResultUrl );
+							}
+
+							if ( 'yes' === searchLogging || true === searchLogging ) {
+								JetSearch.setFormSuggestion( value, false, url );
+							} else {
+								window.location.href = url;
+							}
+						}
+					} else if ( 'click' === event.type ) {
+						disableInputs = true;
+
+						$( settings.inputClass, self )[0].value = value;
+
+						self.addUserSearch( value );
+
+						url = JetSearch.getResultsUrl( form );
+
+						if ( '' != customResultUrl ) {
+							customResultUrl = $.trim( customResultUrl );
+
+							url = JetSearch.getResultsUrl( form, customResultUrl );
+						}
+
+						if ( 'yes' === searchLogging || true === searchLogging ) {
+							JetSearch.setFormSuggestion( value, false, url );
+						} else {
+							window.location.href = url;
+						}
+					}
+				}
+			}
+
+			self.customUrlActions = {
+				selectorOnClick: 'a[href^="#jet-engine-action"][href*="event=click"]',
+				selectorOnHover: 'a[href^="#jet-engine-action"][href*="event=hover"], [data-url^="#jet-engine-action"][data-url*="event=hover"]',
+
+				init: function() {
+					var timeout = null;
+
+					$( document ).on( 'click.JetSearch', this.selectorOnClick, function( event ) {
+						event.preventDefault();
+						self.customUrlActions.actionHandler( event )
+					} );
+
+					$( document ).on( 'click.JetSearch', this.selectorOnHover, function( event ) {
+						if ( 'A' === event.currentTarget.nodeName ) {
+							event.preventDefault();
+						}
+					} );
+
+					$( document ).on( {
+						'mouseenter.JetSearch': function( event ) {
+
+							if ( timeout ) {
+								clearTimeout( timeout );
+							}
+
+							timeout = setTimeout( function() {
+								self.customUrlActions.actionHandler( event )
+							}, window.JetEngineSettings.hoverActionTimeout );
+						},
+						'mouseleave.JetSearch': function() {
+							if ( timeout ) {
+								clearTimeout( timeout );
+								timeout = null;
+							}
+						},
+					}, this.selectorOnHover );
+				},
+
+				actions: {},
+
+				addAction: function( name, callback ) {
+					this.actions[ name ] = callback;
+				},
+
+				actionHandler: function( event ) {
+					var url = $( event.currentTarget ).attr( 'href' ) || $( event.currentTarget ).attr( 'data-url' );
+
+					this.runAction( url );
+				},
+
+				runAction: function( url ) {
+					var queryParts = url.split( '&' ),
+						settings = {};
+
+					queryParts.forEach( function( item ) {
+						if ( -1 !== item.indexOf( '=' ) ) {
+							var pair = item.split( '=' );
+
+							settings[ pair[0] ] = decodeURIComponent( pair[1] );
+						}
+					} );
+
+					if ( ! settings.action ) {
+						return;
+					}
+
+					var actionCb = this.actions[ settings.action ];
+
+					if ( ! actionCb ) {
+						return;
+					}
+
+					actionCb( settings );
+				}
+			};
+
+			self.handleListingItemClick = function( event ) {
+				var url	   = $( this ).data( 'url' ),
+					target = $( this ).data( 'target' ) || false;
+
+				if ( url ) {
+
+					event.preventDefault();
+
+					if ( window.elementorFrontend && window.elementorFrontend.isEditMode() ) {
+						return;
+					}
+
+					if ( -1 !== url.indexOf( '#jet-engine-action' ) ) {
+
+						self.customUrlActions.runAction( url );
+
+					} else {
+
+						if ( '_blank' === target ) {
+							window.open( url );
+							return;
+						}
+
+						window.location = url;
+					}
+				}
+			};
+
+			self.isWooAddToCartTrigger = function( $target ) {
+
+				if ( $target.data( 'product_id' ) || $target.attr( 'data-product_id' ) ) {
+					return true;
+				}
+
+				const href = $target.attr( 'href' ) || '';
+
+				if ( href && href.includes( 'add-to-cart=' ) ) {
+					return true;
+				}
+
+				if ( $target.closest( 'form.cart' ).length ) {
+					return true;
+				}
+
+				if ( $target.is( '.add_to_cart_button, .ajax_add_to_cart, .single_add_to_cart_button' ) ) {
+					return true;
+				}
+
+				return false;
+			};
+
+			self.getWooAddToCartData = function( $trigger ) {
+				let addToCartData = {},
+					href          = $trigger.attr( 'href' ) || '',
+					form          = $trigger.closest( 'form.cart' ),
+					productId     = $trigger.attr( 'data-product_id' ) || $trigger.data( 'product_id' ) || '',
+					quantityInput = $trigger.closest( '.jet-ajax-search__item-add-to-cart' ).find( '.jet-ajax-search__results-item-quantity-input' ),
+					quantity      = $trigger.attr( 'data-quantity' ) || $trigger.data( 'quantity' ) || 1;
+
+				if ( quantityInput.length && '' !== quantityInput.val() ) {
+					quantity = quantityInput.val();
+				}
+
+				$.each( $trigger[0].dataset || {}, function( key, value ) {
+					addToCartData[ key ] = value;
+				} );
+
+				if ( form.length ) {
+					$.each( form.serializeArray(), function( index, field ) {
+						if ( '' !== field.value ) {
+							addToCartData[ field.name ] = field.value;
+						}
+					} );
+				}
+
+				if ( href && -1 !== href.indexOf( 'add-to-cart=' ) && ! productId ) {
+					try {
+						let parsedUrl   = new URL( href, window.location.origin ),
+							hrefProduct = parsedUrl.searchParams.get( 'add-to-cart' );
+
+						if ( hrefProduct ) {
+							productId = hrefProduct;
+						}
+					} catch ( e ) {}
+				}
+
+				if ( ! productId && addToCartData.product_id ) {
+					productId = addToCartData.product_id;
+				}
+
+				if ( ! productId && addToCartData['add-to-cart'] ) {
+					productId = addToCartData['add-to-cart'];
+				}
+
+				if ( productId ) {
+					addToCartData.product_id = productId;
+				}
+
+				if ( quantity && ! addToCartData.quantity ) {
+					addToCartData.quantity = quantity;
+				}
+
+				$( document ).trigger( 'jet-ajax-search/resolve-add-to-cart-data', [ addToCartData, $trigger, self ] );
+
+				return addToCartData;
+			};
+
+			self.normalizeWooAddToCartData = function( addToCartData ) {
+				let normalizedData = {};
+
+				if ( addToCartData.product_id ) {
+					normalizedData.product_id = addToCartData.product_id;
+				}
+
+				if ( addToCartData.quantity ) {
+					normalizedData.quantity = addToCartData.quantity;
+				} else {
+					normalizedData.quantity = 1;
+				}
+
+				if ( addToCartData.variation_id ) {
+					normalizedData.variation_id = addToCartData.variation_id;
+				}
+
+				$.each( addToCartData, function( key, value ) {
+					if ( 0 === key.indexOf( 'attribute_' ) ) {
+						normalizedData[ key ] = value;
+					}
+				} );
+
+				return normalizedData;
+			};
+
+			self.handleWooAddToCartInResults = function( event ) {
+				const $trigger = $( event.target ).closest(
+					'.add_to_cart_button, .ajax_add_to_cart, .single_add_to_cart_button, [data-product_id], a[href*="add-to-cart="], form.cart button'
+				);
+
+				if ( ! $trigger.length || ! self.isWooAddToCartTrigger( $trigger ) ) {
+					return;
+				}
+
+				if ( 'undefined' === typeof wc_add_to_cart_params || ! wc_add_to_cart_params.wc_ajax_url ) {
+					return;
+				}
+
+				event.preventDefault();
+				event.stopImmediatePropagation();
+
+				if ( $trigger.prop( 'disabled' ) || $trigger.hasClass( 'loading' ) ) {
+					return;
+				}
+
+				let addToCartData = self.getWooAddToCartData( $trigger );
+
+				addToCartData = self.normalizeWooAddToCartData( addToCartData );
+
+				if ( ! addToCartData.product_id ) {
+					return;
+				}
+
+				$trigger
+					.removeClass( 'added is-added-to-cart' )
+					.addClass( 'loading' )
+					.prop( 'disabled', true );
+
+				$( document.body ).trigger( 'adding_to_cart', [ $trigger, addToCartData ] );
+
+				$.ajax( {
+					type: 'POST',
+					url: wc_add_to_cart_params.wc_ajax_url.toString().replace( '%%endpoint%%', 'add_to_cart' ),
+					dataType: 'json',
+					data: addToCartData,
+					success: function( response ) {
+						if ( response && response.error && response.product_url ) {
+							window.location = response.product_url;
+							return;
+						}
+
+						if ( response && response.fragments ) {
+							$.each( response.fragments, function( key, value ) {
+								$( key ).replaceWith( value );
+							} );
+						}
+
+						$( document.body ).trigger( 'added_to_cart', [ response.fragments || {}, response.cart_hash || '', $trigger ] );
+					},
+					complete: function() {
+						$trigger.removeClass( 'loading' ).prop( 'disabled', false );
+					}
+				} );
+			};
+
+			self.syncResultsItemQuantity = function( event ) {
+				const $input = $( event.target ),
+					value = $input.val() || $input.attr( 'min' ) || 1;
+
+				$input
+					.closest( '.jet-ajax-search__item-add-to-cart' )
+					.find( '.jet-ajax-search__results-item-cart-button' )
+					.removeClass( 'is-added-to-cart' )
+					.attr( 'data-quantity', value )
+					.data( 'quantity', value );
+			};
+
 			$( settings.inputClass, self )
 				.on( 'input' + settings.searchClass, self.inputChangeHandler )
 				.on( 'focus' + settings.searchClass, self.focusHandler )
 				.on( 'blur' + settings.searchClass, self.blurHandler )
-				.on( 'keypress' + settings.searchClass, self.formSubmit );
+				.on( 'keydown' + settings.searchClass, self.formSubmit );
 
 			$( settings.submitClass, self ).on( 'click' + settings.searchClass, self.clickFullResults );
 
 			$( self )
+				.on( 'mousedown' + settings.searchClass, self.formClick )
 				.on( 'click' + settings.searchClass, self.formClick )
+				.on( 'touchstart' + settings.searchClass, self.formClick )
 				.on( 'touchend' + settings.searchClass, self.formClick )
+				.on( 'mousedown' + settings.searchClass + ' touchstart' + settings.searchClass, '.chosen-container, .chosen-drop', function() {
+					JetSearch.markPopupDropdownInteraction( $( self ), 500 );
+				} )
 				.on( 'click' + settings.searchClass, settings.fullResultsClass, self.clickFullResults )
 				.on( 'click' + settings.searchClass, settings.countClass, self.clickFullResults )
 				.on( 'click' + settings.searchClass, settings.bulletClass, self.clickBulletHandler )
 				.on( 'click' + settings.searchClass, settings.numberClass, self.clickBulletHandler )
 				.on( 'click' + settings.searchClass, settings.prevClass + ':not( ' + settings.disableNavClass + ' )', self.clickNavigationButtonHandler )
 				.on( 'click' + settings.searchClass, settings.nextClass + ':not( ' + settings.disableNavClass + ' )', self.clickNavigationButtonHandler )
+				.on( 'click keydown' + settings.searchClass, settings.inlineSuggestionsItemClass, self.selectSuggestion )
+				.on( 'click keydown' + settings.searchClass, settings.resultsSuggestionItemClass, self.selectSuggestion )
+				.on( 'input change' + settings.searchClass, '.jet-ajax-search__results-item-quantity-input', self.syncResultsItemQuantity )
 				.on( 'change', settings.chosenClass, self.changeHandler )
-				.on( 'chosen:showing_dropdown', settings.chosenClass, self.chosenFocusHandler );
+				.on( 'chosen:showing_dropdown', settings.chosenClass, self.chosenFocusHandler )
+				.on( 'click' + settings.searchClass, '.jet-engine-listing-overlay-wrap:not([data-url*="event=hover"])', self.handleListingItemClick )
+				.on( 'click' + settings.searchClass,
+					settings.resultsAreaClass + ' .add_to_cart_button, ' +
+					settings.resultsAreaClass + ' .ajax_add_to_cart, ' +
+					settings.resultsAreaClass + ' form.cart .single_add_to_cart_button',
+					self.handleWooAddToCartInResults
+				);
 
-			if ( ! self.ajaxSettings.sumbitOnEnter ){
+			$( document.body )
+				.on( 'adding_to_cart' + settings.searchClass, function( event, $trigger ) {
+					if ( ! $trigger || ! $trigger.closest( settings.resultsAreaClass ).length ) {
+						return;
+					}
+
+					$trigger
+						.removeClass( 'added is-added-to-cart' )
+						.siblings( '.added_to_cart, .wc-forward' )
+						.remove();
+				} )
+				.on( 'added_to_cart' + settings.searchClass, function( event, fragments, cartHash, $trigger ) {
+					if ( ! $trigger || ! $trigger.closest( settings.resultsAreaClass ).length ) {
+						return;
+					}
+
+					$trigger
+						.addClass( 'is-added-to-cart' )
+						.siblings( '.added_to_cart, .wc-forward' )
+						.remove();
+				} );
+
+			if ( ! allowSubmitOnEnter ){
 				$( window ).keydown( function( event ) {
 					if ( 13 === event.keyCode && event.target.className.includes( 'jet-ajax-search' ) ) {
 						event.preventDefault();
@@ -978,9 +2803,52 @@
 				});
 			}
 
-			// If after reloading the page the value of the select is not '0'.
-			if ( '0' !== $( settings.chosenClass, self ).val() ) {
-				$( settings.chosenClass, self ).trigger( 'change' );
+			$( self ).on( 'keydown', function( e ) {
+				const keyCode = e.keyCode || e.which;
+
+				if ( 9 === keyCode ) {
+					setTimeout( () => {
+						const focusedElement = document.activeElement;
+
+						if ( $( focusedElement ).is( '.chosen-search-input' ) ) {
+							$( '.chosen-single', self ).addClass( 'focused' );
+						} else {
+							$( '.chosen-single', self ).removeClass( 'focused' );
+						}
+					}, 50 );
+				}
+			} );
+
+			$( settings.inputClass, self ).on( 'click' + settings.searchClass, () => {
+				$( '.chosen-single', self ).removeClass( 'focused' );
+			} );
+
+			if ( '' != categoryIndex ) {
+				let target              = $( settings.chosenClass, self ),
+					globalQuerySettings = $( self ).data( 'settings' ),
+					categorySelect      = $( '.jet-ajax-search__categories-select', self ),
+					currentCategory     = '';
+
+				categorySelect.find( 'option' ).each( function() {
+					var value = $( this ).val();
+
+					if ( value === categoryIndex ) {
+						currentCategory = $( this ).text();
+					}
+				} );
+
+				categorySelect.find( 'option:contains("' + currentCategory + '")' ).attr( 'selected', 'selected' );
+
+				globalQuerySettings.category__in = target.val();
+				data.category__in                = target.val();
+
+				$( self ).data( 'settings', globalQuerySettings );
+			} else {
+				// If after reloading the page the value of the select is not '0'.
+
+				if ( '0' !== $( settings.chosenClass, self ).val() ) {
+					$( settings.chosenClass, self ).trigger( 'change' );
+				}
 			}
 
 			$( 'body' )
@@ -990,6 +2858,10 @@
 			self.setResultsAreaWidth();
 			$( window ).on( 'resize' + settings.searchClass, self.setResultsAreaWidth );
 
+			$( window ).on( 'orientationchange resize', function () {
+				self.syncResultsListHeightOnImagesLoaded();
+			} );
+
 		} else {
 			return 'is init: true';
 		}
@@ -998,5 +2870,11 @@
 	// initialize after all is defined
 	$( window ).on( 'elementor/frontend/init', JetSearch.initElementor );
 	JetSearch.initBlocks();
+
+	window.jetSearchBricks = function() {
+		JetSearch.initBricks();
+	}
+
+	window.JetSearch = JetSearch;
 
 }( jQuery ));

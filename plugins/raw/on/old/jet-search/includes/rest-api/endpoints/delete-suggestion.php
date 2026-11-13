@@ -26,40 +26,78 @@ class Jet_Search_Rest_Delete_Suggestion extends Jet_Search_Rest_Base_Route {
 	 */
 	public function callback( $request ) {
 
-		$suggestion = $request->get_params();
+		$params     = $request->get_params();
+		$suggestion = isset( $params['content'] ) ? $params['content'] : '';
+		$suggestion = is_string( $suggestion ) ? json_decode( $suggestion, true ) : (array) $suggestion;
 
-		if ( empty( $suggestion ) || ! $suggestion['id'] ) {
+		$is_bulk = isset( $suggestion['ids'] ) && is_array( $suggestion['ids'] ) && ! empty( $suggestion['ids'] );
+		$has_id  = isset( $suggestion['id'] ) && $suggestion['id'];
+
+		if ( ! $is_bulk && ! $has_id ) {
 			return rest_ensure_response( array(
 				'success' => false,
 				'data'    => esc_html__( 'Error! The suggestion could not be deleted.', 'jet-search' ),
 			) );
 		}
 
-		unset( $suggestion['_locale'] );
+		if ( isset( $suggestion['_locale'] ) ) {
+			unset( $suggestion['_locale'] );
+		}
 
 		global $wpdb;
 
-		$table_name    = 'search_suggestions';
-		$suggestion_id = esc_sql( (int)$suggestion['id'] );
-		$where         = array( 'id' => $suggestion_id );
+		$table_name = 'search_suggestions';
 
-		jet_search()->db->delete( $table_name, $where );
+		$ids_to_delete = array();
 
-		$prefix     = 'jet_';
-		$table_name = $wpdb->prefix . $prefix . 'search_suggestions';
-		$query      = "SELECT * FROM {$table_name}";
+		if ( $is_bulk ) {
+			foreach ( $suggestion['ids'] as $raw_id ) {
+				$ids_to_delete[] = (int) $raw_id;
+			}
+		} else {
+			$ids_to_delete[] = (int) $suggestion['id'];
+		}
 
-		$suggestions = $wpdb->get_results( $query, ARRAY_A );
+		$ids_to_delete = array_values( array_unique( array_filter( $ids_to_delete, function( $v ){ return $v > 0; } ) ) );
+
+		if ( empty( $ids_to_delete ) ) {
+			return rest_ensure_response( array(
+				'success' => false,
+				'data'    => esc_html__( 'Error! The suggestion could not be deleted.', 'jet-search' ),
+			) );
+		}
+
+		foreach ( $ids_to_delete as $sid ) {
+			$where = array( 'id' => esc_sql( $sid ) );
+			jet_search()->db->delete( $table_name, $where );
+		}
+
+		$prefix       = 'jet_';
+		$table_name   = $wpdb->prefix . $prefix . 'search_suggestions';
+		$suggestions  = $wpdb->get_results( "SELECT * FROM {$table_name}", ARRAY_A );
 
 		if ( $suggestions ) {
 			foreach ( $suggestions as $suggestion_item ) {
-				if ( $suggestion_item['id'] !== $suggestion_id ) {
-					$this->remove_deleted_parent( $suggestion_item, $suggestion_id );
+				foreach ( $ids_to_delete as $deleted_id ) {
+					if ( (int) $suggestion_item['id'] !== (int) $deleted_id ) {
+						$this->remove_deleted_parent( $suggestion_item, $deleted_id );
+					}
 				}
 			}
 		}
 
-		$success_text = sprintf( esc_html__( 'Success! Suggestion: %s has been deleted', 'jet-search' ), $suggestion['name'] );
+		if ( $is_bulk ) {
+			$success_text = sprintf(
+				esc_html__( 'Success! %d suggestion(s) have been deleted', 'jet-search' ),
+				count( $ids_to_delete )
+			);
+		} else {
+			$name         = isset( $suggestion['name'] ) ? $suggestion['name'] : '#' . (int) $suggestion['id'];
+			$success_text = sprintf(
+				esc_html__( 'Success! Suggestion: %s has been deleted', 'jet-search' ),
+				$name
+			);
+		}
 
 		return rest_ensure_response( array(
 			'success' => true,

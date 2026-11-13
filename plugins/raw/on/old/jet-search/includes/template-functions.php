@@ -29,13 +29,13 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 		 * @return string
 		 */
 		static public function get_post_thumbnail( $data, $post ) {
-			$visible = filter_var( $data['thumbnail_visible'], FILTER_VALIDATE_BOOLEAN );
+			$visible = isset( $data['thumbnail_visible'] ) ? filter_var( $data['thumbnail_visible'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( ! $visible ) {
 				return '';
 			}
 
-			$thumbnail_format = apply_filters( 'jet-search/ajax-search/thumbnail-html', '<div class="jet-ajax-search__item-thumbnail">%s</div>' );
+			$thumbnail_format = apply_filters( 'jet-search/ajax-search/thumbnail-html', '<div class="jet-ajax-search__item-thumbnail">%s</div>', $post, $data );
 			$thumbnail_size   = ! empty( $data['thumbnail_size'] ) ? $data['thumbnail_size'] : 'thumbnail';
 			$thumbnail_attr   = array( 'class' => 'jet-ajax-search__item-thumbnail-img' );
 			$thumbnail_html   = get_the_post_thumbnail( $post->ID, $thumbnail_size, $thumbnail_attr );
@@ -58,7 +58,9 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 				} else {
 					$thumbnail_html = apply_filters(
 						'jet-search/ajax-search/thumbnail-placeholder-html',
-						'<div class="jet-ajax-search__item-thumbnail-placeholder"></div>'
+						'<div class="jet-ajax-search__item-thumbnail-placeholder"></div>',
+						$post,
+						$data
 					);
 				}
 			}
@@ -85,7 +87,7 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 		static public function get_post_content( $data, $post ) {
 
 			$after  = '&hellip;';
-			$length = ( int ) $data['post_content_length'];
+			$length = isset( $data['post_content_length'] ) ? ( int ) $data['post_content_length'] : 0;
 
 			if ( 0 !== $length ) {
 
@@ -99,10 +101,16 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 							$content = $post->post_excerpt;
 							break;
 
-						case 'custom-field':
-							$key     = $data['post_content_custom_field_key'];
-							$content = ! empty( $key ) ? get_post_meta( $post->ID, $key, true ) : '';
-							break;
+							case 'custom-field':
+								$key = isset( $data['post_content_custom_field_key'] )
+									? $data['post_content_custom_field_key']
+									: '';
+					
+								$content = ! empty( $key )
+									? get_post_meta( $post->ID, $key, true )
+									: '';
+					
+								break;
 
 						default:
 							$content = $post->post_content;
@@ -131,7 +139,7 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 		 * @return string
 		 */
 		static public function get_product_price( $data, $post ) {
-			$visible = filter_var( $data['show_product_price'], FILTER_VALIDATE_BOOLEAN );
+			$visible = isset( $data['show_product_price'] ) ? filter_var( $data['show_product_price'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( ! $visible || 'product' !== $post->post_type || ! function_exists( 'wc' ) ) {
 				return '';
@@ -163,7 +171,7 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 		 * @return string
 		 */
 		static public function get_product_rating( $data, $post ) {
-			$visible = filter_var( $data['show_product_rating'], FILTER_VALIDATE_BOOLEAN );
+			$visible = isset( $data['show_product_rating'] ) ? filter_var( $data['show_product_rating'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( ! $visible || 'product' !== $post->post_type || ! function_exists( 'wc' ) ) {
 				return '';
@@ -287,10 +295,11 @@ if ( ! class_exists( 'Jet_Search_Template_Functions' ) ) {
 					$meta_val = $value[0];
 				}
 
-				$meta_val = sprintf( $meta['meta_format'], $meta_val );
+				// Sanitize after formatting: both the value and format can contain HTML.
+				$meta_val = wp_kses_post( sprintf( $meta['meta_format'], $meta_val ) );
 
 				$label = ! empty( $meta['meta_label'] )
-					? sprintf( '<div class="%1$s__item-label">%2$s</div>', $base, $meta['meta_label'] )
+					? sprintf( '<div class="%1$s__item-label">%2$s</div>', $base, wp_kses_post( $meta['meta_label'] ) )
 					: '';
 
 				$result .= sprintf(

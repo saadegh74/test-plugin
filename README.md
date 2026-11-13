@@ -62,6 +62,9 @@ plugins/updates/
 │   │   ├── jet-smart-filters/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── jet-smart-filters-v3.8.6.3.zip <-- فایل فشرده با نام استاندارد جهت تست
+│   │   ├── jet-search/
+│   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
+│   │   │   └── jet-search-v3.6.3.1.zip     <-- فایل فشرده با نام استاندارد جهت تست
 │   │   ├── jet-blocks/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── jet-blocks-v1.3.12.zip      <-- فایل فشرده با نام استاندارد جهت تست
@@ -81,8 +84,10 @@ plugins/updates/
 │   ├── staging/
 │   │   ├── jet-elements/
 │   │   │   └── jet-elements-v2.6.13.1.zip  <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
-│   │   └── jet-smart-filters/
-│   │       └── jet-smart-filters-v3.3.2.zip <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
+│   │   ├── jet-smart-filters/
+│   │   │   └── jet-smart-filters-v3.3.2.zip <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
+│   │   └── jet-search/
+│   │       └── jet-search-v3.1.1.zip       <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
 │   └── production/
 │
 └── up-side/                                <-- کانال بسته‌های قالب‌ها و افزونه‌های جانبی
@@ -96,6 +101,15 @@ plugins/updates/
 ---
 
 ## ۳. لیست افزونه‌های فعال و آدرس‌های اندپوینت (Endpoints)
+
+### افزونه JetSearch (نسخه 3.6.3.1)
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-search/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-search/jet-search-v3.6.3.1.zip`
+* **کانال پایدار (Production):**
+  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **آرشیو نسخه قبلی (up-old):**
+  * لینک دانلود نسخه 3.1.1: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-old/staging/jet-search/jet-search-v3.1.1.zip`
 
 ### افزونه JetSmartFilters (نسخه 3.8.6.3)
 * **کانال آزمایشی (Staging):**

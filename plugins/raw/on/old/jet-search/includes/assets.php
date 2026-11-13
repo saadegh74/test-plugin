@@ -50,6 +50,16 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 			add_action( 'wp_print_footer_scripts', array( $this, 'print_results_item_js_template' ), 0 );
 			add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'font_styles' ) );
 			add_action( 'elementor/preview/enqueue_styles', array( $this, 'font_styles' ) );
+
+			/**
+			 * Filters the authentication errors for REST API requests.
+			 *
+			 * This filter allows specific Jet Search REST API routes by bypassing
+			 * authentication errors for them.
+			 *
+			 * @since 3.5.2
+			 */
+			add_filter( 'rest_authentication_errors', array( $this, 'allow_jet_search_rest_api_routes' ), 999 );
 		}
 
 		/**
@@ -83,7 +93,7 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 
 			wp_enqueue_style(
 				'jet-search-font',
-				jet_search()->plugin_url( 'assets/css/jet-search-icons.css' ),
+				jet_search()->plugin_url( 'assets/css/lib/jet-search-icons/jet-search-icons.css' ),
 				array(),
 				jet_search()->get_version()
 			);
@@ -139,35 +149,116 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 				jet_search()->get_version(),
 				true
 			);
+
 		}
 
-		public function get_localize_data() {
+		public function get_localize_data( $settings = null ) {
 
 			if ( empty( $this->localize_data ) ) {
 
-				$ajax_action = jet_search_ajax_handlers()->get_ajax_action();
+				$ajax_action        = jet_search_ajax_handlers()->get_ajax_action();
+				$use_session        = get_option( 'jet_search_suggestions_use_session' );
+				$suggestions_limits = $this->get_ajax_search_suggestions_limits();
 
 				//Ajax search
-				$this->localize_data['rest_api_url']  = get_site_url() . "/wp-json/jet-search/v1/search-posts";
-				$this->localize_data['action']        = $ajax_action;
-				$this->localize_data['nonce']         = wp_create_nonce( $ajax_action );
-				$this->localize_data['sumbitOnEnter'] = true;
+				$this->localize_data['rest_api_url']                = get_rest_url() . "jet-search/v1/search-posts";
+				$this->localize_data['action']                      = $ajax_action;
+				$this->localize_data['nonce']                       = wp_create_nonce( $ajax_action );
+				$this->localize_data['sumbitOnEnter']               = true;
+				$this->localize_data['ajaxSearchSuggestionsLimits'] = $suggestions_limits;
+				$this->localize_data['ajaxurl']                     = esc_url( admin_url( 'admin-ajax.php' ) );
 
 				//Ajax search suggestions
 				$this->localize_data['searchSuggestions'] = array(
 					'ajaxurl'                      => esc_url( admin_url( 'admin-ajax.php' ) ),
-					'get_suggestions_rest_api_url' => get_site_url() . "/wp-json/jet-search/v1/get-suggestions",
-					'add_suggestions_rest_api_url' => get_site_url() . "/wp-json/jet-search/v1/form-add-suggestion",
+					'get_suggestions_rest_api_url' => get_rest_url() . "jet-search/v1/get-suggestions",
+					'add_suggestions_rest_api_url' => get_rest_url() . "jet-search/v1/form-add-suggestion",
 					'get_action'                   => 'get_form_suggestions',
 					'add_action'                   => 'add_form_suggestion',
-					'nonce'                        => wp_create_nonce( 'get_form_suggestions' )
+					'nonce_rest'                   => wp_create_nonce( 'wp_rest' ),
+					'nonce'                        => wp_create_nonce( 'form_suggestions' ),
+					'use_session'                  => $use_session
 				);
-				$this->localize_data = apply_filters( 'jet-ajax-search/assets/localize-data', $this->localize_data );
 
+				/**
+				 * Apply the filter to determine whether to use the legacy AJAX method or REST API for search functionality.
+				 *
+				 * @since 3.5.2
+				 */
+				$use_legacy = apply_filters( 'jet-ajax-search/assets/localize-data/use-legacy-ajax', false );
+
+				/**
+				 * Retrieves the request settings.
+				 *
+				 * @since 3.5.3
+				 */
+				$request_options = get_option( 'jet_ajax_search_request_settings' );
+				$request_type    = '';
+
+				if ( false != $request_options ) {
+					$request_type = isset( $request_options['request_type'] ) ? $request_options['request_type'] : '';
+				}
+
+				if ( $use_legacy || 'ajax' === $request_type ) {
+					$this->localize_data['rest_api_url'] = $this->localize_data['ajaxurl'];
+					$this->localize_data['searchSuggestions']['get_suggestions_rest_api_url'] = $this->localize_data['ajaxurl'];
+					$this->localize_data['searchSuggestions']['add_suggestions_rest_api_url'] = $this->localize_data['ajaxurl'];
+				}
 			}
+
+			$show_search_suggestions   = isset( $settings['show_search_suggestions'] ) ? $settings['show_search_suggestions'] : '';
+			$search_suggestions_source = isset( $settings['search_suggestions_source'] ) ? $settings['search_suggestions_source'] : '';
+			$preview_suggestions       = isset( $settings['preview_suggestions'] ) ? $settings['preview_suggestions'] : false;
+
+			if ( filter_var( $preview_suggestions, FILTER_VALIDATE_BOOLEAN ) || ( 'popular' === $search_suggestions_source && filter_var( $show_search_suggestions, FILTER_VALIDATE_BOOLEAN ) && ! isset( $this->localize_data['ajaxSearchPopularSuggestions'] ) ) ) {
+				$suggestions_limits = $this->get_ajax_search_suggestions_limits();
+
+				$suggestions = array();
+
+				$data = array(
+					'data[list_type]' => 'popular',
+					'data[value]'     => '',
+					'data[limit]'     => $suggestions_limits,
+					'nonce'           => $this->localize_data['searchSuggestions']['nonce']
+				);
+
+				$data = build_query( $data );
+
+				$rest_api_url = $this->localize_data['searchSuggestions']['get_suggestions_rest_api_url'] . '?action=' . $this->localize_data['searchSuggestions']['get_action'] . "&" . $data;
+
+				$response = wp_remote_request( $rest_api_url );
+
+				if ( ! is_wp_error( $response ) ) {
+					$code = (int) wp_remote_retrieve_response_code( $response );
+
+					if ( $code === 200 ) {
+						$body = wp_remote_retrieve_body( $response );
+
+						$suggestions = json_decode( $body, true );
+
+						$suggestions_list = array();
+
+						if ( ! empty( $suggestions ) ) {
+							foreach ( $suggestions as $item ) {
+								if ( isset( $item["name"] ) ) {
+									$suggestions_list[] = $item["name"];
+								}
+							}
+						}
+
+						$this->localize_data['ajaxSearchPopularSuggestions'] = $suggestions_list;
+					}
+				}
+			}
+
+			$this->localize_data = apply_filters( 'jet-ajax-search/assets/localize-data', $this->localize_data );
 
 			return $this->localize_data;
 
+		}
+
+		public function get_ajax_search_suggestions_limits() {
+			return apply_filters( 'jet-ajax-search/search-suggestions-limits', 20 );
 		}
 
 		// /**
@@ -196,7 +287,7 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 				);
 			}
 
-			wp_localize_script( 'jet-search', 'jetSearchSettings', $this->get_localize_data() );
+			wp_localize_script( 'jet-search', 'jetSearchSettings', $this->get_localize_data( $settings ) );
 		}
 
 		public function enqueue_preview_scripts() {
@@ -209,7 +300,9 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 				true
 			);
 
-			wp_localize_script( 'jet-search', 'jetSearchSettings', $this->get_localize_data() );
+			$settings['preview_suggestions'] = true;
+
+			wp_localize_script( 'jet-search', 'jetSearchSettings', $this->get_localize_data( $settings ) );
 
 		}
 
@@ -270,6 +363,14 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 			include jet_search()->get_template( 'jet-search-suggestions/global/inline-suggestion-item.php' );
 			$content_search_suggestions_inline = ob_get_clean();
 
+			ob_start();
+			include jet_search()->get_template( 'jet-ajax-search/global/inline-suggestion-item.php' );
+			$content_ajax_search_suggestions_inline = ob_get_clean();
+
+			ob_start();
+			include jet_search()->get_template( 'jet-ajax-search/global/results-suggestion-item.php' );
+			$content_ajax_search_suggestions_results = ob_get_clean();
+
 			if ( ! empty( $content_search ) ) {
 				$content_search = apply_filters( 'jet-ajax-search/results_item_js_template' , $content_search );
 
@@ -278,7 +379,7 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 					$content_search
 				);
 
-				echo $search_output;
+				echo $search_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			if ( ! empty( $content_search_suggestions_focus ) ) {
@@ -289,7 +390,7 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 					$content_search_suggestions_focus
 				);
 
-				echo $search_suggestions_focus_output;
+				echo $search_suggestions_focus_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 
 			if ( ! empty( $content_search_suggestions_inline ) ) {
@@ -300,8 +401,68 @@ if ( ! class_exists( 'Jet_Search_Assets' ) ) {
 					$content_search_suggestions_inline
 				);
 
-				echo $search_suggestions_inline_output;
+				echo $search_suggestions_inline_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
+
+			if ( ! empty( $content_ajax_search_suggestions_inline ) ) {
+				$content_ajax_search_suggestions_inline = apply_filters( 'jet-ajax-search/inline_suggestion_item_js_template' , $content_ajax_search_suggestions_inline );
+
+				$content_ajax_search_suggestions_inline_output = sprintf(
+					'<script type="text/html" id="tmpl-jet-ajax-search-inline-suggestion-item">%s</script>',
+					$content_ajax_search_suggestions_inline
+				);
+
+				echo $content_ajax_search_suggestions_inline_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+
+			if ( ! empty( $content_ajax_search_suggestions_results ) ) {
+				$content_ajax_search_suggestions_results = apply_filters( 'jet-ajax-search/results_suggestion_item_js_template' , $content_ajax_search_suggestions_results );
+
+				$content_ajax_search_suggestions_results_output = sprintf(
+					'<script type="text/html" id="tmpl-jet-ajax-search-results-suggestion-item">%s</script>',
+					$content_ajax_search_suggestions_results
+				);
+
+				echo $content_ajax_search_suggestions_results_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+		}
+
+		/**
+		 * Allows specific Jet Search REST API routes.
+		 *
+		 * This function checks if the current request is for one of the allowed Jet Search REST API routes.
+		 * If it is, the function returns true to allow the route. Otherwise, it returns any existing errors.
+		 *
+		 * @since 3.5.2
+		 * @param mixed $errors The current error status. Can be boolean or WP_Error object.
+		 * @return mixed True if the route is allowed, otherwise the original errors.
+		 */
+		public function allow_jet_search_rest_api_routes( $errors ) {
+
+			if ( true === $errors ) {
+				return $errors;
+			}
+
+			$allowed_routes = array(
+				'/jet-search/v1/search-posts',
+				'/jet-search/v1/get-suggestions',
+				'/jet-search/v1/form-add-suggestion',
+			);
+
+			$current_route = isset( $GLOBALS['wp']->query_vars['rest_route'] ) ? $GLOBALS['wp']->query_vars['rest_route'] : '';
+
+			if ( ! empty( $current_route ) || '/' != $current_route ) {
+				$current_route = untrailingslashit( $current_route );
+			}
+
+			if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+
+				if ( in_array( $current_route, $allowed_routes ) ) {
+					return true;
+				}
+			}
+
+			return $errors;
 		}
 
 		/**

@@ -53,9 +53,9 @@ class Plugin_Manager {
 
 	/**
 	 * [$registered_plugins description]
-	 * @var boolean
+	 * @var array
 	 */
-	public $registered_plugins_data = false;
+	public $registered_plugins_data = array();
 
 	/**
 	 * Init class parameters.
@@ -287,6 +287,10 @@ class Plugin_Manager {
 	 */
 	public function check_update( $data ) {
 
+		if ( empty( $data ) ) {
+			return false;
+		}
+
 		delete_site_transient( 'jet_dashboard_remote_jet_plugin_list' );
 
 		$registered_plugins = Dashboard::get_instance()->get_registered_plugins();
@@ -423,9 +427,7 @@ class Plugin_Manager {
 				}
 
 				$plugin_data['licenseControl'] = array_key_exists( $plugin_slug, $registered_plugins ) ? true : false;
-
 				$plugin_data['usefulLinks'] = array_key_exists( $plugin_slug, $registered_plugins ) ? $registered_plugins[ $plugin_slug ]['plugin_links'] : array();
-
 				$plugins_list[ $plugin_data['slug'] ] = $plugin_data;
 			}
 		}
@@ -568,6 +570,14 @@ class Plugin_Manager {
 			);
 		}
 
+		// Nonce checking here. The capability checking is in the appropriate methods below
+		if ( ! isset( $data['nonce'] ) || ! wp_verify_nonce( $data['nonce'], 'jet-dashboard' ) ) {
+			wp_send_json( [
+				'status'  => 'error',
+				'message' => __( 'Page has expired. Please reload this page.', 'jet-dashboard' ),
+			] );
+		}
+
 		$action  = $data['action'];
 		$plugin  = $data['plugin'];
 		$version = isset( $data['version'] ) ? $data['version'] : false;
@@ -620,6 +630,15 @@ class Plugin_Manager {
 					'message' => $this->sys_messages['server_error']
 				)
 			);
+		}
+
+		// Nonce checking here. The capability checking is in the appropriate methods below
+		if ( ! isset( $data['nonce'] ) || ! wp_verify_nonce( $data['nonce'], 'jet-dashboard' ) ) {
+			wp_send_json( [
+				'type' => 'error',
+				'title' => __( 'Error', 'jet-dashboard' ),
+				'desc'  => __( 'Server error. Stop cheating!!!', 'jet-dashboard' ),
+			] );
 		}
 
 		$action  = $data['action'];
@@ -778,6 +797,15 @@ class Plugin_Manager {
 			);
 		}
 
+		if ( ! Utils::is_site_activated() ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => 'These licenses are invalid. Deactivate the license and activate it again.'
+				)
+			);
+		}
+
 		if ( ! $plugin_url ) {
 			$package = Utils::package_url( $plugin_file );
 		} else {
@@ -785,7 +813,6 @@ class Plugin_Manager {
 		}
 
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
-		//include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
 		$skin     = new \WP_Ajax_Upgrader_Skin();
 		$upgrader = new \Plugin_Upgrader( $skin );
@@ -858,11 +885,29 @@ class Plugin_Manager {
 	 */
 	public function update_plugin( $plugin_file ) {
 
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => 'Sorry, you are not allowed to update plugins on this site.'
+				)
+			);
+		}
+
 		if ( ! $plugin_file ) {
 			wp_send_json(
 				array(
 					'status'  => 'error',
 					'message' => 'Plugin slug is required'
+				)
+			);
+		}
+
+		if ( ! Utils::is_site_activated() ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => 'These licenses are invalid. Deactivate the license and activate it again.'
 				)
 			);
 		}
@@ -877,7 +922,7 @@ class Plugin_Manager {
 			'newVersion' => '',
 		);
 
-		if ( ! current_user_can( 'update_plugins' ) || 0 !== validate_file( $plugin ) ) {
+		if ( 0 !== validate_file( $plugin ) ) {
 
 			wp_send_json(
 				array(
@@ -1006,6 +1051,15 @@ class Plugin_Manager {
 			);
 		}
 
+		if ( ! Utils::is_site_activated() ) {
+			wp_send_json(
+				array(
+					'status'  => 'error',
+					'message' => 'These licenses are invalid. Deactivate the license and activate it again.'
+				)
+			);
+		}
+
 		$package = Utils::package_url( $plugin_file );
 
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
@@ -1118,4 +1172,5 @@ class Plugin_Manager {
 
 		return $args;
 	}
+
 }

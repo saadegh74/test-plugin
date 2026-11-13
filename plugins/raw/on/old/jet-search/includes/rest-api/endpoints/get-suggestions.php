@@ -63,9 +63,20 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 		}
 
 		if ( ! empty( $sort ) && empty( $filter ) ) {
-			$orderby = $sort['orderby'];
-			$order   = ! empty( $sort['order'] ) ? $sort['order'] : 'desc';
-			$order   = strtoupper( $order );
+			$allowed_orderby = array(
+				'id'        => 's1.id',
+				'name'      => 's1.name',
+				'weight'    => 's1.weight',
+				'parent'    => 's1.parent',
+				'child'     => 'child',
+				's1.id'     => 's1.id',
+				's1.name'   => 's1.name',
+				's1.weight' => 's1.weight',
+				's1.parent' => 's1.parent',
+			);
+			$orderby         = ! empty( $sort['orderby'] ) && isset( $allowed_orderby[ $sort['orderby'] ] ) ? $allowed_orderby[ $sort['orderby'] ] : 's1.id';
+			$order           = ! empty( $sort['order'] ) ? strtoupper( $sort['order'] ) : 'DESC';
+			$order           = in_array( $order, array( 'ASC', 'DESC' ), true ) ? $order : 'DESC';
 			$query  .= " GROUP BY s1.id";
 			$query  .= " ORDER BY {$orderby} {$order}";
 		} else {
@@ -120,7 +131,7 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 
 	public function get_form_suggestions_list( $params ) {
 		$list_type   = ! empty( $params['data']['list_type'] ) ? $params['data']['list_type'] : 'popular';
-		$limit       = ! empty( $params['data']['limit'] ) ? $params['data']['limit'] : 5;
+		$limit       = ! empty( $params['data']['limit'] ) ? absint( $params['data']['limit'] ) : 5;
 		$value       = ! empty( $params['data']['value'] ) ? $params['data']['value'] : '';
 		$parents_ids = array();
 		$suggestions = array();
@@ -132,58 +143,50 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 		$query       = "SELECT * FROM {$table_name}";
 
 		if ( '' != $value ) {
-			$query_limit  = $limit * 3;
-			$query       .= " WHERE ( name LIKE '%{$value}%' )";
+			$value        = '%' . $wpdb->esc_like( $value ) . '%';
+			$query       .= " WHERE ( name LIKE %s )";
 			$query       .= " ORDER BY WEIGHT DESC";
-			$query       .= " LIMIT {$query_limit} OFFSET 0";
+			$query       .= " LIMIT %d OFFSET 0";
+			$query        = $wpdb->prepare( $query, $value, $limit );
 		} else {
+			$query       .= " WHERE parent = 0";
 			if ( 'latest' === $list_type ) {
 				$query .= " ORDER BY ID DESC";
 			} else if ( 'popular' === $list_type ) {
 				$query .= " ORDER BY WEIGHT DESC";
 			}
 
-			$query .= " LIMIT {$limit} OFFSET 0";
+			$query .= " LIMIT %d OFFSET 0";
+			$query  = $wpdb->prepare( $query, $limit );
 		}
 
 		$suggestions = $wpdb->get_results( $query, ARRAY_A );
 
-		foreach ($suggestions as $item ) {
-			$id     = $item['id'];
-			$parent = $item['parent'];
+		if ( $suggestions ) {
+			foreach ( $suggestions as $key => $item ) {
+				$parent = $item['parent'];
 
-			if ( '0' != $parent ) {
-				$parents_ids[$id] = $parent;
+				if ( ! empty( $parent ) ) {
+					$parents_ids[] = $parent;
+
+					unset( $suggestions[$key] );
+				}
+			}
+
+			if ( ! empty( $parents_ids ) ) {
+				$parents_ids = array_unique( $parents_ids );
+				$parents_ids = array_filter( array_map( 'absint', $parents_ids ) );
+
+				if ( ! empty( $parents_ids ) ) {
+					$parents_query = "SELECT * FROM {$table_name} WHERE id IN (" . implode( ', ', $parents_ids ) . ")";
+
+					$parent_suggestions = $wpdb->get_results( $parents_query, ARRAY_A );
+
+					$suggestions = Jet_Search_Tools::merge_arrays_unique_by_id( $suggestions, $parent_suggestions );
+				}
+
 			}
 		}
-
-		if ( count( $parents_ids ) > 0 ) {
-			$id_string = implode( ",", $parents_ids );
-
-			$query = "SELECT * FROM {$table_name} WHERE id IN ( $id_string ) ";
-
-			$suggestions_parents = $wpdb->get_results( $query, ARRAY_A );
-
-			$suggestions = array_map(function($element) use ($suggestions_parents) {
-				foreach ( $suggestions_parents as $parent ) {
-					$element_parent = $element['parent'];
-
-					if ( $element_parent === $parent['id']) {
-						return $parent;
-					}
-				}
-				return $element;
-			}, $suggestions );
-
-			$suggestions = array_values( array_reduce( $suggestions, function( $result, $item ) {
-				if ( !array_key_exists( $item['id'], $result ) ) {
-					$result[$item['id']] = $item;
-				}
-				return $result;
-			}, [] ) );
-		}
-
-		$suggestions = array_slice( $suggestions, 0, $limit );
 
 		return $suggestions;
 	}
@@ -199,8 +202,10 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 
 			$result      = array();
 			$search_rel  = ' WHERE';
-			$query      .= "{$search_rel} s1.name LIKE '%{$search}%' AND s1.parent = 0";
+			$search      = '%' . $wpdb->esc_like( $search ) . '%';
+			$query      .= "{$search_rel} s1.name LIKE %s AND s1.parent = 0";
 			$query      .= " GROUP BY s1.id";
+			$query       = $wpdb->prepare( $query, $search );
 
 			$suggestions = $wpdb->get_results( $query, ARRAY_A );
 
@@ -238,6 +243,7 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 		global $wpdb;
 
 		$search_rel  = ' WHERE';
+		$query_args  = array();
 
 		if ( '' != $filter_type ) {
 			switch ($filter_type) {
@@ -255,11 +261,13 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 
 		if ( '' != $filter_name && '' != $filter_type ) {
 
-			$query .= "{$search_rel} ( s1.name LIKE '%{$filter['search']}%' AND {$type_query} )";
+			$query_args[] = '%' . $wpdb->esc_like( $filter_name ) . '%';
+			$query       .= "{$search_rel} ( s1.name LIKE %s AND {$type_query} )";
 
 		} else if ( '' != $filter_name ) {
 
-			$query .= "{$search_rel} ( s1.name LIKE '%{$filter['search']}%' )";
+			$query_args[] = '%' . $wpdb->esc_like( $filter_name ) . '%';
+			$query       .= "{$search_rel} ( s1.name LIKE %s )";
 
 		} else if ( '' != $filter_type ) {
 
@@ -267,9 +275,20 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 		}
 
 		if ( ! empty( $sort ) ) {
-			$orderby = $sort['orderby'];
-			$order   = ! empty( $sort['order'] ) ? $sort['order'] : 'desc';
-			$order   = strtoupper( $order );
+			$allowed_orderby = array(
+				'id'        => 's1.id',
+				'name'      => 's1.name',
+				'weight'    => 's1.weight',
+				'parent'    => 's1.parent',
+				'child'     => 'child',
+				's1.id'     => 's1.id',
+				's1.name'   => 's1.name',
+				's1.weight' => 's1.weight',
+				's1.parent' => 's1.parent',
+			);
+			$orderby         = ! empty( $sort['orderby'] ) && isset( $allowed_orderby[ $sort['orderby'] ] ) ? $allowed_orderby[ $sort['orderby'] ] : 's1.id';
+			$order           = ! empty( $sort['order'] ) ? strtoupper( $sort['order'] ) : 'DESC';
+			$order           = in_array( $order, array( 'ASC', 'DESC' ), true ) ? $order : 'DESC';
 			$query  .= " GROUP BY s1.id";
 			$query  .= " ORDER BY {$orderby} {$order}";
 		} else {
@@ -279,6 +298,12 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 		$count_query = $query;
 
 		$query       .= " LIMIT {$per_page} OFFSET {$offset}";
+
+		if ( ! empty( $query_args ) ) {
+			$query       = $wpdb->prepare( $query, $query_args );
+			$count_query = $wpdb->prepare( $count_query, $query_args );
+		}
+
 		$suggestions  = $wpdb->get_results( $query, ARRAY_A );
 		$count        = count( $wpdb->get_results( $count_query, ARRAY_A ) );
 		$on_page      = count( $suggestions );
@@ -336,7 +361,18 @@ class Jet_Search_Rest_Get_Suggestions extends Jet_Search_Rest_Base_Route {
 
 		$prefix        = 'jet_';
 		$table_name    = $wpdb->prefix . $prefix . 'search_suggestions';
-		$parents_query = "SELECT * FROM {$table_name} WHERE id IN (" . $ids . ")";
+
+		if ( ! is_array( $ids ) ) {
+			$ids = explode( ',', $ids );
+		}
+
+		$ids = array_filter( array_map( 'absint', $ids ) );
+
+		if ( empty( $ids ) ) {
+			return $parents_list;
+		}
+
+		$parents_query = "SELECT * FROM {$table_name} WHERE id IN (" . implode( ', ', $ids ) . ")";
 		$suggestions   = $wpdb->get_results( $parents_query, ARRAY_A );
 
 		foreach ( $suggestions as $item ) {

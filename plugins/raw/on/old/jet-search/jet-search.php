@@ -3,7 +3,7 @@
  * Plugin Name: JetSearch
  * Plugin URI:  https://crocoblock.com/plugins/jetsearch/
  * Description: The best tool for adding complex search functionality to pages built with Elementor or Blocks editor
- * Version:     3.1.1
+ * Version:     3.6.3.1
  * Author:      Crocoblock
  * Author URI:  https://crocoblock.com/
  * Text Domain: jet-search
@@ -46,7 +46,7 @@ if ( ! class_exists( 'Jet_Search' ) ) {
 		 * @access private
 		 * @var    string
 		 */
-		private $version = '3.1.1';
+		private $version = '3.6.3.1';
 
 		/**
 		 * Holder for base plugin URL.
@@ -80,6 +80,8 @@ if ( ! class_exists( 'Jet_Search' ) ) {
 		 */
 		public $db;
 		public $rest_api = null;
+
+		public $search_sources = null;
 
 		/**
 		 * Sets up needed actions/filters for the plugin to initialize.
@@ -117,6 +119,7 @@ if ( ! class_exists( 'Jet_Search' ) ) {
 
 			$this->module_loader = new Jet_Search_CX_Loader(
 				array(
+					$this->plugin_path( 'includes/modules/blocks-style-manager/style-manager.php' ),
 					$this->plugin_path( 'includes/modules/vue-ui/cherry-x-vue-ui.php' ),
 					$this->plugin_path( 'includes/modules/jet-dashboard/jet-dashboard.php' ),
 				)
@@ -190,9 +193,14 @@ if ( ! class_exists( 'Jet_Search' ) ) {
 			$this->rest_api = new Jet_Search_REST_API();
 
 			jet_search_blocks_integration()->init();
+			jet_search_bricks_integration()->init();
 			jet_search_ajax_handlers()->init();
 			jet_search_assets()->init();
 			jet_search_compatibility()->init();
+
+			$this->search_sources = new \Jet_Search\Search_Sources\Manager();
+
+			new Jet_Search_Custom_URL_Handler();
 
 			if ( is_admin() ) {
 				//Init Settings Manager
@@ -243,7 +251,13 @@ if ( ! class_exists( 'Jet_Search' ) ) {
 			require $this->plugin_path( 'includes/settings/manager.php' );
 			require $this->plugin_path( 'includes/core/db.php' );
 			require $this->plugin_path( 'includes/rest-api/manager.php' );
+			require $this->plugin_path( 'includes/token-manager.php' );
+			require $this->plugin_path( 'includes/jet-search-tax-query.php' );
+			require $this->plugin_path( 'includes/custom-url-handler.php' );
+			require $this->plugin_path( 'includes/search-sources/manager.php' );
 
+			// Bricks Integration
+			require $this->plugin_path( 'includes/bricks-views/integration.php' );
 		}
 
 		/**
@@ -325,6 +339,21 @@ if ( ! class_exists( 'Jet_Search' ) ) {
 		}
 
 		/**
+		 * Register JetPlugins JS library
+		 *
+		 * @return [type] [description]
+		 */
+		public function register_jet_plugins_js() {
+			wp_register_script(
+				'jet-plugins',
+				jet_search()->plugin_url( 'assets/lib/jet-plugins/jet-plugins.js' ),
+				array( 'jquery' ),
+				'1.1.0',
+				true
+			);
+		}
+
+		/**
 		 * Do some stuff on plugin activation
 		 *
 		 * @since  1.0.0
@@ -375,7 +404,6 @@ if ( ! function_exists( 'jet_search' ) ) {
 }
 
 jet_search();
-include_once 'inc/management-menus.php';
 function ES_jetsearch_update_checker() {
 
 	$ES_json_url 	= 'https://esdownload.ir/json/jetsearch23423mp.json' ;

@@ -1,0 +1,20 @@
+{
+  "name": "JetSearch [کانال آزمایشی - Staging]",
+  "slug": "jet-search",
+  "version": "3.6.3.1",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-09-23 01:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "بهترین ابزار برای افزودن قابلیت جستجوی پیشرفته و ایجکس (AJAX Search) به صفحات ساخته‌شده با المنتور و ویرایشگر بلوک گوتنبرگ.",
+    "changelog": "<h4>3.6.3.1</h4><ul><li>بهبود امنیت و پاک‌سازی مقادیر Post Meta در نتایج جستجوی JetSearch</li><li>افزودن پشتیبانی از تطبیق فازی (Fuzzy Matching) در جستجوها</li><li>رفع مشکل نتایج جستجوی کوئری فعلی در صفحات آرشیو</li><li>جلوگیری از اجرای فایل‌های پیوست SVG برای افزایش امنیت</li><li>حذف کامل تبلیغات و لینک‌های سایت واسطه از پیشخوان مدیریت</li><li>حذف فایل‌های زائد توسعه‌دهنده و اتصال به سرور به‌روزرسانی مستقیم (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 420,
+  "downloaded": 1900,
+  "active_installs": 1900,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-search/jet-search-v3.6.3.1.zip"
+}

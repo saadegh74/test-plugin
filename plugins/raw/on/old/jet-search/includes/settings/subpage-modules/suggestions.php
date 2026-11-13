@@ -59,13 +59,6 @@ class Suggestions extends Page_Module_Base {
 	 */
 	public function enqueue_module_assets() {
 
-		// wp_enqueue_style(
-		// 	'jet-search-admin-css',
-		// 	jet_search()->plugin_url( 'assets/css/jet-elements-admin.css' ),
-		// 	false,
-		// 	jet_search()->get_version()
-		// );
-
 		wp_enqueue_style(
 			'jet-search-suggestions-admin-css',
 			jet_search()->plugin_url( 'assets/css/admin/jet-search-suggestions.css' ),

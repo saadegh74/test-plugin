@@ -10,8 +10,8 @@ if ( $this->preview_focus_items() ) {
 }
 ?>
 
-<div class="jet-search-suggestions__focus-area<?php echo $show; ?>">
-    <div class="jet-search-suggestions__focus-results-holder"><?php echo $this->preview_focus_items_template();?></div>
+<div class="jet-search-suggestions__focus-area<?php echo $show; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>">
+    <div class="jet-search-suggestions__focus-results-holder"><?php echo $this->preview_focus_items_template(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
     <div class="jet-search-suggestions__message"></div>
 <?php
     if ( ! $show ) {

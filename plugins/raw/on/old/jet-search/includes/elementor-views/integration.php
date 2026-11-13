@@ -171,7 +171,7 @@ if ( ! class_exists( 'Jet_Search_Integration' ) ) {
 			$result = false;
 
 			if ( wp_doing_ajax() ) {
-				$result = ( isset( $_REQUEST['action'] ) && 'elementor_ajax' === $_REQUEST['action'] );
+				$result = ( isset( $_REQUEST['action'] ) && 'elementor_ajax' === $_REQUEST['action'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			} elseif ( jet_search()->elementor()->editor->is_edit_mode() && 'wp_enqueue_scripts' === current_filter() ) {
 				$result = true;
 			} elseif ( jet_search()->elementor()->preview->is_preview_mode() && 'wp_enqueue_scripts' === current_filter() ) {
