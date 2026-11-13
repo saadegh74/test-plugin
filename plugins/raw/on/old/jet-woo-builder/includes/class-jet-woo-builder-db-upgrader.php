@@ -55,7 +55,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_DB_Upgrader' ) ) {
 			new CX_Db_Updater(
 				array(
 					'slug'      => 'jet-woo-builder',
-					'version'   => '2.1.7',
+					'version'   => '2.1.19',
 					'callbacks' => array(
 						'1.2.0'  => array(
 							array( $this, 'update_db_1_2_0' ),
@@ -167,6 +167,18 @@ if ( ! class_exists( 'Jet_Woo_Builder_DB_Upgrader' ) ) {
 						],
 						'2.1.7' => [
 							[ $this, 'clear_elementor_cache' ],
+						],
+						'2.1.8' => [
+							[ $this, 'clear_elementor_cache' ],
+						],
+						'2.1.10' => [
+							[ $this, 'clear_elementor_cache' ],
+						],
+						'2.1.19' => [
+							[ $this, 'clear_elementor_cache' ],
+						],
+						'2.3.0' => [
+							[ $this, 'update_db_2_3_0' ],
 						],
 					),
 				)
@@ -398,6 +410,11 @@ if ( ! class_exists( 'Jet_Woo_Builder_DB_Upgrader' ) ) {
 
 		}
 
+		/**
+		 * Update db updater 2.0.0
+		 *
+		 * @return void
+		 */
 		public function update_db_2_0_0() {
 
 			$current_version_settings = get_option( $this->key, false );
@@ -424,6 +441,34 @@ if ( ! class_exists( 'Jet_Woo_Builder_DB_Upgrader' ) ) {
 			}
 
 			$this->clear_elementor_cache();
+
+		}
+
+		/**
+		 * Update db updater 2.3.0
+		 *
+		 * @return void
+		 */
+		public function update_db_2_3_0() {
+
+			$current_version_settings      = get_option( $this->key, false );
+			$current_version_settings_shop = get_option( $this->shop_key, false );
+
+			if ( $current_version_settings_shop ) {
+				if ( ! isset( $current_version_settings_shop['myaccount_payment_methods_endpoint_template'] ) ) {
+					$current_version_settings_shop['myaccount_payment_methods_endpoint_template'] = 'default';
+				}
+
+				update_option( $this->shop_key, $current_version_settings_shop );
+			}
+
+			if ( isset( $current_version_settings['myaccount_available_widgets'] ) ) {
+				if ( ! isset( $current_version_settings['myaccount_available_widgets']['jet-myaccount-content'] ) ) {
+					$current_version_settings['myaccount_available_widgets']['jet-myaccount-content'] = 'true';
+				}
+
+				update_option( $this->key, $current_version_settings );
+			}
 
 		}
 

@@ -762,6 +762,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Common_Controls' ) ) {
 				\Jet_Woo_Group_Control_Box_Style::get_type(),
 				[
 					'name'     => 'dots_style',
+					'exclude'  => [ 'box_font_color', 'box_font_size' ],
 					'selector' => '{{WRAPPER}} .jet-woo-carousel .swiper-pagination .swiper-pagination-bullet',
 				]
 			);
@@ -779,6 +780,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Common_Controls' ) ) {
 				\Jet_Woo_Group_Control_Box_Style::get_type(),
 				[
 					'name'     => 'dots_style_hover',
+					'exclude'  => [ 'box_font_color', 'box_font_size' ],
 					'selector' => '{{WRAPPER}} .jet-woo-carousel .swiper-pagination .swiper-pagination-bullet:hover',
 				]
 			);
@@ -796,6 +798,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Common_Controls' ) ) {
 				\Jet_Woo_Group_Control_Box_Style::get_type(),
 				[
 					'name'     => 'dots_style_active',
+					'exclude'  => [ 'box_font_color', 'box_font_size' ],
 					'selector' => '{{WRAPPER}} .jet-woo-carousel .swiper-pagination .swiper-pagination-bullet-active',
 				]
 			);
@@ -1230,7 +1233,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Common_Controls' ) ) {
 					'selectors' => [
 						'{{WRAPPER}} ' . $css_scheme                                                                     => 'color: {{VALUE}}',
 						'{{WRAPPER}} .select2-container .select2-selection .select2-selection__rendered'                 => 'color: {{VALUE}}',
-						'{{WRAPPER}} .select2-container--default .select2-selection--single .select2-selection__arrow b' => 'border-color: {{VALUE}} transparent transparent transparent;',
+						'{{WRAPPER}} .select2-container--default .select2-selection--single .select2-selection__arrow b' => 'border-top-color: {{VALUE}};',
 					],
 				]
 			);

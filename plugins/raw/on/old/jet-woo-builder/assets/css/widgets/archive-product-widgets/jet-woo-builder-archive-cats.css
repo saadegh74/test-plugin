@@ -1,0 +1,8 @@
+.jet-woo-builder-archive-cats ul {
+  margin: 0;
+  padding: 0;
+}
+.jet-woo-builder-archive-cats ul > li {
+  list-style: none;
+  display: inline-block;
+}

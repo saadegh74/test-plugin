@@ -33,8 +33,19 @@ class Jet_Woo_Builder_MyAccount_Order extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-my-account-page-template/';
 	}
 
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ]; 
+
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
+	}
+
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'myaccount' );
+		return $this->is_widget_visible( 'myaccount' );
 	}
 
 	protected function register_controls() {
@@ -42,6 +53,7 @@ class Jet_Woo_Builder_MyAccount_Order extends Jet_Woo_Builder_Base {
 		$css_scheme = apply_filters(
 			'jet-woo-builder/jet-woo-builder-myaccount-order/css-scheme',
 			[
+				'table'      => 'table.woocommerce-orders-table',
 				'heading'    => '.woocommerce-orders-table .woocommerce-orders-table__header',
 				'cell'       => '.woocommerce-orders-table tr.woocommerce-orders-table__row td.woocommerce-orders-table__cell',
 				'button'     => '.woocommerce-orders-table tr.woocommerce-orders-table__row td.woocommerce-orders-table__cell a.woocommerce-button',
@@ -49,6 +61,37 @@ class Jet_Woo_Builder_MyAccount_Order extends Jet_Woo_Builder_Base {
 				'message'    => '.woocommerce-info',
 			]
 		);
+
+		$this->start_controls_section(
+			'myaccount_orders_table_styles',
+			[
+				'label' => __( 'Table', 'jet-woo-builder' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			]
+		);
+
+		$this->add_group_control(
+			Group_Control_Border::get_type(),
+			[
+				'name'     => 'myaccount_orders_table_border',
+				'label'    => __( 'Border', 'jet-woo-builder' ),
+				'selector' => '{{WRAPPER}} ' . $css_scheme['table'],
+			]
+		);
+
+		$this->add_responsive_control(
+			'myaccount_orders_table_border_radius',
+			[
+				'type'       => Controls_Manager::DIMENSIONS,
+				'label'      => __( 'Border Radius', 'jet-woo-builder' ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
+				'selectors'  => [
+					'{{WRAPPER}} ' . $css_scheme['table'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'myaccount_heading_styles',

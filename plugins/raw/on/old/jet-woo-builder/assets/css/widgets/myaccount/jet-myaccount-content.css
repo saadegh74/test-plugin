@@ -1,0 +1,15 @@
+.woocommerce .jet-woo-builder-my-account-content .elementor-jet-myaccount-order .woocommerce-orders-table {
+  width: 100%;
+}
+.woocommerce .jet-woo-builder-my-account-content .elementor-jet-myaccount-order .woocommerce-orders-table .button {
+  display: inline-block;
+}
+.woocommerce .jet-woo-builder-my-account-content .elementor-jet-myaccount-order .woocommerce-pagination {
+  display: block;
+}
+.woocommerce .jet-woo-builder-my-account-content .elementor-jet-myaccount-logout a {
+  display: inline-block;
+}
+.woocommerce .jet-woo-builder-my-account-content .elementor-jet-myaccount-account-details .woocommerce-EditAccountForm .woocommerce-Button {
+  margin-top: 1em;
+}

@@ -1,0 +1,48 @@
+.jet-woo-builder-shop-pagination {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.jet-woo-builder-shop-pagination .page-numbers {
+  display: block;
+  text-align: center;
+}
+.jet-woo-builder-shop-pagination .page-numbers.next, .jet-woo-builder-shop-pagination .page-numbers.prev {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.jet-woo-builder-shop-pagination .jet-woo-builder-shop-pagination__arrow {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  cursor: pointer;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  z-index: inherit;
+}
+.rtl .jet-woo-builder-shop-pagination .jet-woo-builder-shop-pagination__arrow {
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+.jet-woo-builder-shop-pagination .jet-woo-builder-shop-pagination__arrow:before {
+  display: block;
+}

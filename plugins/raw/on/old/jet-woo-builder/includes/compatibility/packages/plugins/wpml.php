@@ -207,10 +207,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_WPML_Package' ) ) {
 			$widgets['jet-cart-table'] = [
 				'conditions'     => [ 'widgetType' => 'jet-cart-table' ],
 				'fields_in_item' => [
-					'cart_table_items' => [
+					'cart_table_items_list' => [
 						[
 							'field'       => 'cart_table_heading_title',
-							'type'        => __( 'Cart Table Column: Heading', 'jet-woo-builder' ),
+							'type'        => __( 'Cart Table: Column Heading', 'jet-woo-builder' ),
 							'editor_type' => 'LINE',
 						],
 					],

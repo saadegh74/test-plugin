@@ -2,12 +2,14 @@
 
 namespace Jet_Woo_Builder;
 
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+
 trait Products_Shortcode_Trait {
 
 	/**
 	 * Query.
 	 *
-	 * Returns products query.
+	 * Returns products.
 	 *
 	 * @since  1.1.0
 	 * @since  2.0.4 Added `jet-woo-builder/shortcodes/ . $this->get_tag() . /query-type/query-args` hook. New query type
@@ -18,27 +20,11 @@ trait Products_Shortcode_Trait {
 	 */
 	public function query() {
 
-		$settings = $this->get_settings();
+		$settings       = $this->get_settings();
+		$query_products = apply_filters( 'jet-woo-builder/shortcodes/query-products', false, $settings, $this );
 
-		if ( isset( $settings['enable_custom_query'] ) && 'yes' === $settings['enable_custom_query'] && ! empty( $settings['custom_query_id'] ) ) {
-			$query_id = absint( $settings['custom_query_id'] );
-			$query_id = apply_filters( 'jet-engine/query-builder/listings/query-id', $query_id, null, $settings );
-
-			if ( ! $query_id ) {
-				return null;
-			}
-
-			$query = \Jet_Engine\Query_Builder\Manager::instance()->get_query_by_id( $query_id );
-
-			if ( ! $query ) {
-				return null;
-			}
-
-			$query->setup_query();
-
-			do_action( 'jet-engine/query-builder/listings/on-query', $query, $settings, $this, false );
-
-			return $query->get_items();
+		if ( $query_products || is_array( $query_products ) && empty( $query_products ) ) {
+			return $query_products;
 		}
 
 		$defaults = apply_filters( 'jet-woo-builder/shortcodes/' . $this->get_tag() . '/query-args', [
@@ -60,9 +46,22 @@ trait Products_Shortcode_Trait {
 		if ( 'yes' === $this->get_attr( 'use_current_query' ) ) {
 			global $wp_query;
 
-			if ( is_shop() || is_product_taxonomy() || is_product_category() || is_product_tag() ) {
+			$is_search_result = (
+				function_exists( 'is_product_search' ) && is_product_search()
+				)
+				|| (
+					is_search()
+					&& (
+						'product' === get_query_var( 'post_type' )
+						|| (
+							is_array( get_query_var( 'post_type' ) )
+							&& in_array( 'product', get_query_var( 'post_type' ), true )
+						)
+					)
+				);
+
+			if ( is_shop() || is_product_taxonomy() || is_product_category() || is_product_tag() || $is_search_result ) {
 				$wp_query->set( 'jet_use_current_query', 'yes' );
-				$wp_query->set( 'posts_per_page', intval( $this->get_attr( 'number' ) ) );
 
 				$query_args = wp_parse_args( $wp_query->query_vars, $defaults );
 				$query_args = apply_filters( 'jet-woo-builder/shortcodes/' . $this->get_tag() . '/query-args', $query_args, $this );
@@ -77,7 +76,7 @@ trait Products_Shortcode_Trait {
 
 		$query_type                  = explode( ',', str_replace( ' ', '', $this->get_attr( 'products_query' ) ) );
 		$product_visibility_term_ids = wc_get_product_visibility_term_ids();
-		$viewed_products             = ! empty( $_COOKIE['woocommerce_recently_viewed'] ) ? (array)explode( '|', wp_unslash( $_COOKIE['woocommerce_recently_viewed'] ) ) : [];
+		$viewed_products             = ! empty( $_COOKIE['woocommerce_recently_viewed'] ) ? (array) explode( '|', sanitize_text_field( wp_unslash( $_COOKIE['woocommerce_recently_viewed'] ) ) ) : [];
 		$viewed_products             = array_reverse( array_filter( array_map( 'absint', $viewed_products ) ) );
 
 		$query_args['posts_per_page'] = intval( $this->get_attr( 'number' ) );

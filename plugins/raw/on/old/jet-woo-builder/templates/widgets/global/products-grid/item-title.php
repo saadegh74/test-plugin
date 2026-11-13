@@ -36,4 +36,4 @@ if ( 'yes' === $this->get_attr( 'add_title_link' ) ) {
 	$close_wrap = '</a>' . $close_wrap;
 }
 
-echo $open_wrap . $title . $close_wrap;
+echo wp_kses_post( $open_wrap . $title . $close_wrap );

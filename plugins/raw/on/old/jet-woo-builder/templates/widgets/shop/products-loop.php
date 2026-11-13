@@ -41,18 +41,18 @@ if ( $layout && ( absint( $switcher_data['main'] ) !== absint( $switcher_data['s
 <div class="jet-woo-builder-products-loop">
 	<div class="jet-woo-switcher-controls-wrapper">
 		<a type="button"
-		   class="button jet-woo-switcher-btn jet-woo-switcher-btn-main <?php echo $active_main_layout; ?>">
+		   class="button jet-woo-switcher-btn jet-woo-switcher-btn-main <?php echo esc_attr( $active_main_layout ); ?>">
 			<span class="jet-woo-switcher-btn__icon">
 				<?php $this->__render_icon( 'main_layout_switcher_icon', '%s', '', true ); ?>
 			</span>
-			<?php echo $main_layout_switcher_label; ?>
+			<?php echo $main_layout_switcher_label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</a>
 		<a type="button"
-		   class="button jet-woo-switcher-btn jet-woo-switcher-btn-secondary <?php echo $active_secondary_layout; ?>">
+		   class="button jet-woo-switcher-btn jet-woo-switcher-btn-secondary <?php echo esc_attr( $active_secondary_layout ); ?>">
 			<span class="jet-woo-switcher-btn__icon">
 				<?php $this->__render_icon( 'secondary_layout_switcher_icon', '%s', '', true ); ?>
 			</span>
-			<?php echo $secondary_layout_switcher_label; ?>
+			<?php echo $secondary_layout_switcher_label; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</a>
 	</div>
 

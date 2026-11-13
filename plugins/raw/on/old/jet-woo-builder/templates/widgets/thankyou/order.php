@@ -7,7 +7,20 @@ defined( 'ABSPATH' ) || exit;
 
 $order = jet_woo_builder_template_functions()->get_current_received_order();
 
-if ( ! $order ) {
+$is_refund = ( $order instanceof \WC_Order_Refund )
+	|| ( class_exists( '\Automattic\WooCommerce\Admin\Overrides\OrderRefund' ) && $order instanceof \Automattic\WooCommerce\Admin\Overrides\OrderRefund );
+
+if ( $is_refund ) {
+	$parent_id = method_exists( $order, 'get_parent_id' ) ? (int) $order->get_parent_id() : 0;
+
+	if ( $parent_id > 0 ) {
+		if ( ( $parent_order = wc_get_order( $parent_id ) ) && $parent_order instanceof \WC_Order ) {
+			$order = $parent_order;
+		}
+	}
+}
+
+if ( ! ( $order instanceof \WC_Order ) ) {
 	return;
 }
 
@@ -35,32 +48,30 @@ if ( $order->has_status( 'failed' ) ) : ?>
 
 <?php else : ?>
 
-	<p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received">
-		<?php echo apply_filters( 'woocommerce_thankyou_order_received_text', esc_html__( 'Thank you. Your order has been received.', 'woocommerce' ), $order ); ?>
-	</p>
+	<?php wc_get_template( 'checkout/order-received.php', [ 'order' => $order ] ); ?>
 
 	<ul class="woocommerce-order-overview woocommerce-thankyou-order-details order_details">
 
 		<li class="woocommerce-order-overview__order order">
 			<?php esc_html_e( $order_heading, 'jet-woo-builder' ); ?>
-			<strong><?php echo $order->get_order_number(); ?></strong>
+			<strong><?php echo esc_html( $order->get_order_number() ); ?></strong>
 		</li>
 
 		<li class="woocommerce-order-overview__date date">
 			<?php esc_html_e( $date_heading, 'jet-woo-builder' ); ?>
-			<strong><?php echo wc_format_datetime( $order->get_date_created() ); ?></strong>
+			<strong><?php echo esc_html( wc_format_datetime( $order->get_date_created() ) ); ?></strong>
 		</li>
 
 		<?php if ( is_user_logged_in() && $order->get_user_id() === get_current_user_id() && $order->get_billing_email() ) : ?>
 			<li class="woocommerce-order-overview__email email">
 				<?php esc_html_e( $email_heading, 'jet-woo-builder' ); ?>
-				<strong><?php echo $order->get_billing_email(); ?></strong>
+				<strong><?php echo esc_html( $order->get_billing_email() ) ; ?></strong>
 			</li>
 		<?php endif; ?>
 
 		<li class="woocommerce-order-overview__total total">
 			<?php esc_html_e( $total_heading, 'jet-woo-builder' ); ?>
-			<strong><?php echo $order->get_formatted_order_total(); ?></strong>
+			<strong><?php echo wp_kses_post( $order->get_formatted_order_total() ); ?></strong>
 		</li>
 
 		<?php if ( $order->get_payment_method_title() ) : ?>

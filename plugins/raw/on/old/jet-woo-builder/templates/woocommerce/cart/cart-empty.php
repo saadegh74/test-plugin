@@ -22,6 +22,6 @@ jet_woo_builder()->admin_bar->register_post_item( $template );
 		do_action( 'woocommerce_cart_is_empty' );
 	}
 
-	echo $content;
+	echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
 </div>

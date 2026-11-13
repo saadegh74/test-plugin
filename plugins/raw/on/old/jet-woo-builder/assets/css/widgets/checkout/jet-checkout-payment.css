@@ -1,0 +1,7 @@
+.elementor-html .woocommerce .elementor-jet-checkout-payment .form-row::before, .elementor-html .woocommerce .elementor-jet-checkout-payment .form-row::after {
+  content: " ";
+  display: table;
+}
+.elementor-html .woocommerce .elementor-jet-checkout-payment .form-row::after {
+  clear: both;
+}

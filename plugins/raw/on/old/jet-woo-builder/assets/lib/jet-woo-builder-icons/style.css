@@ -1,0 +1,266 @@
+@font-face {
+	font-family: 'JetWoobuilder-widgets';
+	src:  url('fonts/JetWoobuilder-widgets.eot?d4zvyc');
+	src:  url('fonts/JetWoobuilder-widgets.eot?d4zvyc#iefix') format('embedded-opentype'),
+		url('fonts/JetWoobuilder-widgets.ttf?d4zvyc') format('truetype'),
+		url('fonts/JetWoobuilder-widgets.woff?d4zvyc') format('woff'),
+		url('fonts/JetWoobuilder-widgets.svg?d4zvyc#JetWoobuilder-widgets') format('svg');
+	font-weight: normal;
+	font-style: normal;
+	font-display: block;
+}
+
+[class*="jet-woo-builder-icon-"] {
+	/* use !important to prevent issues with browser extensions that change fonts */
+	font-family: 'JetWoobuilder-widgets' !important;
+	speak: never;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.jet-woo-builder-icon-products-grid:before {
+	content: "\e900";
+}
+
+.jet-woo-builder-icon-categories-grid:before {
+	content: "\e901";
+}
+
+.jet-woo-builder-icon-products-list:before {
+	content: "\e902";
+}
+
+.jet-woo-builder-icon-taxonomy-tiles:before {
+	content: "\e903";
+}
+
+.jet-woo-builder-icon-woocommerce-actions:before {
+	content: "\e904";
+}
+
+.jet-woo-builder-icon-single-sharing:before {
+	content: "\e905";
+}
+
+.jet-woo-builder-icon-images:before {
+	content: "\e906";
+}
+
+.jet-woo-builder-icon-single-related:before {
+	content: "\e907";
+}
+
+.jet-woo-builder-icon-single-content:before {
+	content: "\e908";
+}
+
+.jet-woo-builder-icon-single-tabs:before {
+	content: "\e909";
+}
+
+.jet-woo-builder-icon-add-to-cart:before {
+	content: "\e90a";
+}
+
+.jet-woo-builder-icon-rating:before {
+	content: "\e90b";
+}
+
+.jet-woo-builder-icon-sale-badge:before {
+	content: "\e90c";
+}
+
+.jet-woo-builder-icon-excerpt:before {
+	content: "\e90d";
+}
+
+.jet-woo-builder-icon-title:before {
+	content: "\e90e";
+}
+
+.jet-woo-builder-icon-single-meta:before {
+	content: "\e90f";
+}
+
+.jet-woo-builder-icon-single-attributes:before {
+	content: "\e910";
+}
+
+.jet-woo-builder-icon-single-reviews-form:before {
+	content: "\e911";
+}
+
+.jet-woo-builder-icon-single-upsells:before {
+	content: "\e912";
+}
+
+.jet-woo-builder-icon-price:before {
+	content: "\e913";
+}
+
+.jet-woo-builder-icon-archive-tags:before {
+	content: "\e918";
+}
+
+.jet-woo-builder-icon-archive-sku:before {
+	content: "\e919";
+}
+
+.jet-woo-builder-icon-archive-categories:before {
+	content: "\e91a";
+}
+
+.jet-woo-builder-icon-archive-stock-status:before {
+	content: "\e91b";
+}
+
+.jet-woo-builder-icon-category-title:before {
+	content: "\e91f";
+}
+
+.jet-woo-builder-icon-category-thumbnail:before {
+	content: "\e920";
+}
+
+.jet-woo-builder-icon-category-description:before {
+	content: "\e921";
+}
+
+.jet-woo-builder-icon-category-count:before {
+	content: "\e922";
+}
+
+.jet-woo-builder-icon-shop-result-count:before {
+	content: "\e923";
+}
+
+.jet-woo-builder-icon-shop-navigation:before {
+	content: "\e924";
+}
+
+.jet-woo-builder-icon-shop-pagination:before {
+	content: "\e925";
+}
+
+.jet-woo-builder-icon-shop-loop:before {
+	content: "\e926";
+}
+
+.jet-woo-builder-icon-shop-description:before {
+	content: "\e927";
+}
+
+.jet-woo-builder-icon-shop-ordering:before {
+	content: "\e928";
+}
+
+.jet-woo-builder-icon-shop-notice:before {
+	content: "\e929";
+}
+
+.jet-woo-builder-icon-cart-return-to-shop:before {
+	content: "\e92b";
+}
+
+.jet-woo-builder-icon-cart-totals:before {
+	content: "\e92c";
+}
+
+.jet-woo-builder-icon-cart-empty-message:before {
+	content: "\e92d";
+}
+
+.jet-woo-builder-icon-cart-table:before {
+	content: "\e92e";
+}
+
+.jet-woo-builder-icon-cart-cross-sells:before {
+	content: "\e92f";
+}
+
+.jet-woo-builder-icon-checkout-payment:before {
+	content: "\e930";
+}
+
+.jet-woo-builder-icon-checkout-login-form:before {
+	content: "\e931";
+}
+
+.jet-woo-builder-icon-checkout-order-review:before {
+	content: "\e932";
+}
+
+.jet-woo-builder-icon-checkout-shipping-form:before {
+	content: "\e933";
+}
+
+.jet-woo-builder-icon-checkout-coupon-form:before {
+	content: "\e934";
+}
+
+.jet-woo-builder-icon-checkout-additional-form:before {
+	content: "\e935";
+}
+
+.jet-woo-builder-icon-checkout-billing-form:before {
+	content: "\e936";
+}
+
+.jet-woo-builder-icon-thank-you-order:before {
+	content: "\e937";
+}
+
+.jet-woo-builder-icon-thank-you-order-details:before {
+	content: "\e938";
+}
+
+.jet-woo-builder-icon-thank-you-address-details:before {
+	content: "\e939";
+}
+
+.jet-woo-builder-icon-my-account-logout:before {
+	content: "\e93a";
+}
+
+.jet-woo-builder-icon-my-account-order:before {
+	content: "\e93b";
+}
+
+.jet-woo-builder-icon-my-account-registration-form:before {
+	content: "\e93c";
+}
+
+.jet-woo-builder-icon-my-account-address:before {
+	content: "\e93d";
+}
+
+.jet-woo-builder-icon-my-account-content:before {
+	content: "\e93e";
+}
+
+.jet-woo-builder-icon-my-account-dashboard:before {
+	content: "\e93f";
+}
+
+.jet-woo-builder-icon-my-account-downloads:before {
+	content: "\e940";
+}
+
+.jet-woo-builder-icon-my-account-login-form:before {
+	content: "\e941";
+}
+
+.jet-woo-builder-icon-my-account-details:before {
+	content: "\e942";
+}
+
+.jet-woo-builder-icon-my-account-payment-methods:before {
+	content: "\e943";
+}

@@ -11,7 +11,7 @@ use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,8 +35,19 @@ class Jet_Woo_Builder_Products_Pagination extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-and-set-a-shop-page-template/';
 	}
 
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ]; 
+
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
+	}
+
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'shop' );
+		return $this->is_widget_visible( 'shop' );
 	}
 
 	protected function register_controls() {
@@ -141,7 +152,9 @@ class Jet_Woo_Builder_Products_Pagination extends Jet_Woo_Builder_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'items_typography',
-				'scheme'   => Typography::TYPOGRAPHY_3,
+				'global'   => [
+					'default' => Typography::TYPOGRAPHY_TEXT,
+				],
 				'selector' => '{{WRAPPER}} .jet-woo-builder-shop-pagination .page-numbers',
 				'exclude'  => array(
 					'text_decoration',
@@ -732,7 +745,7 @@ class Jet_Woo_Builder_Products_Pagination extends Jet_Woo_Builder_Base {
 		}
 
 		echo '<nav class="jet-woo-builder-shop-pagination">';
-		echo paginate_links(
+		echo wp_kses_post( paginate_links(
 			array(
 				'base'      => $base,
 				'format'    => $format,
@@ -744,7 +757,7 @@ class Jet_Woo_Builder_Products_Pagination extends Jet_Woo_Builder_Base {
 				'type'      => 'plain',
 				'end_size'  => 3,
 				'mid_size'  => 3,
-			) );
+			) ) );
 		echo '</nav>';
 
 		$this->__close_wrap();

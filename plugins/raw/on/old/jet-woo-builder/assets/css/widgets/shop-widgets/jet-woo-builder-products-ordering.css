@@ -1,0 +1,46 @@
+.elementor-jet-woo-builder-products-ordering .woocommerce-ordering {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  float: none;
+}
+.elementor-jet-woo-builder-products-ordering .woocommerce-ordering:before {
+  font-family: "FontAwesome";
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 2;
+}
+.elementor-jet-woo-builder-products-ordering .woocommerce-ordering select {
+  width: 100%;
+  background-image: none !important;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.ordering-select-icon-angle .woocommerce-ordering::before {
+  content: "\f107";
+}
+.ordering-select-icon-chevron .woocommerce-ordering::before {
+  content: "\f078";
+}
+.ordering-select-icon-angle-double .woocommerce-ordering::before {
+  content: "\f103";
+}
+.ordering-select-icon-arrow .woocommerce-ordering::before {
+  content: "\f063";
+}
+.ordering-select-icon-caret .woocommerce-ordering::before {
+  content: "\f0d7";
+}
+.ordering-select-icon-arrow-circle .woocommerce-ordering::before {
+  content: "\f0ab";
+}
+.ordering-select-icon-chevron-circle .woocommerce-ordering::before {
+  content: "\f13a";
+}
+.ordering-select-icon-caret-square .woocommerce-ordering::before {
+  content: "\f150";
+}

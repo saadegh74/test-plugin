@@ -1,8 +1,8 @@
 <div class="jet-woo-builder-settings-page jet-woo-builder-settings-page__general">
 	<cx-vui-switcher
 		name="enable_product_thumb_effect"
-		label="<?php _e( 'Enable Thumbnail Effect', 'jet-woo-builder' ); ?>"
-		description="<?php _e( 'Enable product thumbnails to switch on hover', 'jet-woo-builder' ); ?>"
+		label="<?php esc_html_e( 'Enable Thumbnail Effect', 'jet-woo-builder' ); ?>"
+		description="<?php esc_html_e( 'Enable product thumbnails to switch on hover', 'jet-woo-builder' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"
@@ -13,8 +13,8 @@
 	<cx-vui-select
 		v-if="'true' === pageOptions['enable_product_thumb_effect'].value"
 		name="product_thumb_effect"
-		label="<?php _e( 'Thumbnail Effect', 'jet-woo-builder' ); ?>"
-		description="<?php _e( 'Choose a hover effect for product thumbnails switching', 'jet-woo-builder' ); ?>"
+		label="<?php esc_html_e( 'Thumbnail Effect', 'jet-woo-builder' ); ?>"
+		description="<?php esc_html_e( 'Choose a hover effect for product thumbnails switching', 'jet-woo-builder' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		size="fullwidth"
 		:options-list="pageOptions.product_thumb_effect.options"
@@ -23,20 +23,9 @@
 	</cx-vui-select>
 
 	<cx-vui-switcher
-		name="enable_custom_templates_styles"
-		label="<?php _e( 'Enable Woocommerce Templates Styles', 'jet-woo-builder' ); ?>"
-		description="<?php _e( 'Makes browsers render all widgets more consistently.', 'jet-woo-builder' ); ?>"
-		:wrapper-css="[ 'equalwidth' ]"
-		return-true="true"
-		return-false="false"
-		v-model="pageOptions['enable_custom_templates_styles'].value"
-	>
-	</cx-vui-switcher>
-
-	<cx-vui-switcher
 		name="enable_inline_templates_styles"
-		label="<?php _e( 'Print Custom Templates CSS Inline', 'jet-woo-builder' ); ?>"
-		description="<?php _e( 'Styles will be displayed in front of the template content. This will prevent jumps in styles during page load, but will affect the speed of its loading. This option will affect all custom templates.', 'jet-woo-builder' ); ?>"
+		label="<?php esc_html_e( 'Print Custom Templates CSS Inline', 'jet-woo-builder' ); ?>"
+		description="<?php esc_html_e( 'Styles will be displayed in front of the template content. This will prevent jumps in styles during page load, but will affect the speed of its loading. This option will affect all custom templates.', 'jet-woo-builder' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"

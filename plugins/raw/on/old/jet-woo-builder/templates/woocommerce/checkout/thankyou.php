@@ -4,7 +4,7 @@
  *
  * This template can be overridden by copying it to yourtheme/jet-woo-builder/woocommerce/checkout/thankyou.php.
  *
- * @version 3.7.0
+ * @version 8.1.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -19,11 +19,9 @@ jet_woo_builder()->admin_bar->register_post_item( $template );
 	<?php if ( $order ) :
 		do_action( 'woocommerce_before_thankyou', $order->get_id() );
 
-		echo jet_woo_builder_template_functions()->get_woo_builder_content( $template );
+		echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	else : ?>
-		<p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received">
-			<?php echo apply_filters( 'woocommerce_thankyou_order_received_text', esc_html__( 'Thank you. Your order has been received.', 'woocommerce' ), null ); ?>
-		</p>
+		<?php wc_get_template( 'checkout/order-received.php', [ 'order' => false ] ); ?>
 	<?php endif; ?>
 
 </div>

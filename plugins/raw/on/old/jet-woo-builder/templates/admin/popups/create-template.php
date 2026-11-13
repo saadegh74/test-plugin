@@ -5,7 +5,7 @@
 ?>
 
 <div class="jet-woo-builder-template-popup">
-	<form id="jet-woo-builder-create-form" class="jet-woo-builder-create-form" method="POST" action="<?php echo $create_action; ?>" >
+	<form id="jet-woo-builder-create-form" class="jet-woo-builder-create-form" method="POST" action="<?php echo esc_attr( $create_action ); ?>" >
 		<h3 class="jet-woo-builder-create-form__heading">
 			<?php esc_html_e( 'Create Template', 'jet-woo-builder' ); ?>
 		</h3>
@@ -19,8 +19,8 @@
 				foreach ( $doc_types as $type ) {
 					printf(
 						'<option value="%1$s" %3$s>%2$s</option>',
-						$type['slug'],
-						$type['name'],
+						esc_attr( $type['slug'] ),
+						esc_html( $type['name'] ),
 						selected( $selected, $type['slug'], false )
 					);
 				}
@@ -39,48 +39,48 @@
 			<?php esc_html_e( 'Select Layout Preset', 'jet-woo-builder' ); ?>
 		</h4>
 
-		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo $doc_types['single']['slug']; ?> is-active">
+		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo esc_attr( $doc_types['single']['slug'] ); ?> is-active">
 			<?php foreach ( $this->predesigned_templates( 'single', 8 ) as $id => $data ) : ?>
 				<div class="jet-woo-builder-create-form__item">
 					<label class="jet-woo-builder-create-form__label">
-						<input type="radio" name="template_single" value="<?php echo $id; ?>">
-						<img src="<?php echo $data['thumb']; ?>" alt="<?php echo $id; ?>">
+						<input type="radio" name="template_single" value="<?php echo esc_attr( $id ); ?>">
+						<img src="<?php echo esc_url( $data['thumb'] ); ?>" alt="<?php echo esc_attr( $id ); ?>">
 					</label>
 					<span class="jet-woo-builder-create-form__item-uncheck dashicons dashicons-no-alt"></span>
 				</div>
 			<?php endforeach; ?>
 		</div>
 
-		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo $doc_types['archive']['slug']; ?>">
+		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo esc_attr( $doc_types['archive']['slug'] ); ?>">
 			<?php foreach ( $this->predesigned_templates( 'archive' ) as $id => $data ) : ?>
 				<div class="jet-woo-builder-create-form__item">
 					<label class="jet-woo-builder-create-form__label">
-						<input type="radio" name="template_archive" value="<?php echo $id; ?>">
-						<img src="<?php echo $data['thumb']; ?>" alt="<?php echo $id; ?>">
+						<input type="radio" name="template_archive" value="<?php echo esc_attr( $id ); ?>">
+						<img src="<?php echo esc_url( $data['thumb'] ); ?>" alt="<?php echo esc_attr( $id ); ?>">
 					</label>
 					<span class="jet-woo-builder-create-form__item-uncheck dashicons dashicons-no-alt"></span>
 				</div>
 			<?php endforeach; ?>
 		</div>
 
-		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo $doc_types['category']['slug']; ?>">
+		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo esc_attr( $doc_types['category']['slug'] ); ?>">
 			<?php foreach ( $this->predesigned_templates( 'category' ) as $id => $data ) : ?>
 				<div class="jet-woo-builder-create-form__item">
 					<label class="jet-woo-builder-create-form__label">
-						<input type="radio" name="template_category" value="<?php echo $id; ?>">
-						<img src="<?php echo $data['thumb']; ?>" alt="<?php echo $id; ?>">
+						<input type="radio" name="template_category" value="<?php echo esc_attr( $id ); ?>">
+						<img src="<?php echo esc_url( $data['thumb'] ); ?>" alt="<?php echo esc_attr( $id ); ?>">
 					</label>
 					<span class="jet-woo-builder-create-form__item-uncheck dashicons dashicons-no-alt"></span>
 				</div>
 			<?php endforeach; ?>
 		</div>
 
-		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo $doc_types['shop']['slug']; ?>">
+		<div class="jet-woo-builder-create-form__row predesigned-row template-<?php echo esc_attr( $doc_types['shop']['slug'] ); ?>">
 			<?php foreach ( $this->predesigned_templates( 'shop' ) as $id => $data ) : ?>
 				<div class="jet-woo-builder-create-form__item">
 					<label class="jet-woo-builder-create-form__label">
-						<input type="radio" name="template_shop" value="<?php echo $id; ?>">
-						<img src="<?php echo $data['thumb']; ?>" alt="<?php echo $id; ?>">
+						<input type="radio" name="template_shop" value="<?php echo esc_attr( $id ); ?>">
+						<img src="<?php echo esc_url( $data['thumb'] ); ?>" alt="<?php echo esc_attr( $id ); ?>">
 					</label>
 					<span class="jet-woo-builder-create-form__item-uncheck dashicons dashicons-no-alt"></span>
 				</div>

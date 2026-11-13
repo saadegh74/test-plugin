@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: JetWooBuilder For Elementor
+ * Plugin Name: افزونه جت وو
  * Plugin URI:  https://crocoblock.com/plugins/jetwoobuilder/
- * Description: Your perfect asset in creating WooCommerce page templates using loads of special widgets & stylish page layouts.
- * Version:     2.1.7.3
- * Author:      Crocoblock
- * Author URI:  https://crocoblock.com/
+ * Description: ابزاری کاربردی برای ساخت قالب‌های صفحات ووکامرس با ابزارک‌های متنوع و طرح‌بندی‌های جذاب
+ * Version:     2.3.6
+ * Author:      ترجمه : المنتورسایت
+ * Author URI:  https://elementor-site.ir
  * Text Domain: jet-woo-builder
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -14,8 +14,8 @@
  * WC tested up to: 7.8
  * WC requires at least: 3.0
  *
- * Elementor tested up to: 3.14
- * Elementor Pro tested up to: 3.14
+ * Elementor tested up to: 3.22
+ * Elementor Pro tested up to: 3.21
  */
 
 // If this file is called directly, abort.
@@ -46,7 +46,7 @@ if ( ! class_exists( 'Jet_Woo_Builder' ) ) {
 		 *
 		 * @var string
 		 */
-		private $version = '2.1.7.3';
+		private $version = '2.3.6';
 
 		/**
 		 * Require Elementor Version
@@ -259,6 +259,7 @@ if ( ! class_exists( 'Jet_Woo_Builder' ) ) {
 
 				// Init DB upgrader
 				require $this->plugin_path( 'includes/class-jet-woo-builder-db-upgrader.php' );
+
 				jet_woo_builder_db_upgrader()->init();
 			}
 
@@ -516,7 +517,6 @@ if ( ! function_exists( 'jet_woo_builder' ) ) {
 }
 
 jet_woo_builder();
-include_once 'inc/management-menus.php'; 
 function ES_jetwoo_update_checker() {
 
 	$ES_json_url 	= 'https://esdownload.ir/json/jetwoobuilder899652.json' ;

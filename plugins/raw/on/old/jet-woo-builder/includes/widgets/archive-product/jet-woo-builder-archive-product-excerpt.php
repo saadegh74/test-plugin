@@ -30,7 +30,7 @@ class Jet_Woo_Builder_Archive_Product_Excerpt extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'archive' );
+		return $this->is_widget_visible( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -133,7 +133,7 @@ class Jet_Woo_Builder_Archive_Product_Excerpt extends Jet_Woo_Builder_Base {
 			'...'
 		);
 
-		printf( '<div class="jet-woo-builder-archive-product-excerpt">%s</div>', $excerpt );
+		printf( '<div class="jet-woo-builder-archive-product-excerpt">%s</div>', wp_kses_post( $excerpt ) );
 
 	}
 
@@ -146,9 +146,9 @@ class Jet_Woo_Builder_Archive_Product_Excerpt extends Jet_Woo_Builder_Base {
 		];
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings );
+			echo wp_kses_post ( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings ) );
 		} else {
-			echo self::render_callback( $macros_settings );
+			echo wp_kses_post ( self::render_callback( $macros_settings ) ?: '' );
 		}
 
 	}

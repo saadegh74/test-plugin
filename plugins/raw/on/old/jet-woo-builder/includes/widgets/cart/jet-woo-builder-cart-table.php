@@ -34,8 +34,19 @@ class Jet_Woo_Builder_Cart_Table extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-a-cart-page-template/';
 	}
 
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ];
+		
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
+	}
+
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'cart' );
+		return $this->is_widget_visible( 'cart' );
 	}
 
 	protected function register_controls() {
@@ -95,6 +106,18 @@ class Jet_Woo_Builder_Cart_Table extends Jet_Woo_Builder_Base {
 			[
 				'label' => __( 'Heading', 'jet-woo-builder' ),
 				'type'  => Controls_Manager::TEXT,
+			]
+		);
+
+		$repeater->add_control(
+			'cart_table_show_mobile_heading',
+			[
+				'label'     => __( 'Show Heading on Mobile', 'jet-woo-builder' ),
+				'type'      => Controls_Manager::SWITCHER,
+				'default'   => 'yes',
+				'condition' => [
+					'cart_table_items!' => [ 'remove', 'thumbnail' ],
+				],
 			]
 		);
 
@@ -681,7 +704,7 @@ class Jet_Woo_Builder_Cart_Table extends Jet_Woo_Builder_Base {
 					],
 				],
 				'selectors'  => [
-					'{{WRAPPER}} ' . $css_scheme['product_count'] => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['product_count'] => 'max-width: {{SIZE}}{{UNIT}};',
 				],
 			]
 		);
@@ -721,6 +744,68 @@ class Jet_Woo_Builder_Cart_Table extends Jet_Woo_Builder_Base {
 				],
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['remove_button'] => 'font-size: {{SIZE}}{{UNIT}};',
+				],
+			]
+		);
+
+		$this->add_control(
+			'cart_table_remove_button_icon_position_switcher',
+			[
+				'label'        => __( 'Custom Icon Position', 'jet-woo-builder' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => __( 'On', 'jet-woo-builder' ),
+				'label_off'    => __( 'Off', 'jet-woo-builder' ),
+				'separator'    => 'before',
+				'prefix_class' => 'jet-woo-cart-table-remove-custom-pos-',
+			]
+		);
+
+		$this->add_responsive_control(
+			'cart_table_remove_button_icon_horizontal_position',
+			[
+				'type'       => Controls_Manager::SLIDER,
+				'label'      => __( 'Horizontal Position', 'jet-woo-builder' ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em' ] ),
+				'range'      => array(
+					'px' => array(
+						'min' => -1500,
+						'max' => 1500,
+					),
+					'em' => [
+						'min' => -100,
+						'max' => 100,
+					],
+				),
+				'selectors'  => [
+					'{{WRAPPER}} ' . $css_scheme['remove_button'] => ( is_rtl() ? 'right: {{SIZE}}{{UNIT}}; left: auto;' : 'left: {{SIZE}}{{UNIT}}; right: auto;' ),
+				],
+				'condition'  => [
+					'cart_table_remove_button_icon_position_switcher' => 'yes',
+				],
+			]
+		);
+
+		$this->add_responsive_control(
+			'cart_table_remove_button_icon_vertical_position',
+			[
+				'type'       => Controls_Manager::SLIDER,
+				'label'      => __( 'Vertical Position', 'jet-woo-builder' ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em' ] ),
+				'range'      => array(
+					'px' => array(
+						'min' => -1500,
+						'max' => 1500,
+					),
+					'em' => [
+						'min' => -100,
+						'max' => 100,
+					],
+				),
+				'selectors'  => [
+					'{{WRAPPER}} ' . $css_scheme['remove_button'] => 'top: {{SIZE}}{{UNIT}}; bottom: auto;',
+				],
+				'condition'  => [
+					'cart_table_remove_button_icon_position_switcher' => 'yes',
 				],
 			]
 		);
@@ -982,6 +1067,12 @@ class Jet_Woo_Builder_Cart_Table extends Jet_Woo_Builder_Base {
 
 	protected function render() {
 
+		jet_woo_builder_assets()->add_inline_widget_script( 'jet-cart-table.default' );
+
+		if ( ! isset( WC()->cart ) ) {
+			return;
+		}
+
 		$settings = $this->get_settings_for_display();
 
 		$table_settings = [
@@ -1051,15 +1142,16 @@ class Jet_Woo_Builder_Shortcode_Cart extends \WC_Shortcode_Cart {
 
 		wc_maybe_define_constant( 'WOOCOMMERCE_CART', true );
 
-		$nonce_value = wc_get_var( $_REQUEST['woocommerce-shipping-calculator-nonce'], wc_get_var( $_REQUEST['_wpnonce'], '' ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$nonce_value = isset( $_REQUEST['woocommerce-shipping-calculator-nonce'] )
+			? sanitize_text_field( wp_unslash( $_REQUEST['woocommerce-shipping-calculator-nonce'] ) )
+			: ( isset( $_REQUEST['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ) : '' );
 
 		if ( ! empty( $_POST['calc_shipping'] ) && ( wp_verify_nonce( $nonce_value, 'woocommerce-shipping-calculator' ) || wp_verify_nonce( $nonce_value, 'woocommerce-cart' ) ) ) {
 			self::calculate_shipping();
 
 			WC()->cart->calculate_totals();
 		}
-
-		do_action( 'woocommerce_check_cart_items' );
 
 		WC()->cart->calculate_totals();
 

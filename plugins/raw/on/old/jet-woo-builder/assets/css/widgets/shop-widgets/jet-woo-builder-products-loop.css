@@ -1,0 +1,54 @@
+.jet-woo-builder-products-loop .jet-woo-switcher-controls-wrapper {
+  margin-bottom: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  gap: 5px;
+}
+.jet-woo-builder-products-loop .jet-woo-switcher-controls-wrapper .jet-woo-switcher-btn {
+  cursor: pointer;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  gap: 10px;
+}
+.jet-woo-builder-products-loop .jet-woo-switcher-controls-wrapper .jet-woo-switcher-btn__icon {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.jet-woo-builder-products-loop .jet-woo-switcher-controls-wrapper .jet-woo-switcher-btn__icon svg {
+  width: 1em;
+  height: 1em;
+}
+.jet-woo-builder-products-loop .jet-woo-switcher-controls-wrapper .jet-woo-switcher-btn.active {
+  pointer-events: none;
+}
+@media (max-width: 767px) {
+  .jet-woo-builder-hide-mobile-switcher-yes .jet-woo-builder-products-loop .jet-woo-switcher-controls-wrapper {
+    display: none;
+  }
+}
+.jet-woo-builder-products-loop .jet-woo-products-wrapper.jet-layout-loading {
+  opacity: 0.6 !important;
+  pointer-events: none !important;
+}

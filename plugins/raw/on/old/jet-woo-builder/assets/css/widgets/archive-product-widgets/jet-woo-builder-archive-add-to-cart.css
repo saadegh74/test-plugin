@@ -1,0 +1,14 @@
+.elementor-widget-jet-woo-builder-archive-add-to-cart a.wc-forward {
+  display: none !important;
+}
+.elementor-widget-jet-woo-builder-archive-add-to-cart form .quantity, .elementor-widget-jet-woo-builder-archive-add-to-cart form button {
+  float: none !important;
+}
+.elementor-widget-jet-woo-builder-archive-add-to-cart form input.qty {
+  width: 100% !important;
+}
+
+.jet-woo-builder-archive-add-to-cart .ajax_add_to_cart.loading .jet-woo-product-button__label,
+.jet-woo-builder-archive-add-to-cart .wvs_ajax_add_to_cart.loading .jet-woo-product-button__label {
+  visibility: hidden;
+}

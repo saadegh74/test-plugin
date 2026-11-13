@@ -1,0 +1,18 @@
+.woocommerce .elementor-jet-checkout-order-review #order_review_heading,
+.woocommerce .elementor-jet-checkout-order-review #order_review {
+  float: none;
+  width: 100%;
+}
+.woocommerce .elementor-jet-checkout-order-review #order_review_heading .product-quantity,
+.woocommerce .elementor-jet-checkout-order-review #order_review .product-quantity {
+  color: inherit;
+  font-weight: inherit;
+}
+.woocommerce .elementor-jet-checkout-order-review #order_review .shop_table {
+  border: none;
+  border-collapse: collapse;
+  margin: 0;
+}
+.woocommerce .elementor-jet-checkout-order-review #order_review .shop_table #shipping_method li {
+  margin: 0;
+}

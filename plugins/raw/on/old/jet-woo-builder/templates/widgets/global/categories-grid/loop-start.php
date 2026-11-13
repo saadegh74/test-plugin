@@ -19,4 +19,4 @@ $classes = [
 	$equal ? 'jet-equal-cols' : '',
 ];
 
-printf( '<div class="%s" data-mobile-hover="%s">', implode( ' ', $classes ), $hover_on_touch );
+printf( '<div class="%s" data-mobile-hover="%s">', esc_attr( implode( ' ', $classes ) ), esc_attr( $hover_on_touch ) );

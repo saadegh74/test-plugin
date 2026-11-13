@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce compatibility package class.
+ * WooCommerce's compatibility package class.
  */
 
 // If this file is called directly, abort.
@@ -39,6 +39,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		private $current_template_myaccount_address   = null;
 		private $current_template_myaccount_account   = null;
 		private $current_template_form_login          = null;
+		private $current_template_myaccount_payment_methods   = null;
 
 		/**
 		 * Current loop.
@@ -92,11 +93,12 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 			add_filter( 'template_include', [ $this, 'set_product_archive_page_template' ], 9999 );
 			add_filter( 'template_include', [ $this, 'set_wc_pages_template' ], 9999 );
 
-			if ( ! empty( $_GET['elementor-preview'] ) ) {
+			if ( ! empty( $_GET['elementor-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 				add_action( 'template_include', [ $this, 'set_archive_items_editor_template' ], 9999 );
 			}
 
 			add_action( 'template_redirect', [ $this, 'set_track_product_view' ], 20 );
+			add_action( 'wp_footer', [ $this, 'generate_missing_product_structured_data' ], 5 );
 
 			add_filter( 'woocommerce_product_loop_start', [ $this, 'product_archive_item_template_custom_columns' ] );
 			add_filter( 'woocommerce_post_class', [ $this, 'product_archive_item_template_class' ], 10 );
@@ -128,6 +130,22 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 			require jet_woo_builder()->plugin_path( 'includes/components/woocommerce/wc-pages/manager.php' );
 			new Jet_Woo_Builder_WC_Pages_Manager();
 
+		}
+
+		/**
+		 * Get Elementor page settings for template.
+		 *
+		 * Proxies the call to the template functions handler.
+		 *
+		 * @since  2.3.0
+		 * @access private
+		 *
+		 * @param int $template_id Template post ID.
+		 *
+		 * @return array
+		 */
+		private function get_elementor_page_settings( $template_id ) {
+			return jet_woo_builder_template_functions()->get_elementor_page_settings( absint( $template_id ) );
 		}
 
 		/**
@@ -231,12 +249,16 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 				] );
 			}
 
-			$default_taxonomies = get_taxonomies( [
-				'object_type' => [ 'product' ],
-				'public'      => true,
-			] );
+			$default_taxonomies_objects = get_object_taxonomies( 'product', 'objects' );
 
-			$taxonomies = array_merge( $default_taxonomies, $taxonomies );
+			if ( ! empty( $default_taxonomies_objects ) ) {
+				$default_taxonomies = wp_list_pluck( $default_taxonomies_objects, 'name', 'name' );
+
+			} else {
+				$default_taxonomies = [];
+			}
+
+			$taxonomies = array_values( array_unique( array_merge( $default_taxonomies, $taxonomies ) ) );
 
 			foreach ( $taxonomies as $taxonomy ) {
 				add_action( $taxonomy . '_add_form_fields', [ $this, 'taxonomy_add_form_fields' ] );
@@ -266,7 +288,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 			<div class="form-field term-custom-template">
 				<label for="jet_woo_builder_template">
-					<strong><?php echo __( 'Custom Template', 'jet-woo-builder' ); ?></strong>
+					<strong><?php echo esc_html__( 'Custom Template', 'jet-woo-builder' ); ?></strong>
 				</label>
 				<select name="jet_woo_builder_template" id="jet_woo_builder_template">
 					<?php foreach ( $templates as $template_id => $template_title ) : ?>
@@ -275,7 +297,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 						</option>
 					<?php endforeach; ?>
 				</select>
-				<p><?php echo __( 'The selected custom template will be applied to this term archive.', 'jet-woo-builder' ); ?></p>
+				<p><?php echo esc_html__( 'The selected custom template will be applied to this term archive.', 'jet-woo-builder' ); ?></p>
 			</div>
 
 			<?php
@@ -303,7 +325,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 			<tr class="form-field term-custom-template">
 				<th scope="row">
-					<label for="jet_woo_builder_template"><?php echo __( 'Custom Template', 'jet-woo-builder' ); ?></label>
+					<label for="jet_woo_builder_template"><?php echo esc_html__( 'Custom Template', 'jet-woo-builder' ); ?></label>
 				</th>
 				<td>
 					<select name="jet_woo_builder_template" id="jet_woo_builder_template">
@@ -313,7 +335,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 							</option>
 						<?php endforeach; ?>
 					</select>
-					<p><?php echo __( 'The selected custom template will be applied to this term archive.', 'jet-woo-builder' ); ?></p>
+					<p><?php echo esc_html__( 'The selected custom template will be applied to this term archive.', 'jet-woo-builder' ); ?></p>
 				</td>
 			</tr>
 
@@ -326,18 +348,18 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		 * Save extra taxonomy fields callback function.
 		 *
 		 * @since  1.7.10
-		 * @access public
+		 * @since  2.1.13 Added parameter check.
 		 *
-		 * @param int $term_id Taxonomy ID.
+		 * @param mixed  $term_id  Term ID being saved.
+		 * @param mixed  $tt_id    Term taxonomy ID.
+		 * @param string $taxonomy Taxonomy slug.
 		 *
 		 * @return void
 		 */
-		public function save_taxonomy_custom_meta( $term_id ) {
-
-			$jet_woo_builder_template = filter_input( INPUT_POST, 'jet_woo_builder_template' );
-
-			update_term_meta( $term_id, 'jet_woo_builder_template', $jet_woo_builder_template );
-
+		public function save_taxonomy_custom_meta( $term_id, $tt_id = '', $taxonomy = '' ) {
+			if ( isset( $_POST['jet_woo_builder_template'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				update_term_meta( $term_id, 'jet_woo_builder_template', absint( wp_unslash( $_POST['jet_woo_builder_template'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
+			}
 		}
 
 		/**
@@ -401,8 +423,9 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 			$layout          = ! empty( $_COOKIE['jet_woo_builder_layout'] ) ? absint( $_COOKIE['jet_woo_builder_layout'] ) : false;
 			$switcher_enable = apply_filters( 'jet-woo-builder/jet-products-loop/switcher-option-enable', false );
+			$switcher_loops  = apply_filters( 'jet-woo-builder/custom-archive-template/switcher-allowed-loops', [ 'archive' ] );
 
-			if ( $layout && $switcher_enable && 'archive' === $loop ) {
+			if ( $layout && $switcher_enable && in_array( $loop, $switcher_loops ) ) {
 				$this->current_template_archive = $layout;
 			} else {
 				$this->current_template_archive = apply_filters( 'jet-woo-builder/custom-archive-template', $custom_template );
@@ -800,6 +823,37 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		}
 
 		/**
+		 * My account edit payment methods template.
+		 *
+		 * Returns custom my account payment methods endpoint template.
+		 *
+		 * @since 2.3.0
+		 * @access public
+		 *
+		 * @return mixed
+		 */
+		public function get_custom_myaccount_payment_methods_template() {
+
+			if ( null !== $this->current_template_myaccount_payment_methods ) {
+				return $this->current_template_myaccount_payment_methods;
+			}
+
+			$enabled           = jet_woo_builder_shop_settings()->get( 'custom_myaccount_page' );
+			$enabled_endpoints = jet_woo_builder_shop_settings()->get( 'custom_myaccount_page_endpoints' );
+			$custom_template   = false;
+
+			if ( 'yes' === $enabled && 'yes' === $enabled_endpoints && 'default' !== jet_woo_builder_shop_settings()->get( 'myaccount_payment_methods_endpoint_template' ) ) {
+				$custom_template = jet_woo_builder_shop_settings()->get( 'myaccount_payment_methods_endpoint_template' );
+			}
+
+			$this->current_template_myaccount_payment_methods = apply_filters( 'jet-woo-builder/custom-myaccount-edit-address-endpoint-template', $custom_template );
+
+			return $this->current_template_myaccount_payment_methods;
+
+		}
+
+
+		/**
 		 * My account edit account template.
 		 *
 		 * Returns custom my account edit account endpoint template.
@@ -929,10 +983,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		 * Rewrite default WooCommerce pages templates.
 		 *
 		 * @since  1.7.0
-		 * @access public
+		 * @since  2.1.13 Added `jet-woo-builder/wc-pages-templates/is-checkout` hook for checkout template.
 		 *
-		 * @param string $located       Template location.
-		 * @param string $template_name Template name.
+		 * @param string $located       Template path.
+		 * @param string $template_name Name of template.
 		 *
 		 * @return mixed|string
 		 */
@@ -957,8 +1011,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 				}
 			}
 
+			$is_checkout = apply_filters( 'jet-woo-builder/wc-pages-templates/is-checkout', $template_name === 'checkout/form-checkout.php' );
+
 			// Checkout template
-			if ( 'yes' === jet_woo_builder_shop_settings()->get( 'custom_checkout_page' ) && $template_name === 'checkout/form-checkout.php' ) {
+			if ( 'yes' === jet_woo_builder_shop_settings()->get( 'custom_checkout_page' ) && $is_checkout ) {
 				$custom_template = $this->get_custom_checkout_template();
 
 				if ( $custom_template && 'default' !== $custom_template ) {
@@ -1015,6 +1071,13 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 							if ( $custom_template && 'default' !== $custom_template ) {
 								$located = jet_woo_builder()->get_template( 'woocommerce/myaccount/form-edit-account.php' );
+							}
+							break;
+						case 'myaccount/payment-methods.php':
+							$custom_template = $this->get_custom_myaccount_payment_methods_template();
+
+							if ( $custom_template && 'default' !== $custom_template ) {
+								$located = jet_woo_builder()->get_template( 'woocommerce/myaccount/payment-methods.php' );
 							}
 							break;
 						default:
@@ -1090,7 +1153,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 					}
 
 					$template_type = get_post_meta( get_the_ID(), '_template_type', true );
-					$settings      = get_post_meta( $custom_template, '_elementor_page_settings', true );
+					$settings      = $this->get_elementor_page_settings( $custom_template );
 					$layout        = isset( $settings['template_layout'] ) ? $settings['template_layout'] : 'default';
 
 					if ( $template_type && 'default' !== $template_type ) {
@@ -1118,7 +1181,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 				}
 			}
 
-			if ( is_singular( 'product' ) && isset( $_GET['elementor-preview'] ) ) {
+			if ( is_singular( 'product' ) && isset( $_GET['elementor-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 				$template = jet_woo_builder()->plugin_path( 'templates/template-types/product/canvas.php' );
 				do_action( 'jet-woo-builder/template-include/found' );
 			}
@@ -1147,7 +1210,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 					$custom_template = $this->get_custom_product_taxonomy_template();
 
 					if ( $custom_template && 'default' !== $custom_template ) {
-						$settings = get_post_meta( $custom_template, '_elementor_page_settings', true );
+						$settings = $this->get_elementor_page_settings( $custom_template );
 						$layout   = isset( $settings['template_layout'] ) ? $settings['template_layout'] : '';
 
 						switch ( $layout ) {
@@ -1208,12 +1271,12 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 				}
 			}
 
-			if ( $custom_template || ( ! empty( $_GET['elementor-preview'] ) && is_singular( jet_woo_builder_post_type()->slug() ) ) ) {
+			if ( $custom_template || ( ! empty( $_GET['elementor-preview'] ) && is_singular( jet_woo_builder_post_type()->slug() ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 				if ( ! $custom_template ) {
-					$custom_template = $_GET['elementor-preview'];
+					$custom_template = isset( $_GET['elementor-preview'] ) ? absint( wp_unslash( $_GET['elementor-preview'] ) ) : 0;  // phpcs:ignore WordPress.Security.NonceVerification
 				}
 
-				$settings = get_post_meta( $custom_template, '_elementor_page_settings', true );
+				$settings = $this->get_elementor_page_settings( $custom_template );
 				$layout   = isset( $settings['template_layout'] ) ? $settings['template_layout'] : '';
 
 				switch ( $layout ) {
@@ -1290,11 +1353,11 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 			}
 
 			$template_id        = apply_filters( 'jet-woo-builder/woocommerce/products-loop/custom-archive-template', $this->get_custom_archive_template() );
-			$settings           = get_post_meta( $template_id, '_elementor_page_settings', true );
+			$settings           = $this->get_elementor_page_settings( $template_id );
 			$use_custom_columns = isset( $settings['use_custom_template_columns'] ) ? filter_var( $settings['use_custom_template_columns'], FILTER_VALIDATE_BOOLEAN ) : false;
 			$classes            = [ 'products', 'jet-woo-builder-layout-' . $template_id ];
 
-			$settings_cat           = get_post_meta( $this->get_custom_archive_category_template(), '_elementor_page_settings', true );
+			$settings_cat           = $this->get_elementor_page_settings( $this->get_custom_archive_category_template() );
 			$use_custom_cat_columns = isset( $settings_cat['use_custom_template_category_columns'] ) ? filter_var( $settings_cat['use_custom_template_category_columns'], FILTER_VALIDATE_BOOLEAN ) : false;
 			$classes_cat            = [ 'products' ];
 
@@ -1310,7 +1373,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 			$content_cat = '';
 
-			if ( ! empty( woocommerce_maybe_show_product_subcategories() ) ) {
+			$subcategories = woocommerce_maybe_show_product_subcategories();
+
+			if ( ! empty( $subcategories ) ) {
+
 				$classes_cat = implode( ' ', $classes_cat );
 
 				if ( $use_custom_cat_columns ) {
@@ -1321,7 +1387,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 					$after  = '</ul>';
 				}
 
-				$content_cat = $before . woocommerce_maybe_show_product_subcategories() . $after;
+				$content_cat = $before . $subcategories . $after;
 			}
 
 			if ( $use_custom_columns ) {
@@ -1362,7 +1428,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 				return $classes;
 			}
 
-			$settings           = get_post_meta( $this->get_custom_archive_template(), '_elementor_page_settings', true );
+			$settings           = $this->get_elementor_page_settings( $this->get_custom_archive_template() );
 			$use_custom_columns = $settings['use_custom_template_columns'] ?? '';
 			$equal_columns      = $settings['equal_columns_height'] ?? '';
 
@@ -1392,7 +1458,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 				return $classes;
 			}
 
-			$settings           = get_post_meta( $this->get_custom_archive_category_template(), '_elementor_page_settings', true );
+			$settings           = $this->get_elementor_page_settings( $this->get_custom_archive_category_template() );
 			$use_custom_columns = isset( $settings['use_custom_template_category_columns'] ) ? $settings['use_custom_template_category_columns'] : '';
 			$equal_columns      = isset( $settings['equal_columns_height'] ) ? $settings['equal_columns_height'] : '';
 
@@ -1533,8 +1599,8 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		 * @return int
 		 */
 		public function force_preview_template( $custom_template ) {
-			if ( ! empty( $_GET['jet_woo_template'] ) && isset( $_GET['preview_nonce'] ) ) {
-				return absint( $_GET['jet_woo_template'] );
+			if ( ! empty( $_GET['jet_woo_template'] ) && isset( $_GET['preview_nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				return absint( $_GET['jet_woo_template'] ); // phpcs:ignore WordPress.Security.NonceVerification
 			} else {
 				return $custom_template;
 			}
@@ -1553,8 +1619,8 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		 * @return mixed
 		 */
 		public function force_preview_doc_type( $doc_type ) {
-			if ( ! empty( $_GET['jet_woo_template'] ) && isset( $_GET['preview_nonce'] ) ) {
-				return get_post_meta( absint( $_GET['jet_woo_template'] ), '_elementor_template_type', true );
+			if ( ! empty( $_GET['jet_woo_template'] ) && isset( $_GET['preview_nonce'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+				return get_post_meta( absint( $_GET['jet_woo_template'] ), '_elementor_template_type', true ); // phpcs:ignore WordPress.Security.NonceVerification
 			} else {
 				return $doc_type;
 			}
@@ -1574,7 +1640,13 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 		 */
 		public function force_frontend_doc_type( $doc_type ) {
 			if ( ! $doc_type && null !== get_post_meta( get_the_ID(), '_jet_woo_template', true ) ) {
-				if ( is_post_type_archive( 'product' ) || is_page( wc_get_page_id( 'shop' ) ) || is_product_taxonomy() ) {
+
+				$queried_obj = get_queried_object();
+
+				if ( is_post_type_archive( 'product' )
+					 || ( isset( $queried_obj->ID ) && is_page( wc_get_page_id( 'shop' ) ) )
+					 || is_product_taxonomy()
+				) {
 					return 'jet-woo-builder-shop';
 				}
 
@@ -1680,10 +1752,12 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 			global $post;
 
-			if ( empty( $_COOKIE['woocommerce_recently_viewed'] ) ) {
+			$cookie_value = isset( $_COOKIE['woocommerce_recently_viewed'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['woocommerce_recently_viewed'] ) ) : '';
+
+			if ( empty( $cookie_value ) ) {
 				$viewed_products = array();
 			} else {
-				$viewed_products = (array)explode( '|', $_COOKIE['woocommerce_recently_viewed'] );
+				$viewed_products = (array) array_filter( array_map( 'absint', explode( '|', $cookie_value ) ) );
 			}
 
 			if ( ! in_array( $post->ID, $viewed_products ) ) {
@@ -1696,6 +1770,51 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 
 			// Store for session only
 			wc_setcookie( 'woocommerce_recently_viewed', implode( '|', $viewed_products ) );
+
+		}
+
+		/**
+		 * Generate missing product structured data.
+		 *
+		 * Custom single product templates may not run the
+		 * `woocommerce_single_product_summary` action that WooCommerce uses to
+		 * generate product structured data. Generate it before WooCommerce
+		 * outputs its structured data in the footer, unless it already exists.
+		 *
+		 * @since  2.3.5
+		 * @access public
+		 *
+		 * @return void
+		 */
+		public function generate_missing_product_structured_data() {
+
+			if ( ! is_product() ) {
+				return;
+			}
+
+			$woocommerce = WC();
+
+			if ( ! $woocommerce || ! is_a( $woocommerce->structured_data, 'WC_Structured_Data' ) ) {
+				return;
+			}
+
+			$generate_callback = [ $woocommerce->structured_data, 'generate_product_data' ];
+
+			if ( false === has_action( 'woocommerce_single_product_summary', $generate_callback ) ) {
+				return;
+			}
+
+			foreach ( $woocommerce->structured_data->get_data() as $data ) {
+				if ( isset( $data['@type'] ) && 'Product' === $data['@type'] ) {
+					return;
+				}
+			}
+
+			$product = wc_get_product( get_queried_object_id() );
+
+			if ( $product ) {
+				$woocommerce->structured_data->generate_product_data( $product );
+			}
 
 		}
 
@@ -1792,7 +1911,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Woocommerce' ) ) {
 					'woocommerce_template_single_add_to_cart' => 30,
 					'woocommerce_template_single_meta'        => 40,
 					'woocommerce_template_single_sharing'     => 50,
-					'generate_product_data'                   => [ $GLOBALS['woocommerce']->structured_data, 60 ],
 				],
 				'woocommerce_after_single_product_summary'  => [
 					'woocommerce_output_product_data_tabs' => 10,

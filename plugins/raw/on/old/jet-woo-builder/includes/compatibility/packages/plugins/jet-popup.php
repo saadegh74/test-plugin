@@ -155,6 +155,15 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 		 */
 		public function register_controls( $manager ) {
 
+			$qv_templates = jet_woo_builder_post_type()->get_templates_query_args( 'single' );
+			$popup_templates = apply_filters( 'jet_popup_default_query_args', [
+				'post_type'      => jet_popup()->post_type->slug(),
+				'order'          => 'DESC',
+				'orderby'        => 'date',
+				'posts_per_page' => -1,
+				'post_status'    => 'publish',
+			] );
+
 			$manager->add_control(
 				'jet_woo_builder_qv',
 				array(
@@ -175,7 +184,8 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 					'label_block' => true,
 					'type'        => 'jet-query',
 					'query_type'  => 'post',
-					'query'       => jet_woo_builder_post_type()->get_templates_query_args( 'single' ),
+					'query'       => $qv_templates,
+					'signature'   => \Jet_Elementor_Extension\Ajax_Handlers::create_signature( $qv_templates ),
 					'edit_button' => array(
 						'active' => true,
 						'label'  => __( 'Edit Template', 'jet-woo-builder' ),
@@ -202,13 +212,8 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 					'label_block' => true,
 					'type'        => 'jet-query',
 					'query_type'  => 'post',
-					'query'       => apply_filters( 'jet_popup_default_query_args', [
-						'post_type'      => jet_popup()->post_type->slug(),
-						'order'          => 'DESC',
-						'orderby'        => 'date',
-						'posts_per_page' => -1,
-						'post_status'    => 'publish',
-					] ),
+					'query'       => $popup_templates,
+					'signature'   => \Jet_Elementor_Extension\Ajax_Handlers::create_signature( $popup_templates ),
 					'edit_button' => [
 						'active' => true,
 						'label'  => __( 'Edit Popup', 'jet-woo-builder' ),
@@ -331,7 +336,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 		 */
 		public function quick_view_woocommerce_scripts( $deps ) {
 
-			array_push( $deps, 'wc-single-product', 'wc-add-to-cart-variation' );
+			array_push( $deps, 'wc-single-product', 'wc-add-to-cart-variation', 'flexslider' );
 
 			return apply_filters( 'jet-woo-builder/compatibility/jet-popup/script-dependencies', $deps );
 
@@ -348,7 +353,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 
 			array_push( $deps, 'photoswipe', 'photoswipe-default-skin' );
 
-			return $deps;
+			return apply_filters( 'jet-woo-builder/compatibility/jet-popup/style-dependencies', $deps );
 
 		}
 
@@ -366,12 +371,12 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 			); ?>
 
 			<div class="jet-quickview-button__container">
-				<a href="#" class="<?php echo implode( ' ', $button_classes ); ?>">
+				<a href="#" class="<?php echo esc_attr( implode( ' ', $button_classes ) ); ?>">
 					<div class="jet-quickview-button__plane jet-quickview-button__plane-normal"></div>
 					<div class="jet-quickview-button__state jet-quickview-button__state-normal">
 						<?php
 						if ( filter_var( $display_settings['quickview_use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-							printf( '<span class="jet-quickview-button__icon jet-woo-builder-icon">%s</span>', htmlspecialchars_decode( $display_settings['selected_quickview_button_icon_normal'] ) );
+							printf( '<span class="jet-quickview-button__icon jet-woo-builder-icon">%s</span>', htmlspecialchars_decode( $display_settings['selected_quickview_button_icon_normal'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						}
 						printf( '<span class="jet-quickview-button__label">%s</span>', esc_html__( $display_settings['quickview_button_label_normal'], 'jet-woo-builder' ) );
 						?>
@@ -596,10 +601,9 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 				array(
 					'label'     => esc_html__( 'Background Color', 'jet-woo-builder' ),
 					'type'      => Elementor\Controls_Manager::COLOR,
-					'scheme'    => array(
-						'type'  => Elementor\Core\Schemes\Color::get_type(),
-						'value' => Elementor\Core\Schemes\Color::COLOR_1,
-					),
+					'global' => [
+						'default' => Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_PRIMARY,
+					],
 					'selectors' => array(
 						'{{WRAPPER}} ' . $css_scheme['button'] . ' ' . $css_scheme['plane_normal'] => 'background-color: {{VALUE}}',
 					),
@@ -632,10 +636,9 @@ if ( ! class_exists( 'Jet_Woo_Builder_Popup_Package' ) ) {
 				array(
 					'label'     => esc_html__( 'Background Color', 'jet-woo-builder' ),
 					'type'      => Elementor\Controls_Manager::COLOR,
-					'scheme'    => array(
-						'type'  => Elementor\Core\Schemes\Color::get_type(),
-						'value' => Elementor\Core\Schemes\Color::COLOR_4,
-					),
+					'global' => [
+						'default' => Elementor\Core\Kits\Documents\Tabs\Global_Colors::COLOR_ACCENT,
+					],
 					'selectors' => array(
 						'{{WRAPPER}} ' . $css_scheme['button'] . ':hover ' . $css_scheme['plane_normal'] => 'background-color: {{VALUE}}',
 					),

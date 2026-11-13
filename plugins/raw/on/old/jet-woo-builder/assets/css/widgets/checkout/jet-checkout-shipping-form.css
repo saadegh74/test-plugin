@@ -1,0 +1,25 @@
+.woocommerce .elementor-jet-checkout-shipping-form #ship-to-different-address #ship-to-different-address-checkbox,
+.woocommerce .elementor-jet-checkout-shipping-form #ship-to-different-address span {
+  float: none;
+}
+.woocommerce .elementor-jet-checkout-shipping-form #ship-to-different-address label {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.woocommerce .elementor-jet-checkout-shipping-form .form-row {
+  margin: 0;
+  padding: 0;
+}
+.woocommerce .elementor-jet-checkout-shipping-form .form-row label {
+  display: block;
+}
+.woocommerce .elementor-jet-checkout-shipping-form .form-row .select2 {
+  text-align: start;
+}
+@media screen and (max-width: 767px) {
+  .jet-woo-builder-forms-mobile-approach-yes .woocommerce .elementor-jet-checkout-shipping-form .form-row-first, .jet-woo-builder-forms-mobile-approach-yes .woocommerce .elementor-jet-checkout-shipping-form .form-row-last {
+    float: none;
+    width: 100%;
+  }
+}

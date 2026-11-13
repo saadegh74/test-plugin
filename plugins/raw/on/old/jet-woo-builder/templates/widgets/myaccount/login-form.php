@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <h2><?php esc_html_e( 'Login', 'woocommerce' ); ?></h2>
 
-<form class="woocommerce-form woocommerce-form-login login" method="post">
+<form class="woocommerce-form woocommerce-form-login login" method="post" novalidate>
 
 	<?php do_action( 'woocommerce_login_form_start' ); ?>
 

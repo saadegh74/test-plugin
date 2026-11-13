@@ -47,7 +47,7 @@ if ( 'yes' === jet_woo_builder_shop_settings()->get( 'custom_single_page' ) ) {
 function set_post_class( $classes ) {
 
 	if ( is_singular( 'jet-woo-builder' ) ) {
-		$template_settings = get_post_meta( get_the_ID(), '_elementor_page_settings', true );
+		$template_settings = jet_woo_builder_template_functions()->get_elementor_page_settings( get_the_ID() );
 
 		if ( isset( $template_settings['general_condition'] ) ) {
 			$classes[] = 'ct-default-gallery';

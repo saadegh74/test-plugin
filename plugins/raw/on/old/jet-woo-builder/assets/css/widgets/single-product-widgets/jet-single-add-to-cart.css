@@ -1,0 +1,72 @@
+.woocommerce .product .elementor-jet-single-add-to-cart .cart:not(.grouped_form):not(.variations_form),
+.woocommerce .product .elementor-jet-single-add-to-cart .woocommerce-variation-add-to-cart {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .cart {
+  margin: 0;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .cart.grouped_form .quantity .qty {
+  width: 3.631em;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .cart .quantity {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 0;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .cart .quantity.hidden {
+  display: none !important;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .cart .quantity .qty {
+  width: 100%;
+  max-width: 100%;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .cart .single_add_to_cart_button {
+  width: 100%;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .single_variation .price {
+  margin-bottom: 0;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .variations select {
+  vertical-align: top;
+  width: 100%;
+}
+@media not all and (min-resolution: 0.001dpcm) {
+  @supports (-webkit-appearance: none) {
+    .woocommerce .product .elementor-jet-single-add-to-cart .variations select {
+      -webkit-appearance: none;
+    }
+  }
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .variations label {
+  display: block;
+}
+.woocommerce .product .elementor-jet-single-add-to-cart .variations tbody > tr:nth-child(odd) > td, .woocommerce .product .elementor-jet-single-add-to-cart .variations tbody > tr:nth-child(odd) > th,
+.woocommerce .product .elementor-jet-single-add-to-cart .variations tbody > tr:hover > td,
+.woocommerce .product .elementor-jet-single-add-to-cart .variations tbody > tr:hover > th {
+  background: none;
+}
+.woocommerce .jet-woo-builder-single-ajax-add-to-cart .button.loading:after {
+  top: 50%;
+  margin-top: -9px;
+}
+.woocommerce.rtl .jet-woo-builder-single-ajax-add-to-cart .button.added:before {
+  font-family: WooCommerce;
+  content: "\e017";
+  margin-right: 0.53em;
+  vertical-align: bottom;
+}
+.woocommerce.rtl .jet-woo-builder-single-ajax-add-to-cart .button.added:after {
+  content: none;
+}
+
+.elementor-jet-single-add-to-cart .reset_variations {
+  margin: 10px 0 0 0;
+}
+.elementor-jet-single-add-to-cart .added_to_cart.wc-forward {
+  display: var(--add-to-cart-wc-forward-display, none) !important;
+}

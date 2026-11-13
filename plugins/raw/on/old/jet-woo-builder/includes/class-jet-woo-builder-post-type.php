@@ -143,20 +143,20 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 
 			if ( ! current_user_can( 'edit_posts' ) ) {
 				wp_die(
-					__( 'You don\'t have permissions to do this', 'jet-woo-builder' ),
-					__( 'Error', 'jet-woo-builder' )
+					esc_html__( 'You don\'t have permissions to do this', 'jet-woo-builder' ),
+					esc_html__( 'Error', 'jet-woo-builder' )
 				);
 			}
 
 			$doc_types = jet_woo_builder()->documents->get_document_types();
-			$type      = isset( $_REQUEST['template_type'] ) ? $_REQUEST['template_type'] : $doc_types['single']['slug'];
+			$type      = isset( $_REQUEST['template_type'] ) ? sanitize_key( wp_unslash( $_REQUEST['template_type'] ) ) : $doc_types['single']['slug']; // phpcs:ignore WordPress.Security.NonceVerification
 			$documents = Elementor\Plugin::instance()->documents;
 			$doc_type  = $documents->get_document_type( $type );
 
 			if ( ! $doc_type ) {
 				wp_die(
-					__( 'Incorrect template type. Please try again.', 'jet-woo-builder' ),
-					__( 'Error', 'jet-woo-builder' )
+					esc_html__( 'Incorrect template type. Please try again.', 'jet-woo-builder' ),
+					esc_html__( 'Error', 'jet-woo-builder' )
 				);
 			}
 
@@ -164,16 +164,16 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 			$templates     = [];
 
 			if ( $type === $doc_types['single']['slug'] ) {
-				$template  = isset( $_REQUEST['template_single'] ) ? $_REQUEST['template_single'] : '';
+				$template = isset( $_REQUEST['template_single'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['template_single'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 				$templates = $this->predesigned_templates( 'single', 8 );
 			} else if ( $type === $doc_types['archive']['slug'] ) {
-				$template  = isset( $_REQUEST['template_archive'] ) ? $_REQUEST['template_archive'] : '';
+				$template = isset( $_REQUEST['template_archive'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['template_archive'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 				$templates = $this->predesigned_templates( 'archive' );
 			} else if ( $type === $doc_types['category']['slug'] ) {
-				$template  = isset( $_REQUEST['template_category'] ) ? $_REQUEST['template_category'] : '';
+				$template = isset( $_REQUEST['template_category'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['template_category'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 				$templates = $this->predesigned_templates( 'category' );
 			} else if ( $type === $doc_types['shop']['slug'] ) {
-				$template  = isset( $_REQUEST['template_shop'] ) ? $_REQUEST['template_shop'] : '';
+				$template = isset( $_REQUEST['template_shop'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['template_shop'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 				$templates = $this->predesigned_templates( 'shop' );
 			} else {
 				$template = '';
@@ -182,8 +182,8 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 			if ( $template ) {
 				if ( ! isset( $templates[ $template ] ) ) {
 					wp_die(
-						__( 'This template not registered', 'jet-woo-builder' ),
-						__( 'Error', 'jet-woo-builder' )
+						esc_html__( 'This template not registered', 'jet-woo-builder' ),
+						esc_html__( 'Error', 'jet-woo-builder' )
 					);
 				}
 
@@ -214,7 +214,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 				],
 			];
 
-			$name = isset( $_REQUEST['template_name'] ) ? $_REQUEST['template_name'] : '';
+			$name = isset( $_REQUEST['template_name'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['template_name'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 
 			if ( $name ) {
 				$post_data['post_title'] = esc_attr( $name );
@@ -224,15 +224,15 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 
 			if ( ! $template_id ) {
 				wp_die(
-					__( 'Can\'t create template. Please try again', 'jet-woo-builder' ),
-					__( 'Error', 'jet-woo-builder' )
+					esc_html__( 'Can\'t create template. Please try again', 'jet-woo-builder' ),
+					esc_html__( 'Error', 'jet-woo-builder' )
 				);
 			}
 
 			$redirect = Elementor\Plugin::$instance->documents->get( $template_id )->get_edit_url();
 
-			wp_redirect( $redirect );
-			die();
+			wp_safe_redirect( $redirect );
+			exit;
 
 		}
 
@@ -249,7 +249,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 				return;
 			}
 
-			if ( ! isset( $_GET['post_type'] ) || $this->slug() !== $_GET['post_type'] ) {
+			if ( ! isset( $_GET['post_type'] ) || $this->slug() !== $_GET['post_type'] ) { // phpcs:ignore WordPress.Security.NonceVerification
 				return;
 			}
 
@@ -315,7 +315,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 			}
 
 			$doc_types = jet_woo_builder()->documents->get_document_types();
-			$selected  = isset( $_GET[ $this->type_tax ] ) ? $_GET[ $this->type_tax ] : '';
+			$selected  = isset( $_GET[ $this->type_tax ] ) ? sanitize_key( wp_unslash( $_GET[ $this->type_tax ] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
 
 			$create_action = add_query_arg(
 				[
@@ -343,7 +343,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 		 */
 		public function fix_documents_types() {
 
-			if ( ! isset( $_GET['fix_jet_woo_templates'] ) ) {
+			if ( ! isset( $_GET['fix_jet_woo_templates'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
 				return;
 			}
 
@@ -397,7 +397,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 				'jet-dashboard',
 				esc_html__( 'Woo Page Builder', 'jet-woo-builder' ),
 				esc_html__( 'Woo Page Builder', 'jet-woo-builder' ),
-				'edit_pages',
+				'manage_options',
 				'edit.php?post_type=' . $this->slug()
 			);
 		}
@@ -450,7 +450,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 								$this->type_tax => $type['slug'],
 							] );
 
-							printf( '<div class="jet-woo-builder-template-type"><a href="%s">%s</a></div>', $link, $type['name'] );
+							printf( '<div class="jet-woo-builder-template-type"><a href="%s">%s</a></div>', esc_url( $link ), esc_html( $type['name'] ) );
 
 							break;
 
@@ -469,7 +469,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 								}
 							}
 
-							printf( '<div class="jet-woo-builder-active-conditions">%1$s</div>', implode( ', ', $active_conditions ) );
+							printf( '<div class="jet-woo-builder-active-conditions">%1$s</div>', esc_html( implode( ', ', $active_conditions ) ) );
 
 							break;
 
@@ -714,7 +714,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Post_Type' ) ) {
 			}
 
 			$tabs       = array_merge( [ 'all' => __( 'All', 'jet-woo-builder' ) ], $tabs );
-			$active_tab = isset( $_GET[ $this->type_tax ] ) ? $_GET[ $this->type_tax ] : 'all';
+			$active_tab = isset( $_GET[ $this->type_tax ] ) ? sanitize_key( wp_unslash( $_GET[ $this->type_tax ] ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification
 			$page_link  = admin_url( 'edit.php?post_type=' . $this->slug() );
 
 			if ( ! array_key_exists( $active_tab, $tabs ) ) {

@@ -1,0 +1,62 @@
+.jet-woo-builder-shop-navigation {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.jet-woo-builder-shop-navigation-space-between .jet-woo-builder-navigation-next {
+  margin-left: auto !important;
+}
+.rtl .jet-woo-builder-shop-navigation-space-between .jet-woo-builder-navigation-next {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+.jet-woo-builder-shop-navigation-space-between .jet-woo-builder-navigation-prev {
+  margin-right: auto !important;
+}
+.rtl .jet-woo-builder-shop-navigation-space-between .jet-woo-builder-navigation-prev {
+  margin-right: 0 !important;
+  margin-left: auto !important;
+}
+.jet-woo-builder-shop-navigation-flex-start .jet-woo-builder-navigation-next,
+.jet-woo-builder-shop-navigation-flex-start .jet-woo-builder-navigation-prev, .jet-woo-builder-shop-navigation-flex-end .jet-woo-builder-navigation-next,
+.jet-woo-builder-shop-navigation-flex-end .jet-woo-builder-navigation-prev, .jet-woo-builder-shop-navigation-center .jet-woo-builder-navigation-next,
+.jet-woo-builder-shop-navigation-center .jet-woo-builder-navigation-prev {
+  margin: 10px;
+}
+.rtl .jet-woo-builder-shop-navigation i {
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+.jet-woo-builder-shop-navigation > a {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.jet-woo-builder-shop-navigation .jet-woo-builder-shop-navigation__arrow {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  cursor: pointer;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  z-index: 999;
+}
+.jet-woo-builder-shop-navigation .jet-woo-builder-shop-navigation__arrow:before {
+  display: block;
+}

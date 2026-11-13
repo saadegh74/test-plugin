@@ -296,7 +296,10 @@ class Jet_Woo_Builder_Shop_Settings_Page extends WC_Settings_Page {
 
 			array(
 				'title'    => __( 'Cart Template', 'jet-woo-builder' ),
-				'desc'     => __( 'Select the template to use it as a cart template', 'jet-woo-builder' ),
+				'desc'     => __( 'Select the template to use it as a cart template.', 'jet-woo-builder' )
+					. '<br><span class="description" style="display:block;margin-top:6px;">'
+					. __( '<b>Important:</b> In the <i>Block Editor</i>, Cart Template applied only if the Cart page contains the <b>[woocommerce_cart]</b> shortcode (inside a Shortcode block). If the page uses WooCommerce Cart blocks, replace them with the shortcode.', 'jet-woo-builder' )
+					. '</span>',
 				'id'       => jet_woo_builder_shop_settings()->options_key . '[cart_template]',
 				'doc_type' => 'cart',
 				'default'  => '',
@@ -338,7 +341,10 @@ class Jet_Woo_Builder_Shop_Settings_Page extends WC_Settings_Page {
 
 			array(
 				'title'    => __( 'Checkout Template', 'jet-woo-builder' ),
-				'desc'     => __( 'Select the template to use it as a checkout template', 'jet-woo-builder' ),
+				'desc'     => __( 'Select the template to use it as a checkout template', 'jet-woo-builder' )
+					. '<br><span class="description" style="display:block;margin-top:6px;">'
+					. __( '<b>Important:</b> In the <i>Block Editor</i>, Checkout Template is applied only if the Checkout page contains the <b>[woocommerce_checkout]</b> shortcode (inside a Shortcode block). If the page uses WooCommerce Checkout blocks, replace them with the shortcode.', 'jet-woo-builder' )
+					. '</span>',
 				'id'       => jet_woo_builder_shop_settings()->options_key . '[checkout_template]',
 				'doc_type' => 'checkout',
 				'default'  => '',
@@ -488,6 +494,17 @@ class Jet_Woo_Builder_Shop_Settings_Page extends WC_Settings_Page {
 				'title'    => __( 'My Account Edit Account Endpoint Template', 'jet-woo-builder' ),
 				'desc'     => __( 'Select the template to use it as a my account edit account endpoint template', 'jet-woo-builder' ),
 				'id'       => jet_woo_builder_shop_settings()->options_key . '[myaccount_edit_account_endpoint_template]',
+				'doc_type' => 'myaccount',
+				'default'  => '',
+				'type'     => 'jet_woo_select_template',
+				'class'    => 'wc-enhanced-select-nostd',
+				'css'      => 'min-width:300px;',
+			),
+
+			array(
+				'title'    => __( 'My Account Payment Methods Endpoint Template', 'jet-woo-builder' ),
+				'desc'     => __( 'Select the template to use it as a my account payment methods endpoint template', 'jet-woo-builder' ),
+				'id'       => jet_woo_builder_shop_settings()->options_key . '[myaccount_payment_methods_endpoint_template]',
 				'doc_type' => 'myaccount',
 				'default'  => '',
 				'type'     => 'jet_woo_select_template',

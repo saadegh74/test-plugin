@@ -18,5 +18,5 @@ if ( ! $tags ) {
 ?>
 
 <div class="jet-woo-product-tags">
-	<ul><?php echo $tags; ?></ul>
+	<ul><?php echo wp_kses_post( $tags ); ?></ul>
 </div>

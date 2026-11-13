@@ -1,0 +1,54 @@
+.cx-vui-alert {
+	position: relative;
+	padding: 12px;
+	border: 1px solid transparent;
+	border-radius: 3px;
+
+	&:not(:first-child) {
+		margin-top: 15px;
+	}
+
+	&--dismissible {
+		padding-inline-end: 20px;
+	}
+
+	&--success {
+		color: #0f5132;
+		background-color: #d1e7dd;
+		border-color: #badbcc;
+	}
+
+	&--danger {
+		color: #842029;
+		background-color: #f8d7da;
+		border-color: #f5c2c7;
+	}
+
+	&--warning {
+		color: #664d03;
+		background-color: #fff3cd;
+		border-color: #ffecb5;
+	}
+
+	&--info {
+		color: #055160;
+		background-color: #cff4fc;
+		border-color: #b6effb;
+	}
+
+	&__dismiss {
+		position: absolute;
+		padding: 3px;
+		top: 0;
+		right: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+
+		.rtl & {
+			left: 0;
+			right: auto;
+		}
+	}
+}

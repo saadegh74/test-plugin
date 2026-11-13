@@ -25,7 +25,8 @@ $tag   = isset( $settings['block_title_tag'] ) ? jet_woo_builder_tools()->saniti
 $title = isset( $settings['block_title'] ) ? esc_html__( $settings['block_title'], 'jet-woo-builder' ) : '';
 
 if ( ! empty( $title ) ) {
-	printf( '<%1$s class="jet-single-attrs__title">%2$s</%1$s>', $tag, $title );
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- already escaped via esc_html__()
+	printf( '<%1$s class="jet-single-attrs__title">%2$s</%1$s>', esc_attr( $tag ), $title );
 }
 
-echo $content;
+echo wp_kses_post( $content );

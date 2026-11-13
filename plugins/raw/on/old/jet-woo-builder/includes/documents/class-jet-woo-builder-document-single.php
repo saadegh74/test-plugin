@@ -54,6 +54,8 @@ class Jet_Woo_Builder_Document extends Jet_Woo_Builder_Document_Base {
 
 	public function get_preview_as_query_args() {
 
+		jet_woo_builder()->documents->set_current_type( $this->get_name() );
+
 		$args    = [];
 		$product = $this->query_first_product();
 

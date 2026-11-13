@@ -19,4 +19,4 @@ if ( empty( $stock_status ) ) {
 }
 ?>
 
-<div class="jet-woo-product-stock-status"><?php echo $stock_status; ?></div>
+<div class="jet-woo-product-stock-status"><?php echo wp_kses_post( $stock_status ); ?></div>

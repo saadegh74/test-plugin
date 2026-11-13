@@ -1,0 +1,19 @@
+.woocommerce .elementor-jet-checkout-coupon-form .woocommerce-info:before {
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.elementor-html .woocommerce .elementor-jet-checkout-coupon-form .woocommerce-form-coupon {
+  display: block !important;
+}
+.woocommerce .elementor-jet-checkout-coupon-form .woocommerce-form-coupon .form-row-first,
+.woocommerce .elementor-jet-checkout-coupon-form .woocommerce-form-coupon .form-row-last {
+  float: left;
+}
+html[dir=rtl] .woocommerce .elementor-jet-checkout-coupon-form .woocommerce-form-coupon .form-row-first,
+html[dir=rtl] .woocommerce .elementor-jet-checkout-coupon-form .woocommerce-form-coupon .form-row-last {
+  float: right;
+}
+.woocommerce .elementor-jet-checkout-coupon-form .woocommerce-form-coupon .form-row-last .button {
+  width: 100%;
+}

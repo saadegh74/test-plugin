@@ -31,8 +31,19 @@ class Jet_Woo_Builder_Archive_Sale_Badge extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/woocommerce-jetwoobuilder-settings-how-to-create-and-set-a-custom-categories-archive-template/?utm_source=need-help&utm_medium=jet-woo-categories&utm_campaign=jetwoobuilder';
 	}
 
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ];
+		
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
+	}
+
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'archive' );
+		return $this->is_widget_visible( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -200,7 +211,7 @@ class Jet_Woo_Builder_Archive_Sale_Badge extends Jet_Woo_Builder_Base {
 			return;
 		}
 
-		printf( '<div class="jet-woo-builder-archive-product-sale-badge">%s</div>', $badge );
+		printf( '<div class="jet-woo-builder-archive-product-sale-badge">%s</div>', wp_kses_post( $badge ) );
 
 	}
 
@@ -214,9 +225,9 @@ class Jet_Woo_Builder_Archive_Sale_Badge extends Jet_Woo_Builder_Base {
 		], $settings );
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings );
+			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings ) );
 		} else {
-			echo self::render_callback( $macros_settings );
+			echo wp_kses_post( self::render_callback( $macros_settings ) ?: '' );
 		}
 
 	}

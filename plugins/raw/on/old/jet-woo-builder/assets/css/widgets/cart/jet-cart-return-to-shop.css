@@ -1,0 +1,6 @@
+.woocommerce .elementor-jet-cart-return-to-shop .return-to-shop {
+  margin: 0;
+}
+.woocommerce .elementor-jet-cart-return-to-shop .return-to-shop .button {
+  display: inline-block;
+}

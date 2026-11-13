@@ -1,0 +1,17 @@
+.woocommerce .elementor-jet-myaccount-addresses .woocommerce-Address {
+  position: relative;
+}
+.woocommerce .elementor-jet-myaccount-addresses .woocommerce-Address .title:before, .woocommerce .elementor-jet-myaccount-addresses .woocommerce-Address .title:after {
+  content: none;
+}
+.woocommerce .elementor-jet-myaccount-addresses .woocommerce-Address .title > * {
+  float: none;
+}
+.woocommerce .elementor-jet-myaccount-addresses .woocommerce-Address .title .edit {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+html[dir=rtl] .woocommerce .elementor-jet-myaccount-addresses .woocommerce-Address .title .edit {
+  left: 0;
+}

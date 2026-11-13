@@ -19,5 +19,5 @@ $badge      = apply_filters( 'jet-woo-builder/templates/single-product/sale-badg
 $on_sale    = apply_filters( 'jet-woo-builder/templates/single-product/sale-badge/on-sale', $product->is_on_sale(), $product, $settings );
 
 if ( $on_sale ) {
-	echo apply_filters( 'woocommerce_sale_flash', $badge, $post, $product );
+	echo wp_kses_post( apply_filters( 'woocommerce_sale_flash', $badge, $post, $product ) );
 }

@@ -68,6 +68,9 @@ plugins/updates/
 │   │   ├── jet-compare-wishlist/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── jet-compare-wishlist-v1.5.13.zip <-- فایل فشرده با نام استاندارد جهت تست
+│   │   ├── jet-woo-builder/
+│   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
+│   │   │   └── jet-woo-builder-v2.3.6.zip  <-- فایل فشرده با نام استاندارد جهت تست
 │   │   ├── jet-blocks/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── jet-blocks-v1.3.12.zip      <-- فایل فشرده با نام استاندارد جهت تست
@@ -91,8 +94,10 @@ plugins/updates/
 │   │   │   └── jet-smart-filters-v3.3.2.zip <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
 │   │   ├── jet-search/
 │   │   │   └── jet-search-v3.1.1.zip       <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
-│   │   └── jet-compare-wishlist/
-│   │       └── jet-compare-wishlist-v1.5.5.2.zip <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
+│   │   ├── jet-compare-wishlist/
+│   │   │   └── jet-compare-wishlist-v1.5.5.2.zip <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
+│   │   └── jet-woo-builder/
+│   │       └── jet-woo-builder-v2.1.7.3.zip <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
 │   └── production/
 │
 └── up-side/                                <-- کانال بسته‌های قالب‌ها و افزونه‌های جانبی
@@ -106,6 +111,16 @@ plugins/updates/
 ---
 
 ## ۳. لیست افزونه‌های فعال و آدرس‌های اندپوینت (Endpoints)
+
+### افزونه JetWooBuilder (نسخه 2.3.6)
+
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-woo-builder/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-woo-builder/jet-woo-builder-v2.3.6.zip`
+* **کانال پایدار (Production):**
+  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **آرشیو نسخه قبلی (up-old):**
+  * لینک دانلود نسخه 2.1.7.3: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-old/staging/jet-woo-builder/jet-woo-builder-v2.1.7.3.zip`
 
 ### افزونه JetCompareWishlist (نسخه 1.5.13)
 * **کانال آزمایشی (Staging):**

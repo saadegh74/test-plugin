@@ -13,4 +13,4 @@ if ( empty( $description ) ) {
 }
 ?>
 
-<div class="jet-woo-category-excerpt"><?php echo $description; ?></div>
+<div class="jet-woo-category-excerpt"><?php echo wp_kses_post( $description ); ?></div>

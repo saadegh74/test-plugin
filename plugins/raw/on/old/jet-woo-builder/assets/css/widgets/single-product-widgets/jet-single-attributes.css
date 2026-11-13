@@ -1,0 +1,6 @@
+.elementor-jet-single-attributes .shop_attributes {
+  width: 100%;
+}
+.elementor-jet-single-attributes .shop_attributes tr th, .elementor-jet-single-attributes .shop_attributes tr td {
+  border-color: #0b0b0b;
+}

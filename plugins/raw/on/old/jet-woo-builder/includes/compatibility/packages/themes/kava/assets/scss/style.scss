@@ -186,3 +186,46 @@
 		margin: 0;
 	}
 }
+
+/* Woo show-password fallback for Kava (Kava disables default Woo styles) */
+.woocommerce .password-input {
+	position: relative;
+}
+
+.woocommerce .password-input .show-password-input {
+	position: absolute;
+	top: 50%;
+	right: 0.75em;
+	transform: translateY(-50%);
+	cursor: pointer;
+	line-height: 1;
+	width: 1.5em;
+	height: 1.5em;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0.7;
+	background: transparent;
+}
+
+.woocommerce .password-input .show-password-input:hover {
+	opacity: 1;
+}
+
+.woocommerce .password-input .show-password-input::after {
+	font-family: Dashicons;
+	font-weight: 400;
+	font-style: normal;
+	text-transform: none;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: "\f177"; /* dashicons-visibility */
+	font-size: 18px;
+	line-height: 1;
+	color: black;
+}
+
+/* When password is shown (Woo adds class on wrapper in many versions) */
+.woocommerce .password-input .show-password-input.display-password::after {
+	content: "\f530"; /* dashicons-hidden */
+}

@@ -11,6 +11,29 @@
 				hasTitles: false,
 				loadEditUrl: false,
 
+				ui: function() {
+
+					var ui = elementor.modules.controls.Select2.prototype.ui.apply( this, arguments );
+
+					_.extend( ui, {
+						jetEngineCreateButton: 'a.jet-engine-create-listing',
+					} );
+
+					return ui;
+				},
+
+				events: function() {
+
+					var events = elementor.modules.controls.Select2.prototype.events.apply( this, arguments );
+
+					_.extend( events, {
+						'click @ui.jetEngineCreateButton': 'onCreateButtonClick',
+					} );
+
+					return events;
+
+				},
+
 				getQueryArgs: function() {
 					var args = this.model.get( 'query' );
 
@@ -58,6 +81,7 @@
 									action:     'jet_query_control_options',
 									query_type: self.model.get( 'query_type' ),
 									query:      self.getQueryArgs(),
+									signature:  self.model.get( 'signature' ),
 								};
 							},
 							processResults: function( response ) {
@@ -93,7 +117,8 @@
 							action:     'jet_query_control_options',
 							query_type: self.model.get( 'query_type' ),
 							query:      self.getQueryArgs(),
-							ids:        query_ids
+							ids:        query_ids,
+							signature:  self.model.get( 'signature' ),
 						},
 						beforeSend: function() {
 							self.ui.select.prop( 'disabled', true );
@@ -192,6 +217,33 @@
 					} );
 				},
 
+				renderCreateButton: function() {
+
+					var createButton = this.model.get( 'create_button' );
+
+					if ( ! createButton ) {
+						return;
+					}
+
+					var $createHandler = jQuery( '<br><span style="display: flex; justify-content: flex-end;"><a href="#" class="jet-engine-create-listing">Create new listing item</a><span>' );
+					this.$el.find( '.elementor-control-field' ).after( $createHandler );
+
+					$createHandler
+
+				},
+
+				onCreateButtonClick: function( event ) {
+
+					event.preventDefault();
+					var createButton = this.model.get( 'create_button' );
+					var handler = createButton.handler || 'JetListings';
+
+					if ( window[ handler ] && window[ handler ].onEditorCreateClick ) {
+						window[ handler ].onEditorCreateClick( this );
+					}
+
+				},
+
 				onInputChange: function() {
 					this.renderEditButton();
 				},
@@ -205,18 +257,48 @@
 					}
 
 					this.renderEditButton();
+					this.renderCreateButton();
 				}
 			});
 
 			var RepeaterControlItemView = elementor.modules.controls.Repeater.extend({
 				className: function className() {
 					return elementor.modules.controls.Repeater.prototype.className.apply( this, arguments ) + ' elementor-control-type-repeater';
+				},
+				callParentFunction( functionName, args = [] ) {
+					const widgetType     = this.options.container.model.get( 'widgetType' );
+					const parentFunction = elementor.modules.controls.Repeater.prototype[ functionName ];
+
+					if (  ! elementor.widgetsCache[ widgetType ] || ! elementor.widgetsCache[ widgetType ]?.support_nesting ) {
+						parentFunction.apply( this, args );
+						return;
+					}
+
+					elementor.widgetsCache[ widgetType ].support_nesting = false;
+					parentFunction.apply( this, args );
+					elementor.widgetsCache[ widgetType ].support_nesting = true;
+				},
+				onButtonAddRowClick() {
+					this.callParentFunction( 'onButtonAddRowClick' );
+				},
+				onChildviewClickRemove( childView ) {
+					this.callParentFunction( 'onChildviewClickRemove', [ childView ] );
+				},
+				onChildviewClickDuplicate( childView ) {
+					this.callParentFunction( 'onChildviewClickDuplicate', [ childView ] );
+				}
+			});
+
+			var Select2ControlItemView = elementor.modules.controls.Select2.extend({
+				className: function className() {
+					return elementor.modules.controls.Repeater.prototype.className.apply( this, arguments ) + ' elementor-control-type-select2';
 				}
 			});
 
 			// Add controls views
 			elementor.addControlView( 'jet-query',    QueryControlItemView );
 			elementor.addControlView( 'jet-repeater', RepeaterControlItemView );
+			elementor.addControlView( 'jet-select2',  Select2ControlItemView );
 		}
 
 	};

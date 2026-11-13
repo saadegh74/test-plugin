@@ -1,0 +1,83 @@
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form {
+  float: none;
+  overflow: hidden;
+  width: 100%;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table {
+  border: 0;
+  border-collapse: collapse;
+  margin: 0;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions button[name=update_cart],
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions input[name=update_cart] {
+  display: var(--cart-update-automatically-display, inline-block);
+}
+@media only screen and (max-width: 768px) {
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions button[name=update_cart],
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions input[name=update_cart] {
+    display: var(--cart-update-automatically-display, block) !important;
+  }
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions .coupon {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions .coupon label {
+  display: none;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions .coupon .input-text {
+  float: none;
+  width: 100% !important;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td.actions .coupon .button {
+  margin: 0;
+  width: 100%;
+}
+@media only screen and (max-width: 768px) {
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table {
+    width: 100%;
+  }
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td[data-title=""]::before,
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table td:not([data-title])::before {
+    content: none;
+  }
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-thumbnail {
+    display: block !important;
+  }
+  .woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-thumbnail:before {
+    content: none;
+  }
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-thumbnail img {
+  max-width: 100%;
+  width: auto;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-remove .remove {
+  display: inline-block;
+  height: auto;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  width: auto;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-remove .remove svg {
+  display: block;
+  height: 1em;
+  width: 1em;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-remove .remove::before {
+  content: none;
+}
+.woocommerce .elementor-jet-cart-table .woocommerce-cart-form table.shop_table .product-quantity input {
+  width: 100%;
+}
+
+.jet-woo-cart-table-remove-custom-pos-yes .shop_table.cart tr.cart_item {
+  position: relative;
+}
+.jet-woo-cart-table-remove-custom-pos-yes .shop_table.cart td.product-remove {
+  padding: 0px !important;
+}
+.jet-woo-cart-table-remove-custom-pos-yes .shop_table.cart td.product-remove .remove {
+  position: absolute;
+}

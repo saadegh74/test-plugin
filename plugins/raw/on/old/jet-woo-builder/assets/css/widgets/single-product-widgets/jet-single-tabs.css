@@ -1,0 +1,87 @@
+.elementor-jet-single-tabs.jet-woo-builder .wc-tabs-wrapper {
+  overflow: hidden;
+}
+.elementor-jet-single-tabs.jet-woo-builder .jet-single-tabs__wrap .woocommerce-tabs ul.tabs {
+  margin: 0;
+}
+.elementor-jet-single-tabs.jet-woo-builder .jet-single-tabs__wrap .woocommerce-tabs ul.tabs li {
+  overflow: hidden;
+  border-bottom: none;
+  padding: 0;
+}
+.elementor-jet-single-tabs.jet-woo-builder .jet-single-tabs__wrap .woocommerce-tabs ul.tabs li a {
+  background-color: transparent;
+  border: none;
+}
+.elementor-tabs-controls-left .elementor-jet-single-tabs.jet-woo-builder > li, .elementor-tabs-controls-center .elementor-jet-single-tabs.jet-woo-builder > li, .elementor-tabs-controls-right .elementor-jet-single-tabs.jet-woo-builder > li {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.elementor-tabs-controls-left .elementor-jet-single-tabs.jet-woo-builder .tabs {
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -webkit-box-align: start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+.elementor-tabs-controls-center .elementor-jet-single-tabs.jet-woo-builder .tabs {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.elementor-tabs-controls-right .elementor-jet-single-tabs.jet-woo-builder .tabs {
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  -webkit-box-align: end;
+  -ms-flex-align: end;
+  align-items: flex-end;
+}
+.elementor-tabs-controls-stretch .elementor-jet-single-tabs.jet-woo-builder .tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.elementor-tabs-controls-stretch .elementor-jet-single-tabs.jet-woo-builder .tabs > li {
+  -webkit-box-flex: 1;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+.elementor-tabs-view-top .elementor-jet-single-tabs.jet-woo-builder .woocommerce-tabs ul.tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.elementor-tabs-view-top .elementor-jet-single-tabs.jet-woo-builder .wc-tab.panel,
+.elementor-tabs-view-top .elementor-jet-single-tabs.jet-woo-builder .woocommerce-tabs ul.tabs {
+  float: none;
+  width: 100%;
+}
+.elementor-tabs-view-left .elementor-jet-single-tabs.jet-woo-builder .woocommerce-tabs ul.tabs {
+  float: left;
+}
+.elementor-tabs-view-left .elementor-jet-single-tabs.jet-woo-builder .wc-tab.panel {
+  float: right;
+  width: 100%;
+}
+.elementor-tabs-view-right .elementor-jet-single-tabs.jet-woo-builder .woocommerce-tabs ul.tabs {
+  float: right;
+}
+.elementor-tabs-view-right .elementor-jet-single-tabs.jet-woo-builder .wc-tab.panel {
+  float: left;
+  width: 100%;
+}
+.elementor-tabs-view-right .elementor-jet-single-tabs.jet-woo-builder .woocommerce-tabs ul.tabs, .elementor-tabs-view-left .elementor-jet-single-tabs.jet-woo-builder .woocommerce-tabs ul.tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}

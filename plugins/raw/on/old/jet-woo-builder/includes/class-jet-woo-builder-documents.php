@@ -43,7 +43,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Documents' ) ) {
 			add_filter( 'admin_body_class', array( $this, 'set_admin_body_class' ) );
 
 			add_action( 'template_redirect', [ $this, 'block_template_frontend' ] );
-			add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
 		}
 
@@ -62,34 +61,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Documents' ) ) {
 			if ( is_singular( $this->custom_post_type ) && ! current_user_can( Editor::EDITING_CAPABILITY ) ) {
 				wp_safe_redirect( site_url(), 301 );
 				die;
-			}
-		}
-
-		/**
-		 * Enqueue scripts.
-		 *
-		 * Enqueue public-facing scripts and stylesheets for custom templates.
-		 *
-		 * @since  2.1.6
-		 * @access public
-		 *
-		 * @return void
-		 */
-		public function enqueue_scripts() {
-			if (
-				filter_var( jet_woo_builder_settings()->get( 'enable_custom_templates_styles' ), FILTER_VALIDATE_BOOLEAN ) && (
-					( is_cart() || jet_woo_builder()->documents->is_document_type( 'cart' ) ) && 'yes' === jet_woo_builder_shop_settings()->get( 'custom_cart_page' )
-					|| ( is_checkout() || jet_woo_builder()->documents->is_document_type( 'myaccount' ) ) && 'yes' === jet_woo_builder_shop_settings()->get( 'custom_checkout_page' )
-					|| ( is_order_received_page() || jet_woo_builder()->documents->is_document_type( 'thankyou' ) ) && 'yes' === jet_woo_builder_shop_settings()->get( 'custom_thankyou_page' )
-					|| ( is_account_page() || jet_woo_builder()->documents->is_document_type( 'myaccount' ) ) && 'yes' === jet_woo_builder_shop_settings()->get( 'custom_myaccount_page' )
-				)
-			) {
-				wp_enqueue_style(
-					'jet-woo-builder-template-styles',
-					jet_woo_builder()->plugin_url( 'assets/css/templates.css' ),
-					false,
-					jet_woo_builder()->get_version()
-				);
 			}
 		}
 

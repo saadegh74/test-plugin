@@ -7,7 +7,20 @@ defined( 'ABSPATH' ) || exit;
 
 $order = jet_woo_builder_template_functions()->get_current_received_order();
 
-if ( ! $order ) {
+$is_refund = ( $order instanceof \WC_Order_Refund )
+	|| ( class_exists( '\Automattic\WooCommerce\Admin\Overrides\OrderRefund' ) && $order instanceof \Automattic\WooCommerce\Admin\Overrides\OrderRefund );
+
+if ( $is_refund ) {
+	$parent_id = method_exists( $order, 'get_parent_id' ) ? (int) $order->get_parent_id() : 0;
+
+	if ( $parent_id > 0 ) {
+		if ( ( $parent_order = wc_get_order( $parent_id ) ) && $parent_order instanceof \WC_Order ) {
+			$order = $parent_order;
+		}
+	}
+}
+
+if ( ! ( $order instanceof \WC_Order ) ) {
 	return;
 }
 
@@ -15,6 +28,9 @@ $order_items        = $order->get_items( apply_filters( 'woocommerce_purchase_or
 $show_purchase_note = $order->has_status( apply_filters( 'woocommerce_purchase_note_order_statuses', array( 'completed', 'processing' ) ) );
 $downloads          = $order->get_downloadable_items();
 $show_downloads     = $order->has_downloadable_item() && $order->is_download_permitted();
+$actions            = function_exists( 'wc_get_account_orders_actions' ) ? wc_get_account_orders_actions( $order ) : array();
+
+unset( $actions['view'] );
 
 if ( $show_downloads ) {
 	wc_get_template(
@@ -79,6 +95,27 @@ if ( $show_downloads ) {
 			<tr>
 				<th><?php esc_html_e( 'Note:', 'woocommerce' ); ?></th>
 				<td><?php echo wp_kses_post( nl2br( wptexturize( $order->get_customer_note() ) ) ); ?></td>
+			</tr>
+		<?php endif; ?>
+		<?php if ( ! empty( $actions ) ) : ?>
+			<tr>
+				<th class="order-actions--heading"><?php esc_html_e( 'Actions', 'woocommerce' ); ?>:</th>
+				<td>
+					<?php
+					$wp_button_class = function_exists( 'wc_wp_theme_get_element_class_name' ) && wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '';
+
+					foreach ( $actions as $key => $action ) {
+						if ( empty( $action['aria-label'] ) ) {
+							/* translators: %1$s Action name, %2$s Order number. */
+							$action_aria_label = sprintf( __( '%1$s order number %2$s', 'woocommerce' ), $action['name'], $order->get_order_number() );
+						} else {
+							$action_aria_label = $action['aria-label'];
+						}
+
+						echo '<a href="' . esc_url( $action['url'] ) . '" class="woocommerce-button' . esc_attr( $wp_button_class ) . ' button ' . sanitize_html_class( $key ) . ' order-actions-button" aria-label="' . esc_attr( $action_aria_label ) . '">' . esc_html( $action['name'] ) . '</a>';
+					}
+					?>
+				</td>
 			</tr>
 		<?php endif; ?>
 		</tfoot>

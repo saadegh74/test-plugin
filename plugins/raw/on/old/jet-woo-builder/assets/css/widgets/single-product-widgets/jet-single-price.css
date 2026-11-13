@@ -1,0 +1,6 @@
+.single-product .elementor-jet-single-price.jet-woo-builder p.price {
+  margin: 0;
+}
+.single-product .elementor-jet-single-price.jet-woo-builder p.price del {
+  opacity: 1;
+}

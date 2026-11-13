@@ -11,7 +11,7 @@ use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,8 +35,19 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-and-set-a-shop-page-template/';
 	}
 
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ];
+
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
+	}
+
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'shop' );
+		return $this->is_widget_visible( 'shop' );
 	}
 
 	protected function register_controls() {
@@ -94,11 +105,21 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 					'type'        => 'jet-query',
 					'query_type'  => 'post',
 					'query'       => $templates,
+					'signature'   => \Jet_Elementor_Extension\Ajax_Handlers::create_signature( $templates ),
 					'edit_button' => [
 						'active' => true,
 						'label'  => __( 'Edit Template', 'jet-woo-builder' ),
 					],
 					'separator'   => 'after',
+				]
+			);
+
+			$this->add_control(
+				'jetengine_notice',
+				[
+					'type'            => Controls_Manager::RAW_HTML,
+					'raw'             => __( '💡 Want more layout flexibility? Explore <a href="https://crocoblock.com/knowledge-base/jetengine/how-to-change-layouts-in-listing-grids/" target="_blank" rel="noopener noreferrer">JetEngine for dynamic layouts</a>, advanced customization options, and powerful controls.', 'jet-woo-builder' ),
+					'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 				]
 			);
 
@@ -117,6 +138,39 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 					'label'              => __( 'Enable', 'jet-woo-builder' ),
 					'type'               => Controls_Manager::SWITCHER,
 					'frontend_available' => true,
+				]
+			);
+
+			$this->add_control(
+				'switcher_hide_mobile',
+				[
+					'label'        => __( 'Hide on Mobile', 'jet-woo-builder' ),
+					'type'         => Controls_Manager::SWITCHER,
+					'frontend_available' => true,
+					'label_on'     => __( 'Yes', 'jet-woo-builder' ),
+					'label_off'    => __( 'No', 'jet-woo-builder' ),
+					'prefix_class' => 'jet-woo-builder-hide-mobile-switcher-',
+					'condition'    => [
+						'switcher_enable' => 'yes',
+					],
+				]
+			);
+
+			$this->add_control(
+				'layout_default_mobile',
+				[
+					'label'     => __( 'Default Mobile Layout', 'jet-woo-builder' ),
+					'type'      => Controls_Manager::SELECT,
+					'separator'    => 'after',
+					'frontend_available' => true,
+					'options'   => [
+						'main'      => __( 'Main', 'jet-woo-builder' ),
+						'secondary' => __( 'Secondary', 'jet-woo-builder' ),
+					],
+					'default'   => 'main',
+					'condition' => [
+						'switcher_hide_mobile' => 'yes',
+					],
 				]
 			);
 
@@ -144,6 +198,7 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 					'type'               => 'jet-query',
 					'query_type'         => 'post',
 					'query'              => $templates,
+					'signature'   => \Jet_Elementor_Extension\Ajax_Handlers::create_signature( $templates ),
 					'edit_button'        => [
 						'active' => true,
 						'label'  => __( 'Edit Template', 'jet-woo-builder' ),
@@ -196,6 +251,7 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 					'type'               => 'jet-query',
 					'query_type'         => 'post',
 					'query'              => $templates,
+					'signature'   => \Jet_Elementor_Extension\Ajax_Handlers::create_signature( $templates ),
 					'edit_button'        => [
 						'active' => true,
 						'label'  => __( 'Edit Template', 'jet-woo-builder' ),
@@ -316,6 +372,28 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 				]
 			);
 
+			$this->add_responsive_control( 
+				'switcher_buttons_position',
+				[
+					'label'   => __( 'Position', 'jet-woo-builder' ),
+					'type'    => Controls_Manager::CHOOSE,
+					'options' => [
+						'column' => [
+							'title' => __( 'Above', 'jet-woo-builder' ),
+							'icon'  => 'eicon-v-align-top',
+						],
+						'column-reverse' => [
+							'title' => __( 'Below', 'jet-woo-builder' ),
+							'icon'  => 'eicon-v-align-bottom',
+						],
+					],
+					'default' => 'column',
+					'selectors' => [
+						'{{WRAPPER}} .jet-woo-builder-products-loop' => 'display: flex; flex-direction: {{VALUE}};',
+					],
+				] 
+			);
+
 			$this->end_controls_section();
 
 			$this->start_controls_section(
@@ -425,7 +503,9 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 				Group_Control_Typography::get_type(),
 				[
 					'name'     => 'switcher_buttons_label_typography',
-					'scheme'   => Typography::TYPOGRAPHY_1,
+					'global'   => [
+						'default' => Typography::TYPOGRAPHY_PRIMARY,
+					],
 					'selector' => '{{WRAPPER}} ' . $css_scheme['switcher_label'],
 				]
 			);
@@ -821,7 +901,9 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 	}
 
 	public static function products_loop() {
-		if ( jet_woo_builder()->elementor_views->in_elementor() || is_product_taxonomy() || is_post_type_archive( 'product' ) || is_page( wc_get_page_id( 'shop' ) ) ) {
+		$enable_custom_validation = (bool) apply_filters( 'jet-woo-builder/jet-products-loop/custom-validation', false );
+
+		if ( jet_woo_builder()->elementor_views->in_elementor() || is_product_taxonomy() || is_post_type_archive( 'product' ) || is_page( wc_get_page_id( 'shop' ) ) || $enable_custom_validation ) {
 			if ( woocommerce_product_loop() ) {
 				woocommerce_product_loop_start();
 
@@ -843,8 +925,9 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 
 	protected function render() {
 
-		$settings = $this->get_settings_for_display();
+		jet_woo_builder_assets()->add_inline_widget_script( 'jet-woo-builder-products-loop.default' );
 
+		$settings        = $this->get_settings_for_display();
 		$switcher_enable = isset( $settings['switcher_enable'] ) && filter_var( $settings['switcher_enable'], FILTER_VALIDATE_BOOLEAN );
 
 		// Add filters before displaying our Widget.
@@ -856,7 +939,11 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 		$this->__open_wrap();
 
 		if ( $switcher_enable && 'products' === woocommerce_get_loop_display_mode() ) {
+			add_action( 'wp_footer', [ $this, 'render_hidden_template' ], 2 );
+
 			include $this->get_template( 'shop/products-loop.php' );
+
+			remove_filter( 'wp_footer', [ $this, 'render_hidden_template' ] );
 		} else {
 			unset( $_COOKIE['jet_woo_builder_layout'] );
 
@@ -871,6 +958,25 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 		remove_filter( 'jet-woo-builder/custom-archive-template', [ $this, 'get_default_custom_template' ] );
 		remove_filter( 'jet-woo-builder/jet-products-loop/switcher-option-enable', [ $this, 'get_switcher_option_status' ] );
 
+	}
+
+	public function render_hidden_template() {
+		$settings        = $this->get_settings_for_display();
+		$main_layout     = $settings['main_layout'] ?? null;
+		$hidden_template = $settings['secondary_layout'] ?? null;
+		$layout          = ! empty( $_COOKIE['jet_woo_builder_layout'] ) ? absint( $_COOKIE['jet_woo_builder_layout'] ) : false;
+
+		if ( $layout && $layout === absint( $hidden_template ) ) {
+			$hidden_template = $main_layout;
+		}
+
+		if ( ! $hidden_template ) {
+			return;
+		}
+
+		echo '<div id="switcher-hidden-template" style="display: none;">';
+		echo jet_woo_builder_template_functions()->get_woo_builder_content( $hidden_template, false ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo '</div>';
 	}
 
 	/**
@@ -930,7 +1036,7 @@ class Jet_Woo_Builder_Products_Loop extends Jet_Woo_Builder_Base {
 
 		$settings = $this->get_settings_for_display();
 
-		if ( isset( $settings['switcher_enable'] ) && ! empty( $settings['switcher_enable'] ) ) {
+		if ( ! empty( $settings['switcher_enable'] ) ) {
 			$switcher_enable = filter_var( $settings['switcher_enable'], FILTER_VALIDATE_BOOLEAN );
 		}
 

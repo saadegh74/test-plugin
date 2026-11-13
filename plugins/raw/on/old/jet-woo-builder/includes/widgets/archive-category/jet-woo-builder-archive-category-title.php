@@ -32,7 +32,7 @@ class Jet_Woo_Builder_Archive_Category_Title extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'category' );
+		return $this->is_widget_visible( 'category' );
 	}
 
 	protected function register_controls() {
@@ -318,10 +318,10 @@ class Jet_Woo_Builder_Archive_Category_Title extends Jet_Woo_Builder_Base {
 		);
 
 		if ( $settings['title_tooltip'] ) {
-			$title_tooltip = 'title="' . $category->name . '"';
+			$title_tooltip = 'title=' . $category->name;
 		}
 
-		printf( '%s <div class="jet-woo-builder-archive-category-title" %s> %s </div> %s', $open_wrap, $title_tooltip, $title, $close_wrap );
+		printf( '%s <div class="jet-woo-builder-archive-category-title" %s> %s </div> %s', wp_kses_post( $open_wrap ), esc_attr( $title_tooltip ), wp_kses_post( $title ), wp_kses_post( $close_wrap ) );
 
 	}
 
@@ -339,9 +339,9 @@ class Jet_Woo_Builder_Archive_Category_Title extends Jet_Woo_Builder_Base {
 		];
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings );
+			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings ) );
 		} else {
-			echo self::render_callback( $macros_settings, jet_woo_builder()->woocommerce->get_current_args() );
+			echo wp_kses_post( self::render_callback( $macros_settings, jet_woo_builder()->woocommerce->get_current_args() ) ?: '' );
 		}
 
 	}

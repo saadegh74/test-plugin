@@ -32,8 +32,19 @@ class Jet_Woo_Builder_Products_Page_Title extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-and-set-a-shop-page-template/';
 	}
 
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ]; 
+
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
+	}
+
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'shop' );
+		return $this->is_widget_visible( 'shop' );
 	}
 
 	protected function register_controls() {
@@ -123,11 +134,11 @@ class Jet_Woo_Builder_Products_Page_Title extends Jet_Woo_Builder_Base {
 
 		$this->__open_wrap();
 
-		echo '<' . $tag . ' class="woocommerce-products-header__title page-title">';
+		echo '<' . esc_attr( $tag ) . ' class="woocommerce-products-header__title page-title">';
 
 		woocommerce_page_title();
 
-		echo '</' . $tag . '>';
+		echo '</' . esc_attr( $tag ) . '>';
 
 		$this->__close_wrap();
 

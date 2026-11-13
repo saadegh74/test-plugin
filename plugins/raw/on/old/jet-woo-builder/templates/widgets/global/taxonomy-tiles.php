@@ -26,20 +26,20 @@ if ( is_rtl() ) {
 			<div class="jet-woo-taxonomy-item__box-inner">
 				<?php
 				if ( ! empty( $title )  ) {
-					printf( '<%2$s class="jet-woo-taxonomy-item__box-title">%1$s</%2$s>', $title, $title_tag );
+					printf( '<%2$s class="jet-woo-taxonomy-item__box-title">%1$s</%2$s>', esc_html( $title ), esc_attr( $title_tag ) );
 				}
 
 				if ( 'yes' === $settings['show_taxonomy_count'] ) {
-					printf( '<div class="jet-woo-taxonomy-item__box-count">%2$s %1$s %3$s</div>', $taxonomy->count, $before_count, $after_count );
+					printf( '<div class="jet-woo-taxonomy-item__box-count">%2$s %1$s %3$s</div>', esc_html( $taxonomy->count ), esc_html( $before_count ), esc_html( $after_count ) );
 				}
 
 				if ( ! empty( $description )  ) {
-					printf( '<div class="jet-woo-taxonomy-item__box-description">%s</div>', $description );
+					printf( '<div class="jet-woo-taxonomy-item__box-description">%s</div>', esc_html( $description ) );
 				}
 				?>
 			</div>
 		</div>
 
-		<a href="<?php echo esc_url( get_category_link( $taxonomy->term_id ) ) ?>" class="jet-woo-taxonomy-item__box-link" <?php echo $target_attr; ?> ></a>
+		<a href="<?php echo esc_url( get_category_link( $taxonomy->term_id ) ) ?>" class="jet-woo-taxonomy-item__box-link" <?php echo esc_attr( $target_attr ); ?> ></a>
 	</div>
 </div>

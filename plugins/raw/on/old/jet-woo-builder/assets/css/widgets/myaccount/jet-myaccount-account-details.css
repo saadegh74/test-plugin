@@ -1,0 +1,6 @@
+.woocommerce .elementor-jet-myaccount-account-details .woocommerce-EditAccountForm label {
+  display: block;
+}
+.woocommerce .elementor-invisible .form-row .required {
+  visibility: hidden;
+}

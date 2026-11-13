@@ -11,7 +11,6 @@ use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
-use Elementor\Core\Schemes\Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,6 +34,17 @@ class Jet_Woo_Taxonomy_Tiles extends Jet_Woo_Builder_Base {
 
 	public function get_jet_help_url() {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-taxonomy-tiles-widget-overview/';
+	}
+
+	public function get_style_depends() {
+
+		$deps = [ 'jet-woo-builder' ];
+
+		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
+			$deps[] = $handle;
+		}
+
+		return $deps;
 	}
 
 	protected function register_controls() {
@@ -1034,14 +1044,14 @@ class Jet_Woo_Taxonomy_Tiles extends Jet_Woo_Builder_Base {
 		$query = $this->taxonomy_query();
 
 		if ( empty( $query ) || is_wp_error( $query ) ) {
-			echo sprintf( '<h3 class="jet-woo-taxonomy__not-found">%s</h3>', __( 'Taxonomy not found.', 'jet-woo-builder' ) );
+			echo sprintf( '<h3 class="jet-woo-taxonomy__not-found">%s</h3>', esc_html__( 'Taxonomy not found.', 'jet-woo-builder' ) );
 
 			return null;
 		}
 
 		$this->__open_wrap();
 
-		echo '<div class="' . $this->get_taxonomy_wrap_classes() . '" dir="ltr">';
+		echo '<div class="' . esc_attr( $this->get_taxonomy_wrap_classes() ) . '" dir="ltr">';
 
 		foreach ( $query as $taxonomy ) {
 			setup_postdata( $taxonomy );
@@ -1212,7 +1222,7 @@ class Jet_Woo_Taxonomy_Tiles extends Jet_Woo_Builder_Base {
 			$thumb = sprintf( 'http://via.placeholder.com/900x600?text=%s', str_replace( ' ', '+', $taxonomy->name ) );
 		}
 
-		printf( 'style="background-image:url(\'%s\')"', $thumb );
+		printf( 'style="background-image:url(\'%s\')"', esc_url( $thumb ) );
 
 	}
 

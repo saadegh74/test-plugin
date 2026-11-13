@@ -1,4 +1,4 @@
-( function( $, elementorFrontend ) {
+( function( $ ) {
 
 	"use strict";
 
@@ -6,39 +6,139 @@
 
 		init: function() {
 
-			let widgets = {
-				'jet-single-images.default' : JetWooBuilder.widgetProductImages,
-				'jet-single-add-to-cart.default' : JetWooBuilder.widgetSingleAddToCart,
-				'jet-woo-builder-archive-add-to-cart.default' : JetWooBuilder.widgetArchiveAddToCart,
-				'jet-single-tabs.default' : JetWooBuilder.widgetProductTabs,
-				'jet-woo-products.default' : JetWooBuilder.widgetProductsGrid,
-				'jet-woo-products-list.default' : JetWooBuilder.widgetProductsList,
-				'jet-woo-categories.default' : JetWooBuilder.widgetCategories,
-				'jet-cart-table.default' : JetWooBuilder.widgetCartTable,
-				'jet-woo-builder-products-loop.default' : JetWooBuilder.widgetProductsLoop,
-			};
+			if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
+				return;
+			}
 
-			$.each( widgets, function( widget, callback ) {
-				elementorFrontend.hooks.addAction( 'frontend/element_ready/' + widget, callback );
-			});
+			window.elementorFrontend.hooks.addAction(
+				'frontend/element_ready/jet-single-images.default',
+				function( $scope ) {
+					$scope.find( '.jet-single-images__loading' ).remove();
+				}
+			);
 
-			elementorFrontend.hooks.addFilter( 'jet-popup/widget-extensions/popup-data', JetWooBuilder.prepareJetPopup );
+			window.elementorFrontend.hooks.addAction(
+				'frontend/element_ready/jet-single-tabs.default',
+				function( $scope ) {
+					$scope.find( '.jet-single-tabs__loading' ).remove();
+				}
+			);
+
+			window.elementorFrontend.hooks.addFilter( 'jet-popup/widget-extensions/popup-data', JetWooBuilder.prepareJetPopup );
 
 			$( window ).on( 'jet-popup/render-content/ajax/success', JetWooBuilder.jetPopupLoaded );
+			$( window ).on( 'jet-popup/ajax/frontend-init/before', JetWooBuilder.prepareQuickViewGalleryData );
+			$( window ).on( 'jet-popup/ajax/frontend-init/after', JetWooBuilder.initQuickViewGallery );
 
 			$( document )
 				.on( 'wc_update_cart added_to_cart', JetWooBuilder.handleJetPopupWithWCEvents )
 				.on( 'jet-filter-content-rendered', function ( _, $scope ) {
-					JetWooBuilder.widgetProductsGrid( $scope );
-					JetWooBuilder.handleInputQuantityValue( $scope );
+					JetWooBuilder.initFilteredContentWidgets( $scope );
 				} )
 				.on( 'click.JetWooBuilder', '.jet-woo-item-overlay-wrap', JetWooBuilder.handleListingItemClick );
 
+			$( document.body ).on( 'wc_cart_emptied', function () {
+				JetWooBuilder.restoreMovedDefaultEmptyCartMessage();
+				JetWooBuilder.restoreMovedDefaultEmptyCartUndoNotice();
+
+				setTimeout( function() {
+					JetWooBuilder.restoreMovedDefaultEmptyCartMessage();
+					JetWooBuilder.restoreMovedDefaultEmptyCartUndoNotice();
+				}, 0 );
+
+				if ( $( '.jet-woo-builder-woocommerce-empty-cart' ).length ) {
+					JetWooBuilder.captureElementorProEmptyCartNotices();
+					JetWooBuilder.elementorFrontendInit( $( '.jet-woo-builder-woocommerce-empty-cart' ) );
+					JetWooBuilder.handleElementorProEmptyCartNotices();
+				}
+			} );
+
+			$( document.body ).on(
+				'updated_wc_div updated_cart_totals',
+				JetWooBuilder.handleElementorProEmptyCartNotices
+			);
+
+			window.elementorFrontend.hooks.addAction(
+				'frontend/element_ready/woocommerce-notices.default',
+				JetWooBuilder.handleElementorProCheckoutForms
+			);
+
+			$( document.body ).on(
+				'updated_checkout checkout_error applied_coupon_in_checkout removed_coupon_in_checkout',
+				JetWooBuilder.handleElementorProCheckoutForms
+			);
+
+			$( document ).on( 'jet-ajax-search/show-results/listing', function() {
+				$( '.jet-woo-builder-archive-add-to-cart .add_to_cart_button.ajax_add_to_cart' ).off( 'click.JetWooBuilderAjaxSearch' ).on( 'click.JetWooBuilderAjaxSearch', function( e ) {
+					e.preventDefault();
+
+					let _this = $( this );
+
+					if ( _this.attr( 'data-product_id' ) ) {
+						let addToCartData = {};
+
+						$.each( _this[0].dataset, function( key, value ) {
+							addToCartData[ key ] = value;
+						} );
+
+						$.ajax( {
+							type: 'POST',
+							url: wc_add_to_cart_params.wc_ajax_url.toString().replace( '%%endpoint%%', 'add_to_cart' ),
+							dataType: 'json',
+							data: addToCartData,
+							beforeSend: function() {
+								_this.removeClass( 'added' ).addClass( 'loading' );
+							},
+							complete: function() {
+								_this.removeClass( 'loading' );
+							},
+							success: function( response ) {
+								if ( ! response ) {
+									return;
+								}
+
+								if ( response.error && response.product_url ) {
+									window.location = response.product_url;
+
+									return;
+								}
+
+								_this.addClass( 'added' );
+
+								$( document.body ).trigger( 'wc_fragment_refresh' );
+								$( document.body ).trigger( 'added_to_cart', [ response.fragments, response.cart_hash, _this ] );
+							}
+						} );
+					}
+				} );
+			} );
+
+		},
+
+		registerWidgetHandler: function( widgetName, callback ) {
+
+			if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
+				$( window ).on( 'elementor/frontend/init', function() {
+					if ( window.elementorFrontend && window.elementorFrontend.hooks ) {
+						window.elementorFrontend.hooks.addAction(
+							'frontend/element_ready/' + widgetName,
+							callback
+						);
+					}
+				} );
+
+				return;
+			}
+
+			window.elementorFrontend.hooks.addAction(
+				'frontend/element_ready/' + widgetName,
+				callback
+			);
 		},
 
 		commonInit: function () {
 
-			if ( window.jetWooBuilderData.single_ajax_add_to_cart ) {
+			if ( window.jetWooBuilderData && window.jetWooBuilderData.single_ajax_add_to_cart ) {
 				let $product = $( '.woocommerce div.product' );
 
 				if ( ! $product.hasClass( 'product-type-external' ) ) {
@@ -134,53 +234,184 @@
 
 		},
 
-		widgetProductsLoop: function( $scope ) {
+		restoreMovedDefaultEmptyCartMessage: function() {
 
-			let settings = JetWooBuilder.getElementorElementSettings( $scope );
+			let $emptyCartMessage = $( '.wc-empty-cart-message' ).first();
 
-			if ( settings && settings.switcher_enable ) {
-				let $productsWrapper = $scope.find( '.jet-woo-products-wrapper' ),
-					$switcherControl = $scope.find( '.jet-woo-switcher-controls-wrapper .jet-woo-switcher-btn' );
+			if ( ! $emptyCartMessage.length ) {
+				return;
+			}
 
-				$switcherControl.on( 'click.JetWooBuilder', function( event ) {
+			let $cartEmptyNotice = $( '.cart-empty.woocommerce-info' ).first();
 
-					event.preventDefault();
+			if ( $cartEmptyNotice.length ) {
+				JetWooBuilder.defaultEmptyCartNoticeHtml = $cartEmptyNotice.prop( 'outerHTML' );
+			}
 
-					let $thisBtn = $( this ),
-						activeLayout = $thisBtn.hasClass( 'jet-woo-switcher-btn-main' ) ? settings.main_layout : settings.secondary_layout,
-						filterQuery;
+			if ( $emptyCartMessage.find( '.cart-empty.woocommerce-info' ).length ) {
+				$emptyCartMessage.add( $emptyCartMessage.find( '.cart-empty.woocommerce-info' ) ).css( 'display', 'block' );
 
-					if ( window.JetSmartFilters && window.JetSmartFilters.filterGroups['woocommerce-archive/default'] ) {
-						filterQuery = window.JetSmartFilters.filterGroups['woocommerce-archive/default'].query;
+				return;
+			}
+
+			if ( ! $cartEmptyNotice.length && JetWooBuilder.defaultEmptyCartNoticeHtml ) {
+				$cartEmptyNotice = $( JetWooBuilder.defaultEmptyCartNoticeHtml );
+			}
+
+			if ( ! $cartEmptyNotice.length ) {
+				return;
+			}
+
+			let $noticeParent = $cartEmptyNotice.parent();
+
+			$emptyCartMessage.append( $cartEmptyNotice );
+			$emptyCartMessage.add( $cartEmptyNotice ).css( 'display', 'block' );
+
+			if ( $noticeParent.hasClass( 'woocommerce-notices-wrapper' ) && ! $.trim( $noticeParent.html() ) ) {
+				$noticeParent.remove();
+			}
+
+		},
+
+		restoreMovedDefaultEmptyCartUndoNotice: function() {
+
+			let $emptyCartMessage = $( '.wc-empty-cart-message' ).first(),
+				undoNoticeSelector = '.woocommerce-message, .woocommerce-info, .woocommerce-error, .wc-block-components-notice-banner';
+
+			if ( ! $emptyCartMessage.length ) {
+				return;
+			}
+
+			let $noticesWrapper = $emptyCartMessage.closest( '.woocommerce' ).find( '> .woocommerce-notices-wrapper' ).first(),
+				$undoNotice     = $noticesWrapper.find( '.restore-item' ).first().closest( undoNoticeSelector );
+
+			if ( $undoNotice.length ) {
+				JetWooBuilder.defaultEmptyCartUndoNoticeHtml = $undoNotice.prop( 'outerHTML' );
+				$noticesWrapper.add( $undoNotice ).css( 'display', 'block' );
+
+				return;
+			}
+
+			let $restoreLink = $( '.restore-item' ).first();
+
+			$undoNotice = $restoreLink.closest( undoNoticeSelector );
+
+			if ( $undoNotice.length ) {
+				JetWooBuilder.defaultEmptyCartUndoNoticeHtml = $undoNotice.prop( 'outerHTML' );
+
+				return;
+			}
+
+			if ( ! JetWooBuilder.defaultEmptyCartUndoNoticeHtml ) {
+				return;
+			}
+
+			if ( ! $noticesWrapper.length ) {
+				$noticesWrapper = $( '<div class="woocommerce-notices-wrapper"></div>' );
+				$emptyCartMessage.before( $noticesWrapper );
+			}
+
+			if ( $noticesWrapper.find( '.restore-item' ).length ) {
+				return;
+			}
+
+			$noticesWrapper.prepend( JetWooBuilder.defaultEmptyCartUndoNoticeHtml );
+			$noticesWrapper.add( $noticesWrapper.find( undoNoticeSelector ) ).css( 'display', 'block' );
+
+		},
+
+		captureElementorProEmptyCartNotices: function() {
+
+			let noticeSelector = '.woocommerce-NoticeGroup, .woocommerce-error, .woocommerce-message, .woocommerce-info:not(.cart-empty), .wc-block-components-notice-banner',
+				$notices       = $( noticeSelector );
+
+			JetWooBuilder.emptyCartNoticesHtml = '';
+
+			if ( ! $notices.length ) {
+				return;
+			}
+
+			$notices.each( function() {
+				JetWooBuilder.emptyCartNoticesHtml += $( this ).prop( 'outerHTML' );
+			} );
+
+		},
+
+		handleElementorProEmptyCartNotices: function() {
+
+			setTimeout( function() {
+				let $widget = $( '.jet-woo-builder-woocommerce-empty-cart .elementor-widget-woocommerce-notices' ).first();
+
+				if ( ! $widget.length ) {
+					return;
+				}
+
+				let $wrapper = $widget.find( '.e-woocommerce-notices-wrapper' ).first();
+
+				if ( ! $wrapper.length ) {
+					return;
+				}
+
+				let noticeSelector = '.woocommerce-NoticeGroup, .woocommerce-error, .woocommerce-message, .woocommerce-info:not(.cart-empty), .wc-block-components-notice-banner';
+
+				$wrapper.find( '> .woocommerce-notices-wrapper' ).each( function() {
+					let $innerWrapper = $( this ),
+						$innerNotices = $innerWrapper.children( noticeSelector );
+
+					if ( $innerNotices.length ) {
+						$wrapper.prepend( $innerNotices );
 					}
 
-					$productsWrapper.addClass( 'jet-layout-loading' );
-
-					$.ajax( {
-						type: 'POST',
-						url: window.jetWooBuilderData.ajax_url,
-						data: {
-							action: 'jet_woo_builder_get_layout',
-							query: window.jetWooBuilderData.products,
-							layout: activeLayout,
-							filters: filterQuery
-						},
-					} ).done( function( response ) {
-						$productsWrapper.removeClass( 'jet-layout-loading' );
-						$productsWrapper.html( response.data.html );
-
-						JetWooBuilder.elementorFrontendInit( $productsWrapper );
-
-						if ( ! $thisBtn.hasClass( 'active' ) ) {
-							$thisBtn.addClass( 'active' );
-							$thisBtn.siblings().removeClass( 'active' );
-						}
-
-						$( document ).trigger( 'jet-woo-builder-content-rendered', [ this, response ] );
-					} );
-
+					if ( ! $.trim( $innerWrapper.html() ) ) {
+						$innerWrapper.remove();
+					}
 				} );
-			}
+
+				let $notices = $( noticeSelector ).filter( function() {
+					return ! $( this ).closest( $wrapper ).length && ! $( this ).hasClass( 'cart-empty' );
+				} );
+
+				if ( $notices.length ) {
+					$notices.prependTo( $wrapper );
+				} else if ( JetWooBuilder.emptyCartNoticesHtml && ! $wrapper.children( noticeSelector ).length ) {
+					$wrapper.prepend( JetWooBuilder.emptyCartNoticesHtml );
+				}
+
+				$wrapper.removeClass( 'e-woocommerce-notices-wrapper-loading' );
+				$wrapper.find( '.woocommerce-notices-wrapper, .woocommerce-error, .woocommerce-message, .woocommerce-info, .wc-block-components-notice-banner' ).css( 'display', 'block' );
+			}, 0 );
+
+		},
+
+		handleElementorProCheckoutForms: function() {
+
+			setTimeout( function() {
+				let $checkout = $( '.jet-woo-builder-woocommerce-checkout, .elementor-widget-jet-checkout-login-form, .elementor-widget-jet-checkout-coupon-form' );
+
+				if ( ! $checkout.length ) {
+					return;
+				}
+
+				let $noticesWrapper = $( '.elementor-widget-woocommerce-notices .e-woocommerce-notices-wrapper' ).first();
+
+				if ( ! $noticesWrapper.length ) {
+					return;
+				}
+
+				let $loginNotice = $noticesWrapper.find( 'a.showlogin' ).closest( '.woocommerce-info' ).first(),
+					$loginForm   = $( 'form.login, form.woocommerce-form--login' ).first();
+
+				if ( $loginNotice.length && $loginForm.length && ! $loginForm.prev().is( $loginNotice ) ) {
+					$loginForm.insertAfter( $loginNotice );
+				}
+
+				let $couponNotice = $noticesWrapper.find( 'a.showcoupon' ).closest( '.woocommerce-info' ).first(),
+					$couponForm   = $( 'form.checkout_coupon' ).first();
+
+				if ( $couponNotice.length && $couponForm.length && ! $couponForm.prev().is( $couponNotice ) ) {
+					$couponForm.insertAfter( $couponNotice );
+				}
+			}, 0 );
 
 		},
 
@@ -215,20 +446,72 @@
 
 		},
 
+		handleVariationSwatchesAddToCart: function( $scope ) {
+
+			$scope.on( 'show_variation', '.wvs-archive-variations-wrapper', function( event, variation ) {
+				if ( ! variation || ! variation.variation_id ) {
+					return;
+				}
+
+				let $variation = $( this );
+
+				setTimeout( function() {
+					let $button = $variation
+						.closest( '.jet-woo-products__item, .jet-woo-products-list__item' )
+						.find( '.wvs-add-to-cart-button' ),
+						quantity = $button.attr( 'data-quantity' ) || $button.data( 'quantity' ) || 1;
+
+					if ( ! $button.length ) {
+						return;
+					}
+
+					if ( ! $button.find( '.jet-woo-product-button__label' ).length ) {
+						$button.contents().filter( function() {
+							return 3 === this.nodeType && $.trim( this.nodeValue ).length;
+						} ).wrap( '<span class="jet-woo-product-button__label"></span>' );
+					}
+
+					if ( $variation.data( 'WooVariationSwatchesPro' ) ) {
+						$.each( $variation.data( 'WooVariationSwatchesPro' ).getChosenAttributes().data, function( name, value ) {
+							$button
+								.attr( 'data-' + name, value )
+								.data( name, value );
+						} );
+					}
+
+					$button
+						.removeClass( 'wvs_ajax_add_to_cart added loading' )
+						.addClass( 'ajax_add_to_cart' )
+						.attr( 'data-product_id', variation.variation_id )
+						.attr( 'data-quantity', quantity )
+						.data( 'product_id', variation.variation_id )
+						.data( 'quantity', quantity );
+				}, 0 );
+			} );
+
+			$scope.on( 'reset_data', '.wvs-archive-variations-wrapper', function() {
+				$( this )
+					.closest( '.jet-woo-products__item, .jet-woo-products-list__item' )
+					.find( '.wvs-add-to-cart-button' )
+					.removeClass( 'ajax_add_to_cart added loading' )
+					.removeData( 'product_id' );
+			} );
+
+		},
+
 		jetPopupLoaded : function( event, popupData){
 
 			if ( ! popupData.data.isJetWooBuilder ) {
 				return;
 			}
 
-			let $jetPopup = $( '#' + popupData.data.popupId );
+			const $jetPopup = $( '#' + popupData.data.popupId );
+
+			$jetPopup.addClass( 'woocommerce product single-product quick-view-product' );
+			$jetPopup.find( '.jet-popup__container-content' ).addClass( 'product' );
 
 			setTimeout( function() {
-
-				$( window ).trigger('resize');
-
-				$jetPopup.addClass( 'woocommerce product single-product quick-view-product' );
-				$jetPopup.find( '.jet-popup__container-content' ).addClass( 'product' );
+				$( window ).trigger( 'resize' );
 
 				$( '.jet-popup .variations_form' ).each( function() {
 					$( this ).wc_variation_form();
@@ -237,8 +520,156 @@
 				$( '.jet-popup .woocommerce-product-gallery.images' ).each( function() {
 					$( this ).wc_product_gallery();
 				} );
+			}, 300 );
 
-			}, 500 );
+		},
+
+		prepareQuickViewGalleryData: function( event, payload ) {
+
+			if ( ! payload || ! payload.$container || ! payload.$container.find( '.jet-woo-product-gallery' ).length ) {
+				return;
+			}
+
+			let assets = window.jetWooBuilderData && window.jetWooBuilderData.quick_view_gallery_assets;
+
+			if ( ! assets || ! assets.data ) {
+				return;
+			}
+
+			if ( window.jetWooProductGalleryData ) {
+				window.jetWooProductGalleryData = $.extend( {}, assets.data, window.jetWooProductGalleryData );
+			} else {
+				window.jetWooProductGalleryData = assets.data;
+			}
+
+		},
+
+		initQuickViewGallery: function( event, payload ) {
+
+			if ( ! payload || ! payload.$container || ! payload.$container.find( '.jet-woo-product-gallery' ).length ) {
+				return;
+			}
+
+			let assets = window.jetWooBuilderData && window.jetWooBuilderData.quick_view_gallery_assets;
+
+			if ( ! assets ) {
+				return;
+			}
+
+			let hadJetGallery = !! window.JetGallery;
+
+			JetWooBuilder.loadQuickViewGalleryAssets( assets ).then( function() {
+				if ( window.JetGallery && ! hadJetGallery ) {
+					window.JetGallery.init();
+
+					JetWooBuilder.initQuickViewGalleryWidgets( payload.$container );
+				}
+			} );
+
+		},
+
+		loadQuickViewGalleryAssets: function( assets ) {
+
+			let promises = [];
+
+			if ( assets.data && ! window.jetWooProductGalleryData ) {
+				window.jetWooProductGalleryData = assets.data;
+			}
+
+			$.each( assets.styles || {}, function( handle, src ) {
+				promises.push( JetWooBuilder.loadStyle( handle, src ) );
+			} );
+
+			$.each( assets.scripts || {}, function( handle, src ) {
+				promises.push( JetWooBuilder.loadScript( handle, src ) );
+			} );
+
+			return Promise.all( promises );
+
+		},
+
+		loadStyle: function( handle, src ) {
+
+			return new Promise( function( resolve ) {
+				let id = handle + '-css';
+
+				if ( document.getElementById( id ) ) {
+					resolve();
+
+					return;
+				}
+
+				let link = document.createElement( 'link' );
+
+				link.id = id;
+				link.rel = 'stylesheet';
+				link.href = src;
+				link.onload = resolve;
+
+				document.head.appendChild( link );
+			} );
+
+		},
+
+		loadScript: function( handle, src ) {
+
+			return new Promise( function( resolve, reject ) {
+				let id = handle + '-js',
+					script = document.getElementById( id );
+
+				if (
+					script && (
+						script.dataset.loaded
+						|| ( 'jet-woo-product-gallery' === handle && window.JetGallery )
+					)
+				) {
+					resolve();
+
+					return;
+				}
+
+				if ( script ) {
+					script.addEventListener( 'load', resolve );
+					script.addEventListener( 'error', reject );
+
+					return;
+				}
+
+				script = document.createElement( 'script' );
+
+				script.id = id;
+				script.src = src;
+				script.onload = function() {
+					script.dataset.loaded = 'true';
+					resolve();
+				};
+				script.onerror = reject;
+
+				document.body.appendChild( script );
+			} );
+
+		},
+
+		initQuickViewGalleryWidgets: function( $container ) {
+
+			if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
+				return;
+			}
+
+			let widgetTypes = [
+				'jet-woo-product-gallery-anchor-nav.default',
+				'jet-woo-product-gallery-grid.default',
+				'jet-woo-product-gallery-modern.default',
+				'jet-woo-product-gallery-slider.default',
+			];
+
+			widgetTypes.forEach( function( widgetType ) {
+				$container
+					.find( '[data-widget_type="' + widgetType + '"]' )
+					.each( function() {
+						window.elementorFrontend.hooks.doAction( 'frontend/element_ready/' + widgetType, $( this ), $ );
+					} );
+			} );
 
 		},
 
@@ -262,119 +693,6 @@
 			}
 
 			return popupData;
-
-		},
-
-		widgetProductImages: function( $scope ) {
-
-			$scope.find( '.jet-single-images__loading' ).remove();
-
-			if ( $('body').hasClass( 'single-product' ) ) {
-				return;
-			}
-
-			$scope.find( '.woocommerce-product-gallery' ).each( function() {
-				$( this ).wc_product_gallery();
-			} );
-
-		},
-
-		widgetSingleAddToCart: function( $scope ) {
-
-			if ( $('body').hasClass( 'single-product' ) ) {
-				return;
-			}
-
-			if ( 'undefined' !== typeof wc_add_to_cart_variation_params ) {
-				$scope.find( '.variations_form' ).each( function() {
-					$( this ).wc_variation_form();
-				} );
-			}
-
-		},
-
-		widgetArchiveAddToCart: function ( $scope ) {
-			JetWooBuilder.handleInputQuantityValue( $scope );
-		},
-
-		widgetProductTabs: function( $scope ) {
-
-			$scope.find( '.jet-single-tabs__loading' ).remove();
-
-			if ( $('body').hasClass( 'single-product' ) ) {
-				return;
-			}
-
-			let hash  = window.location.hash,
-				url   = window.location.href,
-				$tabs = $scope.find( '.wc-tabs, ul.tabs' ).first();
-
-			$tabs.find( 'a' ).addClass( 'elementor-clickable' );
-
-			$scope.find( '.wc-tab, .woocommerce-tabs .panel:not(.panel .panel)' ).hide();
-
-			if ( hash.toLowerCase().indexOf( 'comment-' ) >= 0 || hash === '#reviews' || hash === '#tab-reviews' ) {
-				$tabs.find( 'li.reviews_tab a' ).trigger( 'click' );
-			} else if ( url.indexOf( 'comment-page-' ) > 0 || url.indexOf( 'cpage=' ) > 0 ) {
-				$tabs.find( 'li.reviews_tab a' ).trigger( 'click' );
-			} else if ( hash === '#tab-additional_information' ) {
-				$tabs.find( 'li.additional_information_tab a' ).trigger( 'click' );
-			} else {
-				$tabs.find( 'li:first a' ).trigger( 'click' );
-			}
-
-		},
-
-		widgetProductsGrid: function ( $scope ) {
-
-			JetWooBuilder.handleInputQuantityValue( $scope );
-
-			let $carousel = $scope.find( '.jet-woo-carousel' ),
-				$wrapper = $scope.find( '.jet-woo-products' ),
-				mobileHover = $wrapper.data( 'mobile-hover' ),
-				$productItem = $wrapper.find( '.jet-woo-products__item' ),
-				$cqwWrapper = $productItem.find( '.jet-woo-products-cqw-wrapper' ),
-				$hoveredContent = $productItem.find( '.hovered-content' ),
-				cqwWrapperExist = false,
-				hoveredContentExist = false;
-
-			if ( $cqwWrapper.length > 0 && $cqwWrapper.html().trim().length > 0 ) {
-				cqwWrapperExist = true;
-			}
-
-			if ( $hoveredContent.length > 0 && $hoveredContent.html().trim().length > 0 ) {
-				hoveredContentExist = true;
-			}
-
-			if ( ( cqwWrapperExist || hoveredContentExist ) && mobileHover ) {
-				JetWooBuilder.mobileHoverOnTouch( $productItem, '.jet-woo-product-thumbnail' );
-			}
-
-			if ( $carousel.length ) {
-				JetWooBuilder.initCarousel( $carousel, $carousel.data( 'slider_options' ) );
-			}
-
-		},
-
-		widgetProductsList: function ( $scope ) {
-			JetWooBuilder.handleInputQuantityValue( $scope );
-		},
-
-		widgetCategories: function ( $scope ) {
-
-			let $carousel = $scope.find( '.jet-woo-carousel' ),
-				$wrapper = $scope.find( '.jet-woo-categories' ),
-				mobileHover = $wrapper.data( 'mobile-hover' ),
-				$categoryItem = $wrapper.find( '.jet-woo-categories__item' ),
-				$count = $categoryItem.find( '.jet-woo-category-count' );
-
-			if ( ( $wrapper.hasClass( 'jet-woo-categories--preset-2' ) && $count.length > 0 || $wrapper.hasClass( 'jet-woo-categories--preset-3' ) ) && mobileHover ) {
-				JetWooBuilder.mobileHoverOnTouch( $categoryItem, '.jet-woo-category-thumbnail' );
-			}
-
-			if ( $carousel.length ) {
-				JetWooBuilder.initCarousel( $carousel, $carousel.data( 'slider_options' ) );
-			}
 
 		},
 
@@ -520,35 +838,11 @@
 				if ( popupId ) {
 					$( window ).trigger( {
 						type: 'jet-popup-open-trigger',
-						popupData: {
+						popupData: window.JetPlugins.hooks.applyFilters( 'jet-woo-builder.purchase-popup.data', {
 							popupId: 'jet-popup-' + popupId
-						}
+						}, event, fragments, hash, button )
 					} );
 				}
-			}
-
-		},
-
-		widgetCartTable: function ( $scope ) {
-
-			$scope.find( '.cart-collaterals' ).filter( function() {
-				return $( this ).children().length === 0;
-			} ).hide();
-
-			let settings = JetWooBuilder.getElementorElementSettings( $scope );
-
-			if ( 'yes' === settings.cart_update_automatically ) {
-				let timeout;
-
-				$('.woocommerce').on('change', 'input.qty', function() {
-					if ( timeout !== undefined ) {
-						clearTimeout( timeout );
-					}
-
-					timeout = setTimeout(function() {
-						$( '[name="update_cart"]' ).trigger( 'click' );
-					}, 300 );
-				} );
 			}
 
 		},
@@ -598,9 +892,20 @@
 					}
 
 					$( document.body ).trigger( 'wc_fragment_refresh' );
-					$( document.body ).trigger( 'added_to_cart', [ response.fragments, response.cart_hash, $thisBtn ] );
 
-					$( '.woocommerce-notices-wrapper' ).html( response.fragments.notices_html );
+					if ( response && response.fragments ) {
+						$( document.body ).trigger( 'added_to_cart', [ response.fragments, response.cart_hash, $thisBtn ] );
+
+						if ( 'undefined' !== typeof response.fragments.notices_html ) {
+							$( '.woocommerce-notices-wrapper' ).html( response.fragments.notices_html );
+						}
+
+						return;
+					}
+
+					if ( 'yes' === wc_add_to_cart_params.cart_redirect_after_add && wc_add_to_cart_params.cart_url ) {
+						window.location = wc_add_to_cart_params.cart_url;
+					}
 
 				},
 			} );
@@ -677,7 +982,37 @@
 
 		},
 
+		initFilteredContentWidgets: function( $content ) {
+
+			if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
+				return;
+			}
+
+			let widgetTypes = [
+				'jet-woo-products.default',
+				'jet-woo-products-list.default',
+				'jet-woo-builder-archive-add-to-cart.default',
+				'jet-woo-categories.default',
+				'jet-cart-table.default',
+				'jet-woo-builder-products-loop.default',
+			];
+
+			widgetTypes.forEach( function( widgetType ) {
+				$content
+					.find( '[data-widget_type="' + widgetType + '"]' )
+					.addBack( '[data-widget_type="' + widgetType + '"]' )
+					.each( function() {
+						window.elementorFrontend.hooks.doAction( 'frontend/element_ready/' + widgetType, $( this ), $ );
+					} );
+			} );
+
+		},
+
 		elementorFrontendInit: function( $content ) {
+
+			if ( ! window.elementorFrontend || ! window.elementorFrontend.hooks ) {
+				return;
+			}
 
 			$content.find( '[data-element_type]' ).each( function() {
 
@@ -709,4 +1044,4 @@
 
 	window.JetWooBuilder = JetWooBuilder;
 
-}( jQuery, window.elementorFrontend ) );
+} ( jQuery ) );

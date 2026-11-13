@@ -24,7 +24,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 				add_action( 'elementor/widgets/widgets_registered', [ $this, 'register_widgets' ], 10 );
 			}
 
-			if ( ! empty( $_REQUEST['action'] ) && 'elementor' === $_REQUEST['action'] && is_admin() ) {
+			if ( ! empty( $_REQUEST['action'] ) && 'elementor' === $_REQUEST['action'] && is_admin() ) { // phpcs:ignore WordPress.Security.NonceVerification
 				add_action( 'init', [ $this, 'register_frontend_wc_hooks' ], 5 );
 			}
 
@@ -32,6 +32,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 			add_action( 'elementor/page_templates/canvas/after_content', [ $this, 'close_canvas_wrap' ] );
 
 			add_action( 'elementor/editor/after_enqueue_styles', [ $this, 'editor_styles' ] );
+			add_action( 'elementor/preview/enqueue_styles', [ $this, 'editor_styles' ] );
 			add_action( 'elementor/editor/before_enqueue_scripts', [ $this, 'init_editor_wc_cart' ] );
 
 			add_filter( 'jet-woo-builder/shortcodes/query-types', [ $this, 'set_additional_query_types' ] );
@@ -57,6 +58,12 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 			// Init Jet Elementor Extension module.
 			$ext_module_data = jet_woo_builder()->module_loader->get_included_module_data( 'jet-elementor-extension.php' );
 			Jet_Elementor_Extension\Module::get_instance( $ext_module_data );
+
+			// Elementor Pro compatibility.
+			if ( class_exists( '\ElementorPro\Plugin' ) ) {
+				add_filter( 'jet-woo-builder/integration/register-widgets', [ $this, 'maybe_enable_widgets' ], 10, 2 );
+				add_filter( 'jet-woo-builder/documents/is-document-type', [ $this, 'maybe_enable_widgets' ], 10, 2 );
+			}
 
 		}
 
@@ -228,7 +235,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 
 			foreach ( $doc_types as $type => $value ) {
 				$template_enable  = 'custom_' . $type . '_page';
-				$template_export  = isset( $_GET['action'] ) && 'jet_woo_builder_export_template' === $_GET['action'];
+				$template_export  = isset( $_GET['action'] ) && 'jet_woo_builder_export_template' === $_GET['action']; // phpcs:ignore WordPress.Security.NonceVerification
 				$register_widgets = apply_filters( 'jet-woo-builder/integration/register-widgets', false, $type );
 
 				switch ( $type ) {
@@ -356,22 +363,21 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 		 * Enqueue editor styles.
 		 *
 		 * @since  1.0.0
-		 * @access public
 		 *
 		 * @return void
 		 */
 		public function editor_styles() {
 
 			wp_enqueue_style(
-				'jet-woo-builder-editor-icons',
-				jet_woo_builder()->plugin_url( 'assets/css/editor/icons.css' ),
+				'jet-woo-builder-icons',
+				jet_woo_builder()->plugin_url( 'assets/css/lib/jet-woo-builder-icons/jet-woo-builder-icons.css' ),
 				[],
 				jet_woo_builder()->get_version()
 			);
 
 			wp_enqueue_style(
-				'jet-woo-builder-icons',
-				jet_woo_builder()->plugin_url( 'assets/css/lib/jet-woo-builder-icons/jet-woo-builder-icons.css' ),
+				'jet-woo-builder-editor-icons',
+				jet_woo_builder()->plugin_url( 'assets/lib/jet-woo-builder-icons/style.css' ),
 				[],
 				jet_woo_builder()->get_version()
 			);
@@ -391,16 +397,12 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 		 * Initialize WooCommerce cart for elementor page builder.
 		 *
 		 * @since  1.7.0
-		 * @access public
 		 *
 		 * @return void
 		 * @throws Exception
 		 */
 		public function init_editor_wc_cart() {
-
-			$has_cart = is_a( WC()->cart, 'WC_Cart' );
-
-			if ( ! $has_cart ) {
+			if ( ! is_a( WC()->cart, 'WC_Cart' ) ) {
 				$wc_session = apply_filters( 'woocommerce_session_handler', 'WC_Session_Handler' );
 
 				WC()->session = new $wc_session();
@@ -410,7 +412,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 				WC()->cart     = new WC_Cart();
 				WC()->customer = new WC_Customer( get_current_user_id(), true );
 			}
-
 		}
 
 		/**
@@ -468,6 +469,30 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 		}
 
 		/**
+		 * Maybe enable widgets.
+		 *
+		 * Enable some JetWooBuilder widgets for appropriate Elementor Pro document types.
+		 *
+		 * @since 2.1.8
+		 *
+		 * @param boolean $status Enable status.
+		 * @param string  $type   Widget template type.
+		 *
+		 * @return bool
+		 */
+		public function maybe_enable_widgets( $status, $type ) {
+
+			$doc_type = get_post_meta( get_the_ID(), '_elementor_template_type', true );
+
+			if ( 'shop' === $type && 'product-archive' === $doc_type || 'single' === $type && 'product' === $doc_type ) {
+				return true;
+			}
+
+			return $status;
+
+		}
+
+		/**
 		 * In Elementor Editor.
 		 *
 		 * Check if Elementor editor mode active.
@@ -502,7 +527,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 		 * @return bool
 		 */
 		public function is_editor_ajax() {
-			return is_admin() && isset( $_REQUEST['action'] ) && 'elementor_ajax' === $_REQUEST['action'];
+			return is_admin() && isset( $_REQUEST['action'] ) && 'elementor_ajax' === $_REQUEST['action']; // phpcs:ignore WordPress.Security.NonceVerification
 		}
 
 		/**
@@ -537,6 +562,28 @@ if ( ! class_exists( 'Jet_Woo_Builder_Elementor_Views' ) ) {
 
 			return $query_types;
 
+		}
+
+		/**
+		 * Check the state of the Swiper upgrade experiment.
+		 *
+		 * Determines whether the "e_swiper_latest" experiment in Elementor is inactive.
+		 *
+		 * @since  2.1.19
+		 * @access public
+		 *
+		 * @return bool True if the experiment is inactive, false otherwise.
+		 */
+		public function is_swiper_upgrade_experiment_state_inactive() {
+			$experiment_exists = ! empty( Elementor\Plugin::instance()->experiments->get_features( 'e_swiper_latest' ) );
+
+			if ( ! $experiment_exists ) {
+				return false;
+			}
+
+			$is_experiment_active = Elementor\Plugin::instance()->experiments->is_feature_active( 'e_swiper_latest' );
+
+			return ! $is_experiment_active;
 		}
 
 	}

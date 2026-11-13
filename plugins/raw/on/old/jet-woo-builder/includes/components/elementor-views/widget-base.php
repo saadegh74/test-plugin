@@ -12,6 +12,26 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 	public $__new_icon_prefix = 'selected_';
 
 	/**
+	 * Determines if the widget should be visible in the Elementor editor.
+	 *
+	 * Returns `true` if the widget is allowed in the specified document type 
+	 * or if an AJAX request is running in the admin panel.
+	 *
+	 * @since 2.1.18
+	 * @access public
+	 *
+	 * @param string $document_type The document type to check.
+	 * @return bool `true` if the widget is visible, otherwise `false`.
+	 */
+	public function is_widget_visible( $document_type ) {
+		if ( is_admin() && wp_doing_ajax() ) {
+			return true;
+		}
+		
+		return jet_woo_builder()->documents->is_document_type( $document_type );
+	}
+	
+	/**
 	 * Current product.
 	 *
 	 * Holder for current product instance.
@@ -70,28 +90,8 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 		return [ 'jet-woo-builder' ];
 	}
 
-	/**
-	 * Get style dependencies.
-	 *
-	 * Retrieve the list of style dependencies the element requires.
-	 *
-	 * @since  2.1.7
-	 * @access public
-	 *
-	 * @return array Element styles dependencies.
-	 */
-	public function get_jet_style_depends() {
-		return [ 'jet-woo-builder' ];
-	}
-
 	public function __construct( $data = [], $args = null ) {
-
 		parent::__construct( $data, $args );
-
-		foreach ( $this->get_jet_style_depends() as $style ) {
-			wp_enqueue_style( $style );
-		}
-
 	}
 
 	/**
@@ -167,7 +167,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 	 * @return void
 	 */
 	public function __open_wrap() {
-		printf( '<div class="elementor-%s jet-woo-builder">', $this->get_name() );
+		printf( '<div class="elementor-%s jet-woo-builder">', esc_attr( $this->get_name() ) );
 	}
 
 	/**
@@ -229,7 +229,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 			return true;
 		}
 
-		if ( 'product' === $post->post_type || 'product_variation' === $post->post_type ) {
+		if ( $post instanceof \WP_Post && ( 'product' === $post->post_type || 'product_variation' === $post->post_type ) ) {
 			$product = wc_get_product( $post );
 
 			$this->__product_data = array(
@@ -243,7 +243,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 			return true;
 		}
 
-		$sample_product = get_post_meta( $post->ID, '_sample_product', true );
+		$sample_product = ( $post instanceof \WP_Post ) ? get_post_meta( $post->ID, '_sample_product', true ) : '';
 
 		$args = [
 			'post_type'      => [ 'product', 'product_variation' ],
@@ -286,7 +286,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 	 * @return void
 	 */
 	public function __reset_editor_product() {
-		if ( ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) || wp_doing_ajax() ) {
+		if ( ( isset( $_GET['action'] ) && 'elementor' === $_GET['action'] ) || wp_doing_ajax() ) { // phpcs:ignore WordPress.Security.NonceVerification
 			global $wp_query;
 			$wp_query = $this->__temp_query;
 			wp_reset_postdata();
@@ -382,6 +382,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 
 			if ( isset( $settings[ $new_setting ] ) ) {
 				ob_start();
+				// Output sanitized by Elementor\Icons_Manager::render_icon
 				Icons_Manager::render_icon( $settings[ $new_setting ], $attr );
 				$icon_html = ob_get_clean();
 			}
@@ -392,7 +393,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 				$icon_class .= ' ' . $settings[ $setting ];
 			}
 
-			$icon_html = sprintf( '<i class="%s" aria-hidden="true"></i>', $icon_class );
+			$icon_html = sprintf( '<i class="%s" aria-hidden="true"></i>', esc_attr( $icon_class ) );
 		}
 
 		if ( empty( $icon_html ) ) {
@@ -403,7 +404,7 @@ abstract class Jet_Woo_Builder_Base extends Widget_Base {
 			return sprintf( $format, $icon_html );
 		}
 
-		printf( $format, $icon_html );
+		printf( $format, $icon_html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 	}
 

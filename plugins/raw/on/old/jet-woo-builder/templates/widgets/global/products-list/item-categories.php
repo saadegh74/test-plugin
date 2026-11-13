@@ -18,5 +18,5 @@ if ( ! $categories ) {
 ?>
 
 <div class="jet-woo-product-categories">
-	<ul><?php echo $categories; ?></ul>
+	<ul><?php echo wp_kses_post( $categories ); ?></ul>
 </div>

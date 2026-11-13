@@ -105,7 +105,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_CX_Loader' ) ) {
 		 */
 		public function include_modules() {
 
-			$modules_data = wp_cache_get( $this->key );
+			$modules_data = $this->cache_get();
 
 			foreach ( $this->modules_slugs as $slug ) {
 				if ( empty( $modules_data[ $slug ] ) ) {
@@ -180,7 +180,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_CX_Loader' ) ) {
 		private function store_module_version( $module_path = null ) {
 
 			$slug         = basename( $module_path );
-			$modules_data = wp_cache_get( $this->key );
+			$modules_data = $this->cache_get();
 			$modules_data = ! empty( $modules_data ) ? $modules_data : array();
 
 			if ( empty( $modules_data[ $slug ] ) ) {
@@ -204,12 +204,55 @@ if ( ! class_exists( 'Jet_Woo_Builder_CX_Loader' ) ) {
 
 			$this->modules_slugs[] = $slug;
 
+			$this->cache_set( $modules_data );
+
 			wp_cache_set( $this->key, $modules_data, '', 1 );
 
 			return true;
 
 		}
 
-	}
+		/**
+		 * Set modules data cache.
+		 *
+		 * @return void
+		 */
+		public function cache_set( $modules_data = array() ) {
+			global $cx_modules_data;
+			$cx_modules_data = $modules_data;
+			wp_cache_set( $this->key, $modules_data, '', 1 );
+		}
 
+		/**
+		 * Get modules data cache.
+		 *
+		 * @return array
+		 */
+		public function cache_get() {
+
+			$modules_data = wp_cache_get( $this->key );
+
+			if ( ! is_array( $modules_data ) ) {
+				$modules_data = array();
+			}
+
+			global $cx_modules_data;
+
+			if ( ! empty( $cx_modules_data ) ) {
+				foreach ( $cx_modules_data as $slug => $versions ) {
+					if ( empty( $modules_data[ $slug ] ) ) {
+						$modules_data[ $slug ] = $versions;
+					} else {
+						foreach ( $versions as $version => $path ) {
+							if ( empty( $modules_data[ $slug ][ $version ] ) ) {
+								$modules_data[ $slug ][ $version ] = $path;
+							}
+						}
+					}
+				}
+			}
+
+			return $modules_data;
+		}
+	}
 }

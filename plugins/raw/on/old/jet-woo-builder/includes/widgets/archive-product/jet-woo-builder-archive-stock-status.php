@@ -7,8 +7,6 @@
 
 namespace Elementor;
 
-use Elementor\Core\Schemes\Typography;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
@@ -32,7 +30,7 @@ class Jet_Woo_Builder_Archive_Stock_Status extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'archive' );
+		return $this->is_widget_visible( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -143,7 +141,7 @@ class Jet_Woo_Builder_Archive_Stock_Status extends Jet_Woo_Builder_Base {
 	public static function render_callback() {
 
 		echo '<div class="jet-woo-builder-archive-product-stock-status">';
-		echo jet_woo_builder_template_functions()->get_product_stock_status();
+		echo wp_kses_post( jet_woo_builder_template_functions()->get_product_stock_status() );
 		echo '</div>';
 
 	}
@@ -151,9 +149,9 @@ class Jet_Woo_Builder_Archive_Stock_Status extends Jet_Woo_Builder_Base {
 	protected function render() {
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo jet_woo_builder()->parser->get_macros_string( $this->get_name() );
+			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name() ) );
 		} else {
-			echo self::render_callback();
+			echo wp_kses_post( self::render_callback() ?: '' );
 		}
 
 	}

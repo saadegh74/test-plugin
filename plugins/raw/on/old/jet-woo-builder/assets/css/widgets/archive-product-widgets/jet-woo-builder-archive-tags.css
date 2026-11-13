@@ -1,0 +1,7 @@
+.jet-woo-builder-archive-product-tags ul {
+  margin: 0;
+}
+.jet-woo-builder-archive-product-tags ul > li {
+  list-style: none;
+  display: inline-block;
+}

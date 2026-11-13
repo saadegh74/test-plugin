@@ -278,9 +278,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Settings' ) ) {
 						'value'   => $this->get( 'product_thumb_effect', 'slide-left' ),
 						'options' => $product_thumb_effect_options,
 					),
-					'enable_custom_templates_styles'     => array(
-						'value' => $this->get( 'enable_custom_templates_styles' ),
-					),
 					'enable_inline_templates_styles'     => array(
 						'value' => $this->get( 'enable_inline_templates_styles' ),
 					),

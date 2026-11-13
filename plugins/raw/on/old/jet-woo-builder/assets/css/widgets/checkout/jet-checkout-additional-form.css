@@ -1,0 +1,10 @@
+.woocommerce .elementor-jet-checkout-additional-form .form-row {
+  margin: 0;
+  padding: 0;
+}
+.woocommerce .elementor-jet-checkout-additional-form .form-row label {
+  display: block;
+}
+.woocommerce .elementor-jet-checkout-additional-form .form-row .select2 {
+  text-align: start;
+}

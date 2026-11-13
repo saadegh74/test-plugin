@@ -73,14 +73,14 @@ if ( ! class_exists( 'Jet_Woo_Builder_Shop_Settings' ) ) {
 			<tr valign="top" class="single_select_page">
 				<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ); ?></th>
 				<td class="forminp">
-					<select style="<?php echo $value['css']; ?>" id="<?php echo $value['id'] ?>"
-						name="<?php echo $value['id'] ?>" class="<?php echo $value['class']; ?>"
+					<select style="<?php echo esc_attr( $value['css'] ); ?>" id="<?php echo esc_attr( $value['id'] ) ?>"
+						name="<?php echo esc_attr( $value['id'] ) ?>" class="<?php echo esc_attr( $value['class'] ); ?>"
 						data-placeholder="<?php esc_attr_e( 'Select a template&hellip;', 'jet-woo-builder' ); ?>">
-						<option value="default"><?php echo __( 'Default', 'jet-woo-builder' ) ?></option>
+						<option value="default"><?php echo esc_html__( 'Default', 'jet-woo-builder' ) ?></option>
 						<?php foreach ( $templates as $template ) {
-						printf( '<option value="%1$s" ' . selected( $options[ $current_option ], $template->ID, true ) . '>%2$s</option>', $template->ID, $template->post_title );
+						printf( '<option value="%1$s" ' . selected( $options[ $current_option ], $template->ID, true ) . '>%2$s</option>', esc_attr( $template->ID ), wp_kses_post( $template->post_title ) );
 						} ?>
-					</select><?php printf( '<br><span class="description">%s</span>', $value['desc'] ); ?>
+					</select><?php printf( '<br><span class="description">%s</span>', wp_kses_post( $value['desc'] ) ); ?>
 				</td>
 			</tr>
 
@@ -105,13 +105,13 @@ if ( ! class_exists( 'Jet_Woo_Builder_Shop_Settings' ) ) {
 			<tr valign="top" class="render_method">
 				<th scope="row" class="titledesc"><?php echo esc_html( $value['title'] ); ?></th>
 				<td class="forminp">
-					<select style="<?php echo $value['css']; ?>" id="<?php echo $value['id'] ?>"
-						name="<?php echo $value['id'] ?>" class="<?php echo $value['class']; ?>"
+					<select style="<?php echo esc_attr( $value['css'] ); ?>" id="<?php echo esc_attr( $value['id'] ) ?>"
+						name="<?php echo esc_attr( $value['id'] ) ?>" class="<?php echo esc_attr( $value['class'] ); ?>"
 						data-placeholder="<?php esc_attr_e( 'Select render method', 'jet-woo-builder' ); ?>">
-						<option value="macros" <?php selected( $option_val, 'macros', true ) ?> ><?php echo __( 'Macros', 'jet-woo-builder' ) ?></option>
-						<option value="elementor"<?php selected( $option_val, 'elementor', true ) ?>><?php echo __( 'Elementor Default', 'jet-woo-builder' ) ?></option>
+						<option value="macros" <?php selected( $option_val, 'macros', true ) ?> ><?php echo esc_html__( 'Macros', 'jet-woo-builder' ) ?></option>
+						<option value="elementor"<?php selected( $option_val, 'elementor', true ) ?>><?php echo esc_html__( 'Elementor Default', 'jet-woo-builder' ) ?></option>
 					</select>
-					<?php printf( '<br><span class="description">%s</span>', $value['desc'] ); ?>
+					<?php printf( '<br><span class="description">%s</span>', wp_kses_post( $value['desc'] ) ); ?>
 				</td>
 			</tr>
 

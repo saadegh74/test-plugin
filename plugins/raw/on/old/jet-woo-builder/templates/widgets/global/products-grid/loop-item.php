@@ -38,12 +38,12 @@ if ( $clickable_item ) {
 }
 ?>
 
-<div class="jet-woo-products__item <?php echo implode( ' ', $classes ); ?>" data-product-id="<?php echo $product_id ?>">
-	<div class="<?php echo implode( ' ', $box_classes ); ?>" <?php echo $clickable_data; ?> >
+<div class="jet-woo-products__item <?php echo esc_attr( implode( ' ', $classes ) ); ?>" data-product-id="<?php echo esc_attr( $product_id ) ?>">
+	<div class="<?php echo esc_attr( implode( ' ', $box_classes ) ); ?>" <?php echo $clickable_data; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> >
 		<?php include $this->get_product_preset_template(); ?>
 	</div>
 
 	<?php if ( $clickable_item ) : ?>
-		<a href="<?php echo $permalink; ?>" class="jet-woo-item-overlay-link" <?php echo $target_attr; ?> ></a>
+		<a href="<?php echo esc_url( $permalink ); ?>" class="jet-woo-item-overlay-link" <?php echo esc_attr( $target_attr ); ?> ></a>
 	<?php endif; ?>
 </div>

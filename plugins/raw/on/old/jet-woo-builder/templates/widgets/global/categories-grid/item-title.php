@@ -22,6 +22,6 @@ if ( -1 !== $this->get_attr( 'title_length' ) && 'yes' === $this->get_attr( 'tit
 	$title_tooltip = 'title="' . $category->name . '"';
 }
 
-echo '<' . $title_tag . ' class="jet-woo-category-title" ' .$title_tooltip . '>';
-echo '<a href="' . $permalink . '" class="jet-woo-category-title__link" ' . $target_attr . '>' . $title . '</a>';
-echo '</' . $title_tag . '>';
+echo '<' . esc_attr( $title_tag ) . ' class="jet-woo-category-title" ' . esc_attr( $title_tooltip ) . '>';
+echo '<a href="' . esc_attr( $permalink ) . '" class="jet-woo-category-title__link" ' . esc_attr( $target_attr ) . '>' . wp_kses_post( $title ) . '</a>';
+echo '</' . esc_attr( $title_tag ) . '>';

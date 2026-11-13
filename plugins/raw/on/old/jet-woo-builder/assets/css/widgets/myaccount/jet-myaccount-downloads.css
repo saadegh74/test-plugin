@@ -1,0 +1,6 @@
+.woocommerce .elementor-jet-myaccount-downloads .woocommerce-info:before {
+  top: 50%;
+  left: 20px;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+}

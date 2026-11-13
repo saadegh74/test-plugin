@@ -19,7 +19,7 @@
 			$link = $page_link;
 		}
 
-		printf( '<a href="%s" class="%s">%s</a>', $link, $class, $label );
+		printf( '<a href="%s" class="%s">%s</a>', esc_url( $link ), esc_attr( $class ), esc_html( $label ) );
 	}
 	?>
 </div>

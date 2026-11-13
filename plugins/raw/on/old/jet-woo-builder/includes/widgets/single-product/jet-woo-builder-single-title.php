@@ -33,7 +33,7 @@ class Jet_Woo_Builder_Single_Title extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return jet_woo_builder()->documents->is_document_type( 'single' );
+		return $this->is_widget_visible( 'single' );
 	}
 
 	protected function register_controls() {

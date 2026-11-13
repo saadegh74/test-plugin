@@ -1,0 +1,11 @@
+.woocommerce .elementor-jet-cart-cross-sells .cross-sells {
+  float: none;
+  width: 100%;
+}
+.woocommerce .elementor-jet-cart-cross-sells .cross-sells .star-rating {
+  width: 5.4em;
+}
+.woocommerce .elementor-jet-cart-cross-sells .cross-sells .star-rating:before,
+.woocommerce .elementor-jet-cart-cross-sells .cross-sells .star-rating span:before {
+  letter-spacing: 0;
+}

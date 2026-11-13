@@ -1,0 +1,20 @@
+{
+  "name": "JetWooBuilder For Elementor [کانال آزمایشی - Staging]",
+  "slug": "jet-woo-builder",
+  "version": "2.3.6",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-10 01:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "افزونه تخصصی ساخت قالب‌های صفحات ووکامرس (صفحه محصول، آرشیو، سبد خرید، تسویه‌حساب و حساب کاربری) با ویجت‌های اختصاصی و انعطاف‌پذیر در صفحه‌ساز المنتور.",
+    "changelog": "<h4>2.3.6</h4><ul><li>ارتقا به نسخه 2.3.6 و بهبود سازگاری با نسخه‌های جدید المنتور و ووکامرس</li><li>به‌روزرسانی ماژول داخلی JetDashboard و بهبود عملکرد ویجت‌های فروشگاهی</li><li>حذف کامل تبلیغات، منوی اضافی و لینک‌های سایت واسطه از پیشخوان مدیریت</li><li>پاک‌سازی فایل‌های زائد توسعه‌دهنده و بازگردانی شناسنامه رسمی Crocoblock</li><li>اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 420,
+  "downloaded": 1800,
+  "active_installs": 1800,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-woo-builder/jet-woo-builder-v2.3.6.zip"
+}

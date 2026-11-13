@@ -1,0 +1,12 @@
+.woocommerce .product .elementor-jet-single-rating .woocommerce-product-rating {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-bottom: 0;
+}
+.woocommerce .product .elementor-jet-single-rating .woocommerce-product-rating:before, .woocommerce .product .elementor-jet-single-rating .woocommerce-product-rating:after {
+  display: none;
+}

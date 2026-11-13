@@ -12,6 +12,13 @@ const RepeaterItem = {
 		subtitle: {
 			type: String,
 		},
+		icon: {
+			type: String,
+		},
+		showIcon: {
+			type: Boolean,
+			default: false,
+		},
 		collapsed: {
 			type: Boolean,
 			default: true,

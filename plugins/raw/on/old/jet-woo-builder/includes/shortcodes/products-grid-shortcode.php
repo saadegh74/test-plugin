@@ -109,6 +109,7 @@ class Jet_Woo_Products_Grid_Shortcode extends Jet_Woo_Builder_Shortcode_Base {
 				'max'       => 1000,
 				'step'      => 1,
 				'condition' => [
+					'use_current_query!'   => 'yes',
 					'enable_custom_query!' => 'yes',
 				],
 			],
@@ -525,10 +526,12 @@ class Jet_Woo_Products_Grid_Shortcode extends Jet_Woo_Builder_Shortcode_Base {
 	 */
 	public function get_product_preset_template() {
 
-		$template = jet_woo_builder()->get_template( $this->get_tag() . '/global/presets/' . $this->get_attr( 'presets' ) . '.php' );
+		$allowed_presets = $this->get_atts()['presets']['options'] ?? [];
+		$preset = isset($allowed_presets[$this->get_attr('presets')]) ? $this->get_attr('presets') : 'preset-1';
+		$template = jet_woo_builder()->get_template( $this->get_tag() . '/global/presets/' . $preset . '.php' );
 
 		if ( ! $template ) {
-			$template = jet_woo_builder()->get_template( 'widgets/global/products-grid/presets/' . $this->get_attr( 'presets' ) . '.php' );
+			$template = jet_woo_builder()->get_template( 'widgets/global/products-grid/presets/' . $preset . '.php' );
 		}
 
 		return $template;

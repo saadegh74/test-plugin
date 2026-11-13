@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<head>
 		<meta charset="<?php bloginfo( 'charset' ); ?>">
 		<?php if ( ! current_theme_supports( 'title-tag' ) ) : ?>
-			<title><?php echo wp_get_document_title(); ?></title>
+			<title><?php echo esc_html( wp_get_document_title() ); ?></title>
 		<?php endif; ?>
 		<?php wp_head(); ?>
 		<?php
 		// Keep the following line after `wp_head()` call, to ensure it's not overridden by another templates.
-		echo \Elementor\Utils::get_meta_viewport( 'canvas' );
+		echo \Elementor\Utils::get_meta_viewport( 'canvas' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		?>
 	</head>
 	<body <?php body_class(); ?>>
@@ -27,7 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		while ( have_posts() ) {
 			the_post();
 
-			if ( ! empty( $_GET['elementor-preview'] ) ) {
+			if ( \Elementor\Plugin::$instance->editor->is_edit_mode()
+			|| \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 				the_content();
 			} else {
 				wc_get_template_part( 'content', 'single-product' );
