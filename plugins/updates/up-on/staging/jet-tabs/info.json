@@ -1,0 +1,20 @@
+{
+  "name": "JetTabs For Elementor [کانال آزمایشی - Staging]",
+  "slug": "jet-tabs",
+  "version": "2.3.5",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-10-24 01:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "افزونه تخصصی ایجاد تب‌ها (Tabs)، آکاردئون‌ها (Accordions)، آکاردئون تصویری و سوییچر محتوا با پشتیبانی از قالب‌های المنتور.",
+    "changelog": "<h4>2.3.5</h4><ul><li>به‌روزرسانی ماژول JetDashboard به آخرین نسخه</li><li>رفع خطای سرور هنگام پاک‌سازی کش خالی قالب‌ها</li><li>افزودن امکان محدودسازی نمایش آیتم‌های تب بر اساس نقش کاربری (User Role)</li><li>افزودن تنظیمات جدید استایل جداکننده برای ویجت Image Accordion</li><li>افزودن حالت نمایش آکاردئون واکنش‌گرا برای ویجت Tabs</li><li>حذف کامل تبلیغات و لینک‌های سایت واسطه از پیشخوان مدیریت</li><li>پاک‌سازی فایل‌های زائد و اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 410,
+  "downloaded": 1700,
+  "active_installs": 1700,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-tabs/jet-tabs-v2.3.5.zip"
+}
