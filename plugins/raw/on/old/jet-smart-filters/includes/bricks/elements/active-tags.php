@@ -618,17 +618,19 @@ class Jet_Smart_Filters_Bricks_Active_Tags extends \Jet_Engine\Bricks_Views\Elem
 		$clear_item           = isset( $settings['clear_item'] ) ? filter_var( $settings['clear_item'], FILTER_VALIDATE_BOOLEAN ) : false;
 		$additional_providers = jet_smart_filters()->utils->get_additional_providers( $settings );
 
+		// render_attributes() returns pre-escaped and validated HTML attributes.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
 		printf(
 			'<div class="%1$s jet-active-tags" data-label="%6$s" data-clear-item-label="%7$s" data-content-provider="%2$s" data-additional-providers="%3$s" data-apply-type="%4$s" data-query-id="%5$s">',
-			$base_class,
-			$provider,
-			$additional_providers,
-			$apply_type,
-			$query_id,
-			$tags_label,
-			$clear_item && $clear_label ? $settings['clear_item_label'] : false,
+			esc_attr( $base_class ),
+			esc_attr( $provider ),
+			esc_attr( $additional_providers ),
+			esc_attr( $apply_type ),
+			esc_attr( $query_id ),
+			esc_attr( wp_kses_post( $tags_label ) ),
+			$clear_item && $clear_label ? esc_attr( wp_kses_post( $settings['clear_item_label'] ) ) : false,
 		);
 
 		if ( ! $this->is_frontend ) {

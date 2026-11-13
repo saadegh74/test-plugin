@@ -5,8 +5,8 @@
 		<div class="tabindex__header">
 			<cx-vui-switcher
 				name="use_tabindex"
-				label="<?php _e( 'Tabindex', 'jet-smart-filters' ); ?>"
-				description="<?php _e( 'Enable filters tabindex functionality', 'jet-smart-filters' ); ?>"
+				label="<?php esc_html_e( 'Tabindex', 'jet-smart-filters' ); ?>"
+				description="<?php esc_html_e( 'Enable filters tabindex functionality', 'jet-smart-filters' ); ?>"
 				:wrapper-css="[ 'equalwidth' ]"
 				return-true="true"
 				return-false="false"
@@ -18,7 +18,7 @@
 		>
 			<cx-vui-colorpicker
 				name="tabindex_color"
-				label="<?php _e( 'Tabindex focus color', 'jet-smart-filters' ); ?>"
+				label="<?php esc_html_e( 'Tabindex focus color', 'jet-smart-filters' ); ?>"
 				type="hex"
 				:wrapper-css="[ 'equalwidth' ]"
 				v-model="settings.tabindex_color">

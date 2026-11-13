@@ -27,13 +27,18 @@ if ( ! class_exists( 'Jet_Smart_Filters_DB' ) ) {
 				'indexer' => array(
 					'name'  => $prefix . 'indexer',
 					'query' => "
-						id INT UNSIGNED NOT NULL auto_increment,
+						id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 						type VARCHAR(50),
-						item_id INT UNSIGNED,
+						item_id BIGINT UNSIGNED,
 						item_query VARCHAR(50),
 						item_key VARCHAR(50),
-						item_value VARCHAR(50),
-						PRIMARY KEY (id)
+						item_value VARCHAR(100),
+						item_value_num DECIMAL(20,6) NULL,
+						PRIMARY KEY (id),
+						KEY idx_item_id (item_id),
+						KEY idx_type_key (type,item_key),
+						KEY idx_key_value (item_key,item_value),
+						KEY idx_key_num (item_key,item_value_num)
 					"
 				)
 			);
@@ -95,7 +100,15 @@ if ( ! class_exists( 'Jet_Smart_Filters_DB' ) ) {
 				return false;
 			}
 
-			return ( strtolower( $table_full_name ) === strtolower( $wpdb->get_var( "SHOW TABLES LIKE '$table_full_name'" ) ) );
+			$found = $wpdb->get_var( $wpdb->prepare(
+				"SHOW TABLES LIKE %s", $table_full_name
+			) );
+
+			if ( ! $found ) {
+				return false;
+			}
+
+			return strtolower( $table_full_name ) === strtolower( $found );
 		}
 
 		/**
@@ -104,19 +117,22 @@ if ( ! class_exists( 'Jet_Smart_Filters_DB' ) ) {
 		public static function create_table( $table_name ) {
 
 			global $wpdb;
+
+			$table = self::get_table( $table_name );
+
+			if ( ! $table ) {
+				return;
+			}
+
 			$charset_collate = $wpdb->get_charset_collate();
 
-			if ( ! self::is_table_exists( $table_name ) ) {
-				$table = self::get_table( $table_name );
+			$sql = "CREATE TABLE " . $table['name'] . " (
+				" . $table['query'] . "
+			) $charset_collate;";
 
-				$sql = "CREATE TABLE " . $table['name'] . " (
-					" . $table['query'] . "
-				) $charset_collate;";
+			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
-				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-				dbDelta( $sql );
-			}
+			dbDelta( $sql );
 		}
 
 		/**

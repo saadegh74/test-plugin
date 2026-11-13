@@ -19,4 +19,4 @@ if ( empty( $label ) ) {
 }
 
 ?>
-<div class="jet-filter-label"><?php echo $label; ?></div>
+<div class="jet-filter-label"><?php echo wp_kses_post( $label ); ?></div>

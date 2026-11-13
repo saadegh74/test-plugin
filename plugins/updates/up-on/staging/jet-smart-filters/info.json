@@ -1,0 +1,20 @@
+{
+  "name": "JetSmartFilters [کانال آزمایشی - Staging]",
+  "slug": "jet-smart-filters",
+  "version": "3.8.6.3",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-10-31 01:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "افزونه حرفه‌ای و قدرتمند ایجاد فیلترهای پیشرفته ایجکس (AJAX) برای محصولات ووکامرس، پست‌تایپ‌های جت‌انجین و صفحات المنتور و گوتنبرگ.",
+    "changelog": "<h4>3.8.6.3</h4><ul><li>ارتقای امنیتی و رفع آسیب‌پذیری XSS در بلوک Listing Link و فیلدهای خروجی</li><li>افزودن امضای دیجیتال پیش‌فرض برای درخواست‌های کوئری و فیلترهای AJAX</li><li>بهبود سازگاری با Safari و Elementor Pro Loop Grid در صفحات آرشیو</li><li>حفظ تنظیمات صفحه فعلی در صفحه‌بندی هنگام اعمال فیلتر</li><li>حذف کامل تبلیغات و لینک‌های سایت واسطه از پیشخوان مدیریت</li><li>حذف پوشه .vscode و فایل‌های زائد توسعه‌دهنده</li><li>اتصال به سرور اختصاصی به‌روزرسانی خودکار و مستقیم (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 460,
+  "downloaded": 2000,
+  "active_installs": 2000,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-smart-filters/jet-smart-filters-v3.8.6.3.zip"
+}

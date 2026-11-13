@@ -170,7 +170,7 @@ class Jet_Smart_Filters_Pagination_Widget extends \Jet_Engine\Bricks_Views\Eleme
 				'min'         => 0,
 				'max'         => 50,
 				'step'        => 1,
-				'description' => esc_html__( 'Set number of items to either side of current page, not including current page.Set 0 to show all items.', 'jet-smart-filters' ),
+				'description' => esc_html__( 'Set number of items to either side of current page, not including current page. Set 0 to show all items.', 'jet-smart-filters' ),
 				'required'    => [ 'enable_items', '=', true ],
 			]
 		);
@@ -218,6 +218,17 @@ class Jet_Smart_Filters_Pagination_Widget extends \Jet_Engine\Bricks_Views\Eleme
 				'label'    => esc_html__( 'Next text', 'jet-smart-filters' ),
 				'type'     => 'text',
 				'default'  => esc_html__( 'Next', 'jet-smart-filters' ),
+				'required' => [ 'enable_prev_next', '=', true ],
+			]
+		);
+
+		$this->register_jet_control(
+			'hide_inactive_prev_next',
+			[
+				'tab'      => 'content',
+				'label'    => esc_html__( 'Hide inactive', 'jet-smart-filters' ),
+				'type'     => 'checkbox',
+				'default'  => true,
 				'required' => [ 'enable_prev_next', '=', true ],
 			]
 		);
@@ -566,16 +577,19 @@ class Jet_Smart_Filters_Pagination_Widget extends \Jet_Engine\Bricks_Views\Eleme
 		}
 
 		if ( true === $nav_enabled ) {
-			$controls['nav_enabled'] = true;
-			$controls['prev']        = $settings['prev_text'];
-			$controls['next']        = $settings['next_text'];
+			$controls['nav_enabled']       = true;
+			$controls['prev']              = wp_kses_post( $settings['prev_text'] );
+			$controls['next']              = wp_kses_post( $settings['next_text'] );
+			$controls['hide_inactive_nav'] = isset( $settings['hide_inactive_prev_next'] )
+				? filter_var( $settings['hide_inactive_prev_next'], FILTER_VALIDATE_BOOLEAN )
+				: false;
 		} else {
 			$controls['nav_enabled'] = false;
 		}
 
 		if ( true === $load_more_enabled ) {
 			$controls['load_more_enabled'] = true;
-			$controls['load_more_text']    = $settings['load_more_text'];
+			$controls['load_more_text']    = wp_kses_post( $settings['load_more_text'] );
 		} else {
 			$controls['load_more_enabled'] = false;
 		}
@@ -584,21 +598,26 @@ class Jet_Smart_Filters_Pagination_Widget extends \Jet_Engine\Bricks_Views\Eleme
 			$controls['provider_top_offset'] = ! empty( $settings['provider_top_offset'] ) ? absint( $settings['provider_top_offset'] ) : 0;
 		}
 
+		jet_smart_filters()->filter_request_validator->register_pagination( $content_provider, $query_id );
+
+		// render_attributes() returns pre-escaped and validated HTML attributes.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
+
 		printf(
 			'<div
-				class="%1$s"
+				class="%1$s jet-filter"
 				data-apply-provider="%2$s"
 				data-content-provider="%2$s"
 				data-query-id="%3$s"
 				data-controls="%4$s"
 				data-apply-type="%5$s"
 			>',
-			$base_class,
-			$content_provider,
-			$query_id,
-			htmlspecialchars( json_encode( $controls ) ),
-			$apply_type
+			esc_attr( $base_class ),
+			esc_attr( $content_provider ),
+			esc_attr( $query_id ),
+			esc_attr( wp_json_encode( $controls ) ),
+			esc_attr( $apply_type )
 		);
 
 		if ( ! $this->is_frontend ) {

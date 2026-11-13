@@ -3,8 +3,8 @@
 >
 	<div class="avaliable-controls">
 		<div class="avaliable-controls__header">
-			<div class="cx-vui-title"><?php _e( 'Use filters for widgets', 'jet-smart-filters' ); ?></div>
-			<div class="cx-vui-subtitle"><?php _e( 'List of content widgets that available for filtering', 'jet-smart-filters' ); ?></div>
+			<div class="cx-vui-title"><?php esc_html_e( 'Enabled providers', 'jet-smart-filters' ); ?></div>
+			<div class="cx-vui-subtitle"><?php esc_html_e( 'List of content widgets/blocks/areas that are available for filtering', 'jet-smart-filters' ); ?></div>
 		</div>
 
 		<div class="avaliable-controls__list">

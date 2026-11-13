@@ -46,7 +46,7 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 	public function add_widget_control_groups( $control_groups = array() ) {
 		$control_groups['section_indexer_options'] = [
 			'tab'   => 'content',
-			'title' => esc_html__( 'Indexer Options', 'jet_smart_filters' ),
+			'title' => esc_html__( 'Indexer Options', 'jet-smart-filters' ),
 		];
 
 		return $control_groups;
@@ -59,14 +59,14 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 		$controls['apply_indexer'] = [
 			'tab'   => 'content',
 			'group' => 'section_indexer_options',
-			'label' => esc_html__( 'Apply indexer', 'jet_smart_filters' ),
+			'label' => esc_html__( 'Apply indexer', 'jet-smart-filters' ),
 			'type'  => 'checkbox'
 		];
 
 		$controls['show_counter'] = [
 			'tab'      => 'content',
 			'group'    => 'section_indexer_options',
-			'label'    => esc_html__( 'Show counter', 'jet_smart_filters' ),
+			'label'    => esc_html__( 'Show counter', 'jet-smart-filters' ),
 			'type'     => 'checkbox',
 			'required' => [ 'apply_indexer', '=', true ],
 		];
@@ -74,7 +74,7 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 		$controls['counter_prefix'] = [
 			'tab'            => 'content',
 			'group'          => 'section_indexer_options',
-			'label'          => esc_html__( 'Counter prefix', 'jet_smart_filters' ),
+			'label'          => esc_html__( 'Counter prefix', 'jet-smart-filters' ),
 			'type'           => 'text',
 			'hasDynamicData' => false,
 			'default'        => '(',
@@ -87,7 +87,7 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 		$controls['counter_suffix'] = [
 			'tab'            => 'content',
 			'group'          => 'section_indexer_options',
-			'label'          => esc_html__( 'Counter suffix', 'jet_smart_filters' ),
+			'label'          => esc_html__( 'Counter suffix', 'jet-smart-filters' ),
 			'type'           => 'text',
 			'hasDynamicData' => false,
 			'default'        => ')',
@@ -100,7 +100,7 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 		$controls['show_items_rule'] = [
 			'tab'      => 'content',
 			'group'    => 'section_indexer_options',
-			'label'    => esc_html__( 'If item empty', 'jet_smart_filters' ),
+			'label'    => esc_html__( 'If item empty', 'jet-smart-filters' ),
 			'type'     => 'select',
 			'options'  => [
 				'show'    => 'Show',
@@ -114,7 +114,7 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 		$controls['change_items_rule'] = [
 			'tab'      => 'content',
 			'group'    => 'section_indexer_options',
-			'label'    => esc_html__( 'Change counters', 'jet_smart_filters' ),
+			'label'    => esc_html__( 'Change counters', 'jet-smart-filters' ),
 			'type'     => 'select',
 			'options'  => [
 				'always'        => 'Always',
@@ -134,7 +134,7 @@ class Jet_Smart_Filters_Bricks_Indexer_Controls {
 	public function add_widget_style_control_groups( $control_groups = array() ) {
 		$control_groups['section_counter_style'] = [
 			'tab'      => 'style',
-			'title'    => esc_html__( 'Counter', 'jet_smart_filters' ),
+			'title'    => esc_html__( 'Counter', 'jet-smart-filters' ),
 			'required' => [ 'show_counter', '=', true ],
 		];
 

@@ -31,7 +31,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 					'tag'        => '.jet-active-tag',
 					'tag-label'  => '.jet-active-tag__label',
 					'tag-value'  => '.jet-active-tag__val',
-					'tag-remove' => '.jet-active-tag__remove',
+					'tag-remove' => '.jet-active-tag__remove'
 				]
 			);
 		}
@@ -57,24 +57,24 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			]);
 
 			$this->controls_manager->add_control([
-				'id'       => 'filters_title_color',
-				'type'     => 'color-picker',
-				'label'     => esc_html__( 'Color', 'jet-smart-filters' ),
+				'id'           => 'filters_title_color',
+				'type'         => 'color-picker',
+				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tags-title'] => 'color: {{VALUE}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tags-title'] => 'color: {{VALUE}};'
 				),
-				'separator' => 'before',
+				'separator'    => 'before'
 			]);
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_title_margin',
-				'type'       => 'dimensions',
-				'label'      => esc_html__( 'Margin', 'jet-smart-filters' ),
-				'units'      => array( 'px', '%' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tags-title'] => 'margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};',
+				'id'           => 'filters_title_margin',
+				'type'         => 'dimensions',
+				'label'        => esc_html__( 'Margin', 'jet-smart-filters' ),
+				'units'        => array( 'px', '%' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tags-title'] => 'margin: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};'
 				),
-				'separator'    => 'before',
+				'separator'    => 'before'
 			]);
 
 			$this->controls_manager->end_section();
@@ -94,170 +94,173 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'label'     => esc_html__( 'Filters Position', 'jet-smart-filters' ),
 				'separator' => 'after',
 				'options'   =>[
-					'row'    => [
+					'row' => [
 						'shortcut' => esc_html__( 'Line', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-ellipsis',
+						'icon'     => 'dashicons-ellipsis'
 					],
 					'column' => [
 						'shortcut' => esc_html__( 'Column', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-menu-alt',
+						'icon'     => 'dashicons-menu-alt'
 					],
 				],
 				'css_selector' => [
 					'{{WRAPPER}} ' . $this->css_scheme['tags']      => 'flex-direction: {{VALUE}};',
-					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'flex-direction: {{VALUE}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'flex-direction: {{VALUE}};'
 				],
 				'attributes' => [
 					'default' => [
-						'value' => 'row',
+						'value' => 'row'
 					]
 				]
 			]);
 
 			$this->controls_manager->add_control([
-				'id'        => 'filters_space_between_horizontal',
-				'type'      => 'range',
-				'label'     => esc_html__( 'Horizontal Offset', 'jet-smart-filters' ),
-				'separator' => 'after',
+				'id'           => 'filters_space_between_horizontal',
+				'type'         => 'range',
+				'label'        => esc_html__( 'Horizontal Offset', 'jet-smart-filters' ),
+				'separator'    => 'after',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'margin-right: {{VALUE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'margin-right: {{VALUE}}{{UNIT}};'
 				],
 				'condition' => [
-					'filters_position' => 'row',
+					'filters_position' => 'row'
 				],
 				'attributes' => [
 					'default' => [
 						'value' => 5,
-						'unit' => 'px'
+						'unit'  => 'px'
 					]
 				],
 				'units' => [
 					[
-						'value' => 'px',
+						'value'     => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
-							'max'  => 40,
+							'max'  => 40
 						]
-					],
-				],
+					]
+				]
 			]);
 
 			$this->controls_manager->add_control([
-				'id'        => 'filters_space_between_vertical',
-				'type'      => 'range',
-				'label'     => esc_html__( 'Vertical Offset', 'jet-smart-filters' ),
-				'separator' => 'after',
+				'id'           => 'filters_space_between_vertical',
+				'type'         => 'range',
+				'label'        => esc_html__( 'Vertical Offset', 'jet-smart-filters' ),
+				'separator'    => 'after',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'margin-bottom: {{VALUE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'margin-bottom: {{VALUE}}{{UNIT}};'
 				],
 				'condition' => [
-					'filters_position' => 'column',
+					'filters_position' => 'column'
 				],
 				'attributes' => [
 					'default' => [
 						'value' => 5,
-						'unit' => 'px'
+						'unit'  => 'px'
 					]
 				],
 				'units' => [
 					[
-						'value' => 'px',
+						'value'     => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
-							'max'  => 40,
+							'max'  => 40
 						]
-					],
-				],
+					]
+				]
 			]);
 
 			$this->controls_manager->add_control([
-				'id'       => 'filters_background_color',
-				'type'     => 'color-picker',
-				'label'     => esc_html__( 'Background Color', 'jet-smart-filters' ),
+				'id'           => 'filters_background_color',
+				'type'         => 'color-picker',
+				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'background-color: {{VALUE}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'background-color: {{VALUE}};'
 				),
-				'separator' => 'after',
+				'separator'    => 'after'
 			]);
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_border',
-				'type'       => 'border',
-				'label'       => esc_html__( 'Border', 'jet-smart-filters' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'border-style:{{STYLE}};border-width:{{WIDTH}};border-radius:{{RADIUS}};border-color:{{COLOR}};',
-				),
+				'id'           => 'filters_border',
+				'type'         => 'border',
+				'label'        => esc_html__( 'Border', 'jet-smart-filters' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'border-style:{{STYLE}};border-width:{{WIDTH}};border-radius:{{RADIUS}};border-color:{{COLOR}};'
+				)
 			]);
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_padding',
-				'type'       => 'dimensions',
-				'label'      => esc_html__( 'Padding', 'jet-smart-filters' ),
-				'units'      => array( 'px', '%' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};',
+				'id'           => 'filters_padding',
+				'type'         => 'dimensions',
+				'label'        => esc_html__( 'Padding', 'jet-smart-filters' ),
+				'units'        => array( 'px', '%' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};'
 				),
-				'separator'  => 'after',
+				'separator'    => 'after'
 			]);
 
 			$this->controls_manager->add_control([
 				'id'        => 'filters_alignment_column',
 				'type'      => 'choose',
-				'label'     => esc_html__( 'Vertical Alignment', 'jet-smart-filters' ),
+				'label'     => esc_html__( 'Alignment', 'jet-smart-filters' ),
 				'separator' => 'after',
 				'options'   =>[
-					'flex-start'    => [
+					'flex-start' => [
 						'shortcut' => esc_html__( 'Top', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-editor-alignleft',
+						'icon'     => 'dashicons-editor-alignleft'
 					],
-					'center'    => [
+					'center' => [
 						'shortcut' => esc_html__( 'Center', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-editor-aligncenter',
+						'icon'     => 'dashicons-editor-aligncenter'
 					],
-					'flex-end'    => [
+					'flex-end' => [
 						'shortcut' => esc_html__( 'Bottom', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-editor-alignright',
+						'icon'     => 'dashicons-editor-alignright'
 					],
 				],
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'align-items: {{VALUE}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'align-items: {{VALUE}};'
 				],
+				'condition' => array(
+					'filters_position' => 'column'
+				),
 				'attributes' => [
 					'default' => [
-						'value' => 'flex-start',
+						'value' => 'flex-start'
 					]
 				]
 			]);
 
 			$this->controls_manager->add_control([
-				'id'        => 'filters_alignment_line',
-				'type'      => 'choose',
-				'label'     => esc_html__( 'Horizontal Alignment', 'jet-smart-filters' ),
-				'options'   =>[
-					'flex-start'    => [
+				'id'      => 'filters_alignment_line',
+				'type'    => 'choose',
+				'label'   => esc_html__( 'Alignment', 'jet-smart-filters' ),
+				'options' =>[
+					'flex-start' => [
 						'shortcut' => esc_html__( 'Left', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-editor-alignleft',
+						'icon'     => 'dashicons-editor-alignleft'
 					],
-					'center'    => [
+					'center' => [
 						'shortcut' => esc_html__( 'Center', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-editor-aligncenter',
+						'icon'     => 'dashicons-editor-aligncenter'
 					],
-					'flex-end'    => [
+					'flex-end' => [
 						'shortcut' => esc_html__( 'Right', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-editor-alignright',
+						'icon'     => 'dashicons-editor-alignright'
 					],
 				],
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'justify-content: {{VALUE}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tags-list'] => 'justify-content: {{VALUE}};'
 				],
 				'condition' => [
-					'filters_position' => 'row',
+					'filters_position' => 'row'
 				],
 				'attributes' => [
 					'default' => [
-						'value' => 'flex-start',
+						'value' => 'flex-start'
 					]
 				]
 			]);
@@ -274,30 +277,30 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			);
 
 			$this->controls_manager->add_control([
-				'id'        => 'group_filters_width',
-				'type'      => 'range',
-				'label'     => esc_html__( 'Minimal Width', 'jet-smart-filters' ),
-				'separator' => 'before',
+				'id'           => 'group_filters_width',
+				'type'         => 'range',
+				'label'        => esc_html__( 'Minimal Width', 'jet-smart-filters' ),
+				'separator'    => 'before',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'min-width: {{VALUE}}{{UNIT}};',
-				],
-				'attributes' => [
-					'default' => [
-						'value' => [
-							'value' => 10,
-							'unit' => '%'
-						]
-					]
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'min-width: {{VALUE}}{{UNIT}};'
 				],
 				'units' => [
+					[
+						'value'     => 'px',
+						'intervals' => [
+							'step' => 1,
+							'min'  => 0,
+							'max'  => 500
+						]
+					],
 					[
 						'value' => '%',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
-							'max'  => 100,
+							'max'  => 100
 						]
-					],
+					]
 				],
 			]);
 
@@ -307,39 +310,39 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'label'     => esc_html__( 'Filter Content Position', 'jet-smart-filters' ),
 				'separator' => 'both',
 				'options'   =>[
-					'row'    => [
+					'row' => [
 						'shortcut' => esc_html__( 'Line', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-ellipsis',
+						'icon'     => 'dashicons-ellipsis'
 					],
 					'column' => [
 						'shortcut' => esc_html__( 'Column', 'jet-smart-filters' ),
-						'icon'  => 'dashicons-menu-alt',
+						'icon'     => 'dashicons-menu-alt'
 					],
 				],
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'flex-direction: {{VALUE}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'flex-direction: {{VALUE}};'
 				],
 				'attributes' => [
 					'default' => [
-						'value' => 'row',
+						'value' => 'row'
 					]
 				]
 			]);
 
 			$this->controls_manager->add_control([
-				'id'            => 'filters_item_border',
-				'type'          => 'border',
-				'label'         => esc_html__( 'Border', 'jet-smart-filters' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] =>'border-style: {{STYLE}}; border-width: {{WIDTH}}; border-radius: {{RADIUS}}; border-color: {{COLOR}};',
+				'id'           => 'filters_item_border',
+				'type'         => 'border',
+				'label'        => esc_html__( 'Border', 'jet-smart-filters' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] =>'border-style: {{STYLE}}; border-width: {{WIDTH}}; border-radius: {{RADIUS}}; border-color: {{COLOR}};'
 				),
 			]);
 
 			$this->controls_manager->start_tabs(
 				'style_controls',
 				[
-					'id' => 'filters_item_style_tabs',
-					'separator'  => 'both',
+					'id'        => 'filters_item_style_tabs',
+					'separator' => 'both'
 				]
 			);
 
@@ -347,7 +350,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'filters_item_normal_styles',
-					'title' => esc_html__( 'Normal', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Normal', 'jet-smart-filters' )
 				]
 			);
 
@@ -356,8 +359,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'background-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'background-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -366,7 +369,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'filters_item_hover_styles',
-					'title' => esc_html__( 'Hover', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Hover', 'jet-smart-filters' )
 				]
 			);
 
@@ -375,8 +378,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover' => 'background-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover' => 'background-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->add_control([
@@ -384,8 +387,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Border Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover' => 'border-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover' => 'border-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -393,26 +396,26 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			$this->controls_manager->end_tabs();
 
 			$this->controls_manager->add_control([
-				'id'            => 'filters_item_padding',
-				'type'          => 'dimensions',
-				'label'         => esc_html__( 'Padding', 'jet-smart-filters' ),
-				'units'         => array( 'px', '%' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};',
-				),
+				'id'           => 'filters_item_padding',
+				'type'         => 'dimensions',
+				'label'        => esc_html__( 'Padding', 'jet-smart-filters' ),
+				'units'        => array( 'px', '%' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};'
+				)
 			]);
 
 			$this->controls_manager->add_control([
-				'id'            => 'tags_clear_item_heading',
-				'type'          => 'text',
-				'content'       => esc_html__( 'Clear Item', 'jet-smart-filters' ),
+				'id'      => 'tags_clear_item_heading',
+				'type'    => 'text',
+				'content' => esc_html__( 'Clear Item', 'jet-smart-filters' )
 			]);
 
 			$this->controls_manager->start_tabs(
 				'style_controls',
 				[
-					'id' => 'tag_clear_style_tabs',
-					'separator'  => 'none',
+					'id'        => 'tag_clear_style_tabs',
+					'separator' => 'none'
 				]
 			);
 
@@ -420,7 +423,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'tag_clear_normal_styles',
-					'title' => esc_html__( 'Normal', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Normal', 'jet-smart-filters' )
 				]
 			);
 
@@ -429,8 +432,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Text Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->add_control([
@@ -438,8 +441,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear ' => 'background-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear ' => 'background-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -448,7 +451,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'tag_clear_hover_styles',
-					'title' => esc_html__( 'Hover', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Hover', 'jet-smart-filters' )
 				]
 			);
 
@@ -457,8 +460,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Text Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear' . ':hover ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear' . ':hover ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->add_control([
@@ -466,8 +469,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear' . ':hover' => 'background-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . '--clear' . ':hover' => 'background-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -475,24 +478,24 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			$this->controls_manager->end_tabs();
 
 			$this->controls_manager->add_control([
-				'id'            => 'filters_item_label_heading',
-				'type'          => 'text',
-				'content'       => esc_html__( 'Label', 'jet-smart-filters' ),
+				'id'      => 'filters_item_label_heading',
+				'type'    => 'text',
+				'content' => esc_html__( 'Label', 'jet-smart-filters' )
 			]);
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_item_label_typography',
-				'type'       => 'typography',
+				'id'           => 'filters_item_label_typography',
+				'type'         => 'typography',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme[ 'tag-label' ] => 'font-family: {{FAMILY}}; font-weight: {{WEIGHT}}; text-transform: {{TRANSFORM}}; font-style: {{STYLE}}; text-decoration: {{DECORATION}}; line-height: {{LINEHEIGHT}}{{LH_UNIT}}; letter-spacing: {{LETTERSPACING}}{{LS_UNIT}}; font-size: {{SIZE}}{{S_UNIT}};',
-				],
+					'{{WRAPPER}} ' . $this->css_scheme[ 'tag-label' ] => 'font-family: {{FAMILY}}; font-weight: {{WEIGHT}}; text-transform: {{TRANSFORM}}; font-style: {{STYLE}}; text-decoration: {{DECORATION}}; line-height: {{LINEHEIGHT}}{{LH_UNIT}}; letter-spacing: {{LETTERSPACING}}{{LS_UNIT}}; font-size: {{SIZE}}{{S_UNIT}};'
+				]
 			]);
 
 			$this->controls_manager->start_tabs(
 				'style_controls',
 				[
-					'id' => 'filters_item_label_style_tabs',
-					'separator'  => 'both',
+					'id'        => 'filters_item_label_style_tabs',
+					'separator' => 'both'
 				]
 			);
 
@@ -500,7 +503,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'filters_item_label_normal_styles',
-					'title' => esc_html__( 'Normal', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Normal', 'jet-smart-filters' )
 				]
 			);
 
@@ -509,8 +512,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag-label'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag-label'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -519,7 +522,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'filters_item_label_hover_styles',
-					'title' => esc_html__( 'Hover', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Hover', 'jet-smart-filters' )
 				]
 			);
 
@@ -528,8 +531,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-label'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-label'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -537,25 +540,25 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			$this->controls_manager->end_tabs();
 
 			$this->controls_manager->add_control([
-				'id'            => 'filters_item_value_heading',
-				'type'          => 'text',
-				'separator'     => 'after',
-				'content'       => esc_html__( 'Value', 'jet-smart-filters' ),
+				'id'        => 'filters_item_value_heading',
+				'type'      => 'text',
+				'separator' => 'after',
+				'content'   => esc_html__( 'Value', 'jet-smart-filters' )
 			]);
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_item_value_typography',
-				'type'       => 'typography',
+				'id'           => 'filters_item_value_typography',
+				'type'         => 'typography',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme[ 'tag-value' ] => 'font-family: {{FAMILY}}; font-weight: {{WEIGHT}}; text-transform: {{TRANSFORM}}; font-style: {{STYLE}}; text-decoration: {{DECORATION}}; line-height: {{LINEHEIGHT}}{{LH_UNIT}}; letter-spacing: {{LETTERSPACING}}{{LS_UNIT}}; font-size: {{SIZE}}{{S_UNIT}};',
-				],
+					'{{WRAPPER}} ' . $this->css_scheme[ 'tag-value' ] => 'font-family: {{FAMILY}}; font-weight: {{WEIGHT}}; text-transform: {{TRANSFORM}}; font-style: {{STYLE}}; text-decoration: {{DECORATION}}; line-height: {{LINEHEIGHT}}{{LH_UNIT}}; letter-spacing: {{LETTERSPACING}}{{LS_UNIT}}; font-size: {{SIZE}}{{S_UNIT}};'
+				]
 			]);
 
 			$this->controls_manager->start_tabs(
 				'style_controls',
 				[
-					'id' => 'filters_item_value_style_tabs',
-					'separator' => 'both',
+					'id'        => 'filters_item_value_style_tabs',
+					'separator' => 'both'
 				]
 			);
 
@@ -572,8 +575,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -591,8 +594,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-value'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -600,10 +603,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			$this->controls_manager->end_tabs();
 
 			$this->controls_manager->add_control([
-				'id'            => 'filters_item_remove_heading',
-				'type'          => 'text',
-				'separator'    => 'after',
-				'content'       => esc_html__( 'Remove', 'jet-smart-filters' ),
+				'id'        => 'filters_item_remove_heading',
+				'type'      => 'text',
+				'separator' => 'after',
+				'content'   => esc_html__( 'Remove', 'jet-smart-filters' )
 			]);
 
 			$this->controls_manager->add_control([
@@ -612,24 +615,24 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'label'        => esc_html__( 'Size', 'jet-smart-filters' ),
 				'separator'    => 'after',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'font-size: {{VALUE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'font-size: {{VALUE}}{{UNIT}};'
 				],
 				'attributes' => [
 					'default' => [
 						'value' => 12,
-						'unit' => 'px'
+						'unit'  => 'px'
 					]
 				],
 				'units' => [
 					[
-						'value' => 'px',
+						'value'     => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
-							'max'  => 40,
+							'max'  => 40
 						]
-					],
-				],
+					]
+				]
 			]);
 
 			$this->controls_manager->add_control([
@@ -638,24 +641,24 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'label'        => esc_html__( 'Offset Top', 'jet-smart-filters' ),
 				'separator'    => 'after',
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'top: {{VALUE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'top: {{VALUE}}{{UNIT}};'
 				],
 				'attributes' => [
 					'default' => [
 						'value' => 15,
-						'unit' => 'px'
+						'unit'  => 'px'
 					]
 				],
 				'units' => [
 					[
-						'value' => 'px',
+						'value'     => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
-							'max'  => 40,
+							'max'  => 40
 						]
-					],
-				],
+					]
+				]
 			]);
 
 			$this->controls_manager->add_control([
@@ -663,31 +666,31 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'range',
 				'label'        => esc_html__( 'Offset Right', 'jet-smart-filters' ),
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'right: {{VALUE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'right: {{VALUE}}{{UNIT}};'
 				],
 				'attributes' => [
 					'default' => [
 						'value' => 15,
-						'unit' => 'px'
+						'unit'  => 'px'
 					]
 				],
 				'units' => [
 					[
-						'value' => 'px',
+						'value'     => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
-							'max'  => 40,
+							'max'  => 40
 						]
-					],
-				],
+					]
+				]
 			]);
 
 			$this->controls_manager->start_tabs(
 				'style_controls',
 				[
-					'id' => 'filters_item_remove_style_tabs',
-					'separator' => 'both',
+					'id'        => 'filters_item_remove_style_tabs',
+					'separator' => 'both'
 				]
 			);
 
@@ -695,7 +698,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'filters_item_remove_normal_styles',
-					'title' => esc_html__( 'Normal', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Normal', 'jet-smart-filters' )
 				]
 			);
 
@@ -704,8 +707,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->add_control([
@@ -713,8 +716,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'background-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'background-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -723,7 +726,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'style_controls',
 				[
 					'id'    => 'filters_item_remove_hover_styles',
-					'title' => esc_html__( 'Hover', 'jet-smart-filters' ),
+					'title' => esc_html__( 'Hover', 'jet-smart-filters' )
 				]
 			);
 
@@ -732,8 +735,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-remove'] => 'color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-remove'] => 'color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->add_control([
@@ -741,8 +744,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Background Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-remove'] => 'background-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-remove'] => 'background-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->add_control([
@@ -750,8 +753,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 				'type'         => 'color-picker',
 				'label'        => esc_html__( 'Border Color', 'jet-smart-filters' ),
 				'css_selector' => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-remove'] => 'border-color: {{VALUE}}',
-				),
+					'{{WRAPPER}} ' . $this->css_scheme['tag'] . ':hover ' . $this->css_scheme['tag-remove'] => 'border-color: {{VALUE}}'
+				)
 			]);
 
 			$this->controls_manager->end_tab();
@@ -759,22 +762,22 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 			$this->controls_manager->end_tabs();
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_bfilters_item_remove_borderorder',
-				'type'       => 'border',
-				'label'       => esc_html__( 'Border', 'jet-smart-filters' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'border-style:{{STYLE}};border-width:{{WIDTH}};border-radius:{{RADIUS}};border-color:{{COLOR}};',
-				),
+				'id'           => 'filters_bfilters_item_remove_borderorder',
+				'type'         => 'border',
+				'label'        => esc_html__( 'Border', 'jet-smart-filters' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'border-style:{{STYLE}};border-width:{{WIDTH}};border-radius:{{RADIUS}};border-color:{{COLOR}};'
+				)
 			]);
 
 			$this->controls_manager->add_control([
-				'id'         => 'filters_item_remove_padding',
-				'type'       => 'dimensions',
-				'label'      => esc_html__( 'Padding', 'jet-smart-filters' ),
-				'units'      => array( 'px', '%' ),
-				'css_selector'  => array(
-					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};',
-				),
+				'id'           => 'filters_item_remove_padding',
+				'type'         => 'dimensions',
+				'label'        => esc_html__( 'Padding', 'jet-smart-filters' ),
+				'units'        => array( 'px', '%' ),
+				'css_selector' => array(
+					'{{WRAPPER}} ' . $this->css_scheme['tag-remove'] => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};'
+				)
 			]);
 
 			$this->controls_manager->end_section();
@@ -785,11 +788,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 		 */
 		public function render_callback( $settings = array() ) {
 
-			jet_smart_filters()->set_filters_used();
-
 			if ( empty( $settings['content_provider'] ) || $settings['content_provider'] === 'not-selected' ) {
 				return $this->is_editor() ? __( 'Please select a provider', 'jet-smart-filters' ) : false;
 			}
+
+			jet_smart_filters()->set_filters_used();
 
 			$base_class           = 'jet-smart-filters-' . $this->get_name();
 			$provider             = $settings['content_provider'];
@@ -802,14 +805,14 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Tags' ) ) {
 
 			printf(
 				'<div class="%1$s jet-active-tags jet-filter" data-is-block="jet-smart-filters/%2$s" data-label="%3$s" data-clear-item-label="%4$s" data-content-provider="%5$s" data-apply-type="%6$s" data-query-id="%7$s">',
-				$base_class,
-				$this->get_name(),
-				$settings['tags_label'],
-				$clear_label ? $clear_label : false,
-				$provider,
-				$settings['apply_type'],
-				$query_id,
-				$additional_providers
+				esc_attr( $base_class ),
+				esc_attr( $this->get_name() ),
+				esc_attr( wp_kses_post( $settings['tags_label'] ) ),
+				esc_attr( $clear_label ? wp_kses_post( $clear_label ) : false ),
+				esc_attr( $provider ),
+				esc_attr( $settings['apply_type'] ),
+				esc_attr( $query_id ),
+				esc_attr( $additional_providers )
 			);
 
 			if ( $this->is_editor() ) {

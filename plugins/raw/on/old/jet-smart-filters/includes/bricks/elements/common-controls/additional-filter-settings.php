@@ -146,6 +146,31 @@ if ( $this->jet_element_render !== 'radio' ) {
 	);
 }
 
+$this->register_jet_control(
+	'dropdown_apply_button',
+	[
+		'tab'      => 'content',
+		'label'    => esc_html__( 'Add apply button', 'jet-smart-filters' ),
+		'type'     => 'checkbox',
+		'default'  => false,
+		'required' => [ 'dropdown_enabled', '=', true ],
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_apply_button_text',
+	[
+		'tab'         => 'content',
+		'label'       => esc_html__( 'Apply button text', 'jet-smart-filters' ),
+		'type'        => 'text',
+		'placeholder' => esc_html__( 'Apply', 'jet-smart-filters' ),
+		'required'    => [
+			[ 'dropdown_enabled', '=', true ],
+			[ 'dropdown_apply_button', '=', true ]
+		]
+	]
+);
+
 /**
  * Scroll controls
  */

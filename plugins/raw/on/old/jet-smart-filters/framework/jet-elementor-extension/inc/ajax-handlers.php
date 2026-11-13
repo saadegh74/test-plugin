@@ -32,22 +32,36 @@ class Ajax_Handlers {
 
 	public function get_edit_url() {
 
-		if ( empty( $_REQUEST['id'] ) ) {
+		check_ajax_referer( 'elementor_ajax', '_nonce' );
+
+		$id = ! empty( $_REQUEST['id'] ) && is_scalar( $_REQUEST['id'] )
+			? absint( wp_unslash( $_REQUEST['id'] ) )
+			: 0;
+
+		if ( ! $id ) {
 			wp_send_json_error();
 		}
 
-		$id         = $_REQUEST['id'];
 		$edit_url   = '';
-		$query_type = ! empty( $_REQUEST['query_type'] ) ? $_REQUEST['query_type'] : 'post';
+		$query_type = ! empty( $_REQUEST['query_type'] ) && is_string( $_REQUEST['query_type'] )
+			? sanitize_key( wp_unslash( $_REQUEST['query_type'] ) )
+			: 'post';
 
 		switch ( $query_type ) {
 			case 'post':
 			case 'elementor_templates':
+				if ( ! current_user_can( 'edit_post', $id ) ) {
+					wp_send_json_error();
+				}
 
 				$is_build_with_elementor = ! ! get_post_meta( $id, '_elementor_edit_mode', true );
 
 				if ( $is_build_with_elementor ) {
-					$edit_url = \Elementor\Plugin::instance()->documents->get( $id )->get_edit_url();
+					$document = \Elementor\Plugin::instance()->documents->get( $id );
+
+					if ( $document && $document->is_editable_by_current_user() ) {
+						$edit_url = $document->get_edit_url();
+					}
 				} else {
 					$edit_url = get_edit_post_link( $id, '' );
 				}
@@ -55,7 +69,9 @@ class Ajax_Handlers {
 				break;
 
 			case 'tax':
-				$edit_url = get_edit_term_link( $id );
+				if ( current_user_can( 'edit_term', $id ) ) {
+					$edit_url = get_edit_term_link( $id );
+				}
 				break;
 		}
 
@@ -67,14 +83,123 @@ class Ajax_Handlers {
 	}
 
 	/**
+	 * Generate a custom secret key for the cases when NONCE_KEY is not set.
+	 *
+	 * @return string
+	 */
+	public static function custom_sercret_key() {
+
+		$secret_key = get_option( 'jet-elementor-extension-secret-key', '' );
+
+		if ( ! $secret_key ) {
+			$secret_key = wp_generate_password( 64, false );
+			update_option( 'jet-elementor-extension-secret-key', $secret_key );
+		}
+
+		return $secret_key;
+	}
+
+	/**
+	 * Create a signature for the request.
+	 *
+	 * @return void
+	 */
+	public static function create_signature( $query = array() ) {
+
+		if ( ! is_array( $query ) ) {
+			$query = array();
+		}
+
+		$allowed_keys = array(
+			'post__not_in',
+			'meta_query',
+			'post_type',
+			'posts_per_page',
+		);
+
+		foreach ( $allowed_keys as $key ) {
+			if ( isset( $query[ $key ] ) ) {
+				unset( $query[ $key ] );
+			}
+		}
+
+		foreach ( $query as $key => $value ) {
+			if ( ! is_array( $value ) ) {
+				$query[ $key ] = (string) $value;
+			}
+		}
+
+		ksort( $query );
+
+		$secret_key = defined( 'NONCE_KEY' ) ? NONCE_KEY : self::custom_sercret_key();
+		$signature = md5( wp_json_encode( $query ) . $secret_key );
+
+		return $signature;
+	}
+
+	/**
+	 * Sanitize query arguments.
+	 *
+	 * @param array $query_args Query arguments.
+	 *
+	 * @return array
+	 */
+	public function sanitize_query( $query_args ) {
+
+		if ( ! is_array( $query_args ) ) {
+			return array();
+		}
+
+		$allowed_keys = array(
+			'post_type',
+			'post__in',
+			'tax_query',
+			'meta_query',
+			's_title', // Custom key for searching by title.
+		);
+
+		foreach ( $query_args as $key => $value ) {
+			if ( ! in_array( $key, $allowed_keys, true ) ) {
+				unset( $query_args[ $key ] );
+			}
+		}
+
+		return $query_args;
+	}
+
+	/**
+	 * Validate signature from request to ensure it wasn't hijacked
+	 *
+	 * @param array $data
+	 * @return bool
+	 */
+	public function validate_request_signature( $data ) {
+
+		$input_signature = ! empty( $data['signature'] ) ? $data['signature'] : false;
+		$query = ! empty( $data['query'] ) ? $data['query'] : array();
+		$generated_signature = self::create_signature( $query );
+
+		return $input_signature === $generated_signature;
+	}
+
+	/**
 	 * Get Query control options list.
 	 */
 	public function get_query_control_options() {
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error();
+		}
+
 		$data = $_REQUEST;
 
 		if ( ! isset( $data['query_type'] ) ) {
 			wp_send_json_error();
 			return;
+		}
+
+		if ( ! $this->validate_request_signature( $data ) ) {
+			wp_send_json_error();
 		}
 
 		$results = array();
@@ -92,7 +217,7 @@ class Ajax_Handlers {
 					'order'               => 'ASC',
 				);
 
-				$query_args = ! empty( $data['query'] ) ? $data['query'] : array();
+				$query_args = ! empty( $data['query'] ) ? $this->sanitize_query( $data['query'] ) : array();
 				$query_args = wp_parse_args( $query_args, $default_query_args );
 
 				if ( ! empty( $data['q'] ) ) {
@@ -218,14 +343,14 @@ class Ajax_Handlers {
 
 		$args = $query->query;
 
-		if ( ! isset( $args['s_title'] ) ) {
+		if ( ! isset( $args['s_title'] ) || ! is_scalar( $args['s_title'] ) ) {
 			return $where;
 		}
 
 		global $wpdb;
 
-		$search = esc_sql( $wpdb->esc_like( $args['s_title'] ) );
-		$where .= " AND {$wpdb->posts}.post_title LIKE '%$search%'";
+		$search = '%' . $wpdb->esc_like( (string) $args['s_title'] ) . '%';
+		$where .= $wpdb->prepare( " AND {$wpdb->posts}.post_title LIKE %s", $search );
 
 		return $where;
 	}

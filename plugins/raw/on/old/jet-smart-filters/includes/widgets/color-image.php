@@ -29,7 +29,7 @@ class Jet_Smart_Filters_Color_Image_Widget extends Jet_Smart_Filters_Base_Widget
 	public function get_help_url() {
 
 		return jet_smart_filters()->widgets->prepare_help_url(
-			'https://crocoblock.com/knowledge-base/articles/jetsmartfilters-how-to-create-visual-filter-with-taxonomies-data-source/',
+			'https://crocoblock.com/knowledge-base/jetsmartfilters/jetsmartfilters-visual-filter-overview/',
 			$this->get_name()
 		);
 	}
@@ -39,16 +39,17 @@ class Jet_Smart_Filters_Color_Image_Widget extends Jet_Smart_Filters_Base_Widget
 		$css_scheme = apply_filters(
 			'jet-smart-filters/widgets/color-image/css-scheme',
 			array(
-				'item'                 => '.jet-color-image-list__row',
-				'button'               => '.jet-color-image-list__button',
-				'label'                => '.jet-color-image-list__label',
-				'decorator'            => '.jet-color-image-list__decorator',
-				'list-item'            => '.jet-color-image-list__row',
-				'list-wrapper'         => '.jet-color-image-list-wrapper',
-				'filter'               => '.jet-filter',
-				'filters-label'        => '.jet-filter-label',
-				'apply-filters'        => '.apply-filters',
-				'apply-filters-button' => '.apply-filters__button',
+				'item'                  => '.jet-color-image-list__row',
+				'button'                => '.jet-color-image-list__button',
+				'label'                 => '.jet-color-image-list__label',
+				'decorator'             => '.jet-color-image-list__decorator',
+				'list-item'             => '.jet-color-image-list__row',
+				'list-wrapper'          => '.jet-color-image-list-wrapper',
+				'filter'                => '.jet-filter',
+				'filters-label'         => '.jet-filter-label',
+				'apply-filters'         => '.apply-filters',
+				'apply-filters-button'  => '.apply-filters__button',
+				'dropdown-apply-button' => '.jet-filter-items-dropdown__apply-button',
 			)
 		);
 
@@ -109,9 +110,6 @@ class Jet_Smart_Filters_Color_Image_Widget extends Jet_Smart_Filters_Base_Widget
 					'value'  => __( 'Value change', 'jet-smart-filters' ),
 					'submit' => __( 'Click on apply button', 'jet-smart-filters' ),
 				),
-				'condition' => array(
-					'apply_type' => array( 'ajax', 'mixed' ),
-				),
 			)
 		);
 
@@ -125,6 +123,10 @@ class Jet_Smart_Filters_Color_Image_Widget extends Jet_Smart_Filters_Base_Widget
 				'label_off'    => esc_html__( 'No', 'jet-smart-filters' ),
 				'return_value' => 'yes',
 				'default'      => '',
+				'condition' => array(
+					'apply_on'     => 'submit',
+					'apply_button' => 'yes'
+				)
 			)
 		);
 
@@ -135,8 +137,9 @@ class Jet_Smart_Filters_Color_Image_Widget extends Jet_Smart_Filters_Base_Widget
 				'type'      => Controls_Manager::TEXT,
 				'default'   => __( 'Apply filter', 'jet-smart-filters' ),
 				'condition' => array(
+					'apply_on'     => 'submit',
 					'apply_button' => 'yes'
-				),
+				)
 			)
 		);
 

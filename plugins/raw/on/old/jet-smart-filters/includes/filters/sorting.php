@@ -27,9 +27,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Sorting_Filter' ) ) {
 		 */
 		public function sorting_options( $options_list = array() ) {
 
+			$sort_standard_request_val = jet_smart_filters()->data->get_request_var( '_sort_standard' );
 			$options  = array();
-			$currentFromRequest = isset( $_REQUEST['_sort_standard'] )
-				? json_decode( str_replace( '\"', '"', $_REQUEST['_sort_standard'] ), true )
+			$currentFromRequest = $sort_standard_request_val
+				? json_decode( str_replace( '\"', '"', $sort_standard_request_val ), true )
 				: false;
 
 			foreach ( $options_list as $option_data ) {
@@ -112,25 +113,44 @@ if ( ! class_exists( 'Jet_Smart_Filters_Sorting_Filter' ) ) {
 		public function container_data_atts( $settings = array() ) {
 
 			$output = '';
-
-			if ( 'submit' === $settings['apply_on'] && in_array( $settings['apply_type'], ['ajax', 'mixed'] ) ) {
-				$apply_type = $settings['apply_type'] . '-reload';
-			} else {
-				$apply_type = $settings['apply_type'];
-			}
+			$provider = ! empty( $settings['content_provider'] ) ? $settings['content_provider'] : '';
+			$query_id = ! empty( $settings['query_id'] ) ? $settings['query_id'] : 'default';
+			$additional_providers = jet_smart_filters()->utils->get_additional_providers( $settings );
 
 			$data_atts = array(
 				'data-smart-filter'         => 'sorting',
 				'data-query-type'           => 'sort',
 				'data-query-var'            => 'standard',
-				'data-content-provider'     => ! empty( $settings['content_provider'] ) ? $settings['content_provider'] : '',
-				'data-additional-providers' => jet_smart_filters()->utils->get_additional_providers( $settings ),
-				'data-query-id'             => ! empty( $settings['query_id'] ) ? $settings['query_id'] : 'default',
-				'data-apply-type'           => $apply_type,
+				'data-content-provider'     => $provider,
+				'data-query-id'             => $query_id,
+				'data-apply-type'           => ! empty( $settings['apply_type'] ) ? $settings['apply_type'] : 'ajax',
+				'data-apply-on'             => ! empty( $settings['apply_on'] ) ? $settings['apply_on'] : 'value',
+				'data-additional-providers' => $additional_providers,
+			);
+
+			$sorting_values = array();
+
+			if ( ! empty( $settings['sorting_list'] ) && is_array( $settings['sorting_list'] ) ) {
+				foreach ( $settings['sorting_list'] as $option ) {
+					if ( is_array( $option ) ) {
+						$sorting_values[] = wp_json_encode( $this->option_value( $option ) );
+					}
+				}
+			}
+
+			jet_smart_filters()->filter_request_validator->register_query_key(
+				$provider,
+				$query_id,
+				'_sort_standard',
+				$additional_providers,
+				array(
+					'type'   => 'sorting',
+					'values' => $sorting_values,
+				)
 			);
 
 			foreach ( $data_atts as $key => $value ) {
-				$output .= sprintf( ' %1$s="%2$s"', $key, $value );
+				$output .= sprintf( ' %1$s="%2$s"', $key, esc_attr( $value ) );
 			}
 
 			return $output;

@@ -185,9 +185,11 @@ class Jet_Smart_Filters_Bricks_Remove_Filters extends \Jet_Engine\Bricks_Views\E
 			$settings['remove_filters_text'] = '';
 		}
 
+		// render_attributes() returns pre-escaped and validated HTML attributes.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-		echo '<div class="' . $base_class . ' jet-filter">';
+		echo '<div class="' . esc_attr( $base_class ) . ' jet-filter">';
 		include jet_smart_filters()->get_template( 'common/remove-filters.php' );
 		echo '</div>';
 

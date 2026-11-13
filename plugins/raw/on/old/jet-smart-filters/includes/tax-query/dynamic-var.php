@@ -26,8 +26,8 @@ class Jet_Smart_Filters_Tax_Query_Dynamic_Var extends Jet_Smart_Filters_Admin_Dy
 		return array(
 			'relation' => array(
 				'type'        => 'select',
-				'title'       => __( 'Taxonomy', 'jet-engine' ),
-				'placeholder' => __( 'Select taxonomy...', 'jet-engine' ),
+				'title'       => __( 'Taxonomy', 'jet-smart-filters' ),
+				'placeholder' => __( 'Select taxonomy...', 'jet-smart-filters' ),
 				'options'     => jet_smart_filters()->data->get_taxonomies_for_options(),
 			),
 		);

@@ -539,16 +539,18 @@ class Jet_Smart_Filters_Bricks_Active_Filters extends \Jet_Engine\Bricks_Views\E
 		$filters_label        = ! empty( $settings['filters_label'] ) ? $settings['filters_label'] : '';
 		$additional_providers = jet_smart_filters()->utils->get_additional_providers( $settings );
 
+		// render_attributes() returns pre-escaped and validated HTML attributes.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
 		printf(
 			'<div class="%1$s jet-active-filters" data-label="%6$s" data-content-provider="%2$s" data-additional-providers="%3$s" data-apply-type="%4$s" data-query-id="%5$s">',
-			$base_class,
-			$provider,
-			$additional_providers,
-			$apply_type,
-			$query_id,
-			$filters_label
+			esc_attr( $base_class ),
+			esc_attr( $provider ),
+			esc_attr( $additional_providers ),
+			esc_attr( $apply_type ),
+			esc_attr( $query_id ),
+			esc_attr( wp_kses_post( $filters_label ) )
 		);
 
 		if ( ! $this->is_frontend ) {

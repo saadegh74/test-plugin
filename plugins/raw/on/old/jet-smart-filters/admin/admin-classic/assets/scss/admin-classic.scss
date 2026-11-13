@@ -139,10 +139,20 @@
 
 #filter-settings {
 	.cx-control {
-		&[data-control-name="_color_image_add_all_option_image"] {
+		&[data-control-name="_color_image_add_all_option_image"],
+		&[data-control-name="_color_image_add_all_option_color"] {
 			margin-left: 30%;
 			padding-top: 0;
 			border: none;
+		}
+		&[data-control-name="_date_available_range_custom_max"] {
+			padding-top: 0;
+			border-top: none;
+
+			.cx-control__description {
+				width: 335%;
+				margin-top: 25px;
+			}
 		}
 	}
 }

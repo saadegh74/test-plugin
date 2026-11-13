@@ -4,7 +4,7 @@ namespace Elementor;
 
 use Elementor\Plugin;
 use Elementor\Group_Control_Border;
-use Elementor\Core\Schemes\Typography as Scheme_Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Global_Typography;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -97,6 +97,17 @@ class Jet_Smart_Filters_Remove_Filters_Widget extends Widget_Base {
 			)
 		);
 
+		$this->add_control(
+			'query_id_wc_shortcode_notice',
+			array(
+				'type' => Controls_Manager::RAW_HTML,
+				'raw'  => __( '<b>Query ID</b> for <b>WooCommerce Shortcode</b> must be specified as attribute class: [products class="query_id"]', 'jet-smart-filters' ),
+				'condition' => array(
+					'content_provider' => array( 'woocommerce-shortcode' ),
+				),
+			)
+		);
+
 		// Include Additional Providers Settings
 		include jet_smart_filters()->plugin_path( 'includes/widgets/common-controls/additional-providers.php' );
 
@@ -124,7 +135,9 @@ class Jet_Smart_Filters_Remove_Filters_Widget extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'remove_filters_button_typography',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
+				'global'   => array(
+					'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
+				),
 				'selector' => '{{WRAPPER}} ' . $css_scheme['remove-filters-button'],
 			)
 		);
@@ -309,7 +322,7 @@ class Jet_Smart_Filters_Remove_Filters_Widget extends Widget_Base {
 		$additional_providers = jet_smart_filters()->utils->get_additional_providers( $settings );
 		$edit_mode            = Plugin::instance()->editor->is_edit_mode();
 
-		echo '<div class="' . $base_class . ' jet-filter">';
+		echo '<div class="' . esc_attr( $base_class ) . ' jet-filter">';
 		include jet_smart_filters()->get_template( 'common/remove-filters.php' );
 		echo '</div>';
 	}

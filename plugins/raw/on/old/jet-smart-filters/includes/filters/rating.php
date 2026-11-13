@@ -57,17 +57,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Rating_Filter' ) ) {
 			$button_text          = isset( $args['button_text'] ) ? $args['button_text'] : false;
 			$rating_icon          = isset( $args['rating_icon'] ) ? $args['rating_icon'] : false;
 			$apply_type           = isset( $args['apply_type'] ) ? $args['apply_type'] : false;
+			$apply_on             = isset( $args['apply_on'] ) ? $args['apply_on'] : false;
 
 			if ( ! $filter_id ) {
 				return false;
 			}
 
-			$options      = get_post_meta( $filter_id, '_rating_options', true );
-			$options      = ! empty( $options ) ? range( 1, intval( $options ) ) : array();
-			$query_type   = 'meta_query';
-			$query_var    = get_post_meta( $filter_id, '_query_var', true );
+			$options          = get_post_meta( $filter_id, '_rating_options', true );
+			$options          = ! empty( $options ) ? range( 1, intval( $options ) ) : array();
+			$query_type       = 'meta_query';
+			$query_var        = get_post_meta( $filter_id, '_query_var', true );
+			$predefined_value = $this->get_predefined_value( $filter_id );
 
-			return array(
+			$result = array(
 				'options'              => $options,
 				'query_type'           => $query_type,
 				'query_var'            => $query_var,
@@ -75,12 +77,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Rating_Filter' ) ) {
 				'content_provider'     => $content_provider,
 				'additional_providers' => $additional_providers,
 				'apply_type'           => $apply_type,
+				'apply_on'             => $apply_on,
 				'filter_id'            => $filter_id,
 				'button_text'          => $button_text,
 				'rating_icon'          => $rating_icon,
 				'__widget_id'          => $widget_id,
 				'accessibility_label'  => $this->get_accessibility_label( $filter_id )
 			);
+
+			if ( $predefined_value !== false ) {
+				$result['predefined_value'] = $predefined_value;
+			}
+
+			return $result;
 		}
 	}
 }

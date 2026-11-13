@@ -8,12 +8,12 @@
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
-	
+
 /**
  * Define Jet_Smart_Filters_Provider_EPro_Loop_Grid class
  */
 class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provider_Base {
-	
+
 	protected $rendered_block = null;
 
 	/**
@@ -38,6 +38,7 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 			 * JetSmartFilters attach this data to AJAX request.
 			 */
 			add_filter( 'elementor/widget/before_render_content', array( $this, 'store_default_settings' ), 0, 3 );
+			add_filter( 'elementor/widget/render_content', array( $this, 'prepare_render_content' ), 10, 2 );
 
 			/**
 			 * Store default query args
@@ -54,8 +55,8 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 		$widget->add_control(
 			'_jsf_filterable',
 			array(
-				'label'       => esc_html__( 'Is Filterable', 'elementor-pro' ),
-				'description' => esc_html__( 'Enable this if you want to filter current loop with JetSmartFilters', 'jet-samrt-filters' ),
+				'label'       => esc_html__( 'Is Filterable', 'jet-smart-filters' ),
+				'description' => esc_html__( 'Enable this if you want to filter current loop with JetSmartFilters', 'jet-smart-filters' ),
 				'type'        => 'switcher',
 				'separator'   => 'before',
 			)
@@ -64,11 +65,11 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 		$widget->add_control(
 			'_jsf_no_result_text',
 			array(
-				'label'       => esc_html__( 'No Result Text', 'elementor-pro' ),
+				'label'       => esc_html__( 'No Result Text', 'jet-smart-filters' ),
 				'label_block' => true,
-				'description' => esc_html__( 'Text that will be displayed if there are no results after filtering', 'jet-samrt-filters' ),
+				'description' => esc_html__( 'Text that will be displayed if there are no results after filtering', 'jet-smart-filters' ),
 				'type'        => 'text',
-				'default'     => __( 'Sorry, nothing to see here...', 'elementor-pro' ),
+				'default'     => __( 'Sorry, nothing to see here...', 'jet-smart-filters' ),
 				'condition'   => array(
 					'_jsf_filterable' => 'yes'
 				),
@@ -84,7 +85,7 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 
 		$total = $query->found_posts;
 		if ( $total == 0 ) {
-			$no_result_text = $widget->get_settings_for_display()['_jsf_no_result_text'];
+			$no_result_text = $this->get_no_result_text( $widget );
 
 			if ( $no_result_text ) {
 				remove_action(
@@ -93,14 +94,40 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 					10, 2
 				);
 
-				$classes = apply_filters( 'jet-smart-filters/providers/' . $this->widget_name() . '/no-result-classes', array(
-					'container' => 'elementor-loop-container',
-					'text'      => 'jet-smart-filters-elementor-loop-no-result'
-				));
-
-				echo '<div class="' . $classes['container'] . '"><div class="' . $classes['text'] . '">' . $no_result_text . '</div></div>';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo $this->get_no_result_content( $no_result_text );
 			}
 		}
+	}
+
+	/**
+	 * Get JetSmartFilters no-results text from the Loop Grid widget.
+	 */
+	public function get_no_result_text( $widget ) {
+
+		$settings = $widget->get_settings_for_display();
+
+		return ! empty( $settings['_jsf_no_result_text'] ) ? $settings['_jsf_no_result_text'] : '';
+	}
+
+	/**
+	 * Get no-results wrapper expected by the frontend provider replacement.
+	 */
+	public function get_no_result_content( $no_result_text = '' ) {
+
+		$classes = apply_filters( 'jet-smart-filters/providers/' . $this->widget_name() . '/no-result-classes', array(
+			'container' => 'elementor-loop-container',
+			'text'      => 'jet-smart-filters-elementor-loop-no-result'
+		) );
+		$content = '';
+
+		if ( $no_result_text ) {
+			$content = '<div class="' . esc_attr( $classes['text'] ) . '">'
+				. wp_kses_post( do_shortcode( $no_result_text ) ) .
+			'</div>';
+		}
+
+		return '<div class="' . esc_attr( $classes['container'] ) . '">' . $content . '</div>';
 	}
 
 	public function is_filterable_widget( $widget ) {
@@ -136,26 +163,41 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 			return;
 		}
 
-		$settings         = $widget->get_settings_for_display();
-		$query_id         = $this->get_query_id( $widget );
-		$current_document = \Elementor\Plugin::$instance->documents->get_current();
+		$settings    = $widget->get_settings_for_display();
+		$query_id    = $this->get_query_id( $widget );
+		$post_id     = $this->helpers->elementor->get_filtered_post_id();
+		$document_id = $this->helpers->elementor->get_current_document_id();
 
-		if ( ! $current_document ) {
-			$post_id = get_the_ID();
-		} else {
-			$post_id = $current_document->get_main_id();
+		// Nested templates may leave a different Elementor document active after rendering.
+		if ( ! $document_id || ! $this->helpers->elementor->get_filtered_widget( $document_id, $widget->get_id() ) ) {
+			$theme_builder = \ElementorPro\Modules\ThemeBuilder\Module::instance();
+			$location      = $theme_builder->get_locations_manager()->get_current_location();
+
+			if ( $location ) {
+				$documents = $theme_builder->get_conditions_manager()->get_documents_for_location( $location );
+
+				foreach ( $documents as $document ) {
+					$location_document_id = $document->get_main_id();
+
+					if ( $this->helpers->elementor->get_filtered_widget( $location_document_id, $widget->get_id() ) ) {
+						$document_id = $location_document_id;
+						break;
+					}
+				}
+			}
 		}
 
 		/**
 		 * We'll parse required block settings from page content.
 		 * In this case such approach used because we need inner content anyway.
 		 * If your block content defined only with attributes - here you can set array of these attributes
-		 * and store it with jet_smart_filters()->providers->add_provider_settings(), than filter add these attributes 
-		 * to request and you'll can create new instane of required block without content parsing
+		 * and store it with jet_smart_filters()->providers->add_provider_settings(), then the filter adds these attributes
+		 * to request and you can create new instance of required block without content parsing
 		 */
 		$attrs = array(
 			'widget_id'        => $widget->get_id(),
 			'filtered_post_id' => $post_id,
+			'document_post_id' => $document_id,
 		);
 
 		jet_smart_filters()->providers->add_provider_settings( $this->get_id(), $attrs, $query_id );
@@ -223,7 +265,13 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 			- the alternate template "Static item position" option
 			- Query source - Sales/Featured/Cross-Sells
 		*/
-		foreach ( array( 'paged', 'posts_per_page', 'ignore_sticky_posts', ) as $propKey ) {
+		$props_to_unset = array( 'paged', 'ignore_sticky_posts' );
+
+		if ( ! $this->helpers->elementor->is_current_query_widget( $widget ) ) {
+			$props_to_unset[] = 'posts_per_page';
+		}
+
+		foreach ( $props_to_unset as $propKey ) {
 			unset( $default_args[$propKey] );
 		}
 
@@ -233,7 +281,7 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 	}
 
 	/**
-	 * Returns Elementor Pro apropriate widget name
+	 * Returns Elementor Pro appropriate widget name
 	 */
 	public function widget_name() {
 
@@ -245,7 +293,7 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 	 */
 	public function get_name() {
 
-		return __( 'Elementor Pro Loop Grid', 'jet-samrt-filters' );
+		return __( 'Elementor Pro Loop Grid', 'jet-smart-filters' );
 	}
 
 	/**
@@ -295,16 +343,36 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 	 */
 	public function ajax_get_content() {
 
-		$settings  = ! empty( $_REQUEST['settings'] ) ? $_REQUEST['settings'] : [];
-		$post_id   = ! empty( $settings['filtered_post_id'] ) ? absint( $settings['filtered_post_id'] ) : false;
-		$widget_id = ! empty( $settings['widget_id'] ) ? $settings['widget_id'] : false;
+		$verified_settings = jet_smart_filters()->query->get_query_settings();
+		$settings          = ! empty( $verified_settings ) ? $verified_settings : array();
+		$post_id     = ! empty( $settings['filtered_post_id'] ) ? absint( $settings['filtered_post_id'] ) : false;
+		$document_id = ! empty( $settings['document_post_id'] ) ? absint( $settings['document_post_id'] ) : false;
+		$widget_id   = ! empty( $settings['widget_id'] ) ? $settings['widget_id'] : false;
 
-		if ( ! $post_id || ! $widget_id ) {
-			_e( 'Error. Incomplete request', 'jet-smart-filters' );
+		if ( ! ( $post_id || $document_id ) || ! $widget_id ) {
+			esc_html_e( 'Error. Incomplete request', 'jet-smart-filters' );
+
 			return;
 		}
 
-		$widget = $this->get_filtered_widget( $post_id, $widget_id );
+		$post_ids = array_filter( array_unique( array( $document_id, $post_id ) ) );
+		$widget   = false;
+
+		foreach ( $post_ids as $post_id ) {
+			$widget = $this->helpers->elementor->get_filtered_widget( $post_id, $widget_id );
+
+			if ( $widget ) {
+				break;
+			}
+		}
+
+		if ( ! $widget ) {
+			$referer_post_id = $this->helpers->elementor->get_referer_post_id();
+
+			if ( $referer_post_id && ! in_array( $referer_post_id, $post_ids, true ) ) {
+				$widget = $this->helpers->elementor->get_filtered_widget( $referer_post_id, $widget_id );
+			}
+		}
 
 		if ( $widget ) {
 
@@ -315,6 +383,9 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 				return $this->add_query_args( $current_query_vars, $widget );
 			} );
 
+			// Alphabet filtering for taxonomy Loop Grid queries.
+			$this->add_alphabet_terms_query_filter( $widget );
+
 			// render content
 			ob_start();
 
@@ -324,12 +395,17 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 				$skin->set_parent( $widget );
 				$skin->render_by_mode();
 			} else {
-				$widget->render_by_mode();
+				//$widget->render_by_mode();
+				$widget->render_content();
 			}
 
 			$content = ob_get_clean();
+			$content = $this->prepare_no_results_content( $content, $widget );
+
+			$this->remove_alphabet_terms_query_filter();
 
 			if ( $content ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $content;
 			} else {
 				echo '<div class="elementor-loop-container"></div>';
@@ -337,6 +413,50 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 		} else {
 			echo 'Widget not found';
 		}
+	}
+
+	/**
+	 * Normalize Loop Grid render content.
+	 */
+	public function prepare_render_content( $content, $widget ) {
+
+		if ( ! $this->is_filterable_widget( $widget ) ) {
+			return $content;
+		}
+
+		return $this->prepare_no_results_content( $content, $widget );
+	}
+
+	/**
+	 * Normalize Loop Grid no-results content for stable provider replacement.
+	 */
+	public function prepare_no_results_content( $content, $widget ) {
+
+		if ( ! $content ) {
+			return $content;
+		}
+
+		$has_elementor_no_result = false !== strpos( $content, 'e-loop-nothing-found-message' );
+
+		if ( ! $has_elementor_no_result ) {
+			return $content;
+		}
+
+		$content = preg_replace(
+			'/<div\b[^>]*class=(["\'])[^"\']*\be-loop-nothing-found-message\b[^"\']*\1[^>]*>\s*<\/div>/i',
+			'',
+			$content
+		);
+
+		if ( false === strpos( $content, 'elementor-loop-container' ) ) {
+			if ( false !== strpos( $content, 'e-loop-nothing-found-message' ) ) {
+				$content = '<div class="elementor-loop-container">' . $content . '</div>';
+			} else {
+				$content = $this->get_no_result_content( $this->get_no_result_text( $widget ) );
+			}
+		}
+
+		return $content;
 	}
 
 	/**
@@ -360,51 +480,63 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 				add_filter( 'elementor/query/get_query_args/current_query', function( $current_query_vars ) use ( $widget ) {
 					return $this->add_query_args( $current_query_vars, $widget );
 				} );
+
+				// Alphabet filtering for taxonomy Loop Grid queries.
+				$this->add_alphabet_terms_query_filter( $widget );
 			}
 		} );
+
+		add_action( 'elementor/frontend/widget/after_render', array( $this, 'remove_alphabet_terms_query_filter' ) );
 	}
 
 	/**
-	 * Find filtered widget inside given page content
+	 * Check whether the Loop Grid uses an Elementor taxonomy skin.
 	 */
-	public function get_filtered_widget( $post_id, $widget_id ) {
+	public function is_taxonomy_loop_widget( $widget ) {
 
-		$elementor = \Elementor\Plugin::instance();
-		$document = $elementor->documents->get( $post_id );
-
-		if ( $document ) {
-			$widget = $this->find_widget_recursive( $document->get_elements_data(), $widget_id );
-
-			if ( $widget ) {
-				$widget_instance = $elementor->elements_manager->create_element_instance( $widget );
-			}
+		if ( ! is_callable( array( $widget, 'get_current_skin_id' ) ) ) {
+			return false;
 		}
 
-		return $widget_instance;
+		return in_array( $widget->get_current_skin_id(), array( 'post_taxonomy', 'product_taxonomy' ), true );
 	}
 
 	/**
-	 * Find required widget in given widgets stack
+	 * Add Alphabet query arguments only while the requested taxonomy Loop Grid is rendered.
 	 */
-	public function find_widget_recursive( $widgets, $widget_id ) {
+	public function add_alphabet_terms_query_filter( $widget ) {
 
-		foreach ( $widgets as $widget ) {
+		$provider = jet_smart_filters()->query->get_current_provider();
 
-			if ( $widget_id === $widget['id'] ) {
-				return $widget;
-			}
-
-			if ( ! empty( $widget['elements'] ) ) {
-
-				$widget = $this->find_widget_recursive( $widget['elements'], $widget_id );
-
-				if ( $widget ) {
-					return $widget;
-				}
-			}
+		if (
+			empty( $provider )
+			|| $this->get_id() !== $provider['provider']
+			|| ! $this->is_taxonomy_loop_widget( $widget )
+			|| ! $this->is_currently_filtered_widget( $widget, $provider['query_id'] )
+		) {
+			return;
 		}
 
-		return false;
+		add_filter( 'elementor/loop_taxonomy/args', array( $this, 'add_alphabet_terms_query_args' ), 20 );
+	}
+
+	/**
+	 * Remove the provider-specific Alphabet filter after the Loop Grid query is prepared.
+	 */
+	public function remove_alphabet_terms_query_filter() {
+
+		remove_filter( 'elementor/loop_taxonomy/args', array( $this, 'add_alphabet_terms_query_args' ), 20 );
+	}
+
+	/**
+	 * Pass Alphabet arguments to the WP_Term_Query used by Elementor taxonomy Loop Grid skins.
+	 */
+	public function add_alphabet_terms_query_args( $query_args ) {
+
+		// Elementor prepares one term query per Loop Grid render, so the scoped filter is no longer needed.
+		$this->remove_alphabet_terms_query_filter();
+
+		return jet_smart_filters()->query->merge_alphabet_query_args( $query_args );
 	}
 
 	/**
@@ -456,20 +588,18 @@ class Jet_Smart_Filters_Provider_EPro_Loop_Grid extends Jet_Smart_Filters_Provid
 			return $query_args;
 		}
 
-		foreach ( $args as $query_var => $value ) {
-			if ( in_array( $query_var, array( 'tax_query', 'meta_query' ) ) ) {
+		$query_args = jet_smart_filters()->utils->merge_query_args(
+			$query_args,
+			$args
+		);
 
-				$current = isset( $query_args[ $query_var ] ) ? $query_args[ $query_var ] : [];
-
-				if ( ! empty( $current ) ) {
-					$value = array_merge( $current, $value );
+		if ( isset( $query_args['post_type'] ) && $query_args['post_type'] === 'product' && function_exists( 'WC' ) ) {
+			foreach ( ['orderby', 'order'] as $value ) {
+				if ( array_key_exists( $value, $args ) ) {
+					WC()->query->remove_ordering_args();
+					break;
 				}
-
-				$query_args[ $query_var ] = $value;
-			} else {
-				$query_args[ $query_var ] = $value;
 			}
-
 		}
 
 		// query args type conversion from string to boolean

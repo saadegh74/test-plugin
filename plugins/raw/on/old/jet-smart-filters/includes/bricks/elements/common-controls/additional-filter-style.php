@@ -348,6 +348,7 @@ $css_items_dropdown_scheme = apply_filters(
 		'dropdown'              => '.jet-filter-items-dropdown',
 		'dropdown-label'        => '.jet-filter-items-dropdown__label',
 		'dropdown-body'         => '.jet-filter-items-dropdown__body',
+		'dropdown-footer'       => '.jet-filter-items-dropdown__footer',
 		'dropdown-active-items' => '.jet-filter-items-dropdown__active',
 		'dropdown-active-item'  => '.jet-filter-items-dropdown__active__item',
 		'dropdown-n-selected'   => '.jet-filter-items-dropdown__n-selected',
@@ -713,6 +714,90 @@ $this->register_jet_control(
 				'selector' => $css_items_dropdown_scheme['dropdown-body'],
 			],
 		],
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_footer_heading',
+	[
+		'tab'   => 'style',
+		'type'  => 'separator',
+		'label' => esc_html__( 'Dropdown Footer', 'jet-smart-filters' ),
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_footer_background_color',
+	[
+		'tab'   => 'style',
+		'label' => esc_html__( 'Background color', 'jet-smart-filters' ),
+		'type'  => 'color',
+		'css'   => [
+			[
+				'property' => 'background-color',
+				'selector' => $css_items_dropdown_scheme['dropdown-footer'],
+			],
+		],
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_footer_border',
+	[
+		'tab'   => 'style',
+		'label' => esc_html__( 'Border', 'jet-smart-filters' ),
+		'type'  => 'border',
+		'css'   => [
+			[
+				'property' => 'border',
+				'selector' => $css_items_dropdown_scheme['dropdown-footer'],
+			],
+		],
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_footer_margin',
+	[
+		'tab'   => 'style',
+		'label' => esc_html__( 'Margin', 'jet-smart-filters' ),
+		'type'  => 'dimensions',
+		'css'   => [
+			[
+				'property' => 'margin',
+				'selector' => $css_items_dropdown_scheme['dropdown-footer'],
+			],
+		],
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_footer_padding',
+	[
+		'tab'   => 'style',
+		'label' => esc_html__( 'Padding', 'jet-smart-filters' ),
+		'type'  => 'dimensions',
+		'css'   => [
+			[
+				'property' => 'padding',
+				'selector' => $css_items_dropdown_scheme['dropdown-footer'],
+			],
+		],
+	]
+);
+
+$this->register_jet_control(
+	'dropdown_footer_alignment',
+	[
+		'tab'      => 'style',
+		'label'    => esc_html__( 'Alignment', 'jet-smart-filters' ),
+		'type'     => 'justify-content',
+		'css'      => [
+			[
+				'property' => 'justify-content',
+				'selector' => $css_items_dropdown_scheme['dropdown-footer'],
+			],
+		]
 	]
 );
 

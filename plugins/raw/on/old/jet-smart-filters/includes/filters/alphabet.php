@@ -54,16 +54,18 @@ if ( ! class_exists( 'Jet_Smart_Filters_Alphabet_Filter' ) ) {
 			$content_provider     = isset( $args['content_provider'] ) ? $args['content_provider'] : false;
 			$additional_providers = isset( $args['additional_providers'] ) ? $args['additional_providers'] : false;
 			$apply_type           = isset( $args['apply_type'] ) ? $args['apply_type'] : false;
+			$apply_on             = isset( $args['apply_on'] ) ? $args['apply_on'] : false;
 
 			if ( ! $filter_id ) {
 				return false;
 			}
 
-			$query_type   = 'alphabet';
-			$query_var    = '';
-			$behavior     = get_post_meta( $filter_id, '_alphabet_behavior', true );
-			$can_deselect = filter_var( get_post_meta( $filter_id, '_alphabet_radio_deselect', true ), FILTER_VALIDATE_BOOLEAN );
-			$options      = array_map( 'trim', explode( ',', get_post_meta( $filter_id, '_alphabet_options', true ) ) );
+			$query_type       = 'alphabet';
+			$query_var        = '';
+			$behavior         = get_post_meta( $filter_id, '_alphabet_behavior', true );
+			$can_deselect     = filter_var( get_post_meta( $filter_id, '_alphabet_radio_deselect', true ), FILTER_VALIDATE_BOOLEAN );
+			$options          = array_map( 'trim', explode( ',', get_post_meta( $filter_id, '_alphabet_options', true ) ) );
+			$predefined_value = $this->get_predefined_value( $filter_id );
 
 			$result = array(
 				'options'              => $options,
@@ -73,6 +75,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Alphabet_Filter' ) ) {
 				'content_provider'     => $content_provider,
 				'additional_providers' => $additional_providers,
 				'apply_type'           => $apply_type,
+				'apply_on'             => $apply_on,
 				'filter_id'            => $filter_id,
 				'behavior'             => $behavior,
 				'accessibility_label'  => $this->get_accessibility_label( $filter_id )
@@ -80,6 +83,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Alphabet_Filter' ) ) {
 
 			if ( $can_deselect ) {
 				$result['can_deselect'] = $can_deselect;
+			}
+
+			if ( $predefined_value !== false ) {
+				$result['predefined_value'] = $predefined_value;
 			}
 
 			return $result;

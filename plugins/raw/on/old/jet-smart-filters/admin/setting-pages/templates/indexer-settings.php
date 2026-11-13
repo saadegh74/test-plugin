@@ -3,32 +3,37 @@
 >
 	<cx-vui-switcher
 		name="use_indexed_filters"
-		label="<?php _e( 'Use Indexed filters', 'jet-smart-filters' ); ?>"
-		description="<?php _e( 'Enable indexed filters functionality', 'jet-smart-filters' ); ?>"
+		label="<?php esc_attr_e( 'Use Indexed filters', 'jet-smart-filters' ); ?>"
+		description="<?php esc_attr_e( 'Enable indexed filters functionality', 'jet-smart-filters' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"
 		v-model="settings.use_indexed_filters">
 	</cx-vui-switcher>
-
 	<cx-vui-switcher
 		v-if="settings.use_indexed_filters === 'true'"
 		name="use_auto_indexing"
-		label="<?php _e( 'Use auto re-indexing', 'jet-smart-filters' ); ?>"
-		description="<?php _e( 'Auto re-indexing data when changing posts or filters', 'jet-smart-filters' ); ?>"
+		label="<?php esc_attr_e( 'Use auto re-indexing', 'jet-smart-filters' ); ?>"
+		description="<?php esc_attr_e(
+			'Auto re-indexing data when changing posts or filters',
+			'jet-smart-filters'
+		); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"
 		v-model="settings.use_auto_indexing">
 	</cx-vui-switcher>
-
 	<div
 		class="avaliable-controls cx-vui-component"
 		v-if="settings.use_indexed_filters === 'true'"
 	>
 		<div class="avaliable-controls__header">
-			<div class="cx-vui-title"><?php _e( 'Index Post Types', 'jet-smart-filters' ); ?></div>
-			<div class="cx-vui-subtitle"><?php _e( 'List post types that will be indexed', 'jet-smart-filters' ); ?></div>
+			<div class="cx-vui-title">
+				<?php esc_html_e( 'Index Post Types', 'jet-smart-filters' ); ?>
+			</div>
+			<div class="cx-vui-subtitle">
+				<?php esc_html_e( 'List post types that will be indexed', 'jet-smart-filters' ); ?>
+			</div>
 		</div>
 		<div class="avaliable-controls__list">
 			<div
@@ -48,5 +53,4 @@
 			</div>
 		</div>
 	</div>
-
 </div>

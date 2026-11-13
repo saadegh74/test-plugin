@@ -20,7 +20,7 @@ $current = $this->get_current_filter_value( $args );
 
 	echo '<form class="jet-alphabet-list-wrapper">';
 	echo '<fieldset>';
-	echo '<legend style="display:none;">' . $accessibility_label . '</legend>';
+	echo '<legend style="display:none;">' . esc_html( $accessibility_label ) . '</legend>';
 	foreach ( $options as $value ) {
 		$checked = '';
 

@@ -84,16 +84,6 @@
 }
 .datepicker--cell.-disabled- {
 	cursor: default;
-	color: #aeaeae;
-}
-.datepicker--cell.-disabled-.-focus- {
-	color: #aeaeae;
-}
-.datepicker--cell.-disabled-.-in-range- {
-	color: #a1a1a1;
-}
-.datepicker--cell.-disabled-.-current-.-focus- {
-	color: #aeaeae;
 }
 .datepicker--cell.-range-from- {
 	background-color: rgba(92, 196, 239, 0.1);

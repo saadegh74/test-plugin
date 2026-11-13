@@ -29,7 +29,7 @@ class Jet_Smart_Filters_Alphabet_Widget extends Jet_Smart_Filters_Base_Widget {
 	public function get_help_url() {
 
 		return jet_smart_filters()->widgets->prepare_help_url(
-			'https://crocoblock.com/knowledge-base/articles/jetsmartfilters-how-to-create-a-alphabet-filter/',
+			'https://crocoblock.com/knowledge-base/jetsmartfilters/jetsmartfilters-how-to-use-alphabet-filter/',
 			$this->get_name()
 		);
 	}
@@ -39,10 +39,11 @@ class Jet_Smart_Filters_Alphabet_Widget extends Jet_Smart_Filters_Base_Widget {
 		$css_scheme = apply_filters(
 			'jet-smart-filters/widgets/alphabet/css-scheme',
 			array(
-				'list-wrapper' => '.jet-alphabet-list__wrapper',
-				'list-item'    => '.jet-alphabet-list__row',
-				'item'         => '.jet-alphabet-list__item',
-				'button'       => '.jet-alphabet-list__button',
+				'list-wrapper'  => '.jet-alphabet-list-wrapper',
+				'list-fieldset' => '.jet-alphabet-list-wrapper > fieldset',
+				'list-item'     => '.jet-alphabet-list__row',
+				'item'          => '.jet-alphabet-list__item',
+				'button'        => '.jet-alphabet-list__button',
 			)
 		);
 
@@ -74,8 +75,7 @@ class Jet_Smart_Filters_Alphabet_Widget extends Jet_Smart_Filters_Base_Widget {
 					'unit' => 'px',
 				),
 				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['list-item']    => 'padding: calc({{SIZE}}{{UNIT}}/2);',
-					'{{WRAPPER}} ' . $css_scheme['list-wrapper'] => 'margin: calc(-{{SIZE}}{{UNIT}}/2);',
+					'{{WRAPPER}} ' . $css_scheme['list-fieldset'] => 'gap: {{SIZE}}{{UNIT}};'
 				),
 			)
 		);
@@ -102,7 +102,7 @@ class Jet_Smart_Filters_Alphabet_Widget extends Jet_Smart_Filters_Base_Widget {
 					),
 				),
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['list-wrapper'] => 'justify-content: {{VALUE}};',
+					'{{WRAPPER}} ' . $css_scheme['list-fieldset'] => 'justify-content: {{VALUE}};',
 				)
 			)
 		);

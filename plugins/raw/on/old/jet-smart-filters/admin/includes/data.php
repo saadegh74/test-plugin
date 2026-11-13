@@ -139,7 +139,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin_Data' ) ) {
 				'title_asc'  => __( 'Title: ascending', 'jet-smart-filters' ),
 				'title_desc' => __( 'Title: descending', 'jet-smart-filters' ),
 				'date_asc'   => __( 'Date: oldest to newest', 'jet-smart-filters' ),
-				'date_desc'  => __( 'Date: newest to oldest (by default)', 'jet-smart-filters' ),
+				'date_desc'  => __( 'Date: newest to oldest', 'jet-smart-filters' ),
 			) );
 		}
 

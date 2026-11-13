@@ -3,7 +3,7 @@
 namespace Elementor;
 
 use Elementor\Group_Control_Border;
-use Elementor\Core\Schemes\Typography as Scheme_Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Global_Typography;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,6 +25,14 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 	public function get_icon() {
 
 		return 'jet-smart-filters-icon-sorting-filter';
+	}
+
+	public function get_help_url() {
+
+		return jet_smart_filters()->widgets->prepare_help_url(
+			'https://crocoblock.com/knowledge-base/jetsmartfilters/jetsmartfilters-how-to-sort-posts-and-products-with-sorting-filter-widget/',
+			$this->get_name()
+		);
 	}
 
 	public function get_categories() {
@@ -95,10 +103,7 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 				'options'   => array(
 					'value'  => __( 'Value change', 'jet-smart-filters' ),
 					'submit' => __( 'Click on apply button', 'jet-smart-filters' ),
-				),
-				'condition' => array(
-					'apply_type' => array( 'ajax', 'mixed' ),
-				),
+				)
 			)
 		);
 
@@ -111,7 +116,10 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 				'label_on'     => esc_html__( 'Yes', 'jet-smart-filters' ),
 				'label_off'    => esc_html__( 'No', 'jet-smart-filters' ),
 				'return_value' => 'yes',
-				'default'      => ''
+				'default'      => '',
+				'condition'    => array(
+					'apply_on' => 'submit'
+				)
 			)
 		);
 
@@ -122,8 +130,9 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 				'type'      => Controls_Manager::TEXT,
 				'default'   => __( 'Apply filter', 'jet-smart-filters' ),
 				'condition' => array(
+					'apply_on'     => 'submit',
 					'apply_button' => 'yes'
-				),
+				)
 			)
 		);
 
@@ -169,6 +178,17 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 				'type'        => Controls_Manager::TEXT,
 				'label_block' => true,
 				'description' => __( 'Set unique query ID if you use multiple widgets of same provider on the page. Same ID you need to set for filtered widget.', 'jet-smart-filters' ),
+			)
+		);
+
+		$this->add_control(
+			'query_id_wc_shortcode_notice',
+			array(
+				'type' => Controls_Manager::RAW_HTML,
+				'raw'  => __( '<b>Query ID</b> for <b>WooCommerce Shortcode</b> must be specified as attribute class: [products class="query_id"]', 'jet-smart-filters' ),
+				'condition' => array(
+					'content_provider' => array( 'woocommerce-shortcode' ),
+				),
 			)
 		);
 
@@ -566,7 +586,9 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'filter_apply_button_typography',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
+				'global'   => array(
+					'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
+				),
 				'selector' => '{{WRAPPER}} ' . $css_scheme['apply-button'],
 			)
 		);
@@ -753,11 +775,15 @@ class Jet_Smart_Filters_Sorting_Widget extends Widget_Base {
 		$placeholder         = ! empty( $settings['placeholder'] ) ? $settings['placeholder'] : __( 'Sort...', 'jet-smart-filters' );
 		$label               = $settings['label'];
 
-		printf( '<div class="%1$s jet-filter">', $base_class );
+		printf(
+			'<div class="%1$s jet-filter">',
+			esc_attr( $base_class )
+		);
 
 		include jet_smart_filters()->get_template( 'filters/sorting.php' );
-		include jet_smart_filters()->get_template( 'common/apply-filters.php' );
 
 		echo '</div>';
+
+		include jet_smart_filters()->get_template( 'common/apply-filters.php' );
 	}
 }

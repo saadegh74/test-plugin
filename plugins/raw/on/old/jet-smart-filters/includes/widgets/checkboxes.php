@@ -337,7 +337,7 @@ class Jet_Smart_Filters_Checkboxes_Widget extends Jet_Smart_Filters_Base_Widget 
 					),
 				),
 				'default'    => array(
-					'size' => 15,
+					'size' => 16,
 					'unit' => 'px',
 				),
 				'selectors'  => array(
@@ -519,6 +519,9 @@ class Jet_Smart_Filters_Checkboxes_Widget extends Jet_Smart_Filters_Base_Widget 
 		);
 
 		$this->end_controls_section();
+
+		// Include Collapse Icon Settings Style
+		include jet_smart_filters()->plugin_path( 'includes/widgets/common-controls/collapse-icon-style.php' );
 
 		// Include Additional Filter Settings Style
 		include jet_smart_filters()->plugin_path( 'includes/widgets/common-controls/additional-filter-style.php' );

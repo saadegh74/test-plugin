@@ -10,6 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 
+	#[AllowDynamicProperties]
 	class Jet_Smart_Filters_Filter_Instance {
 
 		public $type      = null;
@@ -78,7 +79,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 
 			$query_var = sprintf( '_%s_%s', $args['query_type'], $args['query_var'] );
 
-			if ( false !== $args['query_var_suffix'] ) {
+			if ( isset( $args['query_var_suffix'] ) && false !== $args['query_var_suffix'] ) {
 				$query_var .= '|' . $args['query_var_suffix'];
 			}
 
@@ -90,10 +91,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 		 */
 		public function get_current_filter_value( $args = array() ) {
 
+			$request   = jet_smart_filters()->data->get_request();
 			$query_var = $this->get_query_var( $args );
 
-			if ( isset( $_REQUEST[ $query_var ] ) ) {
-				return $_REQUEST[ $query_var ];
+			if ( isset( $request[$query_var] ) ) {
+				return jet_smart_filters()->utils->stripslashes( $request[$query_var] );
 			}
 
 			if ( isset( $args['current_value'] ) ) {
@@ -123,7 +125,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 				'data-content-provider'     => $provider,
 				'data-additional-providers' => $additional_providers,
 				'data-query-id'             => $query_id,
-				'data-active-label'         => htmlspecialchars($active_label),
+				'data-active-label'         => wp_kses_post( $active_label ),
 				'data-layout-options'       => array(
 					'show_label'      => ! empty( $args['show_label'] ) ? $args['show_label'] : '',
 					'display_options' => ! empty( $args['display_options'] ) ? $args['display_options'] : array(),
@@ -134,8 +136,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 				$atts['data-query-var-suffix'] = $args['query_var_suffix'];
 			}
 
+			if ( ! empty( $args['apply_on'] ) ) {
+				$atts['data-apply-on'] = $args['apply_on'];
+			}
+
 			if ( ! empty( $args['is_hierarchical'] ) ) {
 				$atts['data-hierarchical'] = true;
+
+				if ( jet_smart_filters()->request_signature->is_enabled() ) {
+					$hierarchy_args = jet_smart_filters()->hierarchy_request_validator->prepare_args( $atts['data-layout-options'] );
+					$atts['data-hierarchy-context'] = array(
+						'signature' => jet_smart_filters()->request_signature->create_hierarchy_context( $filter_id, $hierarchy_args ),
+					);
+				}
 			}
 
 			if ( ! empty( $args['relational_operator'] ) && 'OR' !== $args['relational_operator'] ) {
@@ -155,6 +168,30 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 				$atts = array_merge( $atts, $this->type->additional_filter_data_atts( $args ) );
 			}
 
+			if ( ! empty( $args['inputs_separators_enabled'] ) && ! empty( $args['inputs_enabled'] ) ) {
+				$atts['data-inputs-separators'] = $args['inputs_separators_enabled'];
+			}
+
+			if ( ! empty( $args['dynamic_range'] ) ) {
+				$atts['data-dynamic-range'] = $args['dynamic_range'];
+			}
+
+			if ( ! empty( $args['predefined_value'] ) ) {
+				$atts['data-predefined-value'] = $args['predefined_value'];
+			}
+
+			if ( isset( $args['sm_id'] ) ) {
+				$atts['data-sm-id'] = $args['sm_id'];
+			}
+
+			jet_smart_filters()->filter_request_validator->register_query_key(
+				$provider,
+				$query_id,
+				$this->get_query_var( $args ),
+				$additional_providers
+			);
+
+			// phpcs:ignore
 			echo $this->get_atts_string( $atts );
 		}
 
@@ -168,8 +205,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 			foreach ( $atts as $key => $value ) {
 
 				if ( is_array( $value ) ) {
-					$value = htmlspecialchars( json_encode( $value ) );
+					$value = wp_json_encode( $value );
 				}
+
+				$value = esc_attr( $value );
 
 				$result[] = sprintf( '%1$s="%2$s"', $key, $value );
 			}
@@ -187,6 +226,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Instance' ) ) {
 			}
 
 			$args = $this->args;
+
+			do_action( 'jet-smart-filters/filters/before-render', $args, $this );
 
 			if ( ! empty( $args['is_hierarchical'] ) ) {
 

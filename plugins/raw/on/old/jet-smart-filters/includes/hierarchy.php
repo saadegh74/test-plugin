@@ -19,14 +19,18 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 		protected $filter     = null;
 		protected $single_tax = null;
 		protected $hierarchy  = null;
+		protected $sort_data  = array();
 
 		/**
 		 * Class constructor
 		 */
 		public function __construct( $filter = 0, $depth = 0, $values = array(), $args = array(), $use_query_args = false ) {
 
+			$args   = is_array( $args ) ? $args : array();
+			$values = is_array( $values ) ? $values : array();
+
 			if ( isset( $args['layout_options'] ) ) {
-				$layout_options = $args['layout_options'];
+				$layout_options = is_array( $args['layout_options'] ) ? $args['layout_options'] : array();
 				unset( $args['layout_options'] );
 				$args = array_merge( $args, $layout_options );
 			}
@@ -48,6 +52,23 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 			$this->values    = $values;
 			$this->args      = $args;
 			$this->hierarchy = $this->get_hierarchy();
+			$this->sort_data = array(
+				'orderby'  => get_post_meta( $this->filter_id, '_ih_terms_orderby', true ),
+				'order'    => get_post_meta( $this->filter_id, '_ih_terms_order', true ),
+				'meta_key' => ''
+			);
+
+			if ( empty( $this->sort_data['orderby'] ) ) {
+				$this->sort_data['orderby'] = 'name';
+			}
+
+			if ( empty( $this->sort_data['order'] ) ) {
+				$this->sort_data['order'] = 'ASC';
+			}
+
+			if ( in_array( $this->sort_data['orderby'], array( 'meta_value', 'meta_value_num' ) ) ) {
+				$this->sort_data['meta_key'] = get_post_meta( $this->filter_id, '_ih_terms_orderby_meta_value', '' );
+			}
 
 			if ( $use_query_args ) {
 				$this->update_values_from_query_args();
@@ -62,13 +83,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 			if ( $this->hierarchy )
 				return $this->hierarchy;
 
+			$result    = array();
 			$hierarchy = get_post_meta( $this->filter_id, '_ih_source_map', true );
 
 			if ( empty( $hierarchy ) ) {
-				return false;
+				return $result;
 			}
-
-			$result = array();
 
 			foreach ( array_values( $hierarchy ) as $depth => $data ) {
 
@@ -147,6 +167,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 
 			$parent          = false;
 			$prepared_values = array();
+			$is_terms_slugs  = jet_smart_filters()->settings->url_taxonomy_term_name === 'slug';
 
 			/**
 			 * Ensure we left only latest child of each taxonomy
@@ -187,8 +208,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 				$result = jet_smart_filters()->data->get_terms_for_options(
 					$curr_level['tax'],
 					false,
+					$is_terms_slugs,
 					array(
 						'parent' => $parent,
+						'orderby'    => $this->sort_data['orderby'],
+						'order'      => $this->sort_data['order'],
+						'meta_key'   => $this->sort_data['meta_key']
 					)
 				);
 			} else {
@@ -200,6 +225,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 				$glue  = '';
 				$index = 0;
 				$ids   = false;
+				$prepare_values = array();
 
 				foreach ( $prepared_values as $tax => $value ) {
 					if ( $value ) {
@@ -212,15 +238,17 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 						if ( 0 === $index ) {
 							$from  .= "SELECT ID FROM $posts_table AS p
 										LEFT JOIN $term_relationships_table AS t0 ON (p.ID = t0.object_id)";
-							$where .= " WHERE t0.term_taxonomy_id = {$term_taxonomy_id}
+							$where .= " WHERE t0.term_taxonomy_id = %d
 										AND p.post_status = 'publish'";
 						} else {
 							$from  .= " INNER JOIN $term_relationships_table AS t{$index}";
-							$where .= " AND t{$index}.term_taxonomy_id = {$term_taxonomy_id}";
+							$where .= " AND t{$index}.term_taxonomy_id = %d";
 							$prev   = $index - 1;
 							$on    .= "{$glue}t{$prev}.object_id = t{$index}.object_id";
 							$glue   = ' AND ';
 						}
+
+						$prepare_values[] = absint( $term_taxonomy_id );
 
 						$index++;
 					}
@@ -231,7 +259,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 				}
 
 				if ( $from ) {
-					$ids = $wpdb->get_results( $from . $on . $where, OBJECT_K );
+					$query = $wpdb->prepare( $from . $on . $where, $prepare_values );
+					$ids   = $wpdb->get_results( $query, OBJECT_K );
 
 					if ( empty( $ids ) ) {
 						return $result;
@@ -244,9 +273,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Hierarchy' ) ) {
 					$terms_args['object_ids'] = array_keys( $ids );
 				}
 
+				$terms_args = array_merge( $this->sort_data, $terms_args );
+
 				$result = jet_smart_filters()->data->get_terms_for_options(
 					$curr_level['tax'],
 					false,
+					$is_terms_slugs,
 					$terms_args
 				);
 			}

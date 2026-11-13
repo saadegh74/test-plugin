@@ -51,26 +51,6 @@ class Jet_Smart_Filters_Bricks_Select extends Jet_Smart_Filters_Bricks_Base {
 		$this->start_jet_control_group( 'section_select_style' );
 
 		$this->register_jet_control(
-			'content_position',
-			[
-				'tab'     => 'style',
-				'label'   => esc_html__( 'Direction', 'jet-smart-filters' ),
-				'type'    => 'select',
-				'options' => [
-					'flex'  => esc_html__( 'Line', 'jet-smart-filters' ),
-					'block' => esc_html__( 'Columns', 'jet-smart-filters' ),
-				],
-				'default' => 'block',
-				'css'     => [
-					[
-						'property' => 'display',
-						'selector' => '.jet-smart-filters-select' . ', .jet-smart-filters-hierarchy ' . $css_scheme['filter'],
-					],
-				],
-			]
-		);
-
-		$this->register_jet_control(
 			'content_alignment',
 			[
 				'tab'      => 'style',

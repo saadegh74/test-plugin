@@ -13,7 +13,7 @@ class Jet_Smart_Filters_Elementor_Filter_URL_Tag extends Elementor\Core\DynamicT
 
 	public function get_title() {
 
-		return __( 'URL with filtered value', 'jet-engine' );
+		return __( 'URL with filtered value', 'jet-smart-filters' );
 	}
 
 	public function get_group() {
@@ -40,17 +40,17 @@ class Jet_Smart_Filters_Elementor_Filter_URL_Tag extends Elementor\Core\DynamicT
 			'filter_notice',
 			array(
 				'type' => Elementor\Controls_Manager::RAW_HTML,
-				'raw'  => __( '<b>Please note!</b> <i>Apply type</i> option for the destination filter should be set into <b>Mixed</b> or <b>Reload</b> type ', 'jet-elements' )
+				'raw'  => __( '<b>Please note!</b> <i>Apply type</i> option for the destination filter should be set to <b>Mixed</b> or <b>Reload</b> type', 'jet-smart-filters' )
 			)
 		);
 
 		$this->add_control(
 			'base_url',
 			array(
-				'label'       => __( 'Base URL', 'jet-engine' ),
+				'label'       => __( 'Base URL', 'jet-smart-filters' ),
 				'label_block' => true,
 				'type'        => Elementor\Controls_Manager::TEXT,
-				'description' => __( 'URL of the page where filter should be applied', 'jet-engine' ),
+				'description' => __( 'URL of the page where filter should be applied', 'jet-smart-filters' ),
 			)
 		);
 
@@ -67,7 +67,7 @@ class Jet_Smart_Filters_Elementor_Filter_URL_Tag extends Elementor\Core\DynamicT
 		$this->add_control(
 			'filter_id',
 			array(
-				'label'   => __( 'Filter', 'jet-engine' ),
+				'label'   => __( 'Filter', 'jet-smart-filters' ),
 				'type'    => Elementor\Controls_Manager::SELECT,
 				'options' => $this->get_filters_list(),
 			)
@@ -76,20 +76,20 @@ class Jet_Smart_Filters_Elementor_Filter_URL_Tag extends Elementor\Core\DynamicT
 		$this->add_control(
 			'filter_value',
 			array(
-				'label'       => __( 'Value', 'jet-engine' ),
+				'label'       => __( 'Value', 'jet-smart-filters' ),
 				'label_block' => true,
 				'type'        => Elementor\Controls_Manager::TEXT,
-				'description' => __( 'You can use JetEngine macros as field value. For example %current_id% - to get ID of the current post or term, %object_id% - ID of any current object, %current_meta|meta_key% - current meta value, etc.', 'jet-engine' ),
+				'description' => __( 'You can use JetEngine macros as field value. For example %current_id% - to get ID of the current post or term, %object_id% - ID of any current object, %current_meta|meta_key% - current meta value, etc.', 'jet-smart-filters' ),
 			)
 		);
 
 		$this->add_control(
 			'query_id',
 			array(
-				'label'       => __( 'Query ID', 'jet-engine' ),
+				'label'       => __( 'Query ID', 'jet-smart-filters' ),
 				'label_block' => true,
 				'type'        => Elementor\Controls_Manager::TEXT,
-				'description' => __( 'If your filter on the destination page uses some custom query ID, you can set it here.', 'jet-engine' ),
+				'description' => __( 'If your filter on the destination page uses some custom query ID, you can set it here.', 'jet-smart-filters' ),
 			)
 		);
 	}
@@ -136,7 +136,14 @@ class Jet_Smart_Filters_Elementor_Filter_URL_Tag extends Elementor\Core\DynamicT
 			),
 		);
 
-		echo jet_smart_filters()->utils->get_filtered_url( $base_url, $query_id, $content_provider, $args );
+		echo esc_url(
+			jet_smart_filters()->utils->get_filtered_url(
+				$base_url,
+				$query_id,
+				$content_provider,
+				$args
+			)
+		);
 	}
 
 	/**

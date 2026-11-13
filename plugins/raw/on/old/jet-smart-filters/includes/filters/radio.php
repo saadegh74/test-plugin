@@ -55,14 +55,13 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 			$content_provider     = isset( $args['content_provider'] ) ? $args['content_provider'] : false;
 			$additional_providers = isset( $args['additional_providers'] ) ? $args['additional_providers'] : false;
 			$apply_type           = isset( $args['apply_type'] ) ? $args['apply_type'] : false;
-			$search_enabled       = isset( $args['search_enabled'] ) ? $args['search_enabled'] : false;
-			$search_placeholder   = isset( $args['search_placeholder'] ) ? $args['search_placeholder'] : __( 'Search...', 'jet-smart-filters' );
-			$less_items_count     = isset( $args['less_items_count'] ) ? $args['less_items_count'] : false;
-			$more_text            = isset( $args['more_text'] ) ? $args['more_text'] : __( 'More', 'jet-smart-filters' );
-			$less_text            = isset( $args['less_text'] ) ? $args['less_text'] : __( 'Less', 'jet-smart-filters' );
-			$scroll_height        = isset( $args['scroll_height'] ) ? $args['scroll_height'] : false;
-			$dropdown_enabled     = isset( $args['dropdown_enabled'] ) ? filter_var( $args['dropdown_enabled'], FILTER_VALIDATE_BOOLEAN ) : false;
-			$dropdown_placeholder = isset( $args['dropdown_placeholder'] ) ? $args['dropdown_placeholder'] : __( 'Select some options', 'jet-smart-filters' );
+			$apply_on             = isset( $args['apply_on'] ) ? $args['apply_on'] : false;
+
+			// additional settings
+			$search_enabled   = isset( $args['search_enabled'] ) ? $args['search_enabled'] : false;
+			$less_items_count = isset( $args['less_items_count'] ) ? $args['less_items_count'] : false;
+			$scroll_height    = isset( $args['scroll_height'] ) ? $args['scroll_height'] : false;
+			$dropdown_enabled = isset( $args['dropdown_enabled'] ) ? filter_var( $args['dropdown_enabled'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( ! $filter_id ) {
 				return false;
@@ -79,13 +78,22 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 			$query_type              = false;
 			$query_var               = false;
 			$current_value           = false;
+			$predefined_value        = $this->get_predefined_value( $filter_id );
 
 			switch ( $source ) {
 				case 'taxonomies':
 					$tax              = get_post_meta( $filter_id, '_source_taxonomy', true );
 					$only_child       = filter_var( get_post_meta( $filter_id, '_only_child', true ), FILTER_VALIDATE_BOOLEAN );
 					$show_empty_terms = filter_var( get_post_meta( $filter_id, '_show_empty_terms', true ), FILTER_VALIDATE_BOOLEAN );
+					$terms_orderby    = get_post_meta( $filter_id, '_terms_orderby', true );
+					$terms_order      = get_post_meta( $filter_id, '_terms_order', true );
+					$terms_meta_key   = '';
 					$custom_query_var = $this->get_custom_query_var( $filter_id );
+					$is_terms_slugs   = jet_smart_filters()->settings->url_taxonomy_term_name === 'slug' && ! $custom_query_var;
+
+					if ( in_array( $terms_orderby, array( 'meta_value', 'meta_value_num' ) ) ) {
+						$terms_meta_key = get_post_meta( $filter_id, '_terms_orderby_meta_value', '' );
+					}
 
 					if ( ! isset( $args['ignore_parents'] ) || true !== $args['ignore_parents'] ) {
 						$by_parents = get_post_meta( $filter_id, '_group_by_parent', true );
@@ -95,10 +103,16 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 					if ( true === $by_parents ) {
 						$options = jet_smart_filters()->data->get_terms_objects( $tax, $only_child, array(
 							'hide_empty' => ! $show_empty_terms,
+							'orderby'    => ! empty( $terms_orderby ) ? $terms_orderby : 'name',
+							'order'      => ! empty( $terms_order ) ? $terms_order : 'ASC',
+							'meta_key'   => $terms_meta_key
 						) );
 					} else {
-						$options = jet_smart_filters()->data->get_terms_for_options( $tax, $only_child, array(
+						$options = jet_smart_filters()->data->get_terms_for_options( $tax, $only_child, $is_terms_slugs, array(
 							'hide_empty' => ! $show_empty_terms,
+							'orderby'    => ! empty( $terms_orderby ) ? $terms_orderby : 'name',
+							'order'      => ! empty( $terms_order ) ? $terms_order : 'ASC',
+							'meta_key'   => $terms_meta_key
 						) );
 					}
 
@@ -117,16 +131,14 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 					break;
 
 				case 'posts':
-					$post_type = get_post_meta( $filter_id, '_source_post_type', true );
-					$args      = array(
+					$post_type  = get_post_meta( $filter_id, '_source_post_type', true );
+					$posts_args = apply_filters( 'jet-smart-filters/filters/posts-source/args', array(
 						'post_type' => $post_type,
 						'post_status' => 'publish',
 						'posts_per_page' => -1
-					);
+					) );
 
-					$args = apply_filters( 'jet-smart-filters/filters/posts-source/args', $args );
-
-					$posts      = get_posts( $args );
+					$posts      = get_posts( $posts_args );
 					$query_type = 'meta_query';
 					$query_var  = get_post_meta( $filter_id, '_query_var', true );
 
@@ -148,7 +160,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 						) );
 					} else {
 						$options = get_post_meta( get_the_ID(), $custom_field, true );
-						$options = jet_smart_filters()->data->maybe_parse_repeater_options( $options );
+
+						if ( ! is_array( $options ) ) {
+							$options = jet_smart_filters()->data->get_options_by_field_key( $custom_field );
+						} else {
+							$options = jet_smart_filters()->data->maybe_parse_repeater_options( $options );
+						}
 					}
 
 					$query_type = 'meta_query';
@@ -171,11 +188,13 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 					break;
 			}
 
-			$options = jet_smart_filters()->data->maybe_include_exclude_options( $use_exclude_include, $exclude_include_options, $options );
+			$options = jet_smart_filters()->data->maybe_include_exclude_options( $use_exclude_include, $exclude_include_options, $options, $by_parents );
+			// Filter for modifying control options
+			$options = apply_filters( 'jet-smart-filters/filters/filter-options', $options, $filter_id, $this );
 
 			if ( $all_option_label ) {
 				if ( true === $by_parents ) {
-					$all_option = (object) array( 
+					$all_option = (object) array(
 						'term_id' => 'all',
 						'name' => htmlspecialchars( $all_option_label )
 					);
@@ -186,8 +205,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 				$options = array( 'all' => $all_option ) + $options;
 			}
 
-			$options = apply_filters( 'jet-smart-filters/filters/filter-options', $options, $filter_id, $this );
-
 			$result = array(
 				'options'              => $options,
 				'query_type'           => $query_type,
@@ -197,15 +214,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 				'content_provider'     => $content_provider,
 				'additional_providers' => $additional_providers,
 				'apply_type'           => $apply_type,
+				'apply_on'             => $apply_on,
 				'filter_id'            => $filter_id,
-				'search_enabled'       => $search_enabled,
-				'search_placeholder'   => $search_placeholder,
-				'less_items_count'     => $less_items_count,
-				'more_text'            => $more_text,
-				'less_text'            => $less_text,
 				'scroll_height'        => $scroll_height,
-				'dropdown_enabled'     => $dropdown_enabled,
-				'dropdown_placeholder' => $dropdown_placeholder,
 				'accessibility_label'  => $this->get_accessibility_label( $filter_id )
 			);
 
@@ -213,8 +224,41 @@ if ( ! class_exists( 'Jet_Smart_Filters_Radio_Filter' ) ) {
 				$result['can_deselect'] = $can_deselect;
 			}
 
-			if ( $current_value ) {
+			if ( jet_smart_filters()->utils->is_truthy_or_zero( $current_value ) ) {
 				$result['current_value'] = $current_value;
+			}
+
+			if ( $search_enabled ) {
+				$result['search_enabled']     = $search_enabled;
+				$result['search_placeholder'] = isset( $args['search_placeholder'] ) ? $args['search_placeholder'] : __( 'Search...', 'jet-smart-filters' );
+			}
+
+			if ( $less_items_count ) {
+				$result['less_items_count'] = $less_items_count;
+				$result['more_text']        = isset( $args['more_text'] ) ? $args['more_text'] : __( 'More', 'jet-smart-filters' );
+				$result['less_text']        = isset( $args['less_text'] ) ? $args['less_text'] : __( 'Less', 'jet-smart-filters' );
+			}
+
+			if ( $dropdown_enabled ) {
+				$result['dropdown_enabled']           = $dropdown_enabled;
+				$result['dropdown_placeholder']       = isset( $args['dropdown_placeholder'] ) ? $args['dropdown_placeholder'] : __( 'Select some options', 'jet-smart-filters' );
+				$result['dropdown_apply_button']      = isset( $args['dropdown_apply_button'] ) ? filter_var( $args['dropdown_apply_button'], FILTER_VALIDATE_BOOLEAN ) : false;
+				$result['dropdown_apply_button_text'] = isset( $args['dropdown_apply_button_text'] ) ? $args['dropdown_apply_button_text'] : __( 'Apply', 'jet-smart-filters' );
+
+				$dropdown_n_selected_enabled = isset( $args['dropdown_n_selected_enabled'] ) ? $args['dropdown_n_selected_enabled'] : false;
+				if ( $dropdown_n_selected_enabled ) {
+					$result['dropdown_n_selected_enabled'] = $dropdown_n_selected_enabled;
+					$result['dropdown_n_selected_number']  = isset( $args['dropdown_n_selected_number'] ) ? $args['dropdown_n_selected_number'] : false;
+					$result['dropdown_n_selected_text']    = isset( $args['dropdown_n_selected_text'] ) ? $args['dropdown_n_selected_text'] : false;
+				}
+			}
+
+			if ( $by_parents ) {
+				$result['collapsible'] = filter_var( get_post_meta( $filter_id, '_group_collapsible', true ), FILTER_VALIDATE_BOOLEAN );
+			}
+
+			if ( $predefined_value !== false ) {
+				$result['predefined_value'] = $predefined_value;
 			}
 
 			return $result;

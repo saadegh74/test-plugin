@@ -15,10 +15,13 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 	 */
 	class Jet_Smart_Filters_Query_Manager {
 
-		public  $_query            = array();
-		private $_default_query    = array();
-		private $_query_settings   = array();
-		private $_props            = array();
+		public  $_query                   = array();
+		private $_default_query           = array();
+		private $_verified_default_query  = null;
+		private $_executed_query          = array();
+		private $_query_settings          = array();
+		private $_verified_query_settings = null;
+		private $_props                   = array();
 
 		private $provider          = null;
 		private $is_ajax_filter    = null;
@@ -36,6 +39,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			 * Note: Moved to the __construct to better compatibility with JetEngine LoadMore and LazyLoad
 			 */
 			add_filter( 'posts_where', array( $this, 'set_query_where' ), 10, 2 );
+			add_filter( 'terms_clauses', array( $this, 'set_terms_query_clauses' ), 10, 3 );
+			add_action( 'pre_user_query', array( $this, 'set_user_query_distinct' ) );
 		}
 
 		/**
@@ -67,13 +72,14 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 				return;
 			}
 
-			if ( isset( $_REQUEST['jet-smart-filters-redirect'] ) ) {
+			$jsf_redirect_request_val = jet_smart_filters()->data->get_request_var( 'jet-smart-filters-redirect' );
+			if ( $jsf_redirect_request_val ) {
 				unset( $query_args['meta_query'] );
 				unset( $query_args['tax_query'] );
 			}
 
 			if ( $this->is_ajax_filter() ) {
-		
+
 				$request_provider = $this->get_current_provider();
 
 				if ( ! $request_provider ) {
@@ -83,7 +89,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 				if ( ! $query_id ) {
 					$query_id = 'default';
 				}
-				
+
 				// store default query only if we trying to set default query for requested provider
 				// its important because multiple different queries could trigger this method during AJAX filters request
 				if ( $request_provider['provider'] === $provider_id && $request_provider['query_id'] === $query_id ) {
@@ -104,11 +110,34 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		}
 
 		/**
+		 * Return executed query args for provider/query ID pair.
+		 *
+		 * @param string $provider Provider ID.
+		 * @param string $query_id Query ID.
+		 *
+		 * @return array
+		 */
+		public function get_executed_query( $provider, $query_id = 'default' ) {
+
+			if ( ! $query_id ) {
+				$query_id = 'default';
+			}
+
+			if ( empty( $this->_executed_query[ $provider ][ $query_id ] ) ) {
+				return array();
+			}
+
+			return $this->_executed_query[ $provider ][ $query_id ];
+		}
+
+		/**
 		 * Returns query settings
 		 */
 		public function get_query_settings() {
 
-			return $this->_query_settings;
+			return null !== $this->_verified_query_settings
+				? $this->_verified_query_settings
+				: $this->_query_settings;
 		}
 
 		/**
@@ -122,9 +151,138 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 				'meta_query',
 				'date_query',
 				'_s',
+				'_sm',
 				'sort',
 				'alphabet'
 			) );
+		}
+
+		/**
+		 * Check whether a plain query variable may alter the provider query.
+		 *
+		 * Plain query filters are intended for custom query variables. Core query
+		 * variables that define the queried object type, access scope, or result
+		 * size must remain under the provider's control.
+		 *
+		 * @param string $key Query variable name.
+		 *
+		 * @return bool
+		 */
+		public function is_allowed_plain_query_var( $key ) {
+
+			// Allow selected ID scope variables to be controlled directly by Plain Query filters.
+			$protected_vars = array_merge(
+				array_diff( $this->get_default_protected_scope_vars(), $this->get_plain_query_scope_vars() ),
+				array(
+					'cache_results',
+					'date_query',
+					'embed',
+					'feed',
+					'jet_smart_filters',
+					'lazy_load_term_meta',
+					'meta_compare',
+					'meta_compare_key',
+					'meta_key',
+					'meta_query',
+					'meta_type',
+					'meta_type_key',
+					'meta_value',
+					'meta_value_num',
+					'no_found_rows',
+					'preview',
+					'showposts',
+					'subpost',
+					'subpost_id',
+					'suppress_filters',
+					'tax_query',
+					'update_menu_item_cache',
+					'update_post_meta_cache',
+					'update_post_term_cache',
+				)
+			);
+
+			$protected_vars = apply_filters( 'jet-smart-filters/query/plain-query/protected-vars', $protected_vars, $this );
+
+			if ( ! is_array( $protected_vars ) ) {
+				return false;
+			}
+
+			return ! in_array( $key, $protected_vars, true );
+		}
+
+		/**
+		 * Normalize a sorting filter item to the supported WP_Query arguments.
+		 *
+		 * @param array $data Sorting filter item.
+		 *
+		 * @return array|false
+		 */
+		public function sanitize_sort_query( $data ) {
+
+			if ( ! is_array( $data ) || empty( $data['orderby'] ) || ! is_string( $data['orderby'] ) ) {
+				return false;
+			}
+
+			$orderby = sanitize_key( $data['orderby'] );
+			$allowed_orderby = array(
+				'none',
+				'rand',
+				'author',
+				'id',
+				'title',
+				'name',
+				'date',
+				'modified',
+				'comment_count',
+				'price',
+				'sales_number',
+				'rating',
+				'reviews_number',
+				'meta_value',
+				'meta_value_num',
+				'clause_value',
+			);
+
+			$allowed_orderby = apply_filters( 'jet-smart-filters/query/sort/allowed-orderby', $allowed_orderby, $this );
+
+			if ( ! is_array( $allowed_orderby ) ) {
+				return false;
+			}
+
+			if ( ! in_array( $orderby, $allowed_orderby, true ) ) {
+				return false;
+			}
+
+			if ( 'id' === $orderby ) {
+				$orderby = 'ID';
+			}
+
+			$order = ! empty( $data['order'] ) && is_string( $data['order'] )
+				? strtoupper( $data['order'] )
+				: '';
+
+			if ( $order && ! in_array( $order, array( 'ASC', 'DESC' ), true ) ) {
+				return false;
+			}
+
+			$result = array(
+				'orderby' => $orderby,
+				'order'   => $order,
+			);
+
+			if ( in_array( $orderby, array( 'meta_value', 'meta_value_num', 'clause_value' ), true ) ) {
+				$meta_key = ! empty( $data['meta_key'] ) && is_string( $data['meta_key'] )
+					? sanitize_text_field( $data['meta_key'] )
+					: '';
+
+				if ( ! $meta_key ) {
+					return false;
+				}
+
+				$result['meta_key'] = $meta_key;
+			}
+
+			return $result;
 		}
 
 		/**
@@ -132,14 +290,300 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		 */
 		public function get_query_args() {
 
+			$query_args = $this->_query;
+
 			if ( $this->is_ajax_filter() && ! empty( $this->_default_query ) ) {
-				return array_merge( $this->_default_query, $this->_query );
-			} else {
-				return $this->_query;
+				$query_args = array_merge( $this->_default_query, $query_args );
 			}
+
+			if ( $this->is_ajax_filter() && $this->has_verified_default_query() ) {
+				$query_args = $this->apply_verified_query_scope( $query_args );
+			}
+
+			return $query_args;
 		}
 
-		
+		/**
+		 * Store the default query after its request signature has been verified.
+		 *
+		 * @param array $query_args Verified default query arguments.
+		 */
+		public function set_verified_default_query( $query_args ) {
+
+			$this->_verified_default_query = is_array( $query_args ) ? $query_args : array();
+		}
+
+		/**
+		 * Check whether the current request has a verified default query.
+		 *
+		 * @return bool
+		 */
+		public function has_verified_default_query() {
+
+			return null !== $this->_verified_default_query;
+		}
+
+		/**
+		 * Store provider settings after their request signature has been verified.
+		 *
+		 * @param array $settings Verified provider settings.
+		 */
+		public function set_verified_query_settings( $settings ) {
+
+			$this->_verified_query_settings = is_array( $settings ) ? $settings : array();
+		}
+
+		/**
+		 * Keep access-sensitive query scope under control of the signed provider query.
+		 *
+		 * Filter values may narrow a provider query, but they must not change the queried
+		 * object type, visibility, author scope, or result shape.
+		 *
+		 * @param array $query_args Merged provider query arguments.
+		 *
+		 * @return array
+		 */
+		private function apply_verified_query_scope( $query_args ) {
+
+			$plain_query_scope_vars = $this->get_plain_query_scope_vars();
+			$default_protected_vars = array_values(
+				array_diff( $this->get_default_protected_scope_vars(), $plain_query_scope_vars )
+			);
+
+			$protected_vars = apply_filters(
+				'jet-smart-filters/query/protected-scope-vars',
+				$default_protected_vars,
+				$this->get_current_provider(),
+				$this
+			);
+
+			if ( ! is_array( $protected_vars ) ) {
+				$protected_vars = $default_protected_vars;
+			}
+
+			foreach ( $protected_vars as $query_var ) {
+				if ( ! is_string( $query_var ) || '' === $query_var ) {
+					continue;
+				}
+
+				if ( array_key_exists( $query_var, $this->_verified_default_query ) ) {
+					$query_args[ $query_var ] = $this->_verified_default_query[ $query_var ];
+				} else {
+					unset( $query_args[ $query_var ] );
+				}
+			}
+
+			return $query_args;
+		}
+
+		/**
+		 * Remove unauthenticated scope changes from an unsigned default query.
+		 *
+		 * Unsigned defaults are retained for compatibility, but they may only
+		 * describe public content. Sensitive scope and raw meta/tax clauses must
+		 * be established by the provider or by the validated filter query.
+		 *
+		 * @param array  $query_args Unsigned default query arguments.
+		 * @param string $provider   Optional provider ID.
+		 *
+		 * @return array
+		 */
+		public function sanitize_unsigned_default_query( $query_args, $provider = '' ) {
+
+			if (
+				! is_array( $query_args )
+				|| ! jet_smart_filters()->request_data_validator->is_safe_request_data( $query_args, 0, 6, 100, 2000 )
+			) {
+				return array();
+			}
+
+			unset(
+				$query_args[ Jet_Smart_Filters_Request_Signature::QUERY_SIGNATURE_KEY ],
+				$query_args[ Jet_Smart_Filters_Request_Signature::QUERY_CONTEXT_KEY ]
+			);
+
+			$provider = is_string( $provider ) && $provider
+				? $provider
+				: $this->get_current_provider( 'provider' );
+			$requested_query_type = isset( $query_args['_query_type'] ) && is_scalar( $query_args['_query_type'] )
+				? sanitize_key( (string) $query_args['_query_type'] )
+				: 'posts';
+			$post_types = isset( $query_args['post_type'] ) ? $query_args['post_type'] : array();
+
+			$product_providers = apply_filters(
+				'jet-smart-filters/query/unsigned-product-providers',
+				array(
+					'default-woo-archive',
+					'epro-archive-products',
+					'epro-products',
+					'jet-woo-products-grid',
+					'jet-woo-products-list',
+					'woocommerce-archive',
+					'woocommerce-shortcode',
+				),
+				$this
+			);
+			$is_product_provider = is_array( $product_providers ) && in_array( $provider, $product_providers, true );
+			$query_type = ! $is_product_provider && in_array(
+				$requested_query_type,
+				array( 'posts', 'current-wp-query', 'wc-product-query', 'users' ),
+				true
+			)
+				? $requested_query_type
+				: 'posts';
+
+			$protected_vars = array_merge(
+				$this->get_default_protected_scope_vars(),
+				array(
+					'date_query',
+					'meta_compare',
+					'meta_compare_key',
+					'meta_key',
+					'meta_query',
+					'meta_type',
+					'meta_type_key',
+					'meta_value',
+					'meta_value_num',
+					'suppress_filters',
+					'tax_query',
+				)
+			);
+			foreach ( array_unique( $protected_vars ) as $query_var ) {
+				if ( is_string( $query_var ) && '' !== $query_var ) {
+					unset( $query_args[ $query_var ] );
+				}
+			}
+
+			if ( 'users' === $query_type ) {
+				$allowed_user_vars = array_fill_keys(
+					array(
+						'blog_id',
+						'count_total',
+						'exclude',
+						'include',
+						'number',
+						'order',
+						'orderby',
+						'paged',
+						'role',
+						'role__in',
+						'role__not_in',
+					),
+					true
+				);
+
+				$query_args = array_intersect_key( $query_args, $allowed_user_vars );
+				$query_args['_query_type'] = 'users';
+			} elseif ( $is_product_provider || 'wc-product-query' === $query_type ) {
+				$query_args['post_type'] = 'product';
+				$query_args['post_status'] = 'publish';
+
+				if ( 'wc-product-query' === $query_type ) {
+					$query_args['_query_type'] = $query_type;
+				}
+			} else {
+				$post_types = is_array( $post_types ) ? $post_types : array( $post_types );
+				$post_types = array_values( array_filter( $post_types, 'is_scalar' ) );
+				$post_types = array_values( array_unique( array_filter( array_map( 'sanitize_key', array_map( 'strval', $post_types ) ) ) ) );
+
+				$public_post_types = get_post_types( array( 'publicly_queryable' => true ), 'names' );
+				$public_post_types = is_array( $public_post_types ) ? array_values( $public_post_types ) : array();
+				$public_post_types = array_values( array_diff( $public_post_types, array( 'attachment' ) ) );
+				$post_types = array_values( array_intersect( $post_types, $public_post_types ) );
+
+				if ( $post_types ) {
+					$query_args['post_type'] = 1 === count( $post_types ) ? reset( $post_types ) : $post_types;
+				}
+
+				$query_args['post_status'] = 'publish';
+
+				if ( 'current-wp-query' === $query_type ) {
+					$query_args['_query_type'] = $query_type;
+				}
+			}
+
+			return (array) apply_filters(
+				'jet-smart-filters/query/sanitized-unsigned-default-query',
+				$query_args,
+				$provider,
+				$this
+			);
+		}
+
+		/**
+		 * Plain Query variables that may be controlled directly by a filter.
+		 *
+		 * @return array
+		 */
+		private function get_plain_query_scope_vars() {
+
+			return array(
+				'author__in',
+				'author__not_in',
+				'post__in',
+				'post__not_in',
+				'post_parent',
+				'post_parent__in',
+				'post_parent__not_in',
+			);
+		}
+
+		/**
+		 * Query variables that must remain controlled by a verified provider query.
+		 *
+		 * @return array
+		 */
+		private function get_default_protected_scope_vars() {
+
+			return array(
+				'_query_type',
+				'attachment',
+				'attachment_id',
+				'author',
+				'author_name',
+				'author__in',
+				'author__not_in',
+				'fields',
+				'has_password',
+				'name',
+				'nopaging',
+				'offset',
+				'p',
+				'page_id',
+				'pagename',
+				'perm',
+				'post_mime_type',
+				'post_parent',
+				'post_parent__in',
+				'post_parent__not_in',
+				'post_password',
+				'post_password__in',
+				'post_password__not_in',
+				'post_status',
+				'post_type',
+				'posts_per_archive_page',
+				'posts_per_page',
+			);
+		}
+
+		/**
+		 * Add current Alphabet arguments to a provider query.
+		 */
+		public function merge_alphabet_query_args( $query_args ) {
+
+			$args = $this->get_query_args();
+
+			if ( empty( $args['jet_smart_filters'] ) || empty( $args['alphabet'] ) ) {
+				return $query_args;
+			}
+
+			$query_args['jet_smart_filters'] = $args['jet_smart_filters'];
+			$query_args['alphabet']          = $args['alphabet'];
+
+			return $query_args;
+		}
+
+
 		/**
 		 * Check if is ajax filter processed
 		 */
@@ -149,24 +593,27 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 				return $this->is_ajax_filter;
 			}
 
+			if ( ! wp_doing_ajax() ) {
+				$this->is_ajax_filter = false;
+				return $this->is_ajax_filter;
+			}
+
 			$allowed_actions = apply_filters( 'jet-smart-filters/query/allowed-ajax-actions', array(
 				'jet_smart_filters',
 				'jet_smart_filters_refresh_controls',
 				'jet_smart_filters_refresh_controls_reload',
 			) );
+			$allowed_actions = is_array( $allowed_actions ) ? array_filter( $allowed_actions, 'is_string' ) : array();
 
-			if ( isset( $_REQUEST['jet_engine_action'] ) && in_array( $_REQUEST['jet_engine_action'], $allowed_actions ) ) {
+			$jet_engine_action_request_val = jet_smart_filters()->data->get_request_var( 'jet_engine_action' );
+			if ( is_string( $jet_engine_action_request_val ) && in_array( $jet_engine_action_request_val, $allowed_actions, true ) ) {
 				$this->is_ajax_filter = true;
 				return $this->is_ajax_filter;
 			}
 
-			if ( isset( $_REQUEST['action'] ) && in_array( $_REQUEST['action'], $allowed_actions ) ) {
+			$action_request_val = jet_smart_filters()->data->get_request_var( 'action' );
+			if ( is_string( $action_request_val ) && in_array( $action_request_val, $allowed_actions, true ) ) {
 				$this->is_ajax_filter = true;
-				return $this->is_ajax_filter;
-			}
-
-			if ( ! wp_doing_ajax() ) {
-				$this->is_ajax_filter = false;
 				return $this->is_ajax_filter;
 			}
 
@@ -203,12 +650,63 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			if ( empty( $this->_props[ $provider ][ $query_id ] ) ) {
 				$this->_props[ $provider ][ $query_id ] = array();
 			}
-			
+
 			do_action( 'jet-smart-filters/query/store-query-props/' . $provider, $this, $query_id );
 
 			$this->_props[ $provider ][ $query_id ]['found_posts']   = $query->found_posts;
 			$this->_props[ $provider ][ $query_id ]['max_num_pages'] = $query->max_num_pages;
-			$this->_props[ $provider ][ $query_id ]['page']          = $query->get( 'paged' );
+			$this->_props[ $provider ][ $query_id ]['page']          = $this->get_current_page( $query->get( 'paged' ) );
+
+			if ( empty( $this->_executed_query[ $provider ] ) ) {
+				$this->_executed_query[ $provider ] = array();
+			}
+
+			$this->_executed_query[ $provider ][ $query_id ] = $query->query_vars;
+		}
+
+		/**
+		 * Resolve current page from query and request vars.
+		 *
+		 * Request-based filtering may pass the page through `jet_paged` or `pagenum`
+		 * before the provider query exposes a normalized `paged` value.
+		 *
+		 * @param mixed $page Current query page.
+		 *
+		 * @return int
+		 */
+		public function get_current_page( $page = false ) {
+
+			$page = absint( $page );
+
+			if ( $page > 0 ) {
+				return $page;
+			}
+
+			if ( $this->is_ajax_filter() ) {
+				$current_query_page = ! empty( $this->_query['paged'] ) ? absint( $this->_query['paged'] ) : 0;
+
+				return $current_query_page ? $current_query_page : 1;
+			}
+
+			$jet_paged = absint( jet_smart_filters()->data->get_request_var( 'jet_paged' ) );
+
+			if ( $jet_paged > 0 ) {
+				return $jet_paged;
+			}
+
+			$pagenum = absint( jet_smart_filters()->data->get_request_var( 'pagenum' ) );
+
+			if ( $pagenum > 0 ) {
+				return $pagenum;
+			}
+
+			$paged = absint( jet_smart_filters()->data->get_request_var( 'paged' ) );
+
+			if ( $paged > 0 ) {
+				return $paged;
+			}
+
+			return 1;
 		}
 
 		/**
@@ -228,21 +726,37 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		 */
 		public function decode_provider_data( $provider ) {
 
-			$data   = explode( '/', $provider );
+			$delimiter = $this->get_provider_data_delimiter( $provider );
+			$data      = $delimiter ? explode( $delimiter, $provider, 2 ) : array( $provider );
 			$result = array();
 
-			if ( empty( $data ) ) {
-				$result['provider'] = $provider;
-				$result['query_id'] = 'default';
-			} elseif ( ! empty( $data[0] ) && empty( $data[1] ) ) {
-				$result['provider'] = $data[0];
-				$result['query_id'] = 'default';
-			} else {
-				$result['provider'] = $data[0];
-				$result['query_id'] = $data[1];
-			}
+			$result['provider'] = ! empty( $data[0] ) ? $data[0] : $provider;
+			$result['query_id'] = ! empty( $data[1] ) ? $data[1] : 'default';
 
 			return $result;
+		}
+
+		private function get_provider_data_delimiter( $provider ) {
+
+			if ( ! is_string( $provider ) || '' === $provider ) {
+				return false;
+			}
+
+			if ( false !== strpos( $provider, '/' ) ) {
+				return '/';
+			}
+
+			$provider_id_delimiter = jet_smart_filters()->data->url_symbol['provider_id'];
+
+			if ( $provider_id_delimiter && false !== strpos( $provider, $provider_id_delimiter ) ) {
+				return $provider_id_delimiter;
+			}
+
+			if ( false !== strpos( $provider, ':' ) ) {
+				return ':';
+			}
+
+			return false;
 		}
 
 		/**
@@ -313,16 +827,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		 */
 		public function set_provider_from_request( $provider = '' ) {
 
-			if ( preg_match( '/[\/:]/', $provider ) ) {
-				$delimiter = strpos( $provider, '/' ) !== false ? '/' : ':';
-				$provider_data = explode( $delimiter, $provider, 2 );
-				$provider_name = $provider_data[0];
-				$provider_id   = $provider_data[1];
+			$provider_data = $this->decode_provider_data( $provider );
 
-				$this->set_provider( $provider_name . '/' . $provider_id );
-			} else {
-				$this->set_provider( $provider . '/default' );
-			}
+			$this->set_provider( $provider_data['provider'] . '/' . $provider_data['query_id'] );
 		}
 
 		/**
@@ -332,10 +839,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 
 			$provider = false;
 
+			$provider_request_val = jet_smart_filters()->data->get_request_var( 'provider' );
 			if ( ! empty( $this->provider ) ) {
 				$provider = $this->provider;
-			} elseif ( $this->is_ajax_filter() && ! empty( $_REQUEST['provider'] ) ) {
-				$provider = $_REQUEST['provider'];
+			} elseif ( $this->is_ajax_filter() && $provider_request_val ) {
+				$provider = $provider_request_val;
 			}
 
 			if ( ! $provider ) {
@@ -362,6 +870,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 
 			$data = $this->get_current_provider();
 
+			if ( empty( $data ) || empty( $data['provider'] ) ) {
+				return array();
+			}
+
 			return $this->get_query_props( $data['provider'], $data['query_id'] );
 		}
 
@@ -370,33 +882,77 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		 */
 		public function set_query_var_to_request( $query_var, $query_var_value ) {
 
-			if ( empty( $query_var_value ) ) {
+			if ( ! jet_smart_filters()->utils->is_truthy_or_zero( $query_var_value ) ) {
 				return;
 			}
 
 			switch ( $query_var ) {
 				case 'tax':
 				case 'meta':
-					foreach ( explode( ';', $query_var_value ) as $data ) {
-						preg_match( '/(.+?):(.+)/', $data, $key_value );
+					foreach ( explode( jet_smart_filters()->data->url_symbol['items_separator'], $query_var_value ) as $data ) {
+						preg_match( '/(.+?)' . preg_quote( jet_smart_filters()->data->url_symbol['key_value'], '/' ) . '(.+)/', $data, $key_value );
 						array_shift( $key_value );
 
 						if ( count( $key_value ) < 2 ) {
 							continue;
 						}
 
-						$key   = str_replace( '!', '|', $key_value[0] ); // replace query var suffix separator
-						$value = strpos( $key_value[1], ',' ) ? explode( ',', $key_value[1] ) : $key_value[1];
+						$key   = str_replace( jet_smart_filters()->data->url_symbol['var_suffix'], '|', $key_value[0] ); // replace query var suffix separator
+						$value = strpos( $key_value[1], jet_smart_filters()->data->url_symbol['value_separator'] )
+							? explode( jet_smart_filters()->data->url_symbol['value_separator'], $key_value[1] )
+							: $key_value[1];
 
 						$_REQUEST[ '_' . $query_var . '_query_' . $key ] = $value;
 					}
+
+					if ( $query_var === 'tax' && jet_smart_filters()->settings->url_taxonomy_term_name === 'slug' ) {
+						$this->convert_term_names_to_ids_in_request( 'slug' );
+					}
+
 					break;
 
 				case 'plain_query':
+					$url_symbol      = jet_smart_filters()->data->url_symbol;
+					$pairs           = explode( $url_symbol['items_separator'], $query_var_value );
+					$key_separator   = $url_symbol['key_value'];
+					$value_separator = $url_symbol['value_separator'];
 
-					$key_data = explode( ':', $query_var_value, 2 );
-					$value    = strpos( $key_data[1], ',' ) ? explode( ',', $key_data[1] ) : $key_data[1];
-					$_REQUEST[ '_' . $query_var . '_' . $key_data[0] ] = $value;
+					foreach ( $pairs as $pair ) {
+						$key_separator_pos    = strpos( $pair, $key_separator );
+						$legacy_separator_pos = ':' !== $key_separator ? strpos( $pair, ':' ) : false;
+						$legacy_pair          = false;
+
+						// Prefer the legacy separator if it appears first to keep old plain_query URLs working.
+						if (
+							false !== $legacy_separator_pos
+							&& ( false === $key_separator_pos || $legacy_separator_pos < $key_separator_pos )
+						) {
+							$key_data    = explode( ':', $pair, 2 );
+							$legacy_pair = true;
+						} elseif ( false !== $key_separator_pos ) {
+							$key_data = explode( $key_separator, $pair, 2 );
+						} else {
+							continue;
+						}
+
+						// Use configured value separator, but preserve comma-separated legacy URLs.
+						if ( false !== strpos( $key_data[1], $value_separator ) ) {
+							$value = explode( $value_separator, $key_data[1] );
+						} elseif (
+							$legacy_pair
+							&& ',' !== $value_separator
+							&& false !== strpos( $key_data[1], ',' )
+						) {
+							$value = explode( ',', $key_data[1] );
+						} else {
+							$value = $key_data[1];
+						}
+
+						$key = str_replace( $url_symbol['var_suffix'], '|', $key_data[0] ); // replace query var suffix separator
+
+						$_REQUEST[ '_' . $query_var . '_' . $key ] = $value;
+					}
+
 					break;
 
 				case 'date':
@@ -407,8 +963,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 				case 'sort':
 					$sort_props = array();
 
-					foreach ( explode( ';', $query_var_value ) as $data) {
-						$sort_data = explode( ':', $data );
+					foreach ( explode( jet_smart_filters()->data->url_symbol['items_separator'], $query_var_value ) as $data) {
+						$sort_data = explode( jet_smart_filters()->data->url_symbol['key_value'], $data );
 
 						if ( count( $sort_data ) < 2 ) {
 							continue;
@@ -426,15 +982,21 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 					$search_key   = '__s_query|search';
 					$search_value = $query_var_value;
 
-					if ( strpos( $search_value, '!' ) ) {
-						$search_data = explode( '!', $search_value, 2 );
-						$search_meta = explode( '=', $search_data[1], 2 );
+					$_REQUEST[ $search_key ] = $search_value;
 
-						if ($search_meta[0] === 'meta' && $search_meta[1]) {
-							$search_key   = '_meta_query_' . $search_meta[1] . '|search';
-							$search_value = $search_data[0];
-						}
+					break;
+
+				case '_sm':
+				case 'search-by-meta':
+					$search_data = explode( jet_smart_filters()->data->url_symbol['var_suffix'], $query_var_value, 2 );
+
+					if ( count( $search_data ) !== 2 ) {
+						break;
 					}
+
+					$meta_key     = $search_data[0];
+					$search_key   = '_meta_query_' . $meta_key . '|search';
+					$search_value = $search_data[1];
 
 					$_REQUEST[ $search_key ] = $search_value;
 
@@ -462,7 +1024,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		public function get_query_from_request( $request = array() ) {
 
 			if ( empty( $request ) ) {
-				$request = $_REQUEST;
+				$request = jet_smart_filters()->data->get_request();
 			}
 
 			$request = apply_filters( 'jet-smart-filters/query/request', $request, $this );
@@ -473,8 +1035,40 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			);
 
 			if ( $this->is_ajax_filter() ) {
-				$this->_default_query  = ! empty( $request['defaults'] ) ? $request['defaults'] : array();
-				$this->_query_settings = ! empty( $request['settings'] ) ? $request['settings'] : array();
+				$signatures_enabled = jet_smart_filters()->request_signature->is_enabled();
+				$allow_unsigned_data = (bool) apply_filters(
+					'jet-smart-filters/query/allow-unsigned-request-data',
+					! $signatures_enabled,
+					$request,
+					$this
+				);
+
+				if ( $this->has_verified_default_query() ) {
+					$this->_default_query = $this->_verified_default_query;
+				} elseif ( $allow_unsigned_data ) {
+					$this->_default_query = $this->sanitize_unsigned_default_query(
+						! empty( $request['defaults'] ) && is_array( $request['defaults'] )
+							? wp_unslash( $request['defaults'] )
+							: array()
+					);
+				} else {
+					$this->_default_query = array();
+				}
+
+				$this->_query_settings = $allow_unsigned_data && ! empty( $request['settings'] ) && is_array( $request['settings'] )
+					? wp_unslash( $request['settings'] )
+					: array();
+
+				if ( is_array( $this->_default_query ) ) {
+					unset(
+						$this->_default_query[ Jet_Smart_Filters_Request_Signature::QUERY_SIGNATURE_KEY ],
+						$this->_default_query[ Jet_Smart_Filters_Request_Signature::QUERY_CONTEXT_KEY ]
+					);
+				}
+
+				if ( is_array( $this->_query_settings ) ) {
+					unset( $this->_query_settings[ Jet_Smart_Filters_Request_Signature::SETTINGS_SIGNATURE_KEY ] );
+				}
 			}
 
 			foreach ( $this->query_vars() as $var ) {
@@ -490,7 +1084,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 
 				array_walk( $data, function( $value, $key ) use ( $var ) {
 
-					if ( $key === $var || strpos( $key, '_' . $var ) !== false ) {
+					if ( $key === $var || strpos( $key, '_' . $var ) === 0 ) {
 						switch ( $var ) {
 							case 'tax_query':
 								$this->add_tax_query_var( $value, $this->clear_key( $key, $var ) );
@@ -498,7 +1092,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 								break;
 
 							case 'date_query':
-								$this->add_date_query_var( $value );
+								$with_suffix = explode( '|', $key );
+								$date_type   = in_array( $with_suffix[1], ['date', 'm_date'] )
+									? $with_suffix[1]
+									: 'date';
+
+								$this->add_date_query_var( $value, $date_type );
 
 								break;
 
@@ -511,6 +1110,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 									$key    = $with_suffix[0];
 									$suffix = $this->process_suffix( $with_suffix[1] );
 									$value  = $this->apply_suffix( $suffix, $value );
+
+									if ( false === $value ) {
+										break;
+									}
 								}
 
 								$this->add_meta_query_var( $value, $key, $suffix );
@@ -538,30 +1141,36 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 										continue;
 									}
 
+									$data = $this->sanitize_sort_query( $data );
+
+									if ( ! $data ) {
+										continue;
+									}
+
 									if ( ! empty( $data['orderby'] ) ) {
 										switch ( $data['orderby'] ) {
 											case 'price':
 												$data['orderby']  = 'meta_value_num';
 												$data['meta_key'] = '_price';
-	
+
 												break;
-	
+
 											case 'sales_number':
-												$data['orderby']  = 'meta_value_num';
+												$data['orderby']  = 'meta_value_num ID';
 												$data['meta_key'] = 'total_sales';
-	
+
 												break;
-	
+
 											case 'rating':
 												$data['orderby']  = 'meta_value_num';
 												$data['meta_key'] = '_wc_average_rating';
-	
+
 												break;
-	
+
 											case 'reviews_number':
 												$data['orderby']  = 'meta_value_num';
 												$data['meta_key'] = '_wc_review_count';
-	
+
 												break;
 										}
 									}
@@ -618,17 +1227,25 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 								break;
 
 							case 'plain_query':
+								$key         = $this->clear_key( $key, $var );
+								$with_suffix = explode( '|', $key );
 
-								if ( $key === $var ) {
-								//	$var = '_' . $var . '_' . 
+								if ( isset( $with_suffix[1] ) ) {
+									$key    = $with_suffix[0];
+									$suffix = $this->process_suffix( $with_suffix[1] );
+									$value  = $this->apply_suffix( $suffix, $value );
+
+									if ( false === $value ) {
+										break;
+									}
 								}
 
-								$this->_query[ $this->clear_key( $key, $var ) ] = $value;
+								if ( $this->is_allowed_plain_query_var( $key ) ) {
+									$this->_query[$key] = $value;
+								}
 								break;
 
-
 							default:
-
 								$this->_query[ $var ] = apply_filters(
 									'jet-smart-filters/query/add-var',
 									$value,
@@ -661,6 +1278,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			}
 
 			$this->_query = apply_filters( 'jet-smart-filters/query/final-query', $this->_query );
+
 			return $this->_query;
 		}
 
@@ -688,7 +1306,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		}
 
 		/**
-		 * Get taxonomy operator from value
+		 * Get operator from value
 		 */
 		public function get_operator( &$data ) {
 
@@ -699,10 +1317,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			}
 
 			foreach ( $data as $key => $value ) {
-				if ( false !== strpos( $value, 'operator_' ) ) {
-					$operator = str_replace( 'operator_', '', $value );
-					unset( $data[ $key ] );
+				if ( ! is_string($value) || strpos( $value, 'operator_' ) === false ) {
+					continue;
 				}
+
+				$operator = str_replace( 'operator_', '', $value );
+				unset( $data[ $key ] );
 			}
 
 			return $operator;
@@ -752,7 +1372,13 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		/**
 		 * Add date query varibales
 		 */
-		public function add_date_query_var( $value ) {
+		public function add_date_query_var( $value, $date_type = 'date' ) {
+
+			if ( ! is_scalar( $value ) ) {
+				return;
+			}
+
+			$value = (string) $value;
 
 			$current_query = array(
 				'inclusive' => true
@@ -802,6 +1428,16 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			} else {
 				$this->_query['date_query'] = $current_query;
 			}
+
+			switch ( $date_type ) {
+				case 'date':
+					$this->_query['date_query']['column'] = 'post_date';
+					break;
+
+				case 'm_date':
+					$this->_query['date_query']['column'] = 'post_modified';
+					break;
+			}
 		}
 
 		/**
@@ -841,22 +1477,30 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 
 			switch ( $suffix['filter_type'] ) {
 				case 'range':
-					return explode( '_', $value );
+					return is_scalar( $value ) ? explode( '_', (string) $value ) : false;
 
 				case 'check-range':
 					$result = array();
+					$rows   = is_array( $value ) ? $value : array( $value );
 
-					if ( is_array( $value ) ) {
-						foreach ( $value as $row ) {
-							$result[] = explode( '_', $row );
+					foreach ( $rows as $row ) {
+						if ( ! is_scalar( $row ) ) {
+							return false;
 						}
-					} else {
-						$result[] = explode( '_', $value );
+
+						$result[] = explode( '_', (string) $row );
 					}
 
 					return $result;
 
 				default:
+					if (
+						in_array( $suffix['filter_type'], array( 'date', 'rating', 'search' ), true )
+						&& ! is_scalar( $value )
+					) {
+						return false;
+					}
+
 					return apply_filters( 'jet-smart-filters/apply-suffix/' . $suffix['filter_type'], $value, $this );
 			}
 		}
@@ -870,6 +1514,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			$filter_type        = isset( $additional_options['filter_type'] ) ? $additional_options['filter_type'] : false;
 			$is_custom_checkbox = isset( $additional_options['is_custom_checkbox'] ) ? true : false;
 			$keys               = explode( ',', $key );
+			$operator           = $this->get_operator( $value );
 
 			if ( count( $keys ) > 1 ) {
 				$meta_query['relation'] = 'OR';
@@ -877,16 +1522,16 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 
 			foreach ($keys as $key) {
 				$key = trim( $key );
-				
+
 				if ( 'check-range' === $filter_type || ( $is_custom_checkbox && is_array( $value ) ) ) {
 					$nested_query = array(
-						'relation' => 'OR',
+						'relation' => $operator ? $operator : 'OR',
 					);
-	
+
 					foreach ( $value as $value_row ) {
 						$nested_query[] = $this->prepare_meta_query_row( $value_row, $key, $additional_options );
 					}
-	
+
 					$meta_query[] = $nested_query;
 				} else {
 					$meta_query[] = $this->prepare_meta_query_row( $value, $key, $additional_options );
@@ -909,7 +1554,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 		}
 
 		/**
-		 * Preapre single meta query item
+		 * Prepare single meta query item
 		 */
 		public function prepare_meta_query_row( $value, $key, $additional_options = array() ) {
 
@@ -920,7 +1565,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 
 			if ( is_array( $value ) ) {
 				$compare = 'IN';
+				$value = jet_smart_filters()->utils->stripslashes_deep( $value );
 			} else {
+				$value = stripslashes( $value );
+
 				switch ( $compare_operand ) {
 					case 'less' :
 						$compare     = '<=';
@@ -1041,19 +1689,18 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			return apply_filters( 'jet-smart-filters/query/meta-query-row', $current_row, $this, $additional_options );
 		}
 
+		/**
+		 * Apply Alphabet filtering to post listings by matching the beginning of the post title.
+		 */
 		public function set_query_where( $where, $query ) {
 
 			if ( $query->get( 'jet_smart_filters' ) && $query->get( 'alphabet' ) ) {
-				$letter = $query->get( 'alphabet' );
+				$letter = $this->prepare_alphabet_regexp( $query->get( 'alphabet' ) );
 
-				if ( is_array( $letter ) ) {
-					$letter = implode( '|', $letter );
+				if ( $letter ) {
+					global $wpdb;
+					$where .= $wpdb->prepare( " AND LOWER( {$wpdb->posts}.post_title ) REGEXP %s", $letter );
 				}
-
-				$letter = mb_strtolower($letter);
-
-				global $wpdb;
-				$where .= " AND LOWER( " . $wpdb->posts . ".post_title) REGEXP '^($letter)'";
 
 				//add_action( 'posts_selection', array( $this, 'remove_query_where' ) );
 			}
@@ -1061,9 +1708,106 @@ if ( ! class_exists( 'Jet_Smart_Filters_Query_Manager' ) ) {
 			return $where;
 		}
 
+		/**
+		 * Prevent duplicate users when filtered usermeta joins match multiple rows for one user.
+		 */
+		public function set_user_query_distinct( $query ) {
+
+			if ( empty( $query->query_vars['jet_smart_filters'] ) ) {
+				return;
+			}
+
+			global $wpdb;
+
+			if ( empty( $query->query_from ) || false === strpos( $query->query_from, $wpdb->usermeta ) ) {
+				return;
+			}
+
+			if ( empty( $query->query_fields ) || preg_match( '/^(SELECT\s+)?DISTINCT\b/i', $query->query_fields ) ) {
+				return;
+			}
+
+			if ( preg_match( '/^SELECT\s+/i', $query->query_fields ) ) {
+				$query_fields = preg_replace( '/^SELECT\s+/i', 'SELECT DISTINCT ', $query->query_fields, 1 );
+			} else {
+				$query_fields = 'DISTINCT ' . $query->query_fields;
+			}
+
+			if ( $query_fields ) {
+				$query->query_fields = $query_fields;
+			}
+		}
+
+		/**
+		 * Apply Alphabet filtering to term listings by matching the beginning of the term name.
+		 */
+		public function set_terms_query_clauses( $clauses, $taxonomies, $args ) {
+
+			if ( empty( $args['jet_smart_filters'] ) || empty( $args['alphabet'] ) ) {
+				return $clauses;
+			}
+
+			$letter = $this->prepare_alphabet_regexp( $args['alphabet'] );
+
+			if ( ! $letter ) {
+				return $clauses;
+			}
+
+			global $wpdb;
+
+			$where = $wpdb->prepare( 'LOWER( t.name ) REGEXP %s', $letter );
+
+			if ( ! empty( $clauses['where'] ) ) {
+				$clauses['where'] .= ' AND ' . $where;
+			} else {
+				$clauses['where'] = $where;
+			}
+
+			return $clauses;
+		}
+
+		/**
+		 * Prepare selected Alphabet values for a safe SQL REGEXP prefix match.
+		 */
+		public function prepare_alphabet_regexp( $letter ) {
+
+			$letter = is_array( $letter ) ? $letter : explode( ',', $letter );
+			$letter = jet_smart_filters()->utils->prepare_regexp_literal_values( $letter, true );
+
+			if ( empty( $letter ) ) {
+				return false;
+			}
+
+			return '^(' . implode( '|', $letter ) . ')';
+		}
+
 		public function remove_query_where() {
 
 			remove_filter( 'posts_where', array( $this, 'set_query_where' ) );
+		}
+
+		public function convert_term_names_to_ids_in_request( $from_type ) {
+
+			if ( ! in_array( $from_type, array('slug') ) ) {
+				return;
+			}
+
+			$request = jet_smart_filters()->data->get_request();
+
+			$tax_data = array_filter( $request, function( $key ) {
+				return strpos($key, '_tax_query_') === 0;
+			}, ARRAY_FILTER_USE_KEY);
+
+			if ( empty( $tax_data ) ) {
+				return;
+			}
+
+			if ( $from_type === 'slug' ) {
+				$_REQUEST = array_merge(
+					$request,
+					jet_smart_filters()->utils->convert_term_slugs_to_ids( $tax_data )
+				);
+			}
 		}
 	}
 }

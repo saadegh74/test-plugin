@@ -77,9 +77,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Providers_Manager' ) ) {
 		 */
 		public function register_providers() {
 
-			$base_path = jet_smart_filters()->plugin_path( 'includes/providers/' );
-			$default_providers = array();
-			$available_providers = jet_smart_filters()->settings->get( 'avaliable_providers' );
+			$base_path           = jet_smart_filters()->plugin_path( 'includes/providers/' );
+			$default_providers   = array();
+			$available_providers = jet_smart_filters()->data->get_avaliable_providers();
 
 			foreach ( glob( $base_path . '*.php' ) as $file ) {
 				$data = get_file_data( $file, array( 'class'=>'Class', 'name' => 'Name', 'slug'=>'Slug' ) );
@@ -87,7 +87,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Providers_Manager' ) ) {
 				$name = $data['name'];
 
 				if ( $name ) {
-					$enabled = isset( $available_providers[ $class ] ) ? $available_providers[ $class ] : '';
+
+					// Assume that the provider is enabled if it wasn't directly set in settings
+					// This is required to enable by default new providers
+					$enabled = isset( $available_providers[ $class ] ) ? $available_providers[ $class ] : true;
 
 					if ( filter_var( $enabled, FILTER_VALIDATE_BOOLEAN ) || ! $available_providers ) {
 						$default_providers[ $data['class'] ] = $file;
@@ -116,7 +119,14 @@ if ( ! class_exists( 'Jet_Smart_Filters_Providers_Manager' ) ) {
 				return;
 			}
 
-			require $provider_file;
+			// if Elementor is disabled
+			if ( ! jet_smart_filters()->has_elementor() && strpos( $provider_file, '/epro-' ) !== false ) {
+				return;
+			}
+
+			if ( ! class_exists( $provider_class ) ) {
+				require $provider_file;
+			}
 
 			if ( class_exists( $provider_class ) ) {
 				$instance = new $provider_class();

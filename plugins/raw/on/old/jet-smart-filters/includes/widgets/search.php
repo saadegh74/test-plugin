@@ -3,7 +3,7 @@
 namespace Elementor;
 
 use Elementor\Group_Control_Border;
-use Elementor\Core\Schemes\Typography as Scheme_Typography;
+use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Global_Typography;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -371,6 +371,15 @@ class Jet_Smart_Filters_Search_Widget extends Jet_Smart_Filters_Base_Widget {
 			)
 		);
 
+		$this->start_controls_tabs( 'search_input_style_tabs' );
+
+		$this->start_controls_tab(
+			'search_input_normal_styles',
+			array(
+				'label' => esc_html__( 'Normal', 'jet-smart-filters' ),
+			)
+		);
+
 		$this->add_control(
 			'search_input_color',
 			array(
@@ -397,6 +406,57 @@ class Jet_Smart_Filters_Search_Widget extends Jet_Smart_Filters_Base_Widget {
 				),
 			)
 		);
+
+		$this->end_controls_tab();
+
+		$this->start_controls_tab(
+			'search_input_focus_styles',
+			array(
+				'label' => esc_html__( 'Focus', 'jet-smart-filters' ),
+			)
+		);
+
+		$this->add_control(
+			'search_input_focus_color',
+			array(
+				'label'     => esc_html__( 'Color', 'jet-smart-filters' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus'                                   => 'color: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus::placeholder'                      => 'color: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus:-ms-input-placeholder'             => 'color: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus::-ms-input-placeholder'            => 'color: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus ~ ' . $css_scheme['input-clear']   => 'color: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus ~ ' . $css_scheme['input-loading'] => 'color: {{VALUE}}'
+				),
+			)
+		);
+
+		$this->add_control(
+			'search_input_focus_background_color',
+			array(
+				'label'     => esc_html__( 'Background Color', 'jet-smart-filters' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus' => 'background-color: {{VALUE}}',
+				),
+			)
+		);
+
+		$this->add_control(
+			'search_input_focus_border_color',
+			array(
+				'label' => esc_html__( 'Border Color', 'jet-smart-filters' ),
+				'type' => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['input'] . ':focus ' => 'border-color: {{VALUE}}',
+				),
+			)
+		);
+
+		$this->end_controls_tab();
+
+		$this->end_controls_tabs();
 
 		$this->add_group_control(
 			Group_Control_Border::get_type(),
@@ -470,7 +530,9 @@ class Jet_Smart_Filters_Search_Widget extends Jet_Smart_Filters_Base_Widget {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'filter_apply_button_typography',
-				'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
+				'global'   => array(
+					'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
+				),
 				'selector' => '{{WRAPPER}} ' . $css_scheme['apply-filters-button'],
 			)
 		);
@@ -856,12 +918,9 @@ class Jet_Smart_Filters_Search_Widget extends Jet_Smart_Filters_Base_Widget {
 
 	protected function render() {
 
-		jet_smart_filters()->set_filters_used();
+		$settings = $this->get_settings();
 
-		$base_class = $this->get_name();
-		$settings   = $this->get_settings();
-
-		if ( empty( $settings['filter_id'] ) ) {
+		if ( ! jet_smart_filters()->utils->is_filter_published( $settings['filter_id'] ) ) {
 			/* if ( Plugin::instance()->editor->is_edit_mode() ) {
 				echo '<div></div>';
 			} */
@@ -869,24 +928,25 @@ class Jet_Smart_Filters_Search_Widget extends Jet_Smart_Filters_Base_Widget {
 			return;
 		}
 
-		printf( '<div class="%1$s jet-filter">', $base_class );
-
-		if ( in_array( $settings['apply_type'], ['ajax', 'mixed'] ) ) {
-			$apply_type = $settings['apply_type'] . '-reload';
-		} else {
-			$apply_type = $settings['apply_type'];
-		}
+		jet_smart_filters()->set_filters_used();
 
 		$filter_id            = apply_filters( 'jet-smart-filters/render_filter_template/filter_id', $settings['filter_id'] );
+		$base_class           = $this->get_name();
 		$provider             = ! empty( $settings['content_provider'] ) ? $settings['content_provider'] : '';
 		$query_id             = ! empty( $settings['query_id'] ) ? $settings['query_id'] : 'default';
+		$apply_type           = ! empty( $settings['apply_type'] ) ? $settings['apply_type'] : 'ajax';
 		$show_label           = ! empty( $settings['show_label'] ) ? filter_var( $settings['show_label'], FILTER_VALIDATE_BOOLEAN ) : false;
 		$additional_providers = jet_smart_filters()->utils->get_additional_providers( $settings );
 		$format               = '<i class="%s"></i>';
-		$icon                 = $settings['apply_button_icon'] ? sprintf( $format, $settings['apply_button_icon'] ) : '';
+		$icon                 = $settings['apply_button_icon'] ? sprintf( $format, esc_attr( $settings['apply_button_icon'] ) ) : '';
 		$hide_apply_button    = ! empty( $settings['hide_apply_button'] ) ? filter_var( $settings['hide_apply_button'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 		jet_smart_filters()->admin_bar_register_item( $filter_id );
+
+		printf(
+			'<div class="%1$s jet-filter">',
+			esc_attr( $base_class )
+		);
 
 		include jet_smart_filters()->get_template( 'common/filter-label.php' );
 

@@ -54,6 +54,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Date_Period_Filter' ) ) {
 			$content_provider     = isset( $args['content_provider'] ) ? $args['content_provider'] : false;
 			$additional_providers = isset( $args['additional_providers'] ) ? $args['additional_providers'] : false;
 			$apply_type           = isset( $args['apply_type'] ) ? $args['apply_type'] : false;
+			$apply_on             = isset( $args['apply_on'] ) ? $args['apply_on'] : false;
 			$button_text          = isset( $args['button_text'] ) ? $args['button_text'] : false;
 			$button_icon          = isset( $args['button_icon'] ) ? $args['button_icon'] : false;
 			$hide_button          = isset( $args['hide_button'] ) ? $args['hide_button'] : false;
@@ -68,7 +69,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Date_Period_Filter' ) ) {
 			$period_type            = get_post_meta( $filter_id, '_date_period_type', true );
 			$datepicker_button_text = get_post_meta( $filter_id, '_date_period_datepicker_button_text', true );
 			$start_end_enabled      = filter_var( get_post_meta( $filter_id, '_date_period_start_end_enabled', true ), FILTER_VALIDATE_BOOLEAN );
-			$min_max_date_enabled   = filter_var( get_post_meta( $filter_id, '_min_max_date_period_enabled', true ), FILTER_VALIDATE_BOOLEAN );
+			$predefined_value       = $this->get_predefined_value( $filter_id );
 
 			if ( $start_end_enabled ) {
 				$date_format_start = get_post_meta( $filter_id, '_date_period_start_format', true );
@@ -92,6 +93,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Date_Period_Filter' ) ) {
 				'content_provider'       => $content_provider,
 				'additional_providers'   => $additional_providers,
 				'apply_type'             => $apply_type,
+				'apply_on'               => $apply_on,
 				'filter_id'              => $filter_id,
 				'hide_button'            => $hide_button,
 				'button_text'            => $button_text,
@@ -103,17 +105,57 @@ if ( ! class_exists( 'Jet_Smart_Filters_Date_Period_Filter' ) ) {
 				'accessibility_label'    => $this->get_accessibility_label( $filter_id )
 			);
 
-			if ( $min_max_date_enabled ) {
-				$min_date = get_post_meta( $filter_id, '_min_date_period', true );
-				$max_date = get_post_meta( $filter_id, '_max_date_period', true );
+			if ( isset( $args['sm_id'] ) ) {
+				$result['sm_id'] = $args['sm_id'];
+			}
 
-				if ( $min_date ) {
-					$result['min_date'] = $min_date;
-				}
+			// available dates args in datepicker
+			$available_range = get_post_meta( $filter_id, '_date_available_range', true );
 
-				if ( $max_date ) {
-					$result['max_date'] = $max_date;
+			if ( $available_range ) {
+				switch ( $available_range ) {
+					case 'future':
+						$result['min_date'] = 'today';
+						break;
+					
+					case 'past':
+						$result['max_date'] = 'today';
+						break;
+
+					case 'custom':
+						$min_date = get_post_meta( $filter_id, '_date_available_range_custom_min', true );
+						$max_date = get_post_meta( $filter_id, '_date_available_range_custom_max', true );
+
+						if ( $min_date ) {
+							$result['min_date'] = $min_date;
+						}
+		
+						if ( $max_date ) {
+							$result['max_date'] = $max_date;
+						}
+
+						break;
 				}
+			} else {
+				// backward compatibility{
+				$min_max_date_enabled = filter_var( get_post_meta( $filter_id, '_min_max_date_period_enabled', true ), FILTER_VALIDATE_BOOLEAN );
+
+				if ( $min_max_date_enabled ) {
+					$min_date = get_post_meta( $filter_id, '_min_date_period', true );
+					$max_date = get_post_meta( $filter_id, '_max_date_period', true );
+
+					if ( $min_date ) {
+						$result['min_date'] = $min_date;
+					}
+
+					if ( $max_date ) {
+						$result['max_date'] = $max_date;
+					}
+				}
+			}
+
+			if ( $predefined_value !== false ) {
+				$result['predefined_value'] = $predefined_value;
 			}
 
 			return $result;

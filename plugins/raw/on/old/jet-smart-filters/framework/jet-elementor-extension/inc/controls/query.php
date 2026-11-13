@@ -30,7 +30,7 @@ class Query_Control extends \Elementor\Control_Select2 {
 		} else {
 			$value = array_map( 'absint', $value );
 		}
-		
+
 		return $value;
 	}
 
@@ -39,6 +39,7 @@ class Query_Control extends \Elementor\Control_Select2 {
 			parent::get_default_settings(), array(
 				'query_type'      => 'post',
 				'query'           => array(),
+				'signature'       => \Jet_Elementor_Extension\Ajax_Handlers::create_signature( array() ),
 				'prevent_looping' => false,
 				'edit_button' => array(
 					'active' => false,
@@ -47,4 +48,6 @@ class Query_Control extends \Elementor\Control_Select2 {
 			)
 		);
 	}
+
+
 }

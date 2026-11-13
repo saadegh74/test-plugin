@@ -512,11 +512,11 @@ $this->add_control(
 		'label'     => esc_html__( 'Color', 'jet-smart-filters' ),
 		'type'      => Controls_Manager::COLOR,
 		'selectors' => array(
-			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-focus-' => 'color: {{VALUE}}',
-			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-in-range-.-focus-' => 'color: {{VALUE}}',
-			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-week-hover-' => 'color: {{VALUE}}',
-			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-range-from-' => 'color: {{VALUE}}',
-			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-range-to-' => 'color: {{VALUE}}',
+			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-focus-:not(.-disabled-)' => 'color: {{VALUE}}',
+			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-in-range-.-focus-:not(.-disabled-)' => 'color: {{VALUE}}',
+			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-week-hover-:not(.-disabled-)' => 'color: {{VALUE}}',
+			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-range-from-:not(.-disabled-)' => 'color: {{VALUE}}',
+			'#datepickers-container .jet-date-period-{{ID}} .datepicker--cell.-range-to-:not(.-disabled-)' => 'color: {{VALUE}}',
 		),
 	)
 );

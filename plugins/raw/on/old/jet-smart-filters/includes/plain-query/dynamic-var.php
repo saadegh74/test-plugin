@@ -26,8 +26,8 @@ class Jet_Smart_Filters_Plain_Query_Dynamic_Var extends Jet_Smart_Filters_Tax_Qu
 		return array(
 			'query_var' => array(
 				'type'        => 'text',
-				'title'       => __( 'Variable Name', 'jet-engine' ),
-				'description' => __( 'This variable will be stored', 'jet-engine' ),
+				'title'       => __( 'Variable Name', 'jet-smart-filters' ),
+				'description' => __( 'This variable will be stored', 'jet-smart-filters' ),
 			),
 		);
 	}

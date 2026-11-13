@@ -18,7 +18,7 @@ class Control_Checkbox extends Base {
 		return array_merge(
 			[
 				'tab'     => 'content',
-				'label'   => esc_html__( $args['label'], 'jet-engine' ),
+				'label'   => esc_html__( $args['label'], 'jet-smart-filters' ),
 				'type'    => 'checkbox',
 				'default' => filter_var( $args['default'], FILTER_VALIDATE_BOOLEAN ),
 			],

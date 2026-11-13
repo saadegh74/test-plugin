@@ -39,7 +39,7 @@ class Jet_Smart_Filters_Date_Period_Widget extends Jet_Smart_Filters_Base_Widget
 	public function get_help_url() {
 
 		return jet_smart_filters()->widgets->prepare_help_url(
-			'https://crocoblock.com/knowledge-base/articles/jetsmartfilters-how-to-add-a-date-period-filter-based-on-the-dates-in-the-meta-fields/',
+			'https://crocoblock.com/knowledge-base/jetsmartfilters/jetsmartfilters-how-to-use-date-period-filter/',
 			$this->get_name()
 		);
 	}

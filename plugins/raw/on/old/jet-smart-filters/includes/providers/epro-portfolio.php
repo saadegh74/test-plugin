@@ -61,19 +61,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Portfolio' ) ) {
 				return;
 			}
 
-			$settings         = $widget->get_settings();
+			$query_id         = $this->helpers->elementor->get_widget_query_id( $widget );
 			$store_settings   = $this->settings_to_store();
-			$default_settings = array();
-
-			if ( ! empty( $settings['_element_id'] ) ) {
-				$query_id = $settings['_element_id'];
-			} else {
-				$query_id = 'default';
-			}
-
-			foreach ( $store_settings as $key ) {
-				$default_settings[ $key ] = isset( $settings[ $key ] ) ? $settings[ $key ] : '';
-			}
+			$default_settings = $this->helpers->elementor->get_widget_settings_for_storage( $widget, $store_settings );
 
 			$default_settings['_el_widget_id'] = $widget->get_id();
 
@@ -97,13 +87,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Portfolio' ) ) {
 				return;
 			}
 			
-			$settings = $widget->get_settings();
-
-			if ( ! empty( $settings['_element_id'] ) ) {
-				$query_id = $settings['_element_id'];
-			} else {
-				$query_id = 'default';
-			}
+			$query_id = $this->helpers->elementor->get_widget_query_id( $widget );
 
 			$wp_query->set( 'jet_smart_filters', $this->get_id() . '/' . $query_id );
 
@@ -215,17 +199,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Portfolio' ) ) {
 		 */
 		public function ensure_settings( $settings ) {
 
-			foreach ( $this->settings_to_store() as $setting ) {
-				if ( ! isset( $settings[ $setting ] ) ) {
-					if ( false !== strpos( $setting, '_meta_data' ) ) {
-						$settings[ $setting ] = array();
-					} else {
-						$settings[ $setting ] = false;
-					}
-				}
-			}
-
-			return $settings;
+			return $this->helpers->elementor->ensure_settings( $settings, $this->settings_to_store() );
 		}
 
 		/**
@@ -233,24 +207,14 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Portfolio' ) ) {
 		 */
 		public function ajax_get_content() {
 
-			$settings  = jet_smart_filters()->query->get_query_settings();
-			$settings  = $this->ensure_settings( $settings );
-			$widget_id = $settings['_el_widget_id'];
-
-			unset( $settings['_el_widget_id'] );
-
-			$data = array(
-				'id'         => $widget_id,
-				'elType'     => 'widget',
-				'settings'   => $this->sanitize_settings( $settings ),
-				'elements'   => array(),
-				'widgetType' => $this->widget_name(),
-			);
+			$settings = $this->ensure_settings( jet_smart_filters()->query->get_query_settings() );
 
 			$this->hook_apply_query();
 
-			$attributes = jet_smart_filters()->query->get_query_settings();
-			$widget     = Elementor\Plugin::$instance->elements_manager->create_element_instance( $data );
+			$widget = $this->helpers->elementor->create_widget_instance(
+				$this->widget_name(),
+				$this->sanitize_settings( $settings )
+			);
 
 			if ( ! $widget ) {
 				throw new \Exception( 'Widget not found.' );
@@ -261,6 +225,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Portfolio' ) ) {
 			$content = ob_get_clean();
 
 			if ( $content ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $content;
 			} else {
 				echo '<div class="elementor-widget-container"></div>';
@@ -290,13 +255,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Portfolio' ) ) {
 				return;
 			}
 
-			$settings = $widget->get_settings();
-
-			if ( ! empty( $settings['_element_id'] ) ) {
-				$query_id = $settings['_element_id'];
-			} else {
-				$query_id = 'default';
-			}
+			$query_id = $this->helpers->elementor->get_widget_query_id( $widget );
 
 			$wp_query->set( 'jet_smart_filters', $this->get_id() . '/' . $query_id );
 

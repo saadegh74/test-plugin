@@ -10,16 +10,20 @@ if ( !$edit_mode ) {
 }
 
 ?>
-<div class="jet-remove-all-filters <?php echo $extra_classes; ?>">
+<div class="jet-remove-all-filters <?php echo esc_attr( $extra_classes ); ?>">
 	<button
 		type="button"
 		class="jet-remove-all-filters__button"
-		data-content-provider="<?php echo $provider; ?>"
-		data-additional-providers="<?php echo $additional_providers; ?>"
-		data-apply-type="<?php echo $settings['apply_type']; ?>"
-		data-query-id="<?php echo $query_id; ?>"
-		<?php echo jet_smart_filters()->data->get_tabindex_attr(); ?>
+		data-content-provider="<?php echo esc_attr( $provider ); ?>"
+		data-additional-providers="<?php echo esc_attr( $additional_providers ); ?>"
+		data-apply-type="<?php echo esc_attr( $settings['apply_type'] ); ?>"
+		data-query-id="<?php echo esc_attr( $query_id ); ?>"
+		<?php
+		// Tabindex attribute is generated internally and considered safe
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo jet_smart_filters()->data->get_tabindex_attr();
+		?>
 	>
-		<?php echo $settings['remove_filters_text']; ?>
+		<?php echo esc_html( $settings['remove_filters_text'] ); ?>
 	</button>
 </div>

@@ -172,6 +172,35 @@ if ( $this->get_name() !== 'jet-smart-filters-radio' ) {
 	);
 }
 
+$this->add_control(
+	'dropdown_apply_button',
+	array(
+		'label'        => esc_html__( 'Add apply button', 'jet-smart-filters' ),
+		'type'         => Controls_Manager::SWITCHER,
+		'description'  => '',
+		'label_on'     => esc_html__( 'Yes', 'jet-smart-filters' ),
+		'label_off'    => esc_html__( 'No', 'jet-smart-filters' ),
+		'return_value' => 'yes',
+		'default'      => '',
+		'condition'    => array(
+			'dropdown_enabled' => 'yes'
+		)
+	)
+);
+
+$this->add_control(
+	'dropdown_apply_button_text',
+	array(
+		'label'       => esc_html__( 'Apply button text', 'jet-smart-filters' ),
+		'type'        => Controls_Manager::TEXT,
+		'placeholder' => esc_html__( 'Apply', 'jet-smart-filters' ),
+		'condition'   => array(
+			'dropdown_enabled'      => 'yes',
+			'dropdown_apply_button' => 'yes'
+		),
+	)
+);
+
 /**
  * Scroll controls
  */

@@ -13,6 +13,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 	 * Define Jet_Smart_Filters_Сlassic_Admin class
 	 */
 	class Jet_Smart_Filters_Сlassic_Admin {
+
+		public $data;
+		public $is_indexer_enabled;
+
 		/**
 		 * Constructor for the class
 		 */
@@ -45,7 +49,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_assets' ) );
 
 			add_action( 'wp_ajax_jet_smart_filters_admin', array( $this, 'filters_admin_action' ) );
-			add_action( 'wp_ajax_nopriv_jet_smart_filters_admin', array( $this, 'filters_admin_action' ) );
 
 			add_action( 'add_meta_boxes_' . jet_smart_filters()->post_type->slug(), array( $this, 'disable_metaboxes' ), 9999 );
 			add_filter( 'post_row_actions', array( $this, 'remove_view_action' ), 10, 2 );
@@ -216,17 +219,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 			);
 
 			// localized data
-			$post_id              = isset( $_GET['post'] ) ? $_GET['post'] : false;
+			$post_id              = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$data_exclude_include = array();
 			$data_color_image     = array();
 
-			if ( ! $post_id && isset( $_REQUEST['post_ID'] ) ) {
-				$post_id = $_REQUEST['post_ID'];
+			$request = jet_smart_filters()->data->get_request();
+
+			if ( ! $post_id && isset( $request['post_ID'] ) ) {
+				$post_id = absint( $request['post_ID'] );
 			}
 
 			if ( !empty( $post_id ) ){
-				$data_exclude_include = get_post_meta( $_REQUEST['post'], '_data_exclude_include', true );
-				$data_color_image = get_post_meta( $_REQUEST['post'], '_source_color_image_input', true );
+				$data_exclude_include = get_post_meta( $post_id, '_data_exclude_include', true );
+				$data_color_image = get_post_meta( $post_id, '_source_color_image_input', true );
 			}
 
 			wp_localize_script( 'jet-smart-filters', 'JetSmartFiltersAdminData', array(
@@ -246,27 +251,38 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 		 */
 		public function filters_admin_action() {
 
-			$tax        = ! empty( $_REQUEST['taxonomy'] ) ? $_REQUEST['taxonomy'] : false;
-			$post_type  = ! empty( $_REQUEST['post_type'] ) ? $_REQUEST['post_type'] : false;
-			$hide_empty = isset( $_REQUEST['hide_empty'] ) ? filter_var( $_REQUEST['hide_empty'], FILTER_VALIDATE_BOOLEAN ) : true;
+			check_ajax_referer( 'wp_rest', 'nonce' );
+
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				wp_send_json_error( esc_html__( 'Permission denied', 'jet-smart-filters' ), 403 );
+			}
+
+			$request    = jet_smart_filters()->data->get_request();
+			$tax        = ! empty( $request['taxonomy'] ) && is_string( $request['taxonomy'] ) ? sanitize_key( $request['taxonomy'] ) : false;
+			$post_type  = ! empty( $request['post_type'] ) && is_string( $request['post_type'] ) ? sanitize_key( $request['post_type'] ) : false;
 			$posts_list = '';
 			$terms_list = '';
 
-			if ( $tax ) {
+			if ( $tax && taxonomy_exists( $tax ) ) {
 				$args = array(
 					'taxonomy'   => $tax,
-					'hide_empty' => $hide_empty
+					'hide_empty' => false,
 				);
 
 				$terms = get_terms( $args );
-				$terms = wp_list_pluck( $terms, 'name', 'term_id' );
+
+				$terms = is_wp_error( $terms ) ? array() : wp_list_pluck( $terms, 'name', 'term_id' );
 
 				foreach ( $terms as $terms_id => $term_name ) {
-					$terms_list .= '<option value="' . $terms_id . '">' . $term_name . '</option>';
+					$terms_list .= sprintf(
+						'<option value="%1$s">%2$s</option>',
+						esc_attr( $terms_id ),
+						esc_html( $term_name )
+					);
 				}
 			}
 
-			if ( $post_type ) {
+			if ( $post_type && post_type_exists( $post_type ) ) {
 				$args = array(
 					'post_type'      => $post_type,
 					'post_status'    => 'publish',
@@ -280,7 +296,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 				}
 
 				foreach ( $posts as $post_id => $post_title ) {
-					$posts_list .= '<option value="' . $post_id . '">' . $post_title . '</option>';
+					$posts_list .= sprintf(
+						'<option value="%1$s">%2$s</option>',
+						esc_attr( $post_id ),
+						esc_html( $post_title )
+					);
 				}
 			}
 
@@ -297,8 +317,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 
 			add_submenu_page(
 				'edit.php?post_type=jet-smart-filters',
-				esc_html__( 'Settings', 'jet-dashboard' ),
-				esc_html__( 'Settings', 'jet-dashboard' ),
+				esc_html__( 'Settings', 'jet-smart-filters' ),
+				esc_html__( 'Settings', 'jet-smart-filters' ),
 				'manage_options',
 				add_query_arg(
 					array(
@@ -330,7 +350,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Сlassic_Admin' ) ) {
 		 */
 		public function add_index_filters_button( $post_type ) {
 
-			if ( 'jet-smart-filters' !== $post_type ) {
+			if ( 'jet-smart-filters' !== $post_type || ! current_user_can( 'manage_options' ) ) {
 				return;
 			}
 

@@ -12,6 +12,8 @@ class Jet_Smart_Filters_Elementor_Dynamic_Tags_Module extends Elementor\Modules\
 
 		return array(
 			'Jet_Smart_Filters_Elementor_Filter_URL_Tag',
+			'Jet_Smart_Filters_Elementor_SEO_Rules_Title',
+			'Jet_Smart_Filters_Elementor_SEO_Rules_Description'
 		);
 	}
 
@@ -19,7 +21,7 @@ class Jet_Smart_Filters_Elementor_Dynamic_Tags_Module extends Elementor\Modules\
 
 		return array(
 			self::JET_SMART_FILTERS_GROUP => array(
-				'title' => __( 'JetSmartFilters', 'jet-engine' ),
+				'title' => __( 'JetSmartFilters', 'jet-smart-filters' ),
 			),
 		);
 	}
@@ -34,14 +36,13 @@ class Jet_Smart_Filters_Elementor_Dynamic_Tags_Module extends Elementor\Modules\
 		foreach ( $this->get_tag_classes_names() as $tag_class ) {
 			$file     = str_replace( 'Jet_Smart_Filters_Elementor_', '', $tag_class );
 			$file     = str_replace( '_', '-', strtolower( $file ) ) . '.php';
-			$filepath = require jet_smart_filters()->plugin_path( 'includes/elementor/dynamic-tags/tags/' . $file );
+			$filepath = jet_smart_filters()->plugin_path( 'includes/elementor/dynamic-tags/tags/' . $file );
 
 			if ( file_exists( $filepath ) ) {
 				require $filepath;
 			}
 
 			if ( class_exists( $tag_class ) ) {
-
 				// `register_tag` method is deprecated since v3.5.0
 				if ( method_exists( $dynamic_tags, 'register' ) ) {
 					$dynamic_tags->register( new $tag_class );

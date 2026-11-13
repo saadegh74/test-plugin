@@ -29,7 +29,7 @@ class Jet_Smart_Filters_Radio_Widget extends Jet_Smart_Filters_Base_Widget {
 	public function get_help_url() {
 
 		return jet_smart_filters()->widgets->prepare_help_url(
-			'https://crocoblock.com/knowledge-base/articles/jetsmartfilters-how-to-create-a-checkboxes-filter-a-difference-between-checkboxes-select-and-radio-filters/',
+			'https://crocoblock.com/knowledge-base/jetsmartfilters/radio-filter-overview/',
 			$this->get_name()
 		);
 	}
@@ -338,7 +338,7 @@ class Jet_Smart_Filters_Radio_Widget extends Jet_Smart_Filters_Base_Widget {
 					),
 				),
 				'default'    => array(
-					'size' => 15,
+					'size' => 16,
 					'unit' => 'px',
 				),
 				'selectors'  => array(
@@ -536,6 +536,9 @@ class Jet_Smart_Filters_Radio_Widget extends Jet_Smart_Filters_Base_Widget {
 		);
 
 		$this->end_controls_section();
+
+		// Include Collapse Icon Settings Style
+		include jet_smart_filters()->plugin_path( 'includes/widgets/common-controls/collapse-icon-style.php' );
 
 		// Include Additional Filter Settings Style
 		include jet_smart_filters()->plugin_path( 'includes/widgets/common-controls/additional-filter-style.php' );

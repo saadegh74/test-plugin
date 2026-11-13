@@ -497,15 +497,16 @@ class Jet_Smart_Filters_Bricks_Date_Range extends Jet_Smart_Filters_Bricks_Base 
 			);
 		}
 
+		// render_attributes() returns pre-escaped and validated HTML attributes.
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-		printf( '<div class="%1$s jet-filter">', $base_class );
+		printf(
+			'<div class="%1$s jet-filter">',
+			esc_attr( $base_class )
+		);
 
 		$apply_type = ! empty( $settings['apply_type'] ) ? $settings['apply_type'] : 'ajax';
-
-		if ( 'ajax' === $apply_type ) {
-			$apply_type = 'ajax-reload';
-		}
 
 		$query_id             = ! empty( $settings['query_id'] ) ? $settings['query_id'] : 'default';
 		$show_label           = ! empty( $settings['show_label'] ) ? filter_var( $settings['show_label'], FILTER_VALIDATE_BOOLEAN ) : false;
@@ -513,6 +514,9 @@ class Jet_Smart_Filters_Bricks_Date_Range extends Jet_Smart_Filters_Bricks_Base 
 		$icon                 = '';
 
 		if ( ! empty( $settings['apply_button_icon'] ) ) {
+			if ( isset( $settings['apply_button_icon']['icon'] ) ) {
+				$settings['apply_button_icon']['icon'] = esc_attr( $settings['apply_button_icon']['icon'] );
+			}
 			$rendered_icon = Element::render_icon( $settings['apply_button_icon'] );
 			$format        = '<span class="jet-date-range__submit-icon">%s</span>';
 			$icon          = sprintf( $format, $rendered_icon );
@@ -525,12 +529,12 @@ class Jet_Smart_Filters_Bricks_Date_Range extends Jet_Smart_Filters_Bricks_Base 
 		$filter_template_args = [
 			'filter_id'            => $filter_id,
 			'content_provider'     => $provider,
-			'additional_providers' => $additional_providers,
+			'query_id'             => $query_id,
 			'apply_type'           => $apply_type,
 			'hide_button'          => $hide_button,
 			'button_text'          => $apply_button_text,
 			'button_icon'          => $icon,
-			'query_id'             => $query_id,
+			'additional_providers' => $additional_providers,
 		];
 
 		jet_smart_filters()->admin_bar_register_item( $filter_id );

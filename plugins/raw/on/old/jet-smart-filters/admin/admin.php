@@ -48,6 +48,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin' ) ) {
 			require_once jet_smart_filters()->plugin_path( 'admin/includes/dynamic-query/registration.php' );
 			new Jet_Smart_Filters_Admin_Dynamic_Query_Registration();
 
+			// Register default value data
+			require_once jet_smart_filters()->plugin_path( 'admin/includes/dynamic-default-value/registration.php' );
+			new Jet_Smart_Filters_Admin_Dynamic_Default_Value_Registration();
+
 			// Register and enqueue admin assets
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 
@@ -63,7 +67,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin' ) ) {
 		 */
 		public function is_filters_page() {
 
-			return ( isset( $_REQUEST['page'] ) && jet_smart_filters()->post_type->slug() === $_REQUEST['page'] );
+			$page_request_val = jet_smart_filters()->data->get_request_var( 'page' );
+			return ( $page_request_val && jet_smart_filters()->post_type->slug() === $page_request_val );
 		}
 
 		/**
@@ -88,8 +93,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin' ) ) {
 			 */
 			add_submenu_page(
 				jet_smart_filters()->post_type->slug(),
-				esc_html__( 'All Filters', 'jet-dashboard' ),
-				esc_html__( 'All Filters', 'jet-dashboard' ),
+				esc_html__( 'All Filters', 'jet-smart-filters' ),
+				esc_html__( 'All Filters', 'jet-smart-filters' ),
 				'manage_options',
 				admin_url( 'admin.php' ) . '?page=' . jet_smart_filters()->post_type->slug() . '#/'
 			);
@@ -99,8 +104,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin' ) ) {
 			 */
 			add_submenu_page(
 				jet_smart_filters()->post_type->slug(),
-				esc_html__( 'Add New', 'jet-dashboard' ),
-				esc_html__( 'Add New', 'jet-dashboard' ),
+				esc_html__( 'Add New', 'jet-smart-filters' ),
+				esc_html__( 'Add New', 'jet-smart-filters' ),
 				'manage_options',
 				admin_url( 'admin.php' ) . '?page=' . jet_smart_filters()->post_type->slug() . '#/new'
 			);
@@ -110,8 +115,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin' ) ) {
 			 */
 			add_submenu_page(
 				jet_smart_filters()->post_type->slug(),
-				esc_html__( 'Settings', 'jet-dashboard' ),
-				esc_html__( 'Settings', 'jet-dashboard' ),
+				esc_html__( 'Settings', 'jet-smart-filters' ),
+				esc_html__( 'Settings', 'jet-smart-filters' ),
 				'manage_options',
 				add_query_arg(
 					array(

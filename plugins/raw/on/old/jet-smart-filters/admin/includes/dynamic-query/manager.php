@@ -30,6 +30,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Admin_Dynamic_Query_Manager' ) ) {
 
 			foreach ( $items_list as $itemKey => $itemLabel ) {
 				$new_item = new class( $itemKey, $itemLabel ) extends Jet_Smart_Filters_Admin_Dynamic_Query_Base {
+
+					public $itemKey;
+					public $itemLabel;
+
 					public function __construct( $itemKey, $itemLabel ) {
 						$this->itemKey = $itemKey;
 						$this->itemLabel = $itemLabel;

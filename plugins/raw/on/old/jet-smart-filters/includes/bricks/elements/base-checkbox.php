@@ -109,7 +109,7 @@ class Jet_Smart_Filters_Bricks_Base_Checkbox extends Jet_Smart_Filters_Bricks_Ba
 				'css'     => [
 					[
 						'property' => 'flex-direction',
-						'selector' => $css_scheme['list-wrapper'] . ', ' . $css_scheme['list-children'],
+						'selector' => $css_scheme['list-wrapper'],
 					],
 				],
 			]
@@ -124,7 +124,7 @@ class Jet_Smart_Filters_Bricks_Base_Checkbox extends Jet_Smart_Filters_Bricks_Ba
 				'css'      => [
 					[
 						'property' => 'justify-content',
-						'selector' => $css_scheme['list-wrapper'] . ', ' . $css_scheme['list-children'],
+						'selector' => $css_scheme['list-wrapper'],
 					],
 				],
 				'required' => [ 'filters_position', '=', 'row' ],
@@ -140,7 +140,7 @@ class Jet_Smart_Filters_Bricks_Base_Checkbox extends Jet_Smart_Filters_Bricks_Ba
 				'css'      => [
 					[
 						'property' => 'align-items',
-						'selector' => $css_scheme['list-wrapper'] . ', ' . $css_scheme['list-children'],
+						'selector' => $css_scheme['list-wrapper'],
 					],
 				],
 				'required' => [ 'filters_position', '=', 'column' ],
@@ -157,7 +157,53 @@ class Jet_Smart_Filters_Bricks_Base_Checkbox extends Jet_Smart_Filters_Bricks_Ba
 				'css'   => [
 					[
 						'property' => 'gap',
-						'selector' => $css_scheme['list-wrapper'] . ', ' . $css_scheme['list-children'],
+						'selector' => $css_scheme['list-wrapper'],
+					],
+				],
+			]
+		);
+
+		$this->register_jet_control(
+			'grouped_terms',
+			[
+				'tab'   => 'style',
+				'type'  => 'separator',
+				'label' => esc_html__( 'Grouped Terms', 'jet-smart-filters' ),
+			]
+		);
+
+		$this->register_jet_control(
+			'grouped_terms_item_gap',
+			[
+				'tab'   => 'style',
+				'label' => esc_html__( 'Item Gap', 'jet-smart-filters' ),
+				'type'  => 'number',
+				'units' => true,
+				'css'   => [
+					[
+						'property' => 'margin-bottom',
+						'selector' => $css_scheme['grouped-item'],
+					],
+					[
+						'property' => 'margin-bottom',
+						'selector' => $css_scheme['grouped-wrapper'],
+						'value'    => '-%s'
+					],
+				],
+			]
+		);
+
+		$this->register_jet_control(
+			'grouped_terms_child_indent',
+			[
+				'tab'   => 'style',
+				'label' => esc_html__( 'Child Indent', 'jet-smart-filters' ),
+				'type'  => 'number',
+				'units' => true,
+				'css'   => [
+					[
+						'property' => 'padding-inline-start',
+						'selector' => $css_scheme['grouped-children'],
 					],
 				],
 			]
@@ -266,7 +312,7 @@ class Jet_Smart_Filters_Bricks_Base_Checkbox extends Jet_Smart_Filters_Bricks_Ba
 				'default' => '12px',
 				'css'     => [
 					[
-						'property' => 'margin-right',
+						'property' => 'margin-inline-end',
 						'selector' => $css_scheme['checkbox'],
 					],
 				],

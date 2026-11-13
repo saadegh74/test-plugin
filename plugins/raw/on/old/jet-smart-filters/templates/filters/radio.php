@@ -7,27 +7,34 @@ if ( empty( $args ) ) {
 $options             = $args['options'];
 $query_var           = $args['query_var'];
 $by_parents          = $args['by_parents'];
-$scroll_height_style = $args['scroll_height'] ? 'style="max-height:' . $args['scroll_height'] . 'px"' : false;
+$collapsible         = isset( $args['collapsible'] ) ? $args['collapsible'] : false;
 $show_decorator      = isset( $args['display_options']['show_decorator'] ) ? filter_var( $args['display_options']['show_decorator'], FILTER_VALIDATE_BOOLEAN ) : false;
 $extra_classes       = '';
 $accessibility_label = $args['accessibility_label'];
+$scroll_height       = ! empty( $args['scroll_height'] )
+	? absint( $args['scroll_height'] )
+	: false;
 
 if ( ! $options ) {
 	return;
 }
 
 $current = $this->get_current_filter_value( $args );
+$has_current = jet_smart_filters()->utils->is_truthy_or_zero( $current );
 
 ?>
 <div class="jet-radio-list" <?php $this->filter_data_atts( $args ); ?>><?php
 
 	include jet_smart_filters()->get_template( 'common/filter-items-search.php' );
 
-	if ( $scroll_height_style ) {echo '<div class="jet-filter-items-scroll" ' . $scroll_height_style . '><div class="jet-filter-items-scroll-container">'; }
+	if ( $scroll_height ) {
+		echo '<div class="jet-filter-items-scroll" style="max-height:' . esc_attr( $scroll_height ) . 'px"><div class="jet-filter-items-scroll-container">';
+	}
 
 	echo '<form class="jet-radio-list-wrapper">';
 	echo '<fieldset>';
-	echo '<legend style="display:none;">' . $accessibility_label . '</legend>';
+	echo '<legend style="display:none;">' . esc_html( $accessibility_label ) . '</legend>';
+
 	if ( $by_parents ) {
 		if ( ! class_exists( 'Jet_Smart_Filters_Terms_Walker' ) ) {
 			require_once jet_smart_filters()->plugin_path( 'includes/walkers/terms-walker.php' );
@@ -41,15 +48,23 @@ $current = $this->get_current_filter_value( $args );
 		$args['current']       = $current;
 		$args['decorator']     = $show_decorator;
 
-		echo '<div class="jet-list-tree">';
+		$container_classes = "jet-list-tree";
+
+		if ( $collapsible ) {
+			$container_classes .= " jet-list-collapsible";
+		}
+
+		echo '<div class="' . esc_attr( $container_classes ) . '">';
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $walker->walk( $options, 0, $args );
 		echo '</div>';
+
 	} else {
-		foreach ( $options as $value => $label ) {
-
+		foreach ( $options as $optionKey => $optionData ) {
 			$checked = '';
+			extract( jet_smart_filters()->utils->сreate_option_data( $optionKey, $optionData ), EXTR_OVERWRITE );
 
-			if ( $current ) {
+			if ( $has_current ) {
 
 				if ( is_array( $current ) && in_array( $value, $current ) ) {
 					$checked = 'checked';
@@ -64,10 +79,13 @@ $current = $this->get_current_filter_value( $args );
 			include jet_smart_filters()->get_template( 'filters/radio-item.php' );
 		}
 	}
+
 	echo '</fieldset>';
 	echo '</form>';
 
-	if ( $scroll_height_style ) { echo '</div></div>'; }
+	if ( $scroll_height ) {
+		echo '</div></div>';
+	}
 
 	include jet_smart_filters()->get_template( 'common/filter-items-moreless.php' );
 ?></div>
