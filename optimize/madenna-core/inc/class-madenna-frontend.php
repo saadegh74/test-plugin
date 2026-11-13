@@ -34,8 +34,8 @@ class Madenna_Frontend {
         
 // لود سیستم Madenna Vault برای ابزارها
         if (is_singular('tools')) {
-            wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '1.0.0');
-            wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '1.0.0', true);
+            wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '8.2.0');
+            wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '8.2.0', true);
 
             $cats = wp_get_post_terms(get_the_ID(), 'madenna_cat');
             $cat_slug = (!empty($cats) && !is_wp_error($cats)) ? $cats[0]->slug : '';

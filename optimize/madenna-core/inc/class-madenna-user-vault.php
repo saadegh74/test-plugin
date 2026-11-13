@@ -165,8 +165,8 @@ class Madenna_User_Vault {
     }
 
     public function enqueue_global_vault_assets() {
-        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '8.1.0');
-        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '8.1.0', true);
+        wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', [], '8.2.0');
+        wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], '8.2.0', true);
 
         $queried_id   = get_queried_object_id() ?: get_the_ID();
         $is_tool_page = (is_singular('tools') && $queried_id);

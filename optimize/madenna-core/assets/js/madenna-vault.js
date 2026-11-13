@@ -1,5 +1,5 @@
 /**
- * Madenna Vault Frontend Controller (نسخه نهایی ۸.۱)
+ * Madenna Vault Frontend Controller (نسخه نهایی ۸.۲)
  * ثبت کامل ساختار ابزار در حالت نتیجه با مخفی‌سازی مراحل سوالات (data-vault-hidden-step)
  * Location: /assets/js/madenna-vault.js
  */
@@ -50,6 +50,9 @@
     let countdownInterval = null;
     let cachedResultElement = null;
     let userHasInteractedWithTool = false;
+    let isAutoPopulating = false;
+    let userManuallySelectedGender = false;
+    let userManuallySelectedBirthdate = { year: false, month: false, day: false };
     const blobToDataUrlMap = new Map();
 
     if (window.URL && typeof window.URL.createObjectURL === 'function') {
@@ -142,6 +145,12 @@
             autoPopulateToolUserFields();
             setupUniversalToolResultWatcher();
 
+            // اجرا بلافاصله پس از لود کامل همه اسکریپت‌های ابزار
+            window.addEventListener('load', () => {
+                syncVaultConfig();
+                autoPopulateToolUserFields();
+            });
+
             // تکرار پر کردن برای ابزارهای داینامیک یا ساخته‌شده با جمینی که با تاخیر لود می‌شوند
             [50, 150, 300, 600, 1000, 1800, 2800, 4500].forEach(delay => {
                 setTimeout(() => {
@@ -155,8 +164,10 @@
                 window._madennaToolObserverInit = true;
                 let observerTimeout = null;
                 const observer = new MutationObserver(() => {
+                    if (isAutoPopulating) return;
                     if (observerTimeout) clearTimeout(observerTimeout);
                     observerTimeout = setTimeout(() => {
+                        if (isAutoPopulating) return;
                         syncVaultConfig();
                         autoPopulateToolUserFields();
                     }, 50);
@@ -164,6 +175,30 @@
                 observer.observe(liveContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
             }
         }
+    }
+
+    function toEnglishDigits(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+            .replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+            .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660));
+    }
+
+    function gregorianToJalali(gy, gm, gd) {
+        const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        let gy2 = (gm > 2) ? (gy + 1) : gy;
+        let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+        let jy = -1595 + (33 * Math.floor(days / 12053));
+        days %= 12053;
+        jy += 4 * Math.floor(days / 1461);
+        days %= 1461;
+        if (days > 365) {
+            jy += Math.floor((days - 1) / 365);
+            days = (days - 1) % 365;
+        }
+        const jm = (days < 186) ? (1 + Math.floor(days / 31)) : (7 + Math.floor((days - 186) / 30));
+        const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+        return { jy, jm, jd };
     }
 
     function autoPopulateToolUserFields(customData) {
@@ -179,18 +214,22 @@
             if (customData.name) activeName = customData.name;
             if (customData.gender) activeGender = customData.gender;
             if (customData.birthdate) activeBirthdate = customData.birthdate;
+            userManuallySelectedGender = false;
+            userManuallySelectedBirthdate = { year: false, month: false, day: false };
         }
 
-        const isFemale = (activeGender === 'female' || activeGender === 'woman' || activeGender === 'girl' || activeGender === 'زن' || activeGender === 'خانم' || activeGender === 'دختر');
-        const isMale   = (activeGender === 'male' || activeGender === 'man' || activeGender === 'boy' || activeGender === 'مرد' || activeGender === 'آقا' || activeGender === 'پسر');
+        const normGender = String(activeGender || '').trim().toLowerCase();
+        const isFemale = ['female', 'woman', 'girl', 'f', 'زن', 'خانم', 'دختر'].includes(normGender);
+        const isMale   = ['male', 'man', 'boy', 'm', 'مرد', 'آقا', 'پسر'].includes(normGender);
         const genderFa = isFemale ? 'خانم' : 'آقا';
         const genderFaAlt = isFemale ? 'زن' : 'مرد';
 
         // استخراج و نرمال‌سازی اجزای تاریخ تولد
         let birthYear = '', birthMonth = '', birthDay = '', calculatedAge = '';
+        let shamsiYearNum = 0, shamsiMonthNum = 0, shamsiDayNum = 0;
         if (activeBirthdate) {
-            const cleanBdate = String(activeBirthdate).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
-            const parts = cleanBdate.split(/[\/\-\.\s]/).map(p => p.trim()).filter(Boolean);
+            const cleanBdate = toEnglishDigits(activeBirthdate);
+            const parts = cleanBdate.split(/[\/\-\.\s]+/).map(p => p.trim()).filter(Boolean);
             if (parts.length >= 1) {
                 if (parts[0].length === 4) {
                     birthYear = parts[0];
@@ -204,33 +243,42 @@
 
                 if (birthYear) {
                     const yNum = parseInt(birthYear, 10);
-                    if (yNum > 1300 && yNum < 1420) {
-                        calculatedAge = String(Math.max(1, 1403 - yNum));
-                    } else if (yNum > 1920 && yNum < 2030) {
+                    const mNum = parseInt(birthMonth, 10) || 1;
+                    const dNum = parseInt(birthDay, 10) || 1;
+                    if (yNum > 1300 && yNum < 1450) {
+                        shamsiYearNum = yNum;
+                        shamsiMonthNum = parseInt(birthMonth, 10) || 0;
+                        shamsiDayNum = parseInt(birthDay, 10) || 0;
+                        calculatedAge = String(Math.max(1, 1405 - yNum));
+                    } else if (yNum > 1920 && yNum < 2050) {
+                        const j = gregorianToJalali(yNum, mNum, dNum);
+                        shamsiYearNum = j.jy;
+                        shamsiMonthNum = j.jm;
+                        shamsiDayNum = j.jd;
                         calculatedAge = String(Math.max(1, new Date().getFullYear() - yNum));
                     }
                 }
             }
         }
 
-        const bYearNum = birthYear ? parseInt(birthYear, 10) : 0;
-        const bMonthNum = birthMonth ? parseInt(birthMonth, 10) : 0;
-        const bDayNum = birthDay ? parseInt(birthDay, 10) : 0;
+        const bYearNum = shamsiYearNum || (birthYear ? parseInt(birthYear, 10) : 0);
+        const bMonthNum = shamsiMonthNum || (birthMonth ? parseInt(birthMonth, 10) : 0);
+        const bDayNum = shamsiDayNum || (birthDay ? parseInt(birthDay, 10) : 0);
 
         // اسامی ماه‌های شمسی برای مچ کردن هوشمند با منوهای متنی
         const shamsiMonthNames = {
-            1: ['فروردین', 'farvardin', '1', '01'],
-            2: ['اردیبهشت', 'ordibehesht', '2', '02'],
-            3: ['خرداد', 'khordad', '3', '03'],
-            4: ['تیر', 'tir', '4', '04'],
-            5: ['مرداد', 'mordad', '5', '05'],
-            6: ['شهریور', 'shahrivar', '6', '06'],
-            7: ['مهر', 'mehr', '7', '07'],
-            8: ['آبان', 'aban', '8', '08'],
-            9: ['آذر', 'azar', '9', '09'],
-            10: ['دی', 'dey', '10'],
-            11: ['بهمن', 'bahman', '11'],
-            12: ['اسفند', 'esfand', '12']
+            1: ['فروردین', 'farvardin', '1', '01', '۱', '۰۱'],
+            2: ['اردیبهشت', 'ordibehesht', '2', '02', '۲', '۰۲'],
+            3: ['خرداد', 'khordad', '3', '03', '۳', '۰۳'],
+            4: ['تیر', 'tir', '4', '04', '۴', '۰۴'],
+            5: ['مرداد', 'mordad', '5', '05', '۵', '۰۵'],
+            6: ['شهریور', 'shahrivar', '6', '06', '۶', '۰۶'],
+            7: ['مهر', 'mehr', '7', '07', '۷', '۰۷'],
+            8: ['آبان', 'aban', '8', '08', '۸', '۰۸'],
+            9: ['آذر', 'اذر', 'azar', '9', '09', '۹', '۰۹'],
+            10: ['دی', 'dey', '10', '۱۰'],
+            11: ['بهمن', 'bahman', '11', '۱۱'],
+            12: ['اسفند', 'esfand', '12', '۱۲']
         };
 
         // پل ارتباطی سراسری MadennaUser
@@ -242,9 +290,9 @@
             genderLabel: genderFa,
             genderText: genderFaAlt,
             birthdate: activeBirthdate,
-            birthYear: birthYear,
-            birthMonth: birthMonth,
-            birthDay: birthDay,
+            birthYear: bYearNum ? String(bYearNum) : birthYear,
+            birthMonth: bMonthNum ? String(bMonthNum) : birthMonth,
+            birthDay: bDayNum ? String(bDayNum) : birthDay,
             age: calculatedAge ? parseInt(calculatedAge, 10) : '',
             mobile: userMobile || ''
         };
@@ -266,348 +314,474 @@
             }
         }
 
-        // ==========================================
-        // ۱. پر کردن خودکار فیلدهای نام کاربر
-        // ==========================================
-        if (activeName) {
-            // الف) سلکتورهای مستقیم و تضمین‌شده
-            const directNameInputs = toolWrap.querySelectorAll(
-                'input[name*="name" i], input[id*="name" i], input[placeholder*="نام"], input[placeholder*="آرش"], input[placeholder*="سارا"], input[placeholder*="علی"], input[data-user-name-input], input[data-user-name], input[name="fullname"], input[name="user_name"], input[id="fullname"], input[id="user_name"]'
-            );
-            directNameInputs.forEach(inp => {
-                const n = (inp.name || '').toLowerCase();
-                const id = (inp.id || '').toLowerCase();
-                if (n.includes('username') || n.includes('file') || id.includes('username') || id.includes('file') || inp.type === 'file' || inp.type === 'hidden') return;
-                setFieldValue(inp, activeName);
-            });
+        isAutoPopulating = true;
+        try {
+            // ==========================================
+            // ۱. پر کردن خودکار فیلدهای نام کاربر
+            // ==========================================
+            if (activeName) {
+                const directNameInputs = toolWrap.querySelectorAll(
+                    'input[name*="name" i], input[id*="name" i], input[placeholder*="نام"], input[placeholder*="آرش"], input[placeholder*="سارا"], input[placeholder*="علی"], input[data-user-name-input], input[data-user-name], input[name="fullname"], input[name="user_name"], input[id="fullname"], input[id="user_name"]'
+                );
+                directNameInputs.forEach(inp => {
+                    const n = (inp.name || '').toLowerCase();
+                    const id = (inp.id || '').toLowerCase();
+                    if (n.includes('username') || n.includes('file') || id.includes('username') || id.includes('file') || inp.type === 'file' || inp.type === 'hidden') return;
+                    setFieldValue(inp, activeName);
+                });
 
-            // ب) جستجوی هوشمند در تمام اینپوت‌های متنی با برچسب یا متن والد
-            const allTextInputs = toolWrap.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="button"]):not([type="submit"]):not([type="file"]):not([type="number"]):not([type="tel"]):not([type="password"]):not([type="email"])');
-            allTextInputs.forEach(inp => {
-                if (inp.value && inp.value.trim() !== '') return;
-                const nAttr = (inp.name || '').toLowerCase();
-                const iAttr = (inp.id || '').toLowerCase();
-                const pAttr = (inp.placeholder || '').toLowerCase();
-                if (nAttr.includes('phone') || nAttr.includes('mobile') || nAttr.includes('birth') || nAttr.includes('year') || nAttr.includes('age') || nAttr.includes('code')) return;
-                if (iAttr.includes('phone') || iAttr.includes('mobile') || iAttr.includes('birth') || iAttr.includes('year') || iAttr.includes('age') || iAttr.includes('code')) return;
+                const allTextInputs = toolWrap.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]):not([type="button"]):not([type="submit"]):not([type="file"]):not([type="number"]):not([type="tel"]):not([type="password"]):not([type="email"])');
+                allTextInputs.forEach(inp => {
+                    if (inp.value && inp.value.trim() !== '') return;
+                    const nAttr = (inp.name || '').toLowerCase();
+                    const iAttr = (inp.id || '').toLowerCase();
+                    const pAttr = (inp.placeholder || '').toLowerCase();
+                    if (nAttr.includes('phone') || nAttr.includes('mobile') || nAttr.includes('birth') || nAttr.includes('year') || nAttr.includes('age') || nAttr.includes('code')) return;
+                    if (iAttr.includes('phone') || iAttr.includes('mobile') || iAttr.includes('birth') || iAttr.includes('year') || iAttr.includes('age') || iAttr.includes('code')) return;
 
-                // بررسی متن نزدیک به اینپوت یا برچسب بالای آن (مانند تصویر ۱: "نام و نام خانوادگی (یا نام شما) *")
-                let nearText = '';
-                const lbl = inp.closest('label') || (inp.id ? toolWrap.querySelector(`label[for="${inp.id}"]`) : null);
-                if (lbl) nearText += ' ' + lbl.textContent;
-                const parentBox = inp.closest('.name-section, .input-group, .form-group, div') || inp.parentElement;
-                if (parentBox) nearText += ' ' + parentBox.textContent.slice(0, 150);
+                    let nearText = '';
+                    const lbl = inp.closest('label') || (inp.id ? toolWrap.querySelector(`label[for="${inp.id}"]`) : null);
+                    if (lbl) nearText += ' ' + lbl.textContent;
+                    const parentBox = inp.closest('.name-section, .input-group, .form-group, div') || inp.parentElement;
+                    if (parentBox) nearText += ' ' + parentBox.textContent.slice(0, 150);
 
-                nearText = nearText.toLowerCase();
-                if (nearText.includes('نام و نام خانوادگی') || nearText.includes('نام شما') || nearText.includes('نام یا نام خانوادگی') || pAttr.includes('آرش علوی') || pAttr.includes('سارا محمدی')) {
-                    if (!nearText.includes('شماره') && !nearText.includes('موبایل') && !nearText.includes('تلفن')) {
-                        setFieldValue(inp, activeName);
-                    }
-                }
-            });
-
-            // ج) تگ‌های متنی نمایش‌دهنده نام
-            const namePlaceholders = toolWrap.querySelectorAll('.madenna-user-name, [data-madenna-user-name], #user-name-display, .user-name-display');
-            namePlaceholders.forEach(el => {
-                el.textContent = activeName;
-            });
-        }
-        // ==========================================
-        // ۲. پر کردن خودکار جنسیت و کارت‌های کاراکتر (پسر/دختر، آقا/خانم، رادیوها، سلکت‌ها)
-        // ==========================================
-        if (activeGender && (isFemale || isMale)) {
-            function hasFemaleKeyword(str) {
-                return str.includes('کاراکتر دختر') || str.includes('دختر') || str.includes('خانم') || str.includes('زن') || str.includes('girl') || str.includes('female') || str.includes('woman');
-            }
-            function hasMaleKeyword(str) {
-                return str.includes('کاراکتر پسر') || str.includes('پسر') || str.includes('آقا') || str.includes('مرد') || str.includes('boy') || str.includes('male') || str.includes('man');
-            }
-
-            // الف) یافتن مستقیم کارت‌ها و دکمه‌های کاراکتر (مانند کارت‌های پرتره پسر/دختر یا آقا/خانم)
-            const candidateElements = toolWrap.querySelectorAll('button, [role="button"], label, div, [onclick], [data-gender], [data-value]');
-            let targetCard = null;
-
-            for (let i = 0; i < candidateElements.length; i++) {
-                const el = candidateElements[i];
-                // جلوگیری اکید از لمس المان‌های هدر یا مودال ورود
-                if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) continue;
-                if (el.tagName === 'A' && el.getAttribute('href')) continue;
-
-                const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
-                if (!txt || txt.length > 80) continue;
-
-                const isMatchFemale = hasFemaleKeyword(txt) && !hasMaleKeyword(txt);
-                const isMatchMale   = hasMaleKeyword(txt) && !hasFemaleKeyword(txt);
-
-                if ((isFemale && isMatchFemale) || (isMale && isMatchMale)) {
-                    let card = el;
-                    let p = el.parentElement;
-                    while (p && p !== toolWrap && p !== document.body) {
-                        const pTxt = (p.innerText || p.textContent || '').trim().toLowerCase();
-                        // اگر والد شامل هر دو متن است یعنی والد گرید هر دو گزینه است؛ متوقف شو
-                        if ((isFemale && hasMaleKeyword(pTxt)) || (isMale && hasFemaleKeyword(pTxt))) {
-                            break;
-                        }
-                        const pCls = (typeof p.className === 'string' ? p.className : '').toLowerCase();
-                        if (p.tagName === 'BUTTON' || p.tagName === 'LABEL' || p.getAttribute('role') === 'button' || p.hasAttribute('onclick') || pCls.includes('card') || pCls.includes('option') || pCls.includes('border') || pCls.includes('rounded') || pCls.includes('cursor') || pCls.includes('btn') || p.hasAttribute('data-gender')) {
-                            card = p;
-                        }
-                        p = p.parentElement;
-                    }
-                    targetCard = card;
-                    break;
-                }
-            }
-
-            if (targetCard) {
-                const isAlreadySelected = (targetCard.classList && (targetCard.classList.contains('selected') || targetCard.classList.contains('active'))) || targetCard.getAttribute('aria-pressed') === 'true' || targetCard.querySelector('input:checked');
-                if (!isAlreadySelected) {
-                    try {
-                        targetCard.click();
-                        targetCard.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-                        targetCard.dispatchEvent(new Event('click', { bubbles: true }));
-
-                        const rad = targetCard.querySelector('input[type="radio"], input[type="checkbox"]');
-                        if (rad && !rad.checked) {
-                            rad.checked = true;
-                            rad.click();
-                            rad.dispatchEvent(new Event('input', { bubbles: true }));
-                            rad.dispatchEvent(new Event('change', { bubbles: true }));
-                        }
-
-                        const ind = targetCard.querySelector('.radio-indicator, [class*="radio"], [class*="circle"], [class*="rounded-full"]');
-                        if (ind) {
-                            ind.click();
-                            ind.dispatchEvent(new Event('click', { bubbles: true }));
-                        }
-
-                        const avt = targetCard.querySelector('img, svg, h3, h4, span, .avatar-render, [class*="avatar"]');
-                        if (avt) {
-                            avt.click();
-                        }
-
-                        targetCard.classList.add('selected', 'active');
-                    } catch (e) {}
-                }
-            }
-
-            // ب) اجرای توابع سراسری ابزار در صورت تعریف بودن توسط جمینی
-            try {
-                const targetVal = isMale ? 'boy' : 'girl';
-                const targetGenderVal = isMale ? 'male' : 'female';
-                if (typeof window.selectCharacter === 'function') window.selectCharacter(targetVal);
-                if (typeof window.selectPortrait === 'function') window.selectPortrait(targetVal);
-                if (typeof window.chooseCharacter === 'function') window.chooseCharacter(targetVal);
-                if (typeof window.setGender === 'function') window.setGender(targetGenderVal);
-                if (typeof window.selectGender === 'function') window.selectGender(targetGenderVal);
-                window.selectedCharacter = targetVal;
-                window.selectedGender = targetGenderVal;
-            } catch (e) {}
-
-            // ج) جستجوی المان‌های دارای data-gender یا data-value
-            const dataElements = toolWrap.querySelectorAll('[data-gender], [data-sex], [data-value="male"], [data-value="female"], [data-value="boy"], [data-value="girl"], [data-value="man"], [data-value="woman"]');
-            dataElements.forEach(el => {
-                if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
-                if (el.tagName === 'A' && el.getAttribute('href')) return;
-                const val = (el.getAttribute('data-gender') || el.getAttribute('data-sex') || el.getAttribute('data-value') || '').toLowerCase().trim();
-                let matches = false;
-                if (isFemale && (val === 'female' || val === 'woman' || val === 'girl' || val === 'f' || val === 'زن' || val === 'خانم' || val === 'دختر')) matches = true;
-                if (isMale && (val === 'male' || val === 'man' || val === 'boy' || val === 'm' || val === 'مرد' || val === 'آقا' || val === 'پسر')) matches = true;
-                if (matches) {
-                    const isAlreadyActive = (el.classList && (el.classList.contains('active') || el.classList.contains('selected'))) || (typeof el.className === 'string' && (el.className.includes('active') || el.className.includes('selected')));
-                    if (!isAlreadyActive) {
-                        try {
-                            el.click();
-                            el.dispatchEvent(new Event('click', { bubbles: true }));
-                        } catch (e) {}
-                    }
-                }
-            });
-
-            // د) رادیوباتن‌ها
-            const genderRadios = toolWrap.querySelectorAll('input[type="radio"]');
-            genderRadios.forEach(radio => {
-                if (radio.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
-                const val   = (radio.value || '').toLowerCase().trim();
-                const label = radio.closest('label') || (radio.id ? toolWrap.querySelector(`label[for="${radio.id}"]`) : null);
-                const txt   = label ? label.textContent.toLowerCase() : '';
-                let isTargetFemale = false;
-                let isTargetMale   = false;
-                if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر', '2', 'girl'].includes(val) || txt.includes('خانم') || txt.includes('دختر') || txt.includes('زن')) {
-                    isTargetFemale = true;
-                }
-                if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر', '1', 'boy'].includes(val) || txt.includes('آقا') || txt.includes('پسر') || txt.includes('مرد')) {
-                    isTargetMale = true;
-                }
-                if ((isFemale && isTargetFemale) || (isMale && isTargetMale)) {
-                    if (!radio.checked) {
-                        radio.checked = true;
-                        radio.dispatchEvent(new Event('input', { bubbles: true }));
-                        radio.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                }
-            });
-
-            // ه) منوهای کشویی Select
-            const genderSelects = toolWrap.querySelectorAll('select');
-            genderSelects.forEach(sel => {
-                if (sel.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
-                const name = (sel.name || '').toLowerCase();
-                const id   = (sel.id || '').toLowerCase();
-                let isGenderSelect = (name.includes('gender') || name.includes('sex') || name.includes('character') || id.includes('gender') || id.includes('sex') || id.includes('character'));
-                let foundMatch = false;
-                Array.from(sel.options).forEach(opt => {
-                    const val = (opt.value || '').toLowerCase().trim();
-                    const txt = (opt.textContent || '').trim().toLowerCase();
-                    if (txt.includes('خانم') || txt.includes('آقا') || txt.includes('مرد') || txt.includes('زن') || txt.includes('پسر') || txt.includes('دختر') || val === 'male' || val === 'female' || val === 'boy' || val === 'girl') {
-                        isGenderSelect = true;
-                    }
-                    if (isFemale) {
-                        if (['female', 'woman', 'f', 'زن', 'خانم', 'دختر', '2', 'girl'].includes(val) || txt.includes('خانم') || txt.includes('زن') || txt.includes('دختر')) {
-                            sel.value = opt.value;
-                            foundMatch = true;
-                        }
-                    } else if (isMale) {
-                        if (['male', 'man', 'm', 'مرد', 'آقا', 'پسر', '1', 'boy'].includes(val) || txt.includes('آقا') || txt.includes('مرد') || txt.includes('پسر')) {
-                            sel.value = opt.value;
-                            foundMatch = true;
+                    nearText = nearText.toLowerCase();
+                    if (nearText.includes('نام و نام خانوادگی') || nearText.includes('نام شما') || nearText.includes('نام یا نام خانوادگی') || pAttr.includes('آرش علوی') || pAttr.includes('سارا محمدی')) {
+                        if (!nearText.includes('شماره') && !nearText.includes('موبایل') && !nearText.includes('تلفن')) {
+                            setFieldValue(inp, activeName);
                         }
                     }
                 });
-                if (isGenderSelect && foundMatch) {
-                    sel.dispatchEvent(new Event('change', { bubbles: true }));
-                    sel.dispatchEvent(new Event('input', { bubbles: true }));
+
+                const namePlaceholders = toolWrap.querySelectorAll('.madenna-user-name, [data-madenna-user-name], #user-name-display, .user-name-display');
+                namePlaceholders.forEach(el => {
+                    el.textContent = activeName;
+                });
+            }
+
+            // ==========================================
+            // ۲. پر کردن خودکار جنسیت و کارت‌های کاراکتر
+            // ==========================================
+            if (activeGender && (isFemale || isMale)) {
+                const femaleTokens = ['female', 'woman', 'girl', 'f', 'زن', 'خانم', 'دختر'];
+                const maleTokens   = ['male', 'man', 'boy', 'm', 'مرد', 'آقا', 'پسر'];
+                const femaleWordRe = /(?:^|[\s\u200c.,:;!?\-_()\/|])(?:کاراکتر\s*دختر|دختر|خانم|زن|girl|female|woman)(?=$|[\s\u200c.,:;!?\-_()\/|])/i;
+                const maleWordRe   = /(?:^|[\s\u200c.,:;!?\-_()\/|])(?:کاراکتر\s*پسر|پسر|آقا|مرد|boy|male|man)(?=$|[\s\u200c.,:;!?\-_()\/|])/i;
+
+                function hasFemaleKeyword(str) {
+                    if (!str) return false;
+                    return str.includes('کاراکتر دختر') || femaleWordRe.test(str);
                 }
-            });
+                function hasMaleKeyword(str) {
+                    if (!str) return false;
+                    return str.includes('کاراکتر پسر') || maleWordRe.test(str);
+                }
 
-            // و) تگ‌های متنی نمایش جنسیت
-            const genderPlaceholders = toolWrap.querySelectorAll('.madenna-user-gender, [data-madenna-user-gender]');
-            genderPlaceholders.forEach(el => { el.textContent = genderFa; });
-        }
-
-                // ۳. پر کردن خودکار تاریخ تولد (روز، ماه، سال) و سن
-        // ==========================================
-        if (activeBirthdate) {
-            // الف) منوهای کشویی Select (مانند تصویر ۱ و ۲: روز تولد، ماه تولد، سال تولد)
-            const allSelects = toolWrap.querySelectorAll('select');
-            allSelects.forEach(sel => {
-                const nameAttr = (sel.name || '').toLowerCase();
-                const idAttr   = (sel.id || '').toLowerCase();
-                const firstOpt = sel.options.length > 0 ? (sel.options[0].textContent || '').toLowerCase() : '';
-                const allOptTexts = Array.from(sel.options).slice(0, 5).map(o => (o.textContent || '').trim()).join(' ');
-
-                // ۱. تشخیص منوی روز تولد (Day)
-                const isDaySelect = (nameAttr.includes('day') || idAttr.includes('day') || firstOpt.includes('روز') || firstOpt.includes('روز تولد') || nameAttr.includes('bday') || idAttr.includes('bday'));
-                if (isDaySelect && bDayNum > 0) {
-                    let matched = false;
-                    Array.from(sel.options).forEach(opt => {
-                        const valNum = parseInt(opt.value, 10);
-                        const txtNum = parseInt(opt.textContent, 10);
-                        if (valNum === bDayNum || txtNum === bDayNum) {
-                            sel.value = opt.value;
-                            matched = true;
+                function isCardVisuallySelected(card) {
+                    if (!card) return false;
+                    if (card.classList && (card.classList.contains('selected') || card.classList.contains('active'))) return true;
+                    if (card.getAttribute('aria-pressed') === 'true' || card.getAttribute('aria-checked') === 'true') return true;
+                    if (card.querySelector('input:checked')) return true;
+                    const chkSvg = card.querySelector('[id*="check-svg"], .mdn-avatar-check svg');
+                    if (chkSvg) {
+                        const cls = (chkSvg.getAttribute('class') || '');
+                        if (cls.includes('opacity-100') || (!cls.includes('opacity-0') && chkSvg.style.opacity === '1')) {
+                            return true;
                         }
-                    });
-                    if (matched) {
-                        sel.dispatchEvent(new Event('change', { bubbles: true }));
-                        sel.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                    return;
+                    return false;
                 }
 
-                // ۲. تشخیص منوی ماه تولد (Month)
-                const isMonthSelect = (nameAttr.includes('month') || idAttr.includes('month') || firstOpt.includes('ماه') || firstOpt.includes('ماه تولد') || nameAttr.includes('bmonth') || idAttr.includes('bmonth'));
-                if (isMonthSelect && bMonthNum > 0) {
-                    const validMonthTokens = shamsiMonthNames[bMonthNum] || [String(bMonthNum)];
-                    let matched = false;
-                    Array.from(sel.options).forEach(opt => {
-                        const v = (opt.value || '').trim().toLowerCase();
-                        const t = (opt.textContent || '').trim().toLowerCase();
-                        const vNum = parseInt(v, 10);
-                        if (vNum === bMonthNum) {
-                            sel.value = opt.value;
-                            matched = true;
-                        } else {
-                            for (let token of validMonthTokens) {
-                                if (v === token || t.includes(token)) {
-                                    sel.value = opt.value;
-                                    matched = true;
-                                    break;
+                const hiddenGenderInputs = Array.from(
+                    toolWrap.querySelectorAll('input[type="hidden"][id*="gender" i], input[type="hidden"][name*="gender" i], input[type="hidden"][id*="char" i][id*="val" i]')
+                );
+                const hasHiddenGenderVal = hiddenGenderInputs.some(inp => (inp.value || '').trim() !== '');
+
+                const structuredCards = Array.from(
+                    toolWrap.querySelectorAll('[data-mdn-gender], [data-gender], [data-sex], [data-char], [data-character], [data-value="male"], [data-value="female"], [data-value="boy"], [data-value="girl"], [data-value="man"], [data-value="woman"], .avatar-select-card, .mdn-char-card-box')
+                ).filter(el => !el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper') && !(el.tagName === 'A' && el.getAttribute('href')));
+
+                const anyStructuredSelected = structuredCards.some(isCardVisuallySelected);
+
+                if (!userManuallySelectedGender && !hasHiddenGenderVal && !anyStructuredSelected) {
+                    let targetCard = null;
+
+                    // الف) اولویت اول: کارت‌های دارای صفت صریح جنسیت (مثل data-mdn-gender="boy/girl" یا .avatar-select-card)
+                    for (let i = 0; i < structuredCards.length; i++) {
+                        const el = structuredCards[i];
+                        const attrVal = (
+                            el.getAttribute('data-mdn-gender') ||
+                            el.getAttribute('data-gender') ||
+                            el.getAttribute('data-sex') ||
+                            el.getAttribute('data-char') ||
+                            el.getAttribute('data-character') ||
+                            el.getAttribute('data-value') ||
+                            ''
+                        ).toLowerCase().trim();
+                        const elId = (el.id || '').toLowerCase();
+                        const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
+
+                        const matchByAttrFemale = femaleTokens.includes(attrVal) || elId.includes('female') || elId.includes('girl');
+                        const matchByAttrMale   = maleTokens.includes(attrVal) || (elId.includes('male') && !elId.includes('female')) || elId.includes('boy');
+
+                        const matchByTxtFemale = hasFemaleKeyword(txt) && !hasMaleKeyword(txt);
+                        const matchByTxtMale   = hasMaleKeyword(txt) && !hasFemaleKeyword(txt);
+
+                        if ((isFemale && (matchByAttrFemale || (!attrVal && matchByTxtFemale))) ||
+                            (isMale && (matchByAttrMale || (!attrVal && matchByTxtMale)))) {
+                            targetCard = el;
+                            break;
+                        }
+                    }
+
+                    // ب) اولویت دوم: جستجوی متنی امن (ابتدا المان‌های تعاملی سپس divها)
+                    if (!targetCard) {
+                        const interactiveEls = Array.from(toolWrap.querySelectorAll('button, [role="button"], label, [onclick], [tabindex]'));
+                        const divEls = Array.from(toolWrap.querySelectorAll('div'));
+                        const candidateElements = interactiveEls.concat(divEls);
+
+                        for (let i = 0; i < candidateElements.length; i++) {
+                            const el = candidateElements[i];
+                            if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) continue;
+                            if (el.tagName === 'A' && el.getAttribute('href')) continue;
+
+                            const txt = (el.innerText || el.textContent || '').trim().toLowerCase();
+                            if (!txt || txt.length > 80) continue;
+
+                            const isMatchFemale = hasFemaleKeyword(txt) && !hasMaleKeyword(txt);
+                            const isMatchMale   = hasMaleKeyword(txt) && !hasFemaleKeyword(txt);
+
+                            if ((isFemale && isMatchFemale) || (isMale && isMatchMale)) {
+                                let card = el;
+                                let p = el.parentElement;
+                                while (p && p !== toolWrap && p !== document.body) {
+                                    const pTxt = (p.innerText || p.textContent || '').trim().toLowerCase();
+                                    if ((isFemale && hasMaleKeyword(pTxt)) || (isMale && hasFemaleKeyword(pTxt))) {
+                                        break;
+                                    }
+                                    const pCls = (typeof p.className === 'string' ? p.className : '').toLowerCase();
+                                    if (p.tagName === 'BUTTON' || p.tagName === 'LABEL' || p.getAttribute('role') === 'button' || p.hasAttribute('onclick') || pCls.includes('card') || pCls.includes('option') || pCls.includes('border') || pCls.includes('rounded') || pCls.includes('cursor') || pCls.includes('btn') || p.hasAttribute('data-gender') || p.hasAttribute('data-mdn-gender')) {
+                                        card = p;
+                                    }
+                                    p = p.parentElement;
                                 }
+                                targetCard = card;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (targetCard && !isCardVisuallySelected(targetCard)) {
+                        try {
+                            targetCard.click();
+                            const rad = targetCard.querySelector('input[type="radio"], input[type="checkbox"]');
+                            if (rad && !rad.checked) {
+                                rad.checked = true;
+                                rad.dispatchEvent(new Event('input', { bubbles: true }));
+                                rad.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        } catch (e) {}
+                    }
+
+                    // ج) اجرای توابع سراسری ابزار در صورت تعریف بودن (فقط اگر هنوز فیلد مخفی جنسیت پر نشده باشد)
+                    const stillEmptyHiddenGender = hiddenGenderInputs.length === 0 || hiddenGenderInputs.every(inp => (inp.value || '').trim() === '');
+                    if (stillEmptyHiddenGender) {
+                        try {
+                            const targetVal = isMale ? 'boy' : 'girl';
+                            const targetGenderVal = isMale ? 'male' : 'female';
+                            if (typeof window.selectCharacter === 'function') window.selectCharacter(targetVal);
+                            if (typeof window.selectPortrait === 'function') window.selectPortrait(targetVal);
+                            if (typeof window.chooseCharacter === 'function') window.chooseCharacter(targetVal);
+                            if (typeof window.setGender === 'function') window.setGender(targetGenderVal);
+                            if (typeof window.selectGender === 'function') window.selectGender(targetGenderVal);
+                            window.selectedCharacter = targetVal;
+                            window.selectedGender = targetGenderVal;
+                        } catch (e) {}
+                    }
+
+                    // د) رادیوباتن‌ها
+                    const genderRadios = toolWrap.querySelectorAll('input[type="radio"]');
+                    genderRadios.forEach(radio => {
+                        if (radio.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
+                        const val   = (radio.value || '').toLowerCase().trim();
+                        const label = radio.closest('label') || (radio.id ? toolWrap.querySelector(`label[for="${radio.id}"]`) : null);
+                        const txt   = label ? label.textContent.toLowerCase() : '';
+                        let isTargetFemale = femaleTokens.concat(['2']).includes(val) || hasFemaleKeyword(txt);
+                        let isTargetMale   = maleTokens.concat(['1']).includes(val) || hasMaleKeyword(txt);
+                        if ((isFemale && isTargetFemale) || (isMale && isTargetMale)) {
+                            if (!radio.checked) {
+                                radio.checked = true;
+                                radio.dispatchEvent(new Event('input', { bubbles: true }));
+                                radio.dispatchEvent(new Event('change', { bubbles: true }));
                             }
                         }
                     });
-                    if (matched) {
-                        sel.dispatchEvent(new Event('change', { bubbles: true }));
-                        sel.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                    return;
-                }
 
-                // ۳. تشخیص منوی سال تولد (Year)
-                const isYearSelect = (nameAttr.includes('year') || idAttr.includes('year') || firstOpt.includes('سال') || firstOpt.includes('سال تولد') || nameAttr.includes('byear') || idAttr.includes('byear'));
-                if (isYearSelect && bYearNum > 0) {
-                    let matched = false;
-                    Array.from(sel.options).forEach(opt => {
-                        const vNum = parseInt(opt.value, 10);
-                        const tNum = parseInt(opt.textContent, 10);
-                        if (vNum === bYearNum || tNum === bYearNum) {
-                            sel.value = opt.value;
-                            matched = true;
+                    // ه) منوهای کشویی Select جنسیت
+                    const genderSelects = toolWrap.querySelectorAll('select');
+                    genderSelects.forEach(sel => {
+                        if (sel.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return;
+                        const name = (sel.name || '').toLowerCase();
+                        const id   = (sel.id || '').toLowerCase();
+                        let isGenderSelect = (name.includes('gender') || name.includes('sex') || name.includes('character') || id.includes('gender') || id.includes('sex') || id.includes('character'));
+                        let foundMatch = false;
+                        Array.from(sel.options).forEach(opt => {
+                            const val = (opt.value || '').toLowerCase().trim();
+                            const txt = (opt.textContent || '').trim().toLowerCase();
+                            if (femaleTokens.includes(val) || maleTokens.includes(val) || hasFemaleKeyword(txt) || hasMaleKeyword(txt)) {
+                                isGenderSelect = true;
+                            }
+                            if (isFemale && (femaleTokens.concat(['2']).includes(val) || hasFemaleKeyword(txt))) {
+                                sel.value = opt.value;
+                                foundMatch = true;
+                            } else if (isMale && (maleTokens.concat(['1']).includes(val) || hasMaleKeyword(txt))) {
+                                sel.value = opt.value;
+                                foundMatch = true;
+                            }
+                        });
+                        if (isGenderSelect && foundMatch) {
+                            sel.dispatchEvent(new Event('change', { bubbles: true }));
+                            sel.dispatchEvent(new Event('input', { bubbles: true }));
                         }
                     });
-                    if (matched) {
-                        sel.dispatchEvent(new Event('change', { bubbles: true }));
-                        sel.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                // و) تگ‌های متنی نمایش جنسیت
+                const genderPlaceholders = toolWrap.querySelectorAll('.madenna-user-gender, [data-madenna-user-gender]');
+                genderPlaceholders.forEach(el => { el.textContent = genderFa; });
+            }
+
+            // ==========================================
+            // ۳. پر کردن خودکار تاریخ تولد (روز، ماه، سال) و سن
+            // ==========================================
+            if (activeBirthdate) {
+                const ddPlaceholders = ['روز تولد', 'ماه تولد', 'سال (شمسی)', 'سال تولد', 'روز', 'ماه', 'سال', 'انتخاب کنید', 'انتخاب'];
+
+                function detectDateFieldType(el, firstOptText, optSampleText) {
+                    const explicitType = ((el.getAttribute && el.getAttribute('data-dd-type')) || '').trim().toLowerCase();
+                    if (explicitType === 'year' || explicitType === 'month' || explicitType === 'day') return explicitType;
+
+                    const attrStr = ((el.name || '') + ' ' + (el.id || '') + ' ' + (el.getAttribute ? (el.getAttribute('aria-label') || '') : '')).replace(/birthday/gi, 'birth');
+                    const lowAttr = attrStr.toLowerCase();
+                    const lowFirst = toEnglishDigits(firstOptText || '').trim().toLowerCase();
+                    const lowSample = toEnglishDigits(optSampleText || '').trim().toLowerCase();
+
+                    if (lowAttr.includes('year') || lowAttr.includes('byear') || lowFirst.includes('سال')) return 'year';
+                    if (lowAttr.includes('month') || lowAttr.includes('bmonth') || lowFirst.includes('ماه')) return 'month';
+                    if (lowAttr.includes('day') || lowAttr.includes('bday') || lowFirst.includes('روز')) return 'day';
+
+                    if (lowSample.includes('فروردین') || lowSample.includes('اردیبهشت') || lowSample.includes('اسفند')) return 'month';
+                    if (/\b13[3-9]\d\b/.test(lowSample)) return 'year';
+                    return '';
+                }
+
+                function findMenuOptionMatch(menu, ddType) {
+                    if (!menu) return null;
+                    const primary = Array.from(menu.querySelectorAll('[data-value], [data-val], [role="option"], .madenna-dd-item, .dd-item, button, li, a'));
+                    const fallback = Array.from(menu.querySelectorAll('div')).filter(d => d.querySelectorAll('div').length === 0);
+                    const candidates = primary.concat(fallback);
+                    const validMonthTokens = shamsiMonthNames[bMonthNum] || [String(bMonthNum)];
+
+                    for (let i = 0; i < candidates.length; i++) {
+                        const opt = candidates[i];
+                        if (opt.querySelector('button, li, [role="option"], [data-value], [data-val]')) continue;
+                        if (opt.children.length > 2) continue;
+
+                        const rawVal = opt.getAttribute('data-value') || opt.getAttribute('data-val') || opt.getAttribute('value') || '';
+                        const rawTxt = (opt.textContent || '').trim();
+                        if (!rawTxt && !rawVal) continue;
+                        if (ddPlaceholders.includes(rawTxt)) continue;
+
+                        const cleanVal = toEnglishDigits(rawVal).trim().toLowerCase();
+                        const cleanTxt = toEnglishDigits(rawTxt).trim().toLowerCase();
+                        const valInt = /^\d+$/.test(cleanVal) ? parseInt(cleanVal, 10) : NaN;
+                        const txtMatch = cleanTxt.match(/\d+/);
+                        const txtInt = txtMatch ? parseInt(txtMatch[0], 10) : NaN;
+
+                        if (ddType === 'year' && bYearNum > 0) {
+                            if (valInt === bYearNum || txtInt === bYearNum) return opt;
+                        } else if (ddType === 'day' && bDayNum > 0) {
+                            if (valInt === bDayNum || txtInt === bDayNum) return opt;
+                        } else if (ddType === 'month' && bMonthNum > 0) {
+                            if (valInt === bMonthNum || txtInt === bMonthNum) return opt;
+                            for (let tIdx = 0; tIdx < validMonthTokens.length; tIdx++) {
+                                const token = toEnglishDigits(validMonthTokens[tIdx]).toLowerCase();
+                                if (cleanVal === token || cleanTxt.includes(token)) return opt;
+                            }
+                        }
                     }
-                    return;
+                    return null;
                 }
-            });
 
-            // ب) فیلدهای Input برای تاریخ تولد، سال، ماه، روز و سن
-            const allInputs = toolWrap.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"])');
-            allInputs.forEach(inp => {
-                const nameAttr = (inp.name || '').toLowerCase();
-                const idAttr   = (inp.id || '').toLowerCase();
-                const phAttr   = (inp.placeholder || '').toLowerCase();
+                // الف) دراپ‌داون‌های کاستوم (.madenna-custom-dd و data-dd-type) به ترتیب سال -> ماه -> روز
+                const customDropdowns = Array.from(
+                    toolWrap.querySelectorAll('.madenna-custom-dd, [data-dd-type="day"], [data-dd-type="month"], [data-dd-type="year"]')
+                );
+                if (customDropdowns.length > 0) {
+                    const ddByType = { year: [], month: [], day: [] };
+                    customDropdowns.forEach(dd => {
+                        const triggerVal = dd.querySelector('.madenna-dd-Trigger-val, .madenna-dd-trigger span, [id*="dd-label"]');
+                        const triggerTxt = triggerVal ? triggerVal.textContent : '';
+                        const ddType = detectDateFieldType(dd, triggerTxt, '');
+                        if (ddType && ddByType[ddType]) {
+                            ddByType[ddType].push({ dd, triggerVal, triggerTxt });
+                        }
+                    });
 
-                // فیلد کامل تاریخ تولد
-                if (nameAttr.includes('birth') || idAttr.includes('birth') || nameAttr.includes('bdate') || idAttr.includes('bdate') || phAttr.includes('تاریخ تولد')) {
-                    if (!nameAttr.includes('year') && !nameAttr.includes('month') && !nameAttr.includes('day') && !idAttr.includes('year') && !idAttr.includes('month') && !idAttr.includes('day') && !phAttr.includes('سال') && !phAttr.includes('ماه') && !phAttr.includes('روز')) {
-                        setFieldValue(inp, activeBirthdate);
+                    ['year', 'month', 'day'].forEach(ddType => {
+                        if (userManuallySelectedBirthdate[ddType]) return;
+                        const targetNum = ddType === 'year' ? bYearNum : (ddType === 'month' ? bMonthNum : bDayNum);
+                        if (!targetNum || targetNum <= 0) return;
+
+                        ddByType[ddType].forEach(item => {
+                            const { dd, triggerVal, triggerTxt } = item;
+                            const cleanCurrentLbl = (triggerTxt || '').trim();
+                            const isPlaceholderLbl = cleanCurrentLbl === '' || ddPlaceholders.includes(cleanCurrentLbl);
+                            const matchingHidden = Array.from(toolWrap.querySelectorAll('input[type="hidden"]')).find(inp => {
+                                const key = ((inp.id || '') + ' ' + (inp.name || '')).replace(/birthday/gi, 'birth').toLowerCase();
+                                return new RegExp(`(?:^|[-_])${ddType}(?:$|[-_])`).test(key) || key.includes(`-${ddType}`) || key.includes(`_${ddType}`);
+                            });
+                            const hiddenVal = matchingHidden ? (matchingHidden.value || '').trim() : '';
+
+                            if (!isPlaceholderLbl && (!matchingHidden || hiddenVal !== '')) {
+                                return;
+                            }
+
+                            const menu = dd.querySelector('.madenna-dd-menu, [id*="dd-menu"], [role="listbox"]');
+                            if (!menu) return;
+
+                            let matchedOpt = findMenuOptionMatch(menu, ddType);
+
+                            // اگر منو خالی است و فقط با کلیک روی تریگر ساخته می‌شود
+                            if (!matchedOpt && menu.children.length === 0 && document.readyState === 'complete' && dd.getAttribute('data-madenna-tried-open') !== 'true') {
+                                dd.setAttribute('data-madenna-tried-open', 'true');
+                                const triggerBtn = dd.querySelector('.madenna-dd-trigger, [role="button"]');
+                                if (triggerBtn) {
+                                    triggerBtn.click();
+                                    matchedOpt = findMenuOptionMatch(menu, ddType);
+                                    if (!matchedOpt) {
+                                        triggerBtn.click();
+                                    }
+                                }
+                            }
+
+                            if (matchedOpt) {
+                                try {
+                                    matchedOpt.click();
+                                } catch (e) {}
+                            }
+                        });
+                    });
+                }
+
+                // ب) منوهای کشویی استاندارد Select به ترتیب سال -> ماه -> روز
+                const allSelects = Array.from(toolWrap.querySelectorAll('select'));
+                const selectsByType = { year: [], month: [], day: [] };
+                allSelects.forEach(sel => {
+                    const firstOpt = sel.options.length > 0 ? (sel.options[0].textContent || '') : '';
+                    const sampleTexts = Array.from(sel.options).slice(0, 15).map(o => (o.textContent || '').trim()).join(' ');
+                    const selType = detectDateFieldType(sel, firstOpt, sampleTexts);
+                    if (selType && selectsByType[selType]) {
+                        selectsByType[selType].push(sel);
                     }
-                }
+                });
 
-                // فیلد سال تولد
-                if ((nameAttr.includes('year') || idAttr.includes('year') || phAttr.includes('سال تولد') || phAttr.includes('سال')) && bYearNum > 0) {
-                    setFieldValue(inp, birthYear);
-                }
+                ['year', 'month', 'day'].forEach(selType => {
+                    if (userManuallySelectedBirthdate[selType]) return;
+                    selectsByType[selType].forEach(sel => {
+                        const curVal = (sel.value || '').trim().toLowerCase();
+                        const hasRealVal = curVal !== '' && curVal !== '0' && !['day', 'month', 'year'].includes(curVal) && sel.selectedIndex > 0;
+                        if (hasRealVal) return;
 
-                // فیلد ماه تولد
-                if ((nameAttr.includes('month') || idAttr.includes('month') || phAttr.includes('ماه تولد') || phAttr.includes('ماه')) && bMonthNum > 0) {
-                    setFieldValue(inp, birthMonth);
-                }
+                        let matched = false;
+                        if (selType === 'day' && bDayNum > 0) {
+                            Array.from(sel.options).forEach(opt => {
+                                const valNum = parseInt(toEnglishDigits(opt.value), 10);
+                                const txtNum = parseInt(toEnglishDigits(opt.textContent), 10);
+                                if (valNum === bDayNum || txtNum === bDayNum) {
+                                    sel.value = opt.value;
+                                    matched = true;
+                                }
+                            });
+                        } else if (selType === 'month' && bMonthNum > 0) {
+                            const validMonthTokens = shamsiMonthNames[bMonthNum] || [String(bMonthNum)];
+                            Array.from(sel.options).forEach(opt => {
+                                const v = toEnglishDigits(opt.value || '').trim().toLowerCase();
+                                const t = toEnglishDigits(opt.textContent || '').trim().toLowerCase();
+                                const vNum = parseInt(v, 10);
+                                if (vNum === bMonthNum) {
+                                    sel.value = opt.value;
+                                    matched = true;
+                                } else {
+                                    for (let token of validMonthTokens) {
+                                        const enToken = toEnglishDigits(token).toLowerCase();
+                                        if (v === enToken || t.includes(enToken)) {
+                                            sel.value = opt.value;
+                                            matched = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            });
+                        } else if (selType === 'year' && bYearNum > 0) {
+                            Array.from(sel.options).forEach(opt => {
+                                const vNum = parseInt(toEnglishDigits(opt.value), 10);
+                                const tNum = parseInt(toEnglishDigits(opt.textContent), 10);
+                                if (vNum === bYearNum || tNum === bYearNum) {
+                                    sel.value = opt.value;
+                                    matched = true;
+                                }
+                            });
+                        }
 
-                // فیلد روز تولد
-                if ((nameAttr.includes('day') || idAttr.includes('day') || phAttr.includes('روز تولد') || phAttr.includes('روز')) && bDayNum > 0) {
-                    setFieldValue(inp, birthDay);
-                }
+                        if (matched) {
+                            sel.dispatchEvent(new Event('change', { bubbles: true }));
+                            sel.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    });
+                });
 
-                // فیلد سن
-                if ((nameAttr.includes('age') || idAttr.includes('age') || phAttr.includes('سن شما') || phAttr.includes('سن')) && calculatedAge) {
-                    if (!nameAttr.includes('message') && !idAttr.includes('message') && !nameAttr.includes('page')) {
-                        setFieldValue(inp, calculatedAge);
+                // ج) فیلدهای Input برای تاریخ تولد، سال، ماه، روز و سن
+                const allInputs = toolWrap.querySelectorAll('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"])');
+                allInputs.forEach(inp => {
+                    const nameAttr = (inp.name || '').toLowerCase();
+                    const idAttr   = (inp.id || '').toLowerCase();
+                    const phAttr   = (inp.placeholder || '').toLowerCase();
+
+                    if (nameAttr.includes('birth') || idAttr.includes('birth') || nameAttr.includes('bdate') || idAttr.includes('bdate') || phAttr.includes('تاریخ تولد')) {
+                        if (!nameAttr.includes('year') && !nameAttr.includes('month') && !nameAttr.includes('day') && !idAttr.includes('year') && !idAttr.includes('month') && !idAttr.includes('day') && !phAttr.includes('سال') && !phAttr.includes('ماه') && !phAttr.includes('روز')) {
+                            setFieldValue(inp, activeBirthdate);
+                        }
                     }
-                }
-            });
 
-            const bdatePlaceholders = toolWrap.querySelectorAll('.madenna-user-birthdate, [data-madenna-user-birthdate]');
-            bdatePlaceholders.forEach(el => { el.textContent = activeBirthdate; });
-            const agePlaceholders = toolWrap.querySelectorAll('.madenna-user-age, [data-madenna-user-age]');
-            agePlaceholders.forEach(el => { el.textContent = calculatedAge; });
+                    if ((nameAttr.includes('year') || idAttr.includes('year') || phAttr.includes('سال تولد') || phAttr.includes('سال')) && bYearNum > 0) {
+                        setFieldValue(inp, String(bYearNum));
+                    }
+
+                    if ((nameAttr.includes('month') || idAttr.includes('month') || phAttr.includes('ماه تولد') || phAttr.includes('ماه')) && bMonthNum > 0) {
+                        setFieldValue(inp, String(bMonthNum));
+                    }
+
+                    if ((nameAttr.includes('day') || idAttr.includes('day') || phAttr.includes('روز تولد') || phAttr.includes('روز')) && bDayNum > 0) {
+                        setFieldValue(inp, String(bDayNum));
+                    }
+
+                    if ((nameAttr.includes('age') || idAttr.includes('age') || phAttr.includes('سن شما') || phAttr.includes('سن')) && calculatedAge) {
+                        if (!nameAttr.includes('message') && !idAttr.includes('message') && !nameAttr.includes('page')) {
+                            setFieldValue(inp, calculatedAge);
+                        }
+                    }
+                });
+
+                const bdatePlaceholders = toolWrap.querySelectorAll('.madenna-user-birthdate, [data-madenna-user-birthdate]');
+                bdatePlaceholders.forEach(el => { el.textContent = activeBirthdate; });
+                const agePlaceholders = toolWrap.querySelectorAll('.madenna-user-age, [data-madenna-user-age]');
+                agePlaceholders.forEach(el => { el.textContent = calculatedAge; });
+            }
+        } finally {
+            isAutoPopulating = false;
         }
     }
-
     function createModalMarkup() {
         if (document.getElementById('madenna-vault-modal')) return;
 
@@ -763,10 +937,22 @@
 
             const liveToolWrap = getLiveToolContainer();
             if (liveToolWrap && liveToolWrap.contains(e.target)) {
-                userHasInteractedWithTool = true;
-                setTimeout(scanForRevealedResultInTool, 80);
-                setTimeout(scanForRevealedResultInTool, 350);
-                setTimeout(scanForRevealedResultInTool, 750);
+                if (!isAutoPopulating && e.isTrusted) {
+                    userHasInteractedWithTool = true;
+                    if (e.target.closest('[data-mdn-gender], [data-gender], [data-sex], [data-char], [data-character], .avatar-select-card, .mdn-char-card-box, input[type="radio"]')) {
+                        userManuallySelectedGender = true;
+                    }
+                    const ddTarget = e.target.closest('.madenna-custom-dd, select');
+                    if (ddTarget) {
+                        const ddType = (ddTarget.getAttribute('data-dd-type') || ddTarget.id || ddTarget.name || '').toLowerCase();
+                        if (ddType.includes('year')) userManuallySelectedBirthdate.year = true;
+                        else if (ddType.includes('month')) userManuallySelectedBirthdate.month = true;
+                        else if (ddType.includes('day')) userManuallySelectedBirthdate.day = true;
+                    }
+                    setTimeout(scanForRevealedResultInTool, 80);
+                    setTimeout(scanForRevealedResultInTool, 350);
+                    setTimeout(scanForRevealedResultInTool, 750);
+                }
             }
         }, true);
 
