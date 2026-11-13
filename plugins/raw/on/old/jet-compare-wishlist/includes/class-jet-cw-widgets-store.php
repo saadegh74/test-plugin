@@ -85,12 +85,17 @@ if ( ! class_exists( 'Jet_CW_Widgets_Store' ) ) {
 		}
 
 		/**
-		 * Return stored widgets data
+		 * Return stored widgets data.
+		 *
+		 * @since 1.0.0
 		 *
 		 * @return array
 		 */
 		public function get_stored_widgets() {
-			return ! empty( $_REQUEST['widgets_data'] ) ? $_REQUEST['widgets_data'] : array();
+			check_ajax_referer( 'jet-cw-compare', 'nonce' );
+
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return ! empty( wp_unslash( $_REQUEST['widgets_data'] ) ) ? wp_unslash( $_REQUEST['widgets_data'] ) : [];
 		}
 
 		/**
@@ -130,15 +135,21 @@ if ( ! class_exists( 'Jet_CW_Widgets_Store' ) ) {
 		}
 
 		/**
-		 * Enqueue filter scripts
+		 * Localize data.
+		 *
+		 * Enqueue scripts & setup localized data.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @return void
 		 */
 		public function localize_data() {
 
 			$deps = [ 'jquery' ];
 
 			wp_enqueue_script(
-				'jet-cw',
-				jet_cw()->plugin_url( 'assets/js/jet-cw.min.js' ),
+				'jet-cw-frontend',
+				jet_cw()->plugin_url( 'assets/js/dist/frontend.js' ),
 				$deps,
 				jet_cw()->get_version(),
 				true
@@ -147,11 +158,12 @@ if ( ! class_exists( 'Jet_CW_Widgets_Store' ) ) {
 			$localized_data = apply_filters( 'jet-cw/localized-data', array(
 				'ajaxurl' => admin_url( 'admin-ajax.php' ),
 				'widgets' => $this->widgets_types,
+				'nonce'   => wp_create_nonce( 'jet-cw-compare' ),
 			) );
 
 			$localized_data = array_merge( $localized_data, $this->get_localized_data() );
 
-			wp_localize_script( 'jet-cw', 'JetCWSettings', $localized_data );
+			wp_localize_script( 'jet-cw-frontend', 'JetCWSettings', $localized_data );
 
 		}
 

@@ -9,36 +9,50 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 if ( ! class_exists( 'Jet_CW_Engine_Package' ) ) {
-
-	/**
-	 * Define Jet_CW_Engine_Package class.
-	 */
 	class Jet_CW_Engine_Package {
 
-		/**
-		 * Jet_CW_Engine_Package constructor.
-		 */
 		public function __construct() {
+
+			add_action( 'jet-engine/ajax-handlers/before-call-handler', [ $this, 'register_assets_on_ajax' ] );
+
 			add_filter( 'jet-engine/ajax/get_listing/response', [ $this, 'define_cw_listing_lazy_load_data' ], 10, 2 );
+
 		}
 
 		/**
+		 * Register assets on AJAX.
+		 *
+		 * @since 1.5.8
+		 *
+		 * @return void
+		 */
+		public function register_assets_on_ajax() {
+
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- no state change, only enqueue styles.
+
+			if ( filter_var( wp_unslash( $_POST['isEditMode'] ?? '' ), FILTER_VALIDATE_BOOLEAN ) ) {
+				return;
+			}
+
+			jet_cw()->assets->enqueue_styles();
+
+		}
+
+		/**
+		 * Define lazy loading data.
+		 *
 		 * Add the JetCompareWishlist widgets data to JetEngine response after lazy loading.
 		 *
-		 * @param array $response
-		 * @param       $settings
+		 * @since 1.4.1
+		 *
+		 * @param array $response Response data list.
+		 * @param array $settings Listing grid widget settings list.
 		 *
 		 * @return array
 		 */
 		public function define_cw_listing_lazy_load_data( $response, $settings ) {
 
 			if ( 'yes' !== $settings['lazy_load'] ) {
-				return $response;
-			}
-
-			$listing_settings = get_post_meta( $settings['lisitng_id'], '_elementor_page_settings', true );
-
-			if ( 'product' !== $listing_settings['listing_post_type'] ) {
 				return $response;
 			}
 
@@ -49,7 +63,6 @@ if ( ! class_exists( 'Jet_CW_Engine_Package' ) ) {
 		}
 
 	}
-
 }
 
 new Jet_CW_Engine_Package();

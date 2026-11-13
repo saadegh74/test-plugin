@@ -46,13 +46,20 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Integration' ) ) {
 		}
 
 		/**
-		 * Add widgets wishlist button
+		 * Add wishlist button.
 		 *
-		 * @param array $settings
+		 * Renders the widget in JetWooBuilder plugin widgets.
+		 *
+		 * @since 1.0.0
+		 * @since 1.5.8.1 Added style enqueue.
+		 *
+		 * @param array $settings List of widget settings.
+		 *
+		 * @return void
 		 */
-		public function add_wishlist_button( $settings = array() ) {
+		public function add_wishlist_button( $settings = [] ) {
 
-			$widget_settings = array(
+			$widget_settings = [
 				'button_icon_position' => $settings['wishlist_button_icon_position'],
 				'use_button_icon'      => $settings['wishlist_use_button_icon'],
 				'button_icon_normal'   => $settings['selected_wishlist_button_icon_normal'],
@@ -61,9 +68,11 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Integration' ) ) {
 				'button_icon_added'    => $settings['selected_wishlist_button_icon_added'],
 				'button_label_added'   => $settings['wishlist_button_label_added'],
 				'_widget_id'           => $settings['_widget_id'],
-			);
+			];
 
 			jet_cw()->wishlist_render->render_wishlist_button( $widget_settings );
+
+			wp_enqueue_style( 'jet-cw-widget-cw-button' );
 
 		}
 
@@ -89,11 +98,18 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Integration' ) ) {
 		}
 
 		/**
-		 * Add default wishlist button
+		 * Add wishlist button default.
+		 *
+		 * Renders the widget in default WooCommerce templates.
+		 *
+		 * @since 1.0.0
+		 * @since 1.5.8 Added style enqueue.
+		 *
+		 * @return void
 		 */
 		public function add_wishlist_button_default() {
 
-			$widget_settings = array(
+			$widget_settings = [
 				'button_icon_position' => 'left',
 				'use_button_icon'      => false,
 				'button_icon_normal'   => '',
@@ -102,9 +118,11 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Integration' ) ) {
 				'button_icon_added'    => '',
 				'button_label_added'   => __( 'View Wishlist', 'jet-cw' ),
 				'_widget_id'           => 'default',
-			);
+			];
 
 			jet_cw()->wishlist_render->render_wishlist_button( $widget_settings );
+
+			wp_enqueue_style( 'jet-cw-widget-cw-button' );
 
 		}
 
@@ -134,8 +152,8 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Integration' ) ) {
 					[
 						'label'     => __( 'Wishlist Button', 'jet-cw' ),
 						'type'      => Elementor\Controls_Manager::SWITCHER,
-						'label_on'  => __( 'Show', 'jet-woo-builder' ),
-						'label_off' => __( 'Hide', 'jet-woo-builder' ),
+						'label_on'  => __( 'Show', 'jet-cw' ),
+						'label_off' => __( 'Hide', 'jet-cw' ),
 					]
 				);
 			} else {
@@ -154,8 +172,8 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Integration' ) ) {
 				[
 					'label'     => __( 'Icon', 'jet-cw' ),
 					'type'      => Elementor\Controls_Manager::SWITCHER,
-					'label_on'  => __( 'Show', 'jet-woo-builder' ),
-					'label_off' => __( 'Hide', 'jet-woo-builder' ),
+					'label_on'  => __( 'Show', 'jet-cw' ),
+					'label_off' => __( 'Hide', 'jet-cw' ),
 					'default'   => 'yes',
 					'condition' => [
 						'show_wishlist!' => '',

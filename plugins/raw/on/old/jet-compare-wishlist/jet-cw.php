@@ -3,7 +3,7 @@
  * Plugin Name: JetCompareWishlist For Elementor
  * Plugin URI:  https://crocoblock.com/plugins/jetcomparewishlist/
  * Description: JetCompareWishlist - Compare and Wishlist functionality for Elementor Page Builder
- * Version:     1.5.5.2
+ * Version:     1.5.13
  * Author:      Crocoblock
  * Author URI:  https://crocoblock.com/
  * Text Domain: jet-cw
@@ -11,11 +11,11 @@
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Domain Path: /languages
  *
- * WC tested up to: 7.4
+ * WC tested up to: 9.3
  * WC requires at least: 3.0
  *
- * Elementor tested up to: 3.11
- * Elementor Pro tested up to: 3.10
+ * Elementor tested up to: 3.25
+ * Elementor Pro tested up to: 3.21
  */
 
 // If this file is called directly, abort.
@@ -45,7 +45,7 @@ if ( ! class_exists( 'Jet_CW' ) ) {
 		 *
 		 * @var string
 		 */
-		private $version = '1.5.5.2';
+		private $version = '1.5.13';
 
 		/**
 		 * Require Elementor Version

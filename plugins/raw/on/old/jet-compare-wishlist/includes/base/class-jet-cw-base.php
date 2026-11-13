@@ -68,7 +68,7 @@ abstract class Jet_CW_Base extends Widget_Base {
 	 * @return void
 	 */
 	public function __open_wrap() {
-		printf( '<div class="%s jet-cw">', $this->get_name() );
+		printf( '<div class="jet-cw %s">', esc_attr( $this->get_name() ) );
 	}
 
 	/**
@@ -136,12 +136,14 @@ abstract class Jet_CW_Base extends Widget_Base {
 	}
 
 	/**
+	 * Render icon.
+	 *
 	 * Print HTML icon template
 	 *
-	 * @param array  $setting
-	 * @param string $format
-	 * @param string $icon_class
-	 * @param bool   $echo
+	 * @param string $setting    Setting key that holds icon.
+	 * @param string $format     Data format.
+	 * @param string $icon_class Icon additional class.
+	 * @param bool   $echo       Printed pointer.
 	 *
 	 * @return void|string
 	 */
@@ -181,17 +183,18 @@ abstract class Jet_CW_Base extends Widget_Base {
 				$icon_class .= ' ' . $settings[ $setting ];
 			}
 
-			$icon_html = sprintf( '<i class="%s" aria-hidden="true"></i>', $icon_class );
+			$icon_html = sprintf( '<i class="%s" aria-hidden="true"></i>', esc_attr( $icon_class ) );
 		}
 
 		if ( empty( $icon_html ) ) {
-			return;
+			return '';
 		}
 
 		if ( ! $echo ) {
 			return sprintf( $format, $icon_html );
 		}
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $format and $icon_html is already escaped
 		printf( $format, $icon_html );
 
 	}

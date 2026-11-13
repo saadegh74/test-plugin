@@ -3,72 +3,62 @@
  * Wishlist Render Class
  */
 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
 if ( ! class_exists( 'Jet_CW_Wishlist_Render' ) ) {
 
-	/**
-	 * Define Jet_CW_Wishlist_Render class
-	 */
 	class Jet_CW_Wishlist_Render {
 
-		/**
-		 * Initialize integration hooks
-		 *
-		 * @return void
-		 */
 		public function __construct() {
-
-			add_action( 'wp_ajax_jet_update_wish_list', array( $this, 'update_wish_list' ) );
-			add_action( 'wp_ajax_nopriv_jet_update_wish_list', array( $this, 'update_wish_list' ) );
-
+			add_action( 'wp_ajax_jet_update_wish_list', [ $this, 'update_wish_list' ] );
+			add_action( 'wp_ajax_nopriv_jet_update_wish_list', [ $this, 'update_wish_list' ] );
 		}
 
 		/**
 		 * Processes buttons actions.
 		 *
 		 * @since  1.0.0
-		 *
-		 * @action wp_ajax_jet_update_wish_list
 		 */
 		function update_wish_list() {
 
-			$pid     = isset( $_REQUEST['pid'] ) ? absint( $_REQUEST['pid'] ) : false;
-			$context = isset( $_REQUEST['context'] ) ? strval( $_REQUEST['context'] ) : false;
+			check_ajax_referer( 'jet-cw-compare', 'nonce' );
+
+			$pid     = isset( $_POST['pid'] )     ? absint( wp_unslash( $_POST['pid'] ) )     : 0;
+			$context = isset( $_POST['context'] ) ? sanitize_text_field( wp_unslash( $_POST['context'] ) ) : '';
+
+			// Hook fires before adding any data into the wishlist store.
+			do_action( 'jet-cw/wishlist/render/before-add-to-wishlist', $pid, $context, $this );
 
 			$data = jet_cw()->wishlist_data->update_data_wishlist( $pid, $context );
 
-			wp_send_json( array(
+			wp_send_json_success( [
 				'content'            => $this->render_content( $pid ),
 				'wishlistItemsCount' => count( $data ),
-			) );
+			] );
 
 		}
 
 		/**
-		 * Render content
+		 * Render content.
 		 *
-		 * @param $product_id
+		 * @param string|int $product_id Product ID.
 		 *
 		 * @return array
 		 */
 		public function render_content( $product_id ) {
 
 			$widgets         = jet_cw()->widgets_store->get_stored_widgets();
-			$widgets_content = array();
+			$widgets_content = [];
+
+			if ( empty( $widgets ) ) {
+				return $widgets_content;
+			}
 
 			foreach ( $widgets['wishlist'] as $selector => $widget_data ) {
-				$selector = urldecode( $selector );
-				$selector = str_replace( '{pid}', $product_id, $selector );
-
-				$widget_setting = $widget_data['settings'];
-				$widget_type    = $widget_data['type'];
+				$selector = str_replace( '{pid}', $product_id, urldecode( $selector ) );
 
 				ob_start();
-				$this->get_render_content_type( $widget_setting, $product_id, $widget_type );
+				$this->get_render_content_type( $widget_data['settings'], $product_id, $widget_data['type'] );
 				$widgets_content[ $selector ] = ob_get_clean();
 			}
 
@@ -77,11 +67,11 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Render' ) ) {
 		}
 
 		/**
-		 * Render current widget type
+		 * Render current widget type.
 		 *
-		 * @param $widget_setting
-		 * @param $product_id
-		 * @param $widget_type
+		 * @param array      $widget_setting List of widget settings.
+		 * @param string|int $product_id     Product ID.
+		 * @param string     $widget_type    Widget type.
 		 */
 		public function get_render_content_type( $widget_setting, $product_id, $widget_type ) {
 			switch ( $widget_type ) {
@@ -101,9 +91,9 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Render' ) ) {
 		}
 
 		/**
-		 * Render wishlist button
+		 * Render wishlist button.
 		 *
-		 * @param $settings
+		 * @param array $settings List of widget settings.
 		 */
 		public function render_wishlist_button( $settings ) {
 

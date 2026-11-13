@@ -36,7 +36,7 @@ class Avaliable_Addons extends Page_Module_Base {
 	 * @return string
 	 */
 	public function get_page_name() {
-		return esc_html__( 'Widgets', 'jet-cw' );
+		return __( 'Widgets', 'jet-cw' );
 	}
 
 	/**
@@ -58,29 +58,32 @@ class Avaliable_Addons extends Page_Module_Base {
 	}
 
 	/**
-	 * Enqueue module-specific assets
+	 * Enqueue module-specific assets.
+	 *
+	 * @since 1.2.2
+	 * @since 1.5.8 Renamed style&script.
 	 *
 	 * @return void
 	 */
 	public function enqueue_module_assets() {
 
 		wp_enqueue_style(
-			'jet-cw-admin-css',
-			jet_cw()->plugin_url( 'assets/css/jet-cw-admin.css' ),
+			'jet-cw-settings-page-css',
+			jet_cw()->plugin_url( 'assets/css/admin/settings-page.css' ),
 			false,
 			jet_cw()->get_version()
 		);
 
 		wp_enqueue_script(
-			'jet-cw-admin-vue-components',
-			jet_cw()->plugin_url( 'assets/js/admin-vue-components.min.js' ),
-			array( 'cx-vue-ui', 'wp-api-fetch' ),
+			'jet-cw-settings-page-js',
+			jet_cw()->plugin_url( 'assets/js/dist/admin/settings-page.js' ),
+			[ 'cx-vue-ui', 'wp-api-fetch' ],
 			jet_cw()->get_version(),
 			true
 		);
 
 		wp_localize_script(
-			'jet-cw-admin-vue-components',
+			'jet-cw-settings-page-js',
 			'jetCWSettingsConfig',
 			apply_filters( 'jet-cw/admin/settings-page/localized-config', jet_cw()->settings->get_localize_data() )
 		);
@@ -96,7 +99,7 @@ class Avaliable_Addons extends Page_Module_Base {
 	 *
 	 * @return array
 	 */
-	public function page_config( $config = array(), $page = false, $subpage = false ) {
+	public function page_config( $config = [], $page = false, $subpage = false ) {
 
 		$config['pageModule']    = $this->get_parent_slug();
 		$config['subPageModule'] = $this->get_page_slug();
@@ -114,7 +117,7 @@ class Avaliable_Addons extends Page_Module_Base {
 	 *
 	 * @return array
 	 */
-	public function page_templates( $templates = array(), $page = false, $subpage = false ) {
+	public function page_templates( $templates = [], $page = false, $subpage = false ) {
 
 		$templates['jet-cw-avaliable-addons'] = jet_cw()->plugin_path( 'templates/admin-templates/avaliable-addons-settings.php' );
 

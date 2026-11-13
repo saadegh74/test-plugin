@@ -3,75 +3,64 @@
  * Compare Render Class
  */
 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
-}
+defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
 
 if ( ! class_exists( 'Jet_CW_Compare_Render' ) ) {
 
-	/**
-	 * Define Jet_CW_Compare_Render class
-	 */
 	class Jet_CW_Compare_Render {
 
-		/**
-		 * Initialize integration hooks
-		 *
-		 * @return void
-		 */
 		public function __construct() {
-
-			add_action( 'wp_ajax_jet_update_compare_list', array( $this, 'update_compare_list' ) );
-			add_action( 'wp_ajax_nopriv_jet_update_compare_list', array( $this, 'update_compare_list' ) );
-
-			add_action( 'wp_footer', array( $this, 'render_compare_messages' ) );
-
+			add_action( 'wp_ajax_jet_update_compare_list', [ $this, 'update_compare_list' ] );
+			add_action( 'wp_ajax_nopriv_jet_update_compare_list', [ $this, 'update_compare_list' ] );
+			add_action( 'wp_footer', [ $this, 'render_compare_messages' ] );
 		}
 
 		/**
-		 * Processes buttons actions.
+		 * Processes compare buttons actions.
 		 *
 		 * @since  1.0.0
-		 *
-		 * @action wp_ajax_jet_update_compare_list
 		 */
 		function update_compare_list() {
 
-			$pid     = isset( $_REQUEST['pid'] ) ? absint( $_REQUEST['pid'] ) : false;
-			$context = isset( $_REQUEST['context'] ) ? strval( $_REQUEST['context'] ) : false;
+			check_ajax_referer( 'jet-cw-compare', 'nonce' );
+
+			$pid     = isset( $_POST['pid'] )     ? absint( wp_unslash( $_POST['pid'] ) )     : 0;
+			$context = isset( $_POST['context'] ) ? sanitize_text_field( wp_unslash( $_POST['context'] ) ) : '';
+
+			// Hook fires before adding any data into the wishlist store.
+			do_action( 'jet-cw/compare/render/before-add-to-compare', $pid, $context, $this );
 
 			$data = jet_cw()->compare_data->update_data_compare( $pid, $context );
 
-			wp_send_json( array(
+			wp_send_json_success( [
 				'content'           => $this->render_content( $pid ),
 				'compareItemsCount' => count( $data ),
-			) );
+			] );
 
 		}
 
 
 		/**
-		 * Render content
+		 * Render content.
 		 *
-		 * @param $product_id
+		 * @param string|int $product_id Product ID.
 		 *
 		 * @return array
 		 */
 		public function render_content( $product_id ) {
 
 			$widgets         = jet_cw()->widgets_store->get_stored_widgets();
-			$widgets_content = array();
+			$widgets_content = [];
+
+			if ( empty( $widgets ) ) {
+				return $widgets_content;
+			}
 
 			foreach ( $widgets['compare'] as $selector => $widget_data ) {
-				$selector = urldecode( $selector );
-				$selector = str_replace( '{pid}', $product_id, $selector );
-
-				$widget_setting = $widget_data['settings'];
-				$widget_type    = $widget_data['type'];
+				$selector = str_replace( '{pid}', $product_id, urldecode( $selector ) );
 
 				ob_start();
-				$this->get_render_content_type( $widget_setting, $product_id, $widget_type );
+				$this->get_render_content_type( $widget_data['settings'], $product_id, $widget_data['type'] );
 				$widgets_content[ $selector ] = ob_get_clean();
 			}
 
@@ -80,11 +69,11 @@ if ( ! class_exists( 'Jet_CW_Compare_Render' ) ) {
 		}
 
 		/**
-		 * Render current widget type
+		 * Render current widget type.
 		 *
-		 * @param $widget_setting
-		 * @param $product_id
-		 * @param $widget_type
+		 * @param array      $widget_setting List of widget settings.
+		 * @param string|int $product_id     Product ID.
+		 * @param string     $widget_type    Widget type.
 		 */
 		public function get_render_content_type( $widget_setting, $product_id, $widget_type ) {
 			switch ( $widget_type ) {
@@ -104,9 +93,9 @@ if ( ! class_exists( 'Jet_CW_Compare_Render' ) ) {
 		}
 
 		/**
-		 * Render compare button
+		 * Render compare button.
 		 *
-		 * @param $settings
+		 * @param array $settings List of widget settings.
 		 */
 		public function render_compare_button( $settings ) {
 
@@ -136,11 +125,10 @@ if ( ! class_exists( 'Jet_CW_Compare_Render' ) ) {
 		 * @since 1.5.2 Added option value for message.
 		 */
 		public function render_compare_messages() {
-
-			$message = jet_cw()->settings->get( 'compare_message_max_items' );
-
-			printf( '<div class="jet-compare-message jet-compare-message--max-items" style="display: none">%s</div>', esc_html__( $message, 'jet-cw' ) );
-
+			printf(
+				'<div class="jet-compare-message jet-compare-message--max-items" style="display: none">%s</div>',
+				esc_html__( jet_cw()->settings->get( 'compare_message_max_items' ), 'jet-cw' )
+			);
 		}
 
 	}

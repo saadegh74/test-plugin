@@ -33,6 +33,19 @@ class Jet_Compare_Button extends Jet_CW_Base {
 		return array( 'jet-cw' );
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'jet-cw-widget-cw-button' ];
+	}
+
 	protected function register_controls() {
 
 		jet_cw()->compare_integration->register_compare_button_content_controls( $this );
@@ -63,9 +76,9 @@ class Jet_Compare_Button extends Jet_CW_Base {
 		$this->__open_wrap();
 
 		if ( class_exists( 'Jet_Woo_Builder' ) && jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $widget_settings );
+			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $widget_settings ) );
 		} else {
-			echo self::render_callback( $widget_settings );
+			echo wp_kses_post( self::render_callback( $widget_settings ) ?? '' );
 		}
 
 		$this->__close_wrap();

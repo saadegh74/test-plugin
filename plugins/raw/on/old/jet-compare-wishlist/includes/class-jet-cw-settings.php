@@ -52,7 +52,6 @@ if ( ! class_exists( 'Jet_CW_Settings' ) ) {
 
 			foreach ( glob( jet_cw()->plugin_path( 'includes/widgets/compare/' ) . '*.php' ) as $file ) {
 				$data = get_file_data( $file, array( 'class' => 'Class', 'name' => 'Name', 'slug' => 'Slug' ) );
-
 				$slug = basename( $file, '.php' );
 
 				$available_widgets[] = array(
@@ -65,7 +64,6 @@ if ( ! class_exists( 'Jet_CW_Settings' ) ) {
 
 			foreach ( glob( jet_cw()->plugin_path( 'includes/widgets/wishlist/' ) . '*.php' ) as $file ) {
 				$data = get_file_data( $file, array( 'class' => 'Class', 'name' => 'Name', 'slug' => 'Slug' ) );
-
 				$slug = basename( $file, '.php' );
 
 				$available_widgets[] = array(

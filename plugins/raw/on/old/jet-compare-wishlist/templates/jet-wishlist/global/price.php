@@ -9,4 +9,4 @@ if ( 'yes' !== $widget_settings['show_item_price'] || '' === $price ) {
 	return;
 }
 
-echo $price;
+echo wp_kses_post( $price ?? '' );

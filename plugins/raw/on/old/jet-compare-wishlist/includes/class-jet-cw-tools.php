@@ -468,6 +468,27 @@ if ( ! class_exists( 'Jet_CW_Tools' ) ) {
 
 		}
 
+		/**
+		* Returns the available products presets.
+		*
+		* @since  1.5.10
+		* @return array
+		*/
+		public static function get_presets() {
+			return [
+				'preset-1'  => esc_html__( 'Preset 1', 'jet-cw' ),
+				'preset-2'  => esc_html__( 'Preset 2', 'jet-cw' ),
+				'preset-3'  => esc_html__( 'Preset 3', 'jet-cw' ),
+				'preset-4'  => esc_html__( 'Preset 4', 'jet-cw' ),
+				'preset-5'  => esc_html__( 'Preset 5', 'jet-cw' ),
+				'preset-6'  => esc_html__( 'Preset 6', 'jet-cw' ),
+				'preset-7'  => esc_html__( 'Preset 7', 'jet-cw' ),
+				'preset-8'  => esc_html__( 'Preset 8', 'jet-cw' ),
+				'preset-9'  => esc_html__( 'Preset 9', 'jet-cw' ),
+				'preset-10' => esc_html__( 'Preset 10', 'jet-cw' ),
+			];
+		}
+
 	}
 
 }

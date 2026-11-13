@@ -1,0 +1,20 @@
+{
+  "name": "JetCompareWishlist For Elementor [کانال آزمایشی - Staging]",
+  "slug": "jet-compare-wishlist",
+  "version": "1.5.13",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-08-10 01:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "افزونه تخصصی ایجاد لیست مقایسه‌ محصولات و لیست علاقه‌مندی‌ها (Compare & Wishlist) برای فروشگاه‌های ووکامرس در صفحه‌ساز المنتور.",
+    "changelog": "<h4>1.5.13</h4><ul><li>به‌روزرسانی ماژول JetDashboard و رفع مشکل دسترسی‌پذیری لینک‌ها</li><li>رفع خطای 403 در بارگذاری تنبل (Lazy Load) جت‌انجین</li><li>اصلاحات کامل امنیتی PHPCS، پاک‌سازی خروجی‌های SVG و جلوگیری از XSS/LFI</li><li>بهبود سازگاری دکمه‌های مقایسه و علاقه‌مندی در قالب‌های FSE و نتایج JetSearch</li><li>حذف کامل تبلیغات و لینک‌های سایت واسطه از پیشخوان مدیریت</li><li>حذف فایل‌های زائد توسعه‌دهنده و اتصال به سرور به‌روزرسانی مستقیم (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 390,
+  "downloaded": 1600,
+  "active_installs": 1600,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-compare-wishlist/jet-compare-wishlist-v1.5.13.zip"
+}
