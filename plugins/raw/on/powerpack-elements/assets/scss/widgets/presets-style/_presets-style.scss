@@ -1,0 +1,31 @@
+.elementor-control-type-pp-presets-style {
+	.elementor-control-content {
+		select {
+			appearance: none;
+			font-size: 12px;
+			font-family: inherit;
+			font-weight: inherit;
+			font-style: inherit;
+			text-transform: inherit;
+			letter-spacing: inherit;
+			line-height: inherit;
+			flex-basis: 100%;
+			padding-left: 5px;
+			padding-right: 20px;
+			cursor: pointer;
+		}
+	}
+	.elementor-control-input-wrapper {
+		&:after {
+			font-family: eicons;
+			content: '\e8ad';
+			font-size: 12px;
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			right: 5px;
+			pointer-events: none;
+		}
+		position: relative;
+	}
+}

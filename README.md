@@ -12,12 +12,15 @@
 plugins/raw/
 ├── on/                                     <-- افزونه‌های دارای قابلیت و لینک آپدیتر سرور
 │   ├── advanced-custom-fields-pro/         <-- نسخه old پاک‌سازی‌شده (6.8.11) متصل به سرور ما
+│   ├── elementor-pro/                      <-- نسخه old پاک‌سازی‌شده (4.3.3) متصل به سرور ما
 │   ├── jet-compare-wishlist/               <-- نسخه old پاک‌سازی‌شده (1.5.5.2) متصل به سرور ما
 │   ├── jet-elements/                       <-- نسخه old پاک‌سازی‌شده (2.6.13.1) متصل به سرور ما
+│   ├── jet-engine/                         <-- نسخه old پاک‌سازی‌شده (3.2.6) متصل به سرور ما
 │   ├── jet-search/                         <-- نسخه old پاک‌سازی‌شده (3.1.1) متصل به سرور ما
 │   ├── jet-smart-filters/                  <-- نسخه old پاک‌سازی‌شده (3.3.2) متصل به سرور ما
 │   ├── jet-tabs/                           <-- نسخه old پاک‌سازی‌شده (2.3.5) متصل به سرور ما
 │   ├── jet-woo-builder/                    <-- نسخه old پاک‌سازی‌شده (2.1.7.3) متصل به سرور ما
+│   ├── powerpack-elements/                 <-- نسخه old پاک‌سازی‌شده (2.9.19) متصل به سرور ما
 │   ├── wp-rocket/                          <-- نسخه old پاک‌سازی‌شده (3.23.5.1) متصل به سرور ما
 │   └── old/                                <-- فایل‌های اصلی و دست‌نخورده سرور بیرونی (منبع استخراج لینک دانلود آپدیت‌ها)
 │       ├── advanced-custom-fields-pro/
@@ -62,6 +65,15 @@ plugins/raw/
 plugins/updates/
 ├── up-on/                                  <-- کانال توزیع افزونه‌های دارای لینک و آپدیت سرور (دسته on)
 │   ├── staging/                            <-- محیط آزمایشی (Staging) جهت تست آخرین نسخه پیش از انتشار
+│   │   ├── elementor-pro/
+│   │   │   ├── info.json
+│   │   │   └── elementor-pro-v4.4.0.zip
+│   │   ├── jet-engine/
+│   │   │   ├── info.json
+│   │   │   └── jet-engine-v3.9.1.zip
+│   │   ├── powerpack-elements/
+│   │   │   ├── info.json
+│   │   │   └── powerpack-elements-v3.1.0.zip
 │   │   ├── jet-elements/
 │   │   │   ├── info.json
 │   │   │   └── jet-elements-v2.9.2.8.zip
@@ -83,9 +95,14 @@ plugins/updates/
 │   │   ├── advanced-custom-fields-pro/
 │   │   │   ├── info.json
 │   │   │   └── advanced-custom-fields-pro-v6.8.11.zip
-│   │   ├── wp-rocket/
-│   │   │   ├── info.json
-│   │   │   └── wp-rocket-v3.23.5.1.zip
+│   │   └── wp-rocket/
+│   │       ├── info.json
+│   │       └── wp-rocket-v3.23.5.1.zip
+│   │
+│   └── production/                         <-- محیط محصول پایدار (Production) جهت تحویل نهایی به کاربران (تنها پس از تست و تأیید در Staging)
+│
+├── up-off/                                 <-- کانال توزیع افزونه‌های فاقد آپدیتر سرور اولیه (دسته off)
+│   ├── staging/                            <-- محیط آزمایشی جهت تست آخرین نسخه ارتقایافته
 │   │   ├── jet-blocks/
 │   │   │   ├── info.json
 │   │   │   └── jet-blocks-v1.3.12.zip
@@ -93,17 +110,13 @@ plugins/updates/
 │   │       ├── info.json
 │   │       └── all-in-one-wp-migration-unlimited-extension-v2.86.zip
 │   │
-│   └── production/                         <-- محیط محصول پایدار (Production) جهت تحویل نهایی به کاربران (تنها پس از تست و تأیید در Staging)
+│   └── production/                         <-- محیط محصول پایدار جهت فروش و دسترسی کاربران
 │       ├── jet-blocks/
 │       │   ├── info.json
 │       │   └── jet-blocks-v1.3.12-[کد_محرمانه_عددی].zip
 │       └── all-in-one-wp-migration-unlimited-extension/
 │           ├── info.json
 │           └── all-in-one-wp-migration-unlimited-extension-v2.86-[کد_محرمانه_عددی].zip
-│
-├── up-off/                                 <-- کانال توزیع افزونه‌های فاقد آپدیتر سرور اولیه (دسته off)
-│   ├── staging/                            <-- محیط آزمایشی جهت تست آخرین نسخه ارتقایافته
-│   └── production/                         <-- محیط محصول پایدار جهت فروش و دسترسی کاربران
 │
 └── up-side/                                <-- کانال توزیع قالب‌ها و افزونه‌های جانبی (دسته side)
     ├── staging/
@@ -117,108 +130,123 @@ plugins/updates/
 
 ## ۳. لیست افزونه‌های فعال و آدرس‌های اندپوینت (Endpoints)
 
-### افزونه WP Rocket (نسخه 3.23.5.1)
+### دسته `up-on` (دارای آپدیتر سرور)
 
+#### افزونه Elementor Pro (نسخه 4.4.0)
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/elementor-pro/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/elementor-pro/elementor-pro-v4.4.0.zip`
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
+* **سورس‌های `raw`:**
+  * نسخه old با سرور ما: `plugins/raw/on/elementor-pro/` (نسخه `4.3.3`)
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/elementor-pro/` (نسخه `4.3.3`)
+
+#### افزونه JetEngine (نسخه 3.9.1)
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-engine/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-engine/jet-engine-v3.9.1.zip`
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
+* **سورس‌های `raw`:**
+  * نسخه old با سرور ما: `plugins/raw/on/jet-engine/` (نسخه `3.2.6`)
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-engine/` (نسخه `3.2.6`)
+
+#### افزونه PowerPack Pro for Elementor (نسخه 3.1.0)
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/powerpack-elements/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/powerpack-elements/powerpack-elements-v3.1.0.zip`
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
+* **سورس‌های `raw`:**
+  * نسخه old با سرور ما: `plugins/raw/on/powerpack-elements/` (نسخه `2.9.19`)
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/powerpack-elements/` (نسخه `2.9.19`)
+
+#### افزونه WP Rocket (نسخه 3.23.5.1)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/wp-rocket-v3.23.5.1.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/wp-rocket/` (نسخه `3.23.5.1`)
-  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/wp-rocket/`
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/wp-rocket/` (نسخه `3.23.5.1`)
 
-### افزونه Advanced Custom Fields PRO (نسخه 6.8.11)
-
+#### افزونه Advanced Custom Fields PRO (نسخه 6.8.11)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/advanced-custom-fields-pro/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/advanced-custom-fields-pro/advanced-custom-fields-pro-v6.8.11.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/advanced-custom-fields-pro/` (نسخه `6.8.11`)
-  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/advanced-custom-fields-pro/`
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/advanced-custom-fields-pro/` (نسخه `6.8.11`)
 
-### افزونه JetTabs For Elementor (نسخه 2.3.5)
-
+#### افزونه JetTabs For Elementor (نسخه 2.3.5)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-tabs/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-tabs/jet-tabs-v2.3.5.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-tabs/` (نسخه `2.3.5`)
-  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-tabs/`
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-tabs/` (نسخه `2.3.5`)
 
-### افزونه JetWooBuilder (نسخه 2.3.6)
-
+#### افزونه JetWooBuilder (نسخه 2.3.6)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-woo-builder/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-woo-builder/jet-woo-builder-v2.3.6.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-woo-builder/` (نسخه `2.1.7.3`)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-woo-builder/` (نسخه `2.1.7.3`)
 
-### افزونه JetCompareWishlist (نسخه 1.5.13)
-
+#### افزونه JetCompareWishlist (نسخه 1.5.13)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-compare-wishlist/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-compare-wishlist/jet-compare-wishlist-v1.5.13.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-compare-wishlist/` (نسخه `1.5.5.2`)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-compare-wishlist/` (نسخه `1.5.5.2`)
 
-### افزونه JetSearch (نسخه 3.6.3.1)
-
+#### افزونه JetSearch (نسخه 3.6.3.1)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-search/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-search/jet-search-v3.6.3.1.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-search/` (نسخه `3.1.1`)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-search/` (نسخه `3.1.1`)
 
-### افزونه JetSmartFilters (نسخه 3.8.6.3)
-
+#### افزونه JetSmartFilters (نسخه 3.8.6.3)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-smart-filters/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-smart-filters/jet-smart-filters-v3.8.6.3.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-smart-filters/` (نسخه `3.3.2`)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-smart-filters/` (نسخه `3.3.2`)
 
-### افزونه JetElements For Elementor (نسخه 2.9.2.8)
-
+#### افزونه JetElements For Elementor (نسخه 2.9.2.8)
 * **کانال آزمایشی (Staging):**
   * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-elements/info.json`
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-elements/jet-elements-v2.9.2.8.zip`
-* **کانال پایدار (Production):**
-  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-elements/` (نسخه `2.6.13.1`)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-elements/` (نسخه `2.6.13.1`)
 
-### افزونه JetBlocks For Elementor (نسخه 1.3.12)
+---
 
+### دسته `up-off` (فاقد آپدیتر اولیه سرور)
+
+#### افزونه JetBlocks For Elementor (نسخه 1.3.12)
 * **کانال Staging:**
-  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-blocks/info.json`
-  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-blocks/jet-blocks-v1.3.12.zip`
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/jet-blocks/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/jet-blocks/jet-blocks-v1.3.12.zip`
 * **کانال Production (لینک محافظت‌شده عددی):**
-  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/production/jet-blocks/info.json`
-  * لینک دانلود مستقیم: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/production/jet-blocks/jet-blocks-v1.3.12-4829501832.zip`
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/production/jet-blocks/info.json`
+  * لینک دانلود مستقیم: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/production/jet-blocks/jet-blocks-v1.3.12-4829501832.zip`
 
-### افزونه All-in-One WP Migration Unlimited Extension (نسخه 2.86)
-
+#### افزونه All-in-One WP Migration Unlimited Extension (نسخه 2.86)
 * **کانال Staging:**
-  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/all-in-one-wp-migration-unlimited-extension/info.json`
-  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/all-in-one-wp-migration-unlimited-extension/all-in-one-wp-migration-unlimited-extension-v2.86.zip`
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/all-in-one-wp-migration-unlimited-extension/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/all-in-one-wp-migration-unlimited-extension/all-in-one-wp-migration-unlimited-extension-v2.86.zip`
 * **کانال Production (لینک محافظت‌شده عددی):**
-  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/production/all-in-one-wp-migration-unlimited-extension/info.json`
-  * لینک دانلود مستقیم: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/production/all-in-one-wp-migration-unlimited-extension/all-in-one-wp-migration-unlimited-extension-v2.86-7193850241.zip`
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/production/all-in-one-wp-migration-unlimited-extension/info.json`
+  * لینک دانلود مستقیم: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/production/all-in-one-wp-migration-unlimited-extension/all-in-one-wp-migration-unlimited-extension-v2.86-7193850241.zip`

@@ -1,0 +1,11 @@
+{
+	"default": {"team_member_description_switch":"yes","member_position_divider":"yes"},
+
+	"preset-1": {"team_member_description_switch":"","member_position_divider":"","member_image_border_radius":{"unit":"%","top":"50","right":"50","bottom":"50","left":"50","isLinked":true}},
+
+	"preset-2": {"team_member_description_switch":"","member_position_divider":"","member_image_width":{"unit":"%","size":100,"sizes":[]},"member_box_alignment":"left"},
+
+	"preset-3": {"team_member_description_switch":"","member_position_divider":"","content_background_background":"classic","content_background_color":"#000000","member_box_content_padding":{"unit":"px","top":"20","right":"20","bottom":"20","left":"20","isLinked":true},"member_image_border_radius":{"unit":"%","top":"50","right":"50","bottom":"50","left":"50","isLinked":true}},
+
+	"preset-4": {"team_member_description_switch":"yes","member_position_divider":"","content_background_background":"","content_background_color":"","member_box_content_padding":{"unit":"px","top":"20","right":"20","bottom":"20","left":"20","isLinked":true},"member_image_border_radius":{"unit":"%","top":"50","right":"50","bottom":"50","left":"50","isLinked":true},"member_image_margin":{"unit":"px","top":"-70","right":"0","bottom":"0","left":"0","isLinked":true},"member_icons_gap":{"unit":"px","size":10,"sizes":[]},"member_icon_size":{"unit":"px","size":18,"sizes":[]},"member_description_margin":{"unit":"px","size":20,"sizes":[]},"_background_background":"classic","_background_color":"#F9F9F9","_border_radius":{"unit":"px","top":"25","right":"25","bottom":"25","left":"25","isLinked":true}}
+}

@@ -1,0 +1,20 @@
+{
+  "name": "All-in-One WP Migration Unlimited Extension",
+  "slug": "all-in-one-wp-migration-unlimited-extension",
+  "version": "2.86",
+  "tested": "6.7",
+  "requires": "5.0",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-08 02:00:00",
+  "author": "ServMask",
+  "author_homepage": "https://servmask.com/",
+  "sections": {
+    "description": "افزونه افزایش نامحدود حجم بکاپ و درون‌ریزی برای All-in-One WP Migration.",
+    "changelog": "<h4>2.86</h4><ul><li>به‌روزرسانی ساختار هسته به نسخه پایدار 2.86</li><li>سازگاری کامل با آخرین نگارش وردپرس و PHP 8.x</li><li>رفع قطعی محدودیت حجم آپلود به صورت نامحدود (Unlimited)</li><li>اتصال به سرور به‌روزرسانی خودکار و مستقیم مخزن (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 400,
+  "downloaded": 1500,
+  "active_installs": 1500,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/production/all-in-one-wp-migration-unlimited-extension/all-in-one-wp-migration-unlimited-extension-v2.86-7193850241.zip"
+}

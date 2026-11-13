@@ -1,0 +1,20 @@
+{
+  "name": "Elementor Pro [کانال آزمایشی - Staging]",
+  "slug": "elementor-pro",
+  "version": "4.4.0",
+  "tested": "6.8",
+  "requires": "6.8",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-10 01:00:00",
+  "author": "Elementor.com",
+  "author_homepage": "https://elementor.com/",
+  "sections": {
+    "description": "افزونه حرفه‌ای المنتور پرو (Elementor Pro) شامل ویجت‌های پیشرفته، قالب‌ساز (Theme Builder)، پاپ‌آپ‌ساز، فرم‌ساز، ووکامرس بیلدر و قابلیت‌های ویرایشگر اتمیک.",
+    "changelog": "<h4>4.4.0</h4><ul><li>ارتقا به نسخه 4.4.0 و سازگاری با ویرایشگر اتمیک و وردپرس جدید</li><li>حذف درخواست‌های بیرونی سایت واسطه از کد هسته</li><li>پاک‌سازی کامل نام و لینک‌های سایت واسطه از ترجمه فارسی و ماژول آپدیتر (PUC)</li><li>حذف فایل‌های زائد و اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 1200,
+  "downloaded": 8500,
+  "active_installs": 8500,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/elementor-pro/elementor-pro-v4.4.0.zip"
+}

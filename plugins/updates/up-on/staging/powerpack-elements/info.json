@@ -1,0 +1,20 @@
+{
+  "name": "PowerPack Pro for Elementor [کانال آزمایشی - Staging]",
+  "slug": "powerpack-elements",
+  "version": "3.1.0",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-09-30 01:00:00",
+  "author": "Team IdeaBox - PowerPack Elements",
+  "author_homepage": "https://powerpackelements.com",
+  "sections": {
+    "description": "افزونه PowerPack Pro برای المنتور با بیش از ۹۰ ابزارک خلاقانه، هدر و فوتر ساز، ووکامرس بیلدر و اکستنشن‌های حرفه‌ای.",
+    "changelog": "<h4>3.1.0</h4><ul><li>ارتقا به نسخه 3.1.0 و افزودن سازگاری با المنتور و المنتور پرو 4.2.0</li><li>حذف لینک و درخواست بیرونی دامنه واسطه gpltimes از هسته افزونه</li><li>پاک‌سازی کامل لینک‌ها و متون سایت واسطه از ترجمه فارسی</li><li>حذف فایل‌های زائد و اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 540,
+  "downloaded": 2600,
+  "active_installs": 2600,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/powerpack-elements/powerpack-elements-v3.1.0.zip"
+}

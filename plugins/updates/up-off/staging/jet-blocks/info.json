@@ -1,0 +1,20 @@
+{
+  "name": "JetBlocks For Elementor [کانال آزمایشی - Staging]",
+  "slug": "jet-blocks",
+  "version": "1.3.12",
+  "tested": "6.7",
+  "requires": "5.4",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-08 02:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "ابزارک‌های اختصاصی و کاربردی برای طراحی هدر و فوتر پیشرفته در المنتور.",
+    "changelog": "<h4>1.3.12</h4><ul><li>حذف کامل فایل‌های زائد توسعه‌دهنده جهت رفع خطای 403 فایروال سرور در هنگام نصب</li><li>اتصال به سرور به‌روزرسانی خودکار و مستقیم مخزن (PUC)</li><li>افزودن بسته‌های ترجمه استاندارد فارسی (fa_IR)</li><li>بهینه‌سازی کامل ساختار بسته با استانداردهای رسمی وردپرس و المنتور</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 350,
+  "downloaded": 1200,
+  "active_installs": 1200,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/jet-blocks/jet-blocks-v1.3.12.zip"
+}

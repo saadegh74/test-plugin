@@ -1,0 +1,7 @@
+{
+	"default": {"first_text_color":"","second_text_color":""},
+
+	"preset-1": {"first_text_color":"#000000","second_text_color":"#FFFFFF","second_part_bg_background":"gradient","second_part_bg_color":"#FD6796","second_part_bg_color_b":"#FD8163","second_part_bg_gradient_angle":{"unit":"deg","size":90,"sizes":[]},"second_text_padding":{"unit":"px","top":"5","right":"10","bottom":"5","left":"10","isLinked":false}},
+
+	"preset-2": {"second_part_display":"block","align":"center","first_text_color":"#000000","second_text_color":"#FB9F00"}
+}

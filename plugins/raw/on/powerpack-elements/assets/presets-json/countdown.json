@@ -1,0 +1,11 @@
+{
+	"default": {"separator_type":"none","label_outside_position":"out_below"},
+
+	"preset-1": {"separator_type":"colon","label_outside_position":"out_above","separator_color":"#000000","separator_size":{"unit":"px","size":45,"sizes":[]},"digit_color":"#000000","digit_typography_typography":"custom","digit_typography_font_size":{"unit":"px","size":65,"sizes":[]},"digit_typography_font_weight":"700"},
+
+	"preset-2": {"separator_type":"colon","separator_color":"#000000","separator_size":{"unit":"px","size":40,"sizes":[]},"block_spacing":{"unit":"px","size":40,"sizes":[]},"block_style":"circle","label_outside_position":"out_below","toggle_switch_background_background":"classic","toggle_switch_background_color":"#f4f4f4f4","digit_color":"#000000"},
+
+	"preset-3": {"separator_type":"colon","block_style":"square","toggle_switch_background_background":"classic","toggle_switch_background_color":"#FFFFFF","box_border_radius":{"unit":"px","top":"5","right":"5","bottom":"5","left":"5","isLinked":true},"block_box_shadow_box_shadow_type":"yes","block_box_shadow_box_shadow":{"horizontal":0,"vertical":0,"blur":5,"spread":0,"color":"rgba(0, 0, 0, 0.1)"},"label_position":"inside","label_outside_position":"out_below","digit_color":"#000000","digit_typography_typography":"custom","digit_typography_font_size":{"unit":"px","size":38,"sizes":[]},"digit_typography_font_weight":"700","label_color":"#000000"},
+
+	"preset-4": {"separator_type":"colon","block_style":"square","toggle_switch_background_background":"classic","toggle_switch_background_color":"#FFFFFF","box_border_border":"solid","box_border_width":{"unit":"px","top":"1","right":"1","bottom":"1","left":"1","isLinked":true},"box_border_color":"#000000","box_border_radius":{"unit":"px","top":"5","right":"5","bottom":"5","left":"5","isLinked":true},"label_position":"inside","label_outside_position":"out_below","digit_color":"#000000","digit_typography_typography":"custom","digit_typography_font_size":{"unit":"px","size":38,"sizes":[]},"digit_typography_font_weight":"700","label_color":"#000000"}
+}

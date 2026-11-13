@@ -1,0 +1,2485 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: JetEngine for Elementor\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-25 10:19+0300\n"
+"PO-Revision-Date: 2023-02-01 05:25+0000\n"
+"Last-Translator: \n"
+"Language-Team: فارسی\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e;_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"esc_attr__;esc_attr_e;esc_attr_x:1,2c;_ex:1,2c;_n:1,2;_nx:4c,1,2;_n_noop:1,2;"
+"_nx_noop:4c,1,2\n"
+"esc_attr__;_x: 1,2c;_n:1,2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Loco https://localise.biz/\n"
+"Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: cherry-framework\n"
+"X-Poedit-SearchPathExcluded-1: node_modules\n"
+"X-Loco-Version: 2.6.3; wp-6.1.1"
+
+msgid "+ New Glossary"
+msgstr "+ اضافه کردن جدید"
+
+msgid "+ New Store"
+msgstr "+ اضافه کردن جدید"
+
+msgid ""
+". Please check your API key (you can validate it in maps settings or check "
+"in Google Console), make sure Geocoding API is enabled."
+msgstr ""
+". لطفاً کلید API خود را بررسی کنید (می‌توانید آن را در تنظیمات نقشه تأیید "
+"کنید یا در کنسول Google بررسی کنید)، مطمئن شوید که API Geocoding فعال است."
+
+msgid ""
+"<b>Please note:</b> You need to reload page after applying new source, "
+"changing post type or taxonomy. New meta fields and options for dynamic "
+"fields will be applied only after reloading."
+msgstr ""
+"<b>لطفا توجه کنید:</b> بعد از استفاده از منبع جدید ، تغییر پست تایپ یا طبقه "
+"بندی ، باید صفحه را بارگیری مجدد کنید. زمینه های جدید متا و گزینه های مربوط "
+"به زمینه های پویا تنها پس از بارگیری مجدد اعمال می شوند."
+
+msgid ""
+"<strong>Warning:</strong> Error appears on callback applying. Please select "
+"other callback to filter field value."
+msgstr ""
+"<strong>اخطار:</strong> در هنگام callback ، خطایی ظاهر می شود. لطفاً برای "
+"فیلتر کردن مقدار فیلد ،callback دیگر را انتخاب کنید."
+
+msgid "ACF"
+msgstr "ACF"
+
+msgid "ACF Field"
+msgstr "فیلد ACF"
+
+msgid "ACF Gallery as WP Gallery"
+msgstr "گالری ACF به عنوان گالری وردپرس"
+
+msgid "API Key"
+msgstr "کلید API"
+
+msgid "ASC"
+msgstr "نزولی"
+
+msgid "Above items"
+msgstr "زیر آیتم ها"
+
+msgid "Access Capability"
+msgstr "قابلیت دسترسی"
+
+msgid "Access capability"
+msgstr "قابلیت دسترسی"
+
+msgid "Access denied"
+msgstr "دسترسی ممنوع"
+
+msgid "Accordion"
+msgstr "آکاردئون ها"
+
+msgid "Account"
+msgstr "حساب"
+
+msgid "Account Page"
+msgstr "برگه حساب"
+
+msgid "Actions"
+msgstr "اقدامات"
+
+msgid "Activate plugins"
+msgstr "افزونه های فعال"
+
+msgid "Activate your license to install external modules"
+msgstr "باید این افزونه را جداگانه نصب و دانلود کنید ."
+
+msgid ""
+"Activate/deactivate external features. These features will be installed as "
+"separate plugins."
+msgstr "این افزونه ها را می بایست به صورت جداگانه تهیه و نصب نمایید ."
+
+msgid "Active"
+msgstr "فعال"
+
+msgid "Add \"rel\" attr"
+msgstr "افزون خصوصیت rel"
+
+msgid "Add New"
+msgstr "اضافه کردن جدید"
+
+msgid "Add New Item"
+msgstr "افزودن آیتم جدید"
+
+msgid "Add New Post Type"
+msgstr "افزودن پست تایپ جدید"
+
+msgid "Add New on Toolbar"
+msgstr "افزودن جدید در تولبار"
+
+msgid "Add Option"
+msgstr "اضافه کردن گزینه"
+
+msgid "Add Post Type"
+msgstr "افزودن پست تایپ"
+
+msgid ""
+"Add a slight offset to avoid overlapping markers with the same addresses"
+msgstr ""
+"برای جلوگیری از همپوشانی نشانگرها با آدرس‌های یکسان، مقدار کمی افست اضافه "
+"کنید"
+
+msgid "Add links to related posts"
+msgstr "لینک به پستهای مرتبط را اضافه کنید"
+
+msgid "Admin Columns"
+msgstr "ستون ادمین"
+
+msgid "Admin Filters"
+msgstr "فیلتر ادمین"
+
+msgid "Advanced settings"
+msgstr "تنظیمات پیشرفته "
+
+msgid "After"
+msgstr "بعد"
+
+msgid "After Label"
+msgstr "بعد از لیبل"
+
+msgid "Alignment"
+msgstr "ترازبندی"
+
+msgid "All"
+msgstr "همه"
+
+msgid "All Items"
+msgstr "همه آِتم ها"
+
+msgid "Allow to select multiple values"
+msgstr "اجازه برای انتخاب چند گانه"
+
+msgid "Alternate"
+msgstr "متناوب"
+
+msgid "Always show"
+msgstr "نمایش همیشه"
+
+msgid "And"
+msgstr "تصادفی"
+
+msgid "Angle"
+msgstr "زاویه"
+
+msgid "Angle Double"
+msgstr "دو زاویه"
+
+msgid "Animation Speed"
+msgstr "انیمیشن سرعت"
+
+msgid "Any"
+msgstr "هرچیزی"
+
+msgid "Any author"
+msgstr "هر نویسنده ای"
+
+msgid "Appearance"
+msgstr "ظاهر"
+
+msgid "Apply"
+msgstr "اعمال کردن"
+
+msgid "April"
+msgstr "آوریل"
+
+msgid "Archive"
+msgstr "آرشیو"
+
+msgid "Are you sure you want to delete this meta box?"
+msgstr "آیا برای حذف ایت متا باکس مطمئن هستید؟"
+
+msgid "Are you sure?"
+msgstr "مطمئن هستید؟"
+
+msgid "Arrow"
+msgstr "فلش"
+
+msgid "Arrow Circle"
+msgstr "دایره فلش"
+
+msgid "Arrow Icon"
+msgstr "آیکون فلش"
+
+msgid "Arrow Size"
+msgstr "سایز فلش"
+
+msgid "August"
+msgstr "آگوست"
+
+msgid "Author"
+msgstr "نویسنده"
+
+msgid "Author Archives"
+msgstr "آرشیو نویسنده"
+
+msgid "Author ID"
+msgstr "ID نویسنده"
+
+msgid "Author Settings"
+msgstr "تنظیمات نویسنده"
+
+msgid "Auto"
+msgstr "خودکار"
+
+msgid "Auto draft"
+msgstr "پیش نویس خودکار"
+
+msgid "Autoplay"
+msgstr "شروع خودکار"
+
+msgid "Autoplay Speed"
+msgstr "سرعت پخش خودکار"
+
+msgid "Average Rating"
+msgstr "میانگین امتیاز"
+
+msgid "Avoid markers overlapping"
+msgstr "از همپوشانی نشانگرها اجتناب کنید"
+
+msgid "Background"
+msgstr "پس زمینه"
+
+msgid "Background Color"
+msgstr "رنگ پس زمینه"
+
+msgid "Background color"
+msgstr "رنگ زمینه"
+
+msgid "Before"
+msgstr "قبل"
+
+msgid "Before Label"
+msgstr "قبل از لیبل"
+
+msgid "Between"
+msgstr "بین"
+
+msgid "Biographical Info"
+msgstr "اطلاعات بیوگرافی"
+
+msgid "Blocks (Gutenberg)"
+msgstr "بلوک (گوتنبرگ)"
+
+msgid "Bookmark"
+msgstr "نشانک"
+
+msgid "Border"
+msgstr "کادر"
+
+msgid "Border Color"
+msgstr "رنگ شناور"
+
+msgid "Border Radius"
+msgstr "شعاع کادر"
+
+msgid "Border Width"
+msgstr "عرض حاشیه"
+
+msgid "Bottom"
+msgstr "پایین"
+
+msgid "Bottom Indent"
+msgstr "ردیف پایین"
+
+msgid "Calculate:"
+msgstr "محسابه:"
+
+msgid "Calendar"
+msgstr "تقویم"
+
+msgid "Can't create template. Please try again"
+msgstr "قالب را نمی توان ایجاد کرد لطفا دوباره تلاش کنید"
+
+msgid "Cancel"
+msgstr "لغو"
+
+msgid "Capability Type"
+msgstr "نوع قابلیت"
+
+msgid "Caption"
+msgstr "عنوان"
+
+msgid "Caret"
+msgstr "مراقبت"
+
+msgid "Caret Square"
+msgstr "مراقب"
+
+msgid "Center"
+msgstr "وسط"
+
+msgid "Center/Middle"
+msgstr "وسط/میانه"
+
+msgid "Character limit"
+msgstr "محدودیت کاراکترها"
+
+msgid "Checkbox"
+msgstr "باکس انتخاب"
+
+msgid "Chevron"
+msgstr "Chevron"
+
+msgid "Chevron Circle"
+msgstr "دایره Chevron"
+
+msgid "Child of"
+msgstr "زیر مجموعه"
+
+msgid "Choose an JetEngine skin JSON file, and add it to your website."
+msgstr "فایل JSON انتخاب کنید"
+
+msgid "Close"
+msgstr "بسته میباشد"
+
+msgid "Collapsed"
+msgstr "قابلیت بازشو بودن"
+
+msgid "Color"
+msgstr "رنگ"
+
+msgid "Colorpicker"
+msgstr "انتحاب رنگ"
+
+msgid "Column"
+msgstr "ستون"
+
+msgid "Columns"
+msgstr "ستون ها"
+
+msgid "Columns Gap"
+msgstr "فاصله ستون ها"
+
+msgid "Columns Number"
+msgstr "شماره ستون ها"
+
+msgid "Comma-separated ID's list"
+msgstr "جداکردن ID با استفاده از کاما"
+
+msgid "Comma/space-separated string of term ids to include"
+msgstr "برای جداکرردن شرایط از کاما استفاده کنید."
+
+msgid "Comment count"
+msgstr "شمارنده نظرات"
+
+msgid "Comments"
+msgstr "نظرات"
+
+msgid "Comments Settings"
+msgstr "تنظیمات نظرات"
+
+msgid "Component"
+msgstr "ترکیب بشه با"
+
+msgid "Conditional Logic"
+msgstr "منطق شرطی"
+
+msgid "Confirm Password"
+msgstr "تایید رمز عبور"
+
+msgid "Content"
+msgstr "محتوا"
+
+msgid "Content:"
+msgstr "محتوا:"
+
+msgid "Context"
+msgstr "محتوا"
+
+msgid "Copy"
+msgstr "کپی"
+
+msgid "Couldn't create item"
+msgstr "مورد ایجاد نشد"
+
+msgid "Couldn't update item"
+msgstr "آیتم ها بروزرسانی نشد"
+
+msgid "Count"
+msgstr "شمارنده"
+
+msgid "Counters"
+msgstr "پیشخوان"
+
+msgid "Create Listing Item"
+msgstr "ایجاد لیست آیتم"
+
+msgid "Create users"
+msgstr "ایجاد کاربر"
+
+msgid "Creating an Options page with JetEngine"
+msgstr "Creating an Options page with JetEngine"
+
+msgid "Crocoblock"
+msgstr "Crocoblock"
+
+msgid "Current User"
+msgstr "کاربر فعلی"
+
+msgid ""
+"Current meta box object type: field or layout element. To close the action "
+"of previously selected Tab or Accordion group, use the `Endpoint` option"
+msgstr "شما میتوانید نوع ساختار چیدمان را مشخص کنید"
+
+msgid "Custom CSS Class:"
+msgstr "کلاس CSS دلخواه:"
+
+msgid "Custom Content Types"
+msgstr "انواع محتوا سفارشی"
+
+msgid "Custom Content Types List"
+msgstr "لیست محتوای سفارشی"
+
+msgid "Custom Field"
+msgstr "فیلد های سفارشی"
+
+msgid "Custom Fields"
+msgstr "فیلد های سفارشی"
+
+msgid "Custom Image"
+msgstr "تصویر سفارشی"
+
+msgid "Custom Post Types List"
+msgstr "لیست پست تایپ های سفارشی"
+
+msgid "Custom Taxonomies List"
+msgstr "لیست طبقه بندی های سفارشی"
+
+msgid "Custom URL"
+msgstr "آدرس سفارشی"
+
+msgid "Custom email"
+msgstr "ایمیل سفارشی"
+
+msgid "Custom length"
+msgstr "طول سفارشی"
+
+msgid "Custom meta field/repeater key"
+msgstr "فیلد سفارشی / تکراشونده"
+
+msgid "Customize field output"
+msgstr "خروجی زمینه را سفارشی کنید"
+
+msgid "DESC"
+msgstr "صعودی"
+
+msgid "Dashboard"
+msgstr "پیشخوان"
+
+msgid "Data Stores"
+msgstr "دیتا "
+
+msgid "Date"
+msgstr "روز"
+
+msgid "Date Query"
+msgstr "کوئری تاریخ"
+
+msgid "Date Settings"
+msgstr "تنظیمات زمان"
+
+msgid "Datetime"
+msgstr "وقت قرار"
+
+msgid "Days"
+msgstr "روز"
+
+msgid "December"
+msgstr "دسامبر"
+
+msgid "Decimal point"
+msgstr "نقطه اعشار"
+
+msgid "Decimal points"
+msgstr "جداکننده اعشار"
+
+msgid "Default Modules"
+msgstr "فیلد های پیش فرض"
+
+msgid "Default value"
+msgstr "مقدار پیش فرض"
+
+msgid "Default:"
+msgstr "پیش‌ فرض:"
+
+msgid "Delete"
+msgstr "پاک کردن"
+
+msgid "Delete all posts"
+msgstr "حذف همه نوشته ها"
+
+msgid "Delete meta box"
+msgstr "حذف متا باکس ها"
+
+msgid "Delimiter"
+msgstr "حائل، جداکننده"
+
+msgid "Description"
+msgstr "توضيحات"
+
+msgid "Description:"
+msgstr "توضیحات:"
+
+msgid "Direction"
+msgstr "مسیر حرکت"
+
+msgid "Disable Google Maps API JS file"
+msgstr "غیر فعال کردن فایل JS نقشه Google Maps"
+
+msgid ""
+"Disable Google Maps API JS file, if it already included by another plugin or "
+"theme"
+msgstr ""
+"فایل Google Maps API JS را غیرفعال کنید، اگر قبلاً توسط افزونه یا طرح زمینه "
+"دیگری اضافه شده است"
+
+msgid "Display"
+msgstr "نمایش"
+
+msgid "Display Name"
+msgstr "نام نمایش"
+
+msgid "Documentation on date and time formatting"
+msgstr "مستندات در قالب بندی تاریخ و زمان"
+
+msgid "Done"
+msgstr "انجام شد"
+
+msgid "Dots Gap"
+msgstr "فاصله نقطه"
+
+msgid "Dots Size"
+msgstr "سایز نقطه"
+
+msgid "Dots Styles"
+msgstr "استایل های نقطه"
+
+msgid "Draft"
+msgstr "پیش نویس"
+
+msgid "Dynamic Field"
+msgstr "فیلد داینامیک"
+
+msgid "Dynamic Function"
+msgstr "عملکرد داینامیک"
+
+msgid "Dynamic Image"
+msgstr "تصویر داینامیک"
+
+msgid "Dynamic Link"
+msgstr "لینک داینامیک"
+
+msgid "Dynamic Meta"
+msgstr "متا داینامیک"
+
+msgid "Dynamic Repeater"
+msgstr "تکرار داینامیک"
+
+msgid "Dynamic Terms"
+msgstr "ارتفاع ارتفاع"
+
+msgid "Dynamic Visibility for Widgets and Sections"
+msgstr "شرط گذاری نمایش و عدم نمایش"
+
+msgid "Dynamic function"
+msgstr "عملکرد داینامیک"
+
+msgid "E-mail"
+msgstr "ایمیل"
+
+msgid "Edit"
+msgstr "ویرایش"
+
+msgid "Edit Item"
+msgstr "ویرایش آیتم"
+
+msgid "Edit Options Page"
+msgstr "ویرایش صفحه تنظیمات"
+
+msgid "Edit User"
+msgstr "افزودن ارجاع"
+
+msgid "Edit pages"
+msgstr "ویرایش برگه ها"
+
+msgid "Edit posts"
+msgstr "ویرایش نوشته ها"
+
+msgid "Editable user settings page for user profile"
+msgstr "صفحه تنظیمات کاربر قابل ویرایش برای پروفایل کاربر"
+
+msgid "Editor"
+msgstr "ویرایشگر"
+
+msgid "Effect"
+msgstr "اثر"
+
+msgid "Elementor"
+msgstr "صفحه ساز المنتور"
+
+msgid "Elementor missed"
+msgstr "المنتور یافت نشد"
+
+msgid "Email"
+msgstr "نام"
+
+msgid "Email Address:"
+msgstr "آردس ایمیل:"
+
+msgid "Embed URL"
+msgstr "درج آدرس اینترنتی"
+
+msgid "Enable For Post Types"
+msgstr "فعال کردن برای پست تایپ"
+
+msgid "Enable For Taxonomies"
+msgstr "فعال کردن برای طبقه بندی"
+
+msgid "Enable Slider"
+msgstr "فعال کردن اسلایدر"
+
+msgid "Enable/disable additional built-in features"
+msgstr "فعال/غیر فعال مردن ویژگی های جانبی جت انجین"
+
+msgid "End"
+msgstr "پایان"
+
+msgid "Endpoint"
+msgstr "نقطه پایانی"
+
+msgid "Equal"
+msgstr "برابر"
+
+msgid "Equal columns height"
+msgstr "ارتفاع ستون برابر"
+
+msgid "Equal or less"
+msgstr "برابر یا کمتر"
+
+msgid "Error"
+msgstr "خطا"
+
+msgid "Error!"
+msgstr "خطا!"
+
+msgid "Excerpt"
+msgstr "خلاصه"
+
+msgid "Exclude From Search"
+msgstr "حذف از جستجو"
+
+msgid "Exclude posts by IDs"
+msgstr "به جز نوشته ها با ID"
+
+msgid "Exclude roles"
+msgstr "به جز نقش ها"
+
+msgid "Exclude terms"
+msgstr "به جز شرط ها"
+
+msgid "Exclude users by ID"
+msgstr "به جز کاربران با ID"
+
+msgid "Export"
+msgstr "برون ریزی"
+
+msgid "Export Skin"
+msgstr "خروجی گرفتن از تنظیمات"
+
+msgid ""
+"Export combination of post types, related taxonomies and listing items as "
+"new skin"
+msgstr ""
+"وارد کردن ترکیبی از انواع پست، طبقه بندی های مرتبط و فهرست بندی موارد به "
+"عنوان پوسته جدید"
+
+msgid "Export settings"
+msgstr "برون‌بری تنظیمات"
+
+msgid "External"
+msgstr "خارجی"
+
+msgid "External Modules"
+msgstr "افزونه های دیگر"
+
+msgid "Fade"
+msgstr "محو شدن"
+
+msgid "Fallback"
+msgstr "مقدار بازگشتی"
+
+msgid "Fallback Image"
+msgstr "تصویر بازگشت"
+
+msgid "Featured Image"
+msgstr "تصویر ویژه"
+
+msgid "February"
+msgstr "فوریه"
+
+msgid "Field"
+msgstr "فیلد"
+
+msgid "Field Content Alignment"
+msgstr "ترازبندی فیلد محتوا"
+
+msgid "Field Icon"
+msgstr "فیلد آیکون"
+
+msgid "Field Name"
+msgstr "نام زمینه"
+
+msgid "Field Type:"
+msgstr "نوع فیلد"
+
+msgid "Field content width"
+msgstr "عرض فیلد محتوا"
+
+msgid "Field format"
+msgstr "فرمت فیلد"
+
+msgid "Field type"
+msgstr "نوع فیلد"
+
+msgid "Field value. Affects to multiline field values."
+msgstr "مقدار فیلد.روی مقدار فیلد چند خطی تاثیر میگذارید."
+
+msgid "Field width"
+msgstr "عرض فیلد"
+
+msgid "Fields"
+msgstr "فیلد ها"
+
+msgid "Fields Settings"
+msgstr "فیلد تنظیمات"
+
+msgid "Fields width"
+msgstr "عرض فیلدها"
+
+msgid "Filter field output"
+msgstr "خروجی فیلد فیلتر"
+
+msgid "First Name"
+msgstr "نام کوچک"
+
+msgid "Fits only top level sections of grid item"
+msgstr "فقط در بخش های سطح بالای شبکه بندی آیتم قرار می گیرد"
+
+msgid "Fixed item size"
+msgstr "سایز آیتم های ثابت"
+
+msgid "Font Size"
+msgstr "سایز فونت"
+
+msgid "For all"
+msgstr "برای همه"
+
+msgid "For example:"
+msgstr "برای مثال:"
+
+msgid "For not authorized users"
+msgstr "برای کاربران تایید نشده"
+
+msgid "For post type/taxonomy"
+msgstr "برای post type و taxonomy"
+
+msgid "For taxonomy archives only"
+msgstr "فقط برای طبقه بندی آرشیو"
+
+msgid "Form"
+msgstr "فرم"
+
+msgid "Format"
+msgstr "فرمت"
+
+msgid "Format date"
+msgstr "زمان فرمت"
+
+msgid "Format date (localized)"
+msgstr "فرمت زمان (محلی)"
+
+msgid "Format not allowed"
+msgstr "فرمت مجاز نیست"
+
+msgid "Format number"
+msgstr "فرمت عدد"
+
+msgid "Forms"
+msgstr "فرم ها"
+
+msgid "Forms (Legacy)"
+msgstr "فرم ها"
+
+msgid "Forms Settings"
+msgstr "تنظیمات فرم"
+
+msgid "From Email Address:"
+msgstr "از آدرس ایمیل:"
+
+msgid "From Field:"
+msgstr "فیلد فرم:"
+
+msgid "From Name:"
+msgstr "از نام:"
+
+msgid "From post type:"
+msgstr "نوع فرم پست:"
+
+msgid "From taxonomy"
+msgstr "از طبقه بندی"
+
+msgid "From taxonomy:"
+msgstr "فرم طبقه بندی:"
+
+msgid "Full"
+msgstr "کامل"
+
+msgid "Fullwidth"
+msgstr "تمام عرض"
+
+msgid "Fullwidth Block Editor"
+msgstr "لیست تمام صفحه "
+
+msgid "Future"
+msgstr "آینده"
+
+msgid "Gallery"
+msgstr "گالری"
+
+msgid "Gallery from options"
+msgstr "گالری از تنظیمات"
+
+msgid "Gap"
+msgstr "شکاف"
+
+msgid "General"
+msgstr "عمومی"
+
+msgid "General Settings"
+msgstr "تنظیمات عمومی"
+
+msgid "Generate shortcode"
+msgstr "تولید کننده کدهای کوتاه"
+
+msgid "Generate shortcode to output JetEngine-related data anywhere in content"
+msgstr ""
+"ایجاد کد کوتاه برای خروجی داده های مربوط به JetEngine در هر نقطه از محتوا"
+
+msgid "Geocoding Provider"
+msgstr "ارائه دهنده ژئوکدینگ"
+
+msgid "Get child of"
+msgstr "دریافت فرزند از"
+
+msgid "Get posts with status"
+msgstr "نوشته ها با وضعیت"
+
+msgid "Get terms of posts"
+msgstr "شرایط نوشته ها را قرار دهید"
+
+msgid "Glossaries"
+msgstr "واژه نامه"
+
+msgid "Go to license manager"
+msgstr "رفتن به تنظیمات"
+
+msgid ""
+"Google maps API key. Video tutorial about creating Google Maps API key <a "
+"href='https://www.youtube.com/watch?v=t2O2a2YiLJA' target='_blank'>here</a>. "
+"<br>Please make sure <b>Geocoding API</b> is enabled for your API key (or "
+"use sparate key for Geocoding API)."
+msgstr ""
+"Google Maps API key را وارد نمایید<a href='https://www.youtube.com/watch?"
+"v=t2O2a2YiLJA' target='_blank'>آموزش</a>"
+
+msgid "Greater or equal"
+msgstr "بزرگتر یا برابر"
+
+msgid "Greater than"
+msgstr "بزرگتر از"
+
+msgid "Grid Gallery for Dynamic Field widget"
+msgstr "گالری شبکه ای برای فیلد های داینامیک"
+
+msgid "HTML tag"
+msgstr "تگ HTML"
+
+msgid "Has Archive"
+msgstr "بایگانی دارد"
+
+msgid "Height"
+msgstr "ارتفاع"
+
+msgid "Help"
+msgstr "راهنمایی"
+
+msgid "Hidden"
+msgstr "مخفی"
+
+msgid "Hide admin bar"
+msgstr "مخفی کردن نوار مدیریت"
+
+msgid "Hide empty"
+msgstr "مخفی کردن خالی ها"
+
+msgid "Hide from menu"
+msgstr "مخفی کردن از منو"
+
+msgid "Hide if value is empty"
+msgstr "اگر مقدار خالی بود مخفی شود"
+
+msgid "Hide meta field names"
+msgstr "مخفی سازی نام متا فیلدها"
+
+msgid "Hide meta field names on post edit page."
+msgstr "پاک کردن نام متا ها در ویرایش صفحه"
+
+msgid "Hide meta field names on post/term/user edit page."
+msgstr "پاک کردن نام متا ها در ویرایش صفحه"
+
+msgid "Hide widget if"
+msgstr "مخفی کردن ویجت اگر"
+
+msgid "Hierarchical"
+msgstr "سلسله مراتب"
+
+msgid "Horizontal"
+msgstr "افقی"
+
+msgid "Horizontal Alignment"
+msgstr "ترازبندی افقی"
+
+msgid "Horizontal Gap"
+msgstr "فاصله افقی"
+
+msgid "Horizontal Position by"
+msgstr "موضعیت افقی توسط"
+
+msgid "Hover"
+msgstr "هاور"
+
+msgid "ID"
+msgstr "شماره"
+
+msgid "Icon"
+msgstr "آیکون"
+
+msgid "Icon Color"
+msgstr "رنگ آیکون"
+
+msgid "Icon Gap"
+msgstr "فاصله آیکون"
+
+msgid "Icon Position"
+msgstr "موقیعت آیکون"
+
+msgid "Icon Size"
+msgstr "سایز آیکون"
+
+msgid "Icon and field value. Affects to single line field values."
+msgstr "مقدار فیلد و آیکون.روی مقدار فیلد تک خطی تاثیر میگذارید."
+
+msgid "Icon will be visible in admin menu"
+msgstr " "
+
+msgid "Iconpicker"
+msgstr "انتخاب آیکون"
+
+msgid ""
+"If you are not sure where to start, please check tutorials list below this "
+"block"
+msgstr "اگر مطمئن نیستید از کجا شروع کنید، فهرست آموزش‌های زیر را بررسی کنید"
+
+msgid "Image"
+msgstr "تصویر"
+
+msgid "Image Overlay"
+msgstr "روکش تصویر"
+
+msgid "Image Size"
+msgstr "سایز تصویر"
+
+msgid "Image from options"
+msgstr "تصویر از تنظیمات"
+
+msgid "Images Size"
+msgstr "سایز تصاویر"
+
+msgid "Images gap"
+msgstr "فاصله تصاویر"
+
+msgid "Import"
+msgstr "درون‌ریزی"
+
+msgid "Import Skin"
+msgstr "وارد کردن پوسته"
+
+msgid "Import configuration part from preset"
+msgstr "وارد کردن بخش پیکربندی از پیش تعیین شده"
+
+msgid "Import new post types, taxonomies and listing items from JSON file."
+msgstr "انواع پست، طبقه بندی و موارد فهرست شده جدید را از فایل JSON وارد کنید."
+
+msgid "In"
+msgstr "در"
+
+msgid "Include posts by IDs"
+msgstr "شامل نوشته ها با ID"
+
+msgid "Include terms"
+msgstr "شامل شرط ها"
+
+msgid "Include users by ID"
+msgstr "شامل کاربران با ID"
+
+msgid "Incorrect template type. Please try again."
+msgstr "نوع قالب نامعتبر است. لطفا دوباره امتحان کنید."
+
+msgid "Infinite Loop"
+msgstr "بی نهایت"
+
+msgid "Inherit"
+msgstr "ارثی"
+
+msgid "Inline"
+msgstr "درون خطی"
+
+msgid "Install Elementor Page Builder"
+msgstr "نصب افزونه المنتور"
+
+msgid "Is Public"
+msgstr "عمومی"
+
+msgid "Is masonry grid"
+msgstr "شبکه بندی ماسونری"
+
+msgid "Is required"
+msgstr "این فیلد الزامی است"
+
+msgid "Item Height"
+msgstr "ارتفاع آیتم"
+
+msgid "Item ID not passed"
+msgstr "آیتم ID پاس نشد"
+
+msgid "Item Text Alignment"
+msgstr "ترازبندی متن آیتم"
+
+msgid "Item Width"
+msgstr "عرض آیتم"
+
+msgid "Item format"
+msgstr "فرمت آیتم ها"
+
+msgid "Item number"
+msgstr "تعداد آیتم"
+
+msgid "Items"
+msgstr "آیتم ها"
+
+msgid "Items Alignment"
+msgstr "ترازبندی آیتم ها"
+
+msgid "Items Value"
+msgstr "مقدار آیتم"
+
+msgid "January"
+msgstr "ژانویه"
+
+msgid "JetEngine"
+msgstr "جت انجین"
+
+msgid "JetEngine Actions"
+msgstr "عملیات JetEngine"
+
+msgid "JetEngine Gallery"
+msgstr "گالری JetEngine"
+
+msgid "JetEngine Maps"
+msgstr "نقشه JetEngine"
+
+msgid "JetEngine Post Type"
+msgstr "پست تایپ JetEngine"
+
+msgid "JetEngine Taxonomy"
+msgstr "طیقه بندی JetEngine"
+
+msgid "JetEngine dashboard"
+msgstr "داشبورد JetEngine"
+
+msgid "July"
+msgstr "جولای"
+
+msgid "June"
+msgstr "ژوئن"
+
+msgid "Label"
+msgstr "برچسب"
+
+msgid "Label Color"
+msgstr "رنگ لیبل"
+
+msgid "Label:"
+msgstr "لیبل:"
+
+msgid "Labels"
+msgstr "نام قسمت ها"
+
+msgid "Last Name"
+msgstr "نام خانوادگی"
+
+msgid "Layout"
+msgstr "طرح"
+
+msgid "Layout 1"
+msgstr "طرح 1"
+
+msgid "Layout 2"
+msgstr "طرح 2"
+
+msgid "Layout 3"
+msgstr "طرح 3"
+
+msgid "Layout 4"
+msgstr "طرح 4"
+
+msgid "Lazy load"
+msgstr "لود تنبل"
+
+msgid ""
+"Leave empty to create top level menu page or select a parent for current page"
+msgstr ""
+"خالی بگذارید تا صفحه منوی سطح بالا ایجاد شود یا یک والدین برای صفحه فعلی "
+"انتخاب کنید"
+
+msgid "Left"
+msgstr "چپ"
+
+msgid "Left Gap"
+msgstr "فاصله چپ"
+
+msgid "Left Indent"
+msgstr "ردیف چپ"
+
+msgid "Left/Top"
+msgstr "چپ/بالا"
+
+msgid "Length"
+msgstr "طول"
+
+msgid "Less than"
+msgstr "کمتر از"
+
+msgid "License"
+msgstr "لایسنس"
+
+msgid "Like"
+msgstr "مثل این"
+
+msgid "Link"
+msgstr "لینک"
+
+msgid "Link Source"
+msgstr "لینک منبع"
+
+msgid "Link source"
+msgstr "منبع لینک"
+
+msgid "Linked image"
+msgstr "تصویر لینک شده"
+
+msgid "Links"
+msgstr "لینک ها"
+
+msgid "List"
+msgstr "فهرست"
+
+msgid "Listing"
+msgstr "لیست کردن"
+
+msgid "Listing Elements"
+msgstr "لیست کردن عناصر"
+
+msgid "Listing Grid"
+msgstr "شبکه بندی لیست"
+
+msgid "Listing Grid injections"
+msgstr "لیست های گرید"
+
+msgid "Listing Item"
+msgstr "لیست کردن آیتم"
+
+msgid "Listing Items"
+msgstr "لیست آیتم ها"
+
+msgid "Listing Settings"
+msgstr "لیست کردن تنظیمات"
+
+msgid "Listing item name:"
+msgstr "نام لیست آیتم:"
+
+msgid "Listing items"
+msgstr "لیست کردن آیتم"
+
+msgid "Listing source:"
+msgstr "منبع لیست:"
+
+msgid "Listing view:"
+msgstr "مشاهده لیست:"
+
+msgid "Listings"
+msgstr "لیست"
+
+msgid "Load more"
+msgstr "بارگذرای بیشتر"
+
+msgid "Login"
+msgstr "ورود"
+
+msgid "Long Arrow"
+msgstr "فلش بلند"
+
+msgid "Make listing item clickable"
+msgstr "ایجاد لیست قابل کلیک"
+
+msgid "Manage options"
+msgstr "انتخاب کنید"
+
+msgid "Manual Input"
+msgstr "ورودی دستی"
+
+msgid "Map Provider"
+msgstr "ارائه دهنده نقشه"
+
+msgid "Maps Listings"
+msgstr "لیست نقشه"
+
+msgid "Maps Settings"
+msgstr "تنظیمات نقشه"
+
+msgid "March"
+msgstr "مارس"
+
+msgid "Margin"
+msgstr "فاصله"
+
+msgid "Max Random Posts number"
+msgstr "حداکثر تعداد نوشته ها"
+
+msgid "Max Width"
+msgstr "حداکثر عرض"
+
+msgid "Max field value length. Leave empty for no limit"
+msgstr "حداکثر طول مقدار فیلد. بدون محدودیت خالی بگذارید"
+
+msgid "May"
+msgstr "می"
+
+msgid "Media"
+msgstr "مدیا"
+
+msgid "Menu Icon"
+msgstr "آیکن منو"
+
+msgid "Menu Position"
+msgstr "موقعیت منو"
+
+msgid "Menu name"
+msgstr "نام منو"
+
+msgid "Menu name text"
+msgstr "نام منو"
+
+msgid "Menu order"
+msgstr "ترتیب منو"
+
+msgid "Menu position"
+msgstr "موقعیت منو"
+
+msgid "Message"
+msgstr "پیغام"
+
+msgid "Messages"
+msgstr "پیام ها"
+
+msgid "Meta Box"
+msgstr "جعبه متا"
+
+msgid "Meta Box Field"
+msgstr "فیلد جعبه متا"
+
+msgid "Meta Box Name"
+msgstr "نام متا باکس"
+
+msgid "Meta Box Title"
+msgstr "عنوان متا باکس"
+
+msgid "Meta Box for"
+msgstr "حعبه متا برای"
+
+msgid "Meta Boxes"
+msgstr "متا باکس ها"
+
+msgid "Meta Boxes List"
+msgstr "متا باکس ها"
+
+msgid "Meta Data"
+msgstr "اطلاعات متا"
+
+msgid "Meta Field"
+msgstr "متا فیلد"
+
+msgid "Meta Query"
+msgstr "کوئری متا"
+
+msgid "Meta Value"
+msgstr "مقدار متا"
+
+msgid "Meta boxes"
+msgstr "متا باکس ها"
+
+msgid "Meta clause"
+msgstr "عبارت متا"
+
+msgid "Meta clause to order"
+msgstr "عبارت متا برای ترتیب"
+
+msgid "Meta field description to be shown on Post edit page"
+msgstr "توضیحات فیلد متا در صفحه ویرایش پست نشان داده شود"
+
+msgid "Meta field label. It will be displayed on Post edit page"
+msgstr ""
+" نام / کلید / شناسه فیلد متا. در زیر این نام فیلد در پایگاه داده ذخیره می "
+"شود. باید فقط شامل حروف لاتین، اعداد، نویسه های «-» یا «_» باشد"
+
+msgid ""
+"Meta field type. Defines the way field to be displayed on Post edit page"
+msgstr "نوع فیلد متا فیلد راه را برای نمایش در صفحه ویرایش پست تعریف می کند"
+
+msgid "Meta fields"
+msgstr "فیلد های متا"
+
+msgid "Meta key to order"
+msgstr "کلید متا برای ترتیب"
+
+msgid "Meta query relation"
+msgstr "ارتباط کوئری متا"
+
+msgid "Meta type"
+msgstr "نوع متا"
+
+msgid "Meta value"
+msgstr "مقدار متا"
+
+msgid "Middle"
+msgstr "میانه"
+
+msgid "Misc"
+msgstr "متفرقه"
+
+msgid "Mobile"
+msgstr "موبایل"
+
+msgid "Mobile Trigger Alignment"
+msgstr "ترازبندی گیره موبایل"
+
+msgid "Modified"
+msgstr "ویرایش شده"
+
+msgid "Modules"
+msgstr "ماژول ها"
+
+msgid "More Comments Format"
+msgstr "فرمت نظرات بیشتر"
+
+msgid "More string"
+msgstr "رشته های بیشتر"
+
+msgid "Multiline"
+msgstr "چند خطی"
+
+msgid "Multiple"
+msgstr "چندگانه"
+
+msgid "My Library"
+msgstr "کتابخانه من"
+
+msgid "Name"
+msgstr "اسم"
+
+msgid "Name for one object of this post type"
+msgstr " "
+
+msgid "Name/ID"
+msgstr "نام / ID"
+
+msgid "Name:"
+msgstr "نام:"
+
+msgid "Name: "
+msgstr "نام: "
+
+msgid "Navigation Arrows"
+msgstr "فلش های ناوبری"
+
+msgid "Need Help?"
+msgstr "به کمک نیاز دارید؟"
+
+msgid "New Field"
+msgstr "فیلد جدید"
+
+msgid "New Item"
+msgstr "آیتم جدید"
+
+msgid "New Meta Field"
+msgstr "فیلد متا جدید"
+
+msgid "Next"
+msgstr "بعد"
+
+msgid "Next Arrow Position"
+msgstr "موقیعیت فلش یعدی"
+
+msgid "Nickname"
+msgstr "نام مستعار"
+
+msgid "No"
+msgstr "خیر"
+
+msgid "No Templates Found"
+msgstr "هیچ قالبی یافت نشد"
+
+msgid "No Templates Found In Trash"
+msgstr "هیچ قالب در سطل زباله یافت نشد"
+
+msgid "No data found in file"
+msgstr "هیچ داده ای در فایل یافت نشد"
+
+msgid "No data was found"
+msgstr "هیچ داده ای یافت نشد"
+
+msgid "No meta boxes found"
+msgstr "هیچ متایی یافت نشد"
+
+msgid "No taxonomies found"
+msgstr "هیچ طبقه بندی یافت نشد"
+
+msgid "None"
+msgstr "هیچ"
+
+msgid "Normal"
+msgstr "نرمال"
+
+msgid "Not between"
+msgstr "بین این نه"
+
+msgid "Not equal"
+msgstr "برابر نیست"
+
+msgid "Not found message"
+msgstr "هیچ پیامی یافت نشد"
+
+msgid "Not in"
+msgstr "در این نه"
+
+msgid "Not like"
+msgstr "مثل این نه"
+
+msgid "Not selected"
+msgstr "انتخاب نشده"
+
+msgid "Note: the `Posts number` control set min random posts number"
+msgstr ""
+"توجه: در قسمت \"تعداد نوشته ها\" می توانید حداقل تعداد نوشته ها را تنظیم "
+"کنید."
+
+msgid "Note: this filed will override Meta Field value"
+msgstr "توجه: این پرونده ارزش Meta Field را نادیده می گیرد"
+
+msgid "Note: this filed will override Source value"
+msgstr "توجه: این پرونده منبع اصلی را رد می کند"
+
+msgid "November"
+msgstr "نوامبر"
+
+msgid "Number"
+msgstr "عدد"
+
+msgid "Object Field"
+msgstr "فیلد Object"
+
+msgid "Object type"
+msgstr "نوع ساختار فیلد"
+
+msgid "October"
+msgstr "اکتبر"
+
+msgid "Offset"
+msgstr "افست"
+
+msgid "One Comments Format"
+msgstr "فرمت نظرات 1"
+
+msgid "Only logged-in user can delete posts"
+msgstr "فقط کاربران وارد شده قادر به حذف نوشته ها هستند"
+
+msgid "Opacity"
+msgstr "شفافیت"
+
+msgid "Open in new window"
+msgstr "در پنجره جدید باز کنید"
+
+msgid "Operator"
+msgstr "اپراتور"
+
+msgid "Option"
+msgstr "فیلد تنظیمات"
+
+msgid "Options"
+msgstr "فیلد تنظیمات"
+
+msgid "Options Pages"
+msgstr "ساخت تنظیمات"
+
+msgid "Or enter meta field key"
+msgstr "یا کلید متا فیلد را وارد کنید"
+
+msgid "Order"
+msgstr "ترتیب"
+
+msgid "Order & Offset"
+msgstr "ترتیب و افست"
+
+msgid "Order By"
+msgstr "ترتیب بر اساس"
+
+msgid "Order by"
+msgstr "سفارش توسط"
+
+msgid "Other"
+msgstr "سایر"
+
+msgid "Padding"
+msgstr "پدینگ"
+
+msgid "Page Attributes"
+msgstr "نویسنده"
+
+msgid "Page Name"
+msgstr "نام برگه"
+
+msgid "Page Slug"
+msgstr "نامک برگه"
+
+msgid "Page Slug (and option name)"
+msgstr "نامک برگه (و نام تنظیمات)"
+
+msgid "Page not found"
+msgstr "صفحه یافت نشد"
+
+msgid "Page slug"
+msgstr "نامک صفحه"
+
+msgid "Page title"
+msgstr "عنوان برگه"
+
+msgid "Pages"
+msgstr "برگه‌ها"
+
+msgid "Parent"
+msgstr "مرجع"
+
+msgid "Parent %s"
+msgstr "والدین %s"
+
+msgid "Parent page"
+msgstr "صفحه والد"
+
+msgid "Password"
+msgstr "کلمه عبور"
+
+msgid "Passwords don't match."
+msgstr "رمز عبور متفاوت است."
+
+msgid "PayPal settings:"
+msgstr "تنظیمات پی پال:"
+
+msgid "Pending"
+msgstr "در حال بررسی"
+
+msgid "Pending Review"
+msgstr "بررسی معلق"
+
+msgid "Permalink"
+msgstr "پیوند یکتا"
+
+msgid "Placeholder Color"
+msgstr "رنگ محل جایگزین"
+
+msgid "Placeholder:"
+msgstr "نگهدارنده:"
+
+msgid "Please change post type slug. Current is reserved for WordPress needs"
+msgstr ""
+"لطفا نامک پست تایپ تایپ را تغییر دهید. کنونی برای نیازهای وردپرس محفوظ است"
+
+msgid "Please confirm meta box deletion"
+msgstr "لطفا حذف متا باکس ها را تایید کنید"
+
+msgid ""
+"Please install <a href=\"https://wordpress.org/plugins/elementor/\" "
+"target=\"_blank\">Elementor page builder</a> to manage listings layout"
+msgstr ""
+"لطفا افزونه <a href=\"https://wordpress.org/plugins/elementor/\" "
+"target=\"_blank\">المنتور</a>را برای میدریت طرح لیست نصب کنید"
+
+msgid "Please provide item ID to delete"
+msgstr "لطفا شناسه مورد را برای حذف ارائه دهید"
+
+msgid "Please set post type name"
+msgstr "لطفا نام پست تایپ را تنظیم کنید"
+
+msgid "Please set post type slug"
+msgstr "لطفاً پست تایپ تایپ را تنظیم کنید"
+
+msgid "Please, select form to show"
+msgstr "لطفا، یک فرم را برای نمایش انتخاب کنید"
+
+msgid "Plugins"
+msgstr "افزونه ها"
+
+msgid "Position"
+msgstr "موقعیت"
+
+msgid "Post"
+msgstr "پست"
+
+msgid "Post Content"
+msgstr "محتویات پست"
+
+msgid "Post Excerpt"
+msgstr "خلاصه پست"
+
+msgid "Post Formats"
+msgstr "فرمت های پست"
+
+msgid "Post Meta"
+msgstr "متا پست"
+
+msgid "Post Status"
+msgstr "وضعیت نوشته"
+
+msgid "Post Terms"
+msgstr "شرایط پست"
+
+msgid "Post Title"
+msgstr "عنوان ارسال"
+
+msgid "Post Type"
+msgstr "پست تایپ"
+
+msgid "Post Type Name"
+msgstr "نام پست تایپ"
+
+msgid "Post Type Slug"
+msgstr "نامک پست تایپ"
+
+msgid "Post Types"
+msgstr "پست تایپ"
+
+msgid "Post date"
+msgstr "ستون"
+
+msgid "Post date GMT"
+msgstr "تاریخ پست GMT"
+
+msgid "Post modified"
+msgstr "پست اصلاح شده"
+
+msgid "Post modified GMT"
+msgstr "پست اصلاح شده GMT"
+
+msgid "Post thumbnail"
+msgstr "تصویر بند انگشتی پست"
+
+msgid "Post types"
+msgstr "پست تایپ"
+
+msgid "Post/Term/User/Object Data"
+msgstr "نوشته/شرط/کاربر/داده ها"
+
+msgid "Posts"
+msgstr "نوشته ها"
+
+msgid "Posts & Author Parameters"
+msgstr "پارامتر های نویسنده و نوشته"
+
+msgid "Posts Query"
+msgstr "کوئری پست"
+
+msgid "Posts by author"
+msgstr "نوشته ها بر اساس نویسنده"
+
+msgid "Posts count"
+msgstr "شمارنده نوشته ها"
+
+msgid "Posts number"
+msgstr "تعداد نوشته ها"
+
+msgid "Posts offset"
+msgstr "افست نوشته ها"
+
+msgid "Prefix"
+msgstr "پیشوند"
+
+msgid "Prefix Color"
+msgstr "پیشوند رنگ"
+
+msgid "Preload coordinates by address"
+msgstr "از پیش بارگیری مختصات بر اساس آدرس"
+
+msgid "Presets"
+msgstr "از پیش آماده"
+
+msgid "Prev"
+msgstr "قبلی"
+
+msgid "Preview Width"
+msgstr "عرض پیش نمایش"
+
+msgid "Price"
+msgstr "قیمت"
+
+msgid "Private"
+msgstr "خصوصی"
+
+msgid "Profile Builder"
+msgstr "پروفایل ساز "
+
+msgid "Profile Menu"
+msgstr "منو پروفایل"
+
+msgid "Profile Page"
+msgstr "برگه پروفایل"
+
+msgid "Publicly Queryable"
+msgstr "عمومی قابل استعلام است"
+
+msgid "Publish"
+msgstr "انتشار"
+
+msgid "QR Code"
+msgstr "کد QR"
+
+msgid "QR Code for Dynamic Field widget"
+msgstr "فیلد QR کد داینامیک"
+
+msgid "Queries"
+msgstr "کوئری"
+
+msgid "Queries List"
+msgstr "لیست کوئری"
+
+msgid "Query Builder"
+msgstr "کوئری بیلدر"
+
+msgid "Query Builder knowledge base"
+msgstr "آموزش جامع کوئری بیلدر"
+
+msgid "Query Type"
+msgstr "نوع کوئری"
+
+msgid "Radio"
+msgstr "دکمه رادیو"
+
+msgid "Read More"
+msgstr "اطلاعات بیشتر"
+
+msgid "Redirect URL"
+msgstr "لینک ریدایرکت"
+
+msgid "Redirect to page"
+msgstr "ریدایرکت به برگه"
+
+msgid "Register Query Var"
+msgstr "ثبت Query Var"
+
+msgid "Registration Date"
+msgstr "گراف ثبت‌نام همکاران فروش"
+
+msgid "Related list HTML tag"
+msgstr "لیست مرتبط با برچسب HTML"
+
+msgid "Related objects"
+msgstr "مرتبط ها"
+
+msgid "Relation Type"
+msgstr "نوع ارتباط"
+
+msgid "Relation type"
+msgstr "نوع ارتباط"
+
+msgid "Relations"
+msgstr "ارتباط ها"
+
+msgid "Relations Hierarchy"
+msgstr "مراتب ارتباط"
+
+msgid "Relations List"
+msgstr "لیست همه موارد"
+
+msgid "Relevance"
+msgstr "ارتباط"
+
+msgid "Reload"
+msgstr "بارگیری مجدد"
+
+msgid "Repeater"
+msgstr "تکرار کننده"
+
+msgid "Repeater Field"
+msgstr "فیلد تکرار شونده"
+
+msgid "Repeater field:"
+msgstr "فیلد تکرار شونده:"
+
+msgid "Repeater source:"
+msgstr "منبع تکرارشونده:"
+
+msgid "Rest API Listings"
+msgstr "لیست Rest API"
+
+msgid "Revisions"
+msgstr "تاریخچه"
+
+msgid "Rewrite"
+msgstr "بازنویسی"
+
+msgid "Rewrite Slug"
+msgstr "بازنویسی Slug"
+
+msgid "Right"
+msgstr "راست"
+
+msgid "Right Gap"
+msgstr "فاصله راست"
+
+msgid "Right Indent"
+msgstr "ردیف راست"
+
+msgid "Right/Bottom"
+msgstr "راست/پایین"
+
+msgid "Roles"
+msgstr "نقش ها"
+
+msgid "Row"
+msgstr "ردیف"
+
+msgid "Rows"
+msgstr "ردیف"
+
+msgid "Rows Gap"
+msgstr "فاصله خط ها"
+
+msgid "SKU"
+msgstr "کد محصول"
+
+msgid "Sale Price"
+msgstr "قیمت فروش"
+
+msgid "Sales"
+msgstr "فروش"
+
+msgid "Sample content"
+msgstr "محتوا پیش فرض"
+
+msgid "Save"
+msgstr "ذخیره"
+
+msgid "Saved"
+msgstr "ذخیره"
+
+msgid "Saved!"
+msgstr "ذخیره شد!"
+
+msgid "Search"
+msgstr "جست و جو"
+
+msgid "Search Form"
+msgstr "فرم جستجو"
+
+msgid "Search Item"
+msgstr "جستجو آیتم ها"
+
+msgid "Search for items"
+msgstr "جستجو برای آیتم ها"
+
+msgid "Select"
+msgstr "انتخاب"
+
+msgid "Select %s"
+msgstr "انتخاب %s"
+
+msgid "Select capability type to restrict access to created page"
+msgstr "نوع قابلیت را برای محدود کردن دسترسی به صفحه ایجاد شده انتخاب کنید"
+
+msgid "Select existing menu item to add page after"
+msgstr "اضافه کنید بعد از کدام منو ؟"
+
+msgid ""
+"Select geocoding source code provider. This provider will be used to get "
+"coordinates by address string for all map listings."
+msgstr ""
+"ارائه دهنده کد منبع جغرافیایی را انتخاب کنید. این ارائه دهنده برای دریافت "
+"مختصات با رشته آدرس برای همه فهرست های نقشه استفاده خواهد شد."
+
+msgid ""
+"Select map source code provider. This provider will be used to render map "
+"for all map listings."
+msgstr " "
+
+msgid "Select meta field width from the dropdown list for Post edit page"
+msgstr "عرض فیلد متا را از لیست کشویی صفحه ویرایش پست انتخاب کنید"
+
+msgid "Select page..."
+msgstr "انتخاب برگه..."
+
+msgid "Select plugin component to get value from"
+msgstr "انتخاب کنید"
+
+msgid "Select post types where this meta box should be shown"
+msgstr "انواع پست را انتخاب کنید که این متا باکس باید نشان داده شود"
+
+msgid "Separate Geocoding API key"
+msgstr "کلید API جغرافیایی جداگانه"
+
+msgid "September"
+msgstr "سپتامبر"
+
+msgid "Set advanced query parameters"
+msgstr "پارامتر های پیشرفته کوئری را تنظیم کنید"
+
+msgid ""
+"Set default value for current field. <b>Note</b> For date field you can set "
+"any value could be processed by strtotime() function."
+msgstr ""
+"مقدار پیش فرض را برای فیلد فعلی تنظیم کنید. توجه داشته باشید برای فیلد تاریخ "
+"می توانید هر مقداری را تنظیم کنید که توسط تابع strtotime() پردازش شود."
+
+msgid "Set listing name"
+msgstr "تنظیم نام لیست"
+
+msgid ""
+"Set slug for your options page. Slug should contain only letters, numbers "
+"and `-` or `_` chars. This slug also be used to store options into database"
+msgstr ""
+"نامک را برای صفحه تنظیمات خود تنظیم کنید. نامک باید فقط شامل حروف، اعداد و "
+"نویسه های «-» یا «_» باشد. این نامک همچنین برای ذخیره تنظیمات در پایگاه داده "
+"استفاده می شود"
+
+msgid ""
+"Set slug for your post type. Slug should contain only letters, numbers and `-"
+"` or `_` chars"
+msgstr " "
+
+msgid ""
+"Set slug for your taxonomy. Slug should contain only letters, numbers and `-"
+"` or `_` chars"
+msgstr " "
+
+msgid "Set unique name for your options page"
+msgstr "نام منحصر به فردی را برای صفحه گزینه های خود تنظیم کنید"
+
+msgid "Set unique name for your post type. Eg. `Projects`"
+msgstr "برای مثال Projects ( باید منحصر به فرد باشد )"
+
+msgid "Sets the separator for the decimal point"
+msgstr "جداکننده را برای اعشار تنظیم می کند"
+
+msgid "Settings"
+msgstr "پیکربندی"
+
+msgid "Setup Listing Item"
+msgstr "راه اندازی لیست آیتم"
+
+msgid "Short"
+msgstr "کوتاه"
+
+msgid "Shortcode Generator"
+msgstr ""
+"تولید کننده کدهای کوتاه"
+
+msgid "Show Admin UI"
+msgstr "نمایش UI مدیریت"
+
+msgid "Show Arrows Navigation"
+msgstr "نمایش فلش های ناوبری"
+
+msgid "Show Dots Navigation"
+msgstr "نمایش نقطه های ناوبری"
+
+msgid "Show On"
+msgstr "نمایش در"
+
+msgid "Show all terms"
+msgstr "نمایش همه مقررات"
+
+msgid "Show in Admin Menu"
+msgstr "نمایش در منو ناوبری"
+
+msgid "Show in Nav Menu"
+msgstr "نمایش در منو ناوبری"
+
+msgid "Show in Rest API"
+msgstr "نمایش در Rest API"
+
+msgid "Show template"
+msgstr "نمایش قالب ها"
+
+msgid "Show this if field value is empty"
+msgstr "نمایش این زمانی که مقدار خالی باشد"
+
+msgid "Single User Page"
+msgstr "برگه تکی کاربر"
+
+msgid "Single user page"
+msgstr "برگه تکی کاربر"
+
+msgid "Single value"
+msgstr "مقدار تکی"
+
+msgid "Singular name"
+msgstr "نام پست تایپ قابل نمایش"
+
+msgid "Size"
+msgstr "سایز"
+
+msgid "Skins Manager"
+msgstr "مدیریت پوسته ها"
+
+msgid "Skins manager"
+msgstr "مدیریت پوسته ها"
+
+msgid "Slide"
+msgstr "اسلاید"
+
+msgid "Slider"
+msgstr "اسلایدر"
+
+msgid "Slider Gallery for Dynamic Field widget"
+msgstr "گالری اسلایدری برای فیلدهای داینامیک"
+
+msgid "Slider arrows"
+msgstr "فلش های اسلایدر"
+
+msgid "Slider arrows box size"
+msgstr "سایز جعبه فلش اسلایدر"
+
+msgid "Slider arrows size"
+msgstr "سایز فلش های اسلایدر"
+
+msgid "Slider settings are disabled for masonry layout"
+msgstr "تنظیمات اسلایدر برای طرح پازلی غیرفعال شده است"
+
+msgid "Slides to Scroll"
+msgstr "اسلایدر در هر اسکرول"
+
+msgid "Slug"
+msgstr "نامک"
+
+msgid "Source"
+msgstr "منبع"
+
+msgid "Source:"
+msgstr "منبع:"
+
+msgid "Specific Author ID"
+msgstr "ID نویسنده خاص"
+
+msgid "Specific post ID"
+msgstr "پست خاص"
+
+msgid "Start"
+msgstr "شروع"
+
+msgid "Static page"
+msgstr "صفحه استاتیک"
+
+msgid "Status"
+msgstr "وضعیت"
+
+msgid "Stock Status"
+msgstr "وضعیت موجودی"
+
+msgid "Stretch"
+msgstr "کش آمدن"
+
+msgid "Subject:"
+msgstr "موضوع:"
+
+msgid "Submit"
+msgstr "ارسال"
+
+msgid "Submit Button"
+msgstr "دکمه ارسال"
+
+msgid "Success"
+msgstr "موفقیت"
+
+msgid "Suffix"
+msgstr "پسوند"
+
+msgid "Suffix Color"
+msgstr "زنگ پیشوند"
+
+msgid "Supports"
+msgstr "پشتیبانی"
+
+msgid "Switch themes"
+msgstr "تغییر قالب ها"
+
+msgid "Switcher"
+msgstr "تغغیر دهنده"
+
+msgid "Tab"
+msgstr "تب"
+
+msgid "Tag"
+msgstr "برچسب"
+
+msgid "Tax Query"
+msgstr "کوئری طبقه بندی"
+
+msgid "Tax query relation"
+msgstr "ارتباط کوئری طبقه بندی"
+
+msgid "Taxonomies"
+msgstr "طبقه بندی"
+
+msgid "Taxonomy"
+msgstr "طبقه بندی"
+
+msgid "Taxonomy Name"
+msgstr "نام Taxonomy"
+
+msgid "Taxonomy Slug"
+msgstr "نامک Taxonomy"
+
+msgid "Taxonomy from meta field"
+msgstr "طبقه بندی از فیلد متا"
+
+msgid "Taxonomy not found"
+msgstr "طبقه بندی یافت نشد"
+
+msgid "Taxonomy slug"
+msgstr "نامک Taxonomy"
+
+msgid "Tel"
+msgstr "تلفن"
+
+msgid "Template"
+msgstr "قالب"
+
+msgid "Template mode"
+msgstr "حالت قالب"
+
+msgid "Term"
+msgstr "شرط"
+
+msgid "Term Field"
+msgstr "ترم فیلد"
+
+msgid "Term Group"
+msgstr "گروه شرط"
+
+msgid "Term ID"
+msgstr "شناسه شرط"
+
+msgid "Term description"
+msgstr "توضیحات مقررات"
+
+msgid "Term name"
+msgstr "نام مقررات"
+
+msgid "Terms"
+msgstr "شرایط"
+
+msgid "Terms Icon"
+msgstr "آیکون شرایط"
+
+msgid "Terms Query"
+msgstr "شرایط کوئری"
+
+msgid "Text"
+msgstr "متن"
+
+msgid "Text Color"
+msgstr "رنگ متن"
+
+msgid "Text after"
+msgstr "بعد متن"
+
+msgid "Text before"
+msgstr "قبل متن"
+
+msgid "Text if disabled"
+msgstr "اگر متن فعال نباشد"
+
+msgid "Text if enabled"
+msgstr "اگر متن فعال باشد"
+
+msgid "Textarea"
+msgstr "ناحیه متن"
+
+msgid "Textarea Height"
+msgstr "ارتفاع ناحیه متن"
+
+msgid ""
+"The add new text. The default is `Add New` for both hierarchical and non-"
+"hierarchical post types"
+msgstr ""
+"اضافه کردن متن جدید پیش‌فرض «افزودن جدید» برای انواع پست سلسله مراتبی و غیر "
+"سلسله مراتبی است"
+
+msgid "The post type archive label used in nav menus"
+msgstr "برچسب بایگانی پست تایپ که در فهرست های nav استفاده می شود"
+
+msgid ""
+"The ultimate solution for managing custom post types, taxonomies and meta "
+"boxes."
+msgstr "افزونه حرفه ای برای المنتور - ساخت پست تایپ - لیست - متاباکس و ..."
+
+msgid "Thousands separator"
+msgstr "جداکننده هزارگان"
+
+msgid "Thumbnail"
+msgstr "بند انگشتی"
+
+msgid "Thumbnail (Featured Image)"
+msgstr "تصویر بند انگشتی(تصویر برجسته)"
+
+msgid "Thumbnail meta key"
+msgstr "کلید متا تصویر بند انگشتی"
+
+msgid "Time"
+msgstr "زمان"
+
+msgid "Title"
+msgstr "عنوان"
+
+msgid "Title Field"
+msgstr "فیلد نمایش تیتر"
+
+msgid "Title field"
+msgstr "فیلد نمایش تیتر"
+
+msgid "Toggle this option to collapse repeater items on page load"
+msgstr "این گزینه را تغییر دهید تا موارد تکرار کننده در بارگذاری صفحه جمع شود"
+
+msgid ""
+"Toggle this option to make this field as required one. Note: so far, "
+"required fields don’t work properly with Blocks editor"
+msgstr ""
+"این گزینه را تغییر دهید تا این فیلد به عنوان یکی از موارد مورد نیاز باشد. "
+
+msgid "Tools"
+msgstr "ابزارها"
+
+msgid "Top"
+msgstr "بالا"
+
+msgid "Top Indent"
+msgstr "ردیف بالا"
+
+msgid "Trackbacks"
+msgstr "پیگیری ها"
+
+msgid "Trash"
+msgstr "سطل زباله"
+
+msgid "Type"
+msgstr "نوع"
+
+msgid "Type:"
+msgstr "نوع:"
+
+msgid "URL"
+msgstr "نشانی"
+
+msgid "Update Post Type"
+msgstr "بروزرسانی پست تایپ"
+
+msgid "Upload files"
+msgstr "آپلود فایل"
+
+msgid "Uploaded to this post"
+msgstr "بارگذاری شده در این نوشته"
+
+msgid "Use % for comments number"
+msgstr "استفاده از %f برای تعداد نظرات برای"
+
+msgid "Use Custom Post Types"
+msgstr "استفاده از پست تایپ سفارشی"
+
+msgid "Use Random posts number"
+msgstr "استفاده از تعداد نوشته تصادفی"
+
+msgid "Use as Archive Template"
+msgstr "استفاده از قالب آرشیو"
+
+msgid "Use lightbox"
+msgstr "استفاده از لایت باکس"
+
+msgid "Use page content"
+msgstr "محتوا برگه کاربر"
+
+msgid ""
+"Use separate key for Geocoding API. This allows you to set more accurate "
+"restrictions for your API key."
+msgstr ""
+"از کلید جداگانه برای Geocoding API استفاده کنید. این به شما امکان می دهد "
+"محدودیت های دقیق تری را برای کلید API خود تعیین کنید."
+
+msgid "User"
+msgstr "کاربر"
+
+msgid "User Field"
+msgstr "فیلد کاربر"
+
+msgid "User ID"
+msgstr "شناسه‌ی کاربر"
+
+msgid "User Image"
+msgstr "تصویر کاربر"
+
+msgid "User Login"
+msgstr "نام کاربری"
+
+msgid "User Page"
+msgstr "صفحه کاربر"
+
+msgid "User Profile Builder"
+msgstr "پروفایل ساز"
+
+msgid "User Properties"
+msgstr "تنظیمات کاربر"
+
+msgid "User avatar (works only for user listing and pages)"
+msgstr "آواتار کاربر (فقط در حالت لیست کاربران و برگه کار میکند)"
+
+msgid "User nicename"
+msgstr "نام مستعار کاربر"
+
+msgid "User profile with editable content"
+msgstr "پروفایل کاربری با محتوای قابل ویرایش"
+
+msgid "Username"
+msgstr "نام کاربری"
+
+msgid "Users"
+msgstr "کاربران"
+
+msgid "Users Query"
+msgstr "کوئری کاربر"
+
+msgid "Users page"
+msgstr "برگه کاربر"
+
+msgid "Validate API Key"
+msgstr "اعتبار سنجی کلید API"
+
+msgid "Value"
+msgstr "مقدار"
+
+msgid "Value:"
+msgstr "ارزش:"
+
+msgid "Vertical"
+msgstr "عمودی"
+
+msgid "Vertical Alignment"
+msgstr "ترازبندی عمودی"
+
+msgid "Vertical Gap"
+msgstr "فاصله عمودی"
+
+msgid "Vertical Position by"
+msgstr "موقیعیت فلش بعدی"
+
+msgid "View Item"
+msgstr "مشاهده آیتم"
+
+msgid "Visibility Conditions"
+msgstr "شرایط مشاهده شدن"
+
+msgid "WYSIWYG"
+msgstr "WYSIWYG"
+
+msgid ""
+"We recommend to enable this option and set meta field to preload coordinates "
+"for. This is required to avoid optimize Google Maps API requests. Note: only "
+"JetEngine meta fields could be preloaded"
+msgstr ""
+"توصیه می کنیم این گزینه را فعال کنید و فیلد متا را برای پیش بارگذاری مختصات "
+"تنظیم کنید. این برای جلوگیری از بهینه سازی درخواست های Google Maps API ضروری "
+"است. توجه: فقط فیلدهای متا JetEngine را می توان از قبل بارگذاری کرد"
+
+msgid "Weight"
+msgstr "وزن"
+
+msgid "What to do when non-authorized user try to access account page"
+msgstr ""
+"وقتی کاربر غیرمجاز سعی در دسترسی به صفحه حساب خود دارد چه کاری انجام شود"
+
+msgid "Who can access this page"
+msgstr "چه کسی به این برگه دسترسی داشته باشد"
+
+msgid "Widget Items Alignment"
+msgstr "ترازبندی ویجت آیتم ها"
+
+msgid "Widget Visibility"
+msgstr "نمایش ویجت"
+
+msgid "Width"
+msgstr "عرض"
+
+msgid "Yes"
+msgstr "بله"
+
+msgid "You don't have permissions to do this"
+msgstr "شما مجوز کافی برای دسترسی به این صفحه را ندارید"
+
+msgid "Zero Comments Format"
+msgstr "فرمت نظرات 0"
+
+msgid "`Edit meta box` link"
+msgstr "پیوند «ویرایش متا »."
+
+msgid "`Edit post type/meta box` link"
+msgstr "پیوند «ویرایش نوع پست/متا باکس»."
+
+msgid "`Edit taxonomy/meta box` link"
+msgstr "پیوند «ویرایش taxonomy »."
+
+msgid "here"
+msgstr "اینجا"
+
+msgid "https://crocoblock.com/"
+msgstr "https://crocoblock.com/"
+
+msgid "name: "
+msgstr "نام:"

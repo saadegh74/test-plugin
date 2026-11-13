@@ -1,0 +1,13 @@
+{
+	"default": {"icon_type":"icon","divider_title_switch":"","link_type":"none","info_box_border_border":"","info_box_border_color":""},
+
+	"preset-1": {"icon_type":"icon","sub_heading":"","divider_title_switch":"","link_type":"none","info_box_border_border":"solid","info_box_border_color":"#E0E0E0","info_box_padding":{"unit":"px","top":"20","right":"20","bottom":"20","left":"20","isLinked":true},"description_margin":{"unit":"px","size":0,"sizes":[]}},
+
+	"preset-2": {"icon_type":"icon","sub_heading":"","divider_title_switch":"","link_type":"none","info_box_border_border":"none","info_box_shadow_box_shadow_type":"yes","info_box_shadow_box_shadow":{"horizontal":0,"vertical":0,"blur":15,"spread":0,"color":"rgba(0, 0, 0, 0.08)"},"align":"left","info_box_padding":{"unit":"px","top":"30","right":"30","bottom":"30","left":"30","isLinked":true},"description_margin":{"unit":"px","size":0,"sizes":[]}},
+
+	"preset-3": {"icon_type":"icon","sub_heading":"","divider_title_switch":"","link_type":"button","info_box_border_border":"solid","info_box_border_color":"#E0E0E0","align":"left","info_box_padding":{"unit":"px","top":"20","right":"20","bottom":"20","left":"20","isLinked":true}},
+
+	"preset-4": {"icon_type":"icon","sub_heading":"","divider_title_switch":"yes","link_type":"button","icon_bg_color_normal":"#FFFFFF","icon_border_border":"solid","icon_border_radius":{"unit":"px","top":"100","right":"100","bottom":"100","left":"100","isLinked":true},"info_box_shadow_box_shadow_type":"yes","info_box_shadow_box_shadow":{"horizontal":0,"vertical":0,"blur":15,"spread":0,"color":"rgba(0, 0, 0, 0.08)"},"icon_margin":{"unit":"px","top":"-44","right":"0","bottom":"0","left":"0","isLinked":true},"icon_padding":{"unit":"px","top":"12","right":"12","bottom":"12","left":"12","isLinked":true},"align":"center","info_box_padding":{"unit":"px","top":"20","right":"20","bottom":"20","left":"20","isLinked":true},"button_bg_color_normal":"#61CE7000","button_padding":{"unit":"px","top":"0","right":"0","bottom":"0","left":"0","isLinked":true}},
+
+	"preset-5": {"icon_type":"icon","icon_size":{"unit":"px","size":40,"sizes":[]},"icon_position":"left","icon_vertical_position":"middle","divider_title_switch":"","link_type":"none","align":"left","info_box_padding":{"unit":"px","top":"30","right":"20","bottom":"30","left":"20","isLinked":true},"info_box_border_border":"solid","info_box_border_color":"#E0E0E0","description_margin":{"unit":"px","size":0,"sizes":[]}}
+}

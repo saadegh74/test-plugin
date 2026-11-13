@@ -1,0 +1,9 @@
+{
+	"default": {"pp_icon_type":"none","counter_layout":"layout-1","num_divider":""},
+
+	"preset-1": {"pp_icon_type":"icon","counter_layout":"layout-1","num_divider":""},
+
+	"preset-2": {"pp_icon_type":"icon","counter_layout":"layout-1","num_divider":"yes"},
+
+	"preset-3": {"pp_icon_type":"icon","counter_layout":"layout-5","num_divider":"","counter_icon_margin":{"unit":"px","top":"0","right":"20","bottom":"0","left":"0","isLinked":true}}
+}

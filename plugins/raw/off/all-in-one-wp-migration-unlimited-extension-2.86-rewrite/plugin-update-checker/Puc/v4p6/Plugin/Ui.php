@@ -210,7 +210,7 @@ if ( !class_exists('Puc_v4p6_Plugin_Ui', false) ):
 				$details = '';
 
 				if ( $status == 'no_update' ) {
-					$message = sprintf(_x('افزونه %s آخرین نسخه موجود در برند تست بوده و نیازی به آپدیت ندارد!', 'the plugin title', 'plugin-update-checker'), $title);
+					$message = sprintf(_x('افزونه %s به‌روز است و نسخه جدیدتری منتشر نشده است.', 'the plugin title', 'plugin-update-checker'), $title);
 				} else if ( $status == 'update_available' ) {
 					$message = sprintf(_x('نسخه جدید برای محصول %s موجود است.', 'the plugin title', 'plugin-update-checker'), $title);
 				} else if ( $status === 'error' ) {

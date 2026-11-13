@@ -1,0 +1,7 @@
+{
+	"default": {"connector":"yes","pros":"","cons":"","final_rating":"yes","icon_position":"left"},
+
+	"preset-1": {"connector":"","icon_position":"left","items_spacing":{"unit":"px","size":25,"sizes":[]},"icon_size":{"unit":"px","size":20,"sizes":[]},"icon_box_size":{"unit":"px","size":60,"sizes":[]},"icon_spacing":{"unit":"px","size":20,"sizes":[]},"icon_border_radius":{"unit":"%","top":"50","right":"50","bottom":"50","left":"50","isLinked":true}},
+
+	"preset-2": {"connector":"yes","icon_position":"top","icon_size":{"unit":"px","size":20,"sizes":[]},"icon_box_size":{"unit":"px","size":60,"sizes":[]},"icon_border_border":"solid","icon_border_width":{"unit":"px","top":"1","right":"1","bottom":"1","left":"1","isLinked":true},"icon_border_radius":{"unit":"%","top":"50","right":"50","bottom":"50","left":"50","isLinked":true}}
+}

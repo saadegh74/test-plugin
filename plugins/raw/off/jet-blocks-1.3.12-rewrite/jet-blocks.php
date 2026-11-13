@@ -4,8 +4,8 @@
  * Plugin URI:  https://github.com/saadegh74/test-plugin
  * Description: ابزارک‌های کاربردی برای ایجاد هدر و فوتر پیشرفته در المنتور
  * Version:     1.3.12
- * Author:      برند تست
- * Author URI:  https://github.com/saadegh74/test-plugin
+ * Author:      Crocoblock
+ * Author URI:  https://crocoblock.com/
  * Text Domain: jet-blocks
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -412,13 +412,13 @@ if ( ! function_exists( 'jet_blocks' ) ) {
 jet_blocks();
 
 // ==========================================
-// = Plugin Update Checker - برند تست       =
+// = Plugin Update Checker =
 // ==========================================
 if ( ! class_exists( 'Puc_v4_Factory' ) ) {
 	require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'plugin-update-checker' . DIRECTORY_SEPARATOR . 'plugin-update-checker.php';
 }
 $jetblocksUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-blocks/info.json',
+	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/jet-blocks/info.json',
 	__FILE__,
 	'jet-blocks'
 );

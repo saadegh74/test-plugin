@@ -1,0 +1,20 @@
+{
+  "name": "JetEngine [کانال آزمایشی - Staging]",
+  "slug": "jet-engine",
+  "version": "3.9.1",
+  "tested": "6.8",
+  "requires": "5.8",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-08 06:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "افزونه جامع JetEngine برای مدیریت انواع پست سفارشی (CPT)، تکسونومی‌ها، متافیلدها، لیستینگ‌ها، صفحات تنظیمات، روابط و کوئری بیلدر در وردپرس و المنتور.",
+    "changelog": "<h4>3.9.1</h4><ul><li>بهبودهای امنیتی URL ویرایشگر کوئری، پیش‌نمایش بلوک‌ها، روابط و توابع داینامیک</li><li>پشتیبانی از Nested Repeaters، ماژول Async Listings و سازگاری با JetPopup و وردپرس 7.1</li><li>رفع باگ‌های لیستینگ اسلایدر، گالری، Map Listings، Options Pages و راست‌به‌چپ (RTL)</li><li>حذف کامل تبلیغات پیشخوان، منوی اضافی و لینک‌های سایت واسطه از کد و ترجمه فارسی</li><li>پاک‌سازی فایل‌های زائد توسعه‌دهنده و اتصال به سرور به‌روزرسانی مستقیم مخزن آزمایشی (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 890,
+  "downloaded": 4800,
+  "active_installs": 4800,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-engine/jet-engine-v3.9.1.zip"
+}

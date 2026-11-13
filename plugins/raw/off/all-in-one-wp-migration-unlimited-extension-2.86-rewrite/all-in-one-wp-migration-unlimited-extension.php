@@ -1,10 +1,10 @@
 <?php
 /**
- * Plugin Name: All-in-One WP Migration Unlimited Extension (برند تست)
+ * Plugin Name: All-in-One WP Migration Unlimited Extension
  * Plugin URI: https://servmask.com/
- * Description: افزونه افزایش نامحدود حجم درون‌ریزی برای افزونه All-in-One WP Migration با پشتیبانی و به‌روزرسانی هوشمند برند تست.
- * Author: برند تست
- * Author URI: https://github.com/saadegh74/test-plugin
+ * Description: Extension for All-in-One WP Migration that enables unlimited import size.
+ * Author: ServMask
+ * Author URI: https://servmask.com/
  * Version: 2.86
  * Text Domain: all-in-one-wp-migration-unlimited-extension
  * Domain Path: /languages
@@ -75,11 +75,11 @@ require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'functions.php';
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'loader.php';
 
 // ==========================================
-// = Plugin Update Checker - برند تست       =
+// = Plugin Update Checker =
 // ==========================================
 require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'plugin-update-checker' . DIRECTORY_SEPARATOR . 'plugin-update-checker.php';
 $ai1wmueUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/all-in-one-wp-migration-unlimited-extension/info.json',
+	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-off/staging/all-in-one-wp-migration-unlimited-extension/info.json',
 	__FILE__,
 	'all-in-one-wp-migration-unlimited-extension'
 );
