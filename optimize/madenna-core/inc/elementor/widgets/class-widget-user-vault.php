@@ -49,7 +49,7 @@ class Madenna_User_Vault_Elementor_Widget extends \Elementor\Widget_Base {
 
     public function render_vault_dashboard_content($settings = []) {
         wp_enqueue_style('madenna-vault-fa6', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', [], '6.5.1');
-        $vault_ver = defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.0';
+        $vault_ver = defined('MADENNA_CORE_VERSION') ? MADENNA_CORE_VERSION : '8.3.2';
         wp_enqueue_style('madenna-vault-css', MADENNA_CORE_URL . 'assets/css/madenna-vault.css', ['madenna-vault-fa6'], $vault_ver);
         wp_enqueue_script('madenna-vault-js', MADENNA_CORE_URL . 'assets/js/madenna-vault.js', ['jquery'], $vault_ver, true);
 

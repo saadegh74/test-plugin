@@ -1,5 +1,5 @@
 /**
- * Madenna Vault Frontend Controller (نسخه نهایی ۸.۳.۱)
+ * Madenna Vault Frontend Controller (نسخه نهایی ۸.۳.۲)
  * ثبت کامل ساختار ابزار در حالت نتیجه با مخفی‌سازی مراحل سوالات (data-vault-hidden-step)
  * Location: /assets/js/madenna-vault.js
  */
@@ -284,8 +284,13 @@
         let birthYear = '', birthMonth = '', birthDay = '', calculatedAge = '';
         let shamsiYearNum = 0, shamsiMonthNum = 0, shamsiDayNum = 0;
         if (activeBirthdate) {
-            const cleanBdate = toEnglishDigits(activeBirthdate);
-            const parts = cleanBdate.split(/[\/\-\.\s،,]+/).map(p => p.trim()).filter(Boolean);
+            const cleanBdate = toEnglishDigits(activeBirthdate)
+                .replace(/[\u200c\u200e\u200f\u202a-\u202e\u0640\uFEFF]/g, '')
+                .trim();
+            let parts = cleanBdate.split(/[\/\-\.\s،,]+/).map(p => p.trim()).filter(Boolean);
+            if (parts.length === 1 && /^\d{8}$/.test(parts[0])) {
+                parts = [parts[0].slice(0, 4), parts[0].slice(4, 6), parts[0].slice(6, 8)];
+            }
             if (parts.length >= 3) {
                 if (parts[0].length === 4) {
                     birthYear = parts[0];
@@ -687,13 +692,22 @@
                 // ۳. پر کردن خودکار تاریخ تولد (روز، ماه، سال) و سن
                 // ==========================================
                 if (activeBirthdate) {
-                    const ddPlaceholders = ['روز تولد', 'ماه تولد', 'سال (شمسی)', 'سال تولد', 'روز', 'ماه', 'سال', 'انتخاب روز', 'انتخاب ماه', 'انتخاب سال', 'انتخاب کنید', 'انتخاب'];
+                    const ddPlaceholders = ['روز تولد', 'ماه تولد', 'سال (شمسی)', 'سال شمسی', 'سال تولد', 'روز', 'ماه', 'سال', 'انتخاب روز', 'انتخاب ماه', 'انتخاب سال', 'انتخاب کنید', 'انتخاب'];
+                    const monthWordList = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'ابان', 'اذر', 'دی', 'بهمن', 'اسفند'];
+
+                    function containsMonthWord(cleanTxt) {
+                        if (!cleanTxt) return false;
+                        return monthWordList.some(mw => {
+                            const escaped = mw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            return new RegExp('(?:^|\\s)' + escaped + '(?:$|\\s)').test(cleanTxt);
+                        });
+                    }
 
                     function isPlaceholderLabel(lblText) {
                         const clean = normalizeFaText(lblText || '');
                         if (clean === '' || ddPlaceholders.some(ph => normalizeFaText(ph) === clean)) return true;
-                        if (/^(انتخاب|روز|ماه|سال)\b/.test(clean) && !/\d/.test(clean)) return true;
-                        if (clean.includes('تولد') || clean.includes('شمسی')) return true;
+                        if (containsMonthWord(clean)) return false;
+                        if (!/\d/.test(clean) && (/^(انتخاب|روز|ماه|سال)\b/.test(clean) || clean.includes('تولد') || clean.includes('شمسی'))) return true;
                         return false;
                     }
 
@@ -705,50 +719,152 @@
                             ((el && el.name) || '') + ' ' +
                             ((el && el.id) || '') + ' ' +
                             ((el && typeof el.className === 'string') ? el.className : '') + ' ' +
-                            ((el && el.getAttribute) ? (el.getAttribute('aria-label') || '') : '')
+                            ((el && el.getAttribute) ? ((el.getAttribute('aria-label') || '') + ' ' + (el.getAttribute('aria-controls') || '') + ' ' + (el.getAttribute('data-target') || '')) : '')
                         ).replace(/birthday/gi, 'birth');
                         const lowAttr = attrStr.toLowerCase();
                         const lowFirst = normalizeFaText(firstOptText || '');
                         const lowSample = normalizeFaText(optSampleText || '');
 
-                        if (lowAttr.includes('year') || lowAttr.includes('byear') || lowFirst.includes('سال')) return 'year';
-                        if (lowAttr.includes('month') || lowAttr.includes('bmonth') || lowFirst.includes('ماه')) return 'month';
-                        if (lowAttr.includes('day') || lowAttr.includes('bday') || lowFirst.includes('روز')) return 'day';
+                        const hasAttrYear = /(?:^|[-_\s])(year|byear|yr)(?:$|[-_\s0-9])/.test(lowAttr) || lowAttr.includes('year');
+                        const hasAttrMonth = /(?:^|[-_\s])(month|bmonth|mo)(?:$|[-_\s0-9])/.test(lowAttr) || lowAttr.includes('month');
+                        const hasAttrDay = /(?:^|[-_\s])(day|bday)(?:$|[-_\s0-9])/.test(lowAttr) || lowAttr.includes('day');
+                        const attrMatches = [hasAttrYear, hasAttrMonth, hasAttrDay].filter(Boolean).length;
+                        if (attrMatches === 1) {
+                            if (hasAttrYear) return 'year';
+                            if (hasAttrMonth) return 'month';
+                            if (hasAttrDay) return 'day';
+                        }
 
-                        if (lowSample.includes('فروردین') || lowSample.includes('اردیبهشت') || lowSample.includes('اسفند')) return 'month';
-                        if (/\b13[3-9]\d\b/.test(lowSample) || /سال\s*13\d\d/.test(lowSample)) return 'year';
-                        if (lowSample.includes('روز 1') && lowSample.includes('روز 2')) return 'day';
+                        const hasLblYear = lowFirst.includes('سال');
+                        const hasLblMonth = lowFirst.includes('ماه');
+                        const hasLblDay = lowFirst.includes('روز');
+                        const lblMatches = [hasLblYear, hasLblMonth, hasLblDay].filter(Boolean).length;
+                        if (lblMatches === 1) {
+                            if (hasLblYear) return 'year';
+                            if (hasLblMonth) return 'month';
+                            if (hasLblDay) return 'day';
+                        }
+
+                        if (lowSample) {
+                            if (lowSample.includes('فروردین') || lowSample.includes('اردیبهشت') || lowSample.includes('اسفند')) return 'month';
+                            if (/\b13[3-9]\d\b/.test(lowSample) || /سال\s*13\d\d/.test(lowSample)) return 'year';
+                            if (lowSample.includes('روز 1') && lowSample.includes('روز 2')) return 'day';
+                        }
                         return '';
+                    }
+
+                    function getOptionRawVal(opt) {
+                        if (!opt || !opt.getAttribute) return '';
+                        return opt.getAttribute('data-value')
+                            || opt.getAttribute('data-val')
+                            || opt.getAttribute('data-mdn-val')
+                            || opt.getAttribute('data-mdn-value')
+                            || opt.getAttribute('data-mdn-day')
+                            || opt.getAttribute('data-mdn-month')
+                            || opt.getAttribute('data-mdn-year')
+                            || opt.getAttribute('data-day')
+                            || opt.getAttribute('data-month')
+                            || opt.getAttribute('data-year')
+                            || opt.getAttribute('data-option')
+                            || opt.getAttribute('data-num')
+                            || opt.getAttribute('data-item')
+                            || opt.getAttribute('data-key')
+                            || opt.getAttribute('value')
+                            || '';
                     }
 
                     function collectMenuCandidates(menu) {
                         if (!menu) return [];
-                        const explicit = Array.from(menu.querySelectorAll('[data-value], [data-val], [data-option], [data-num], [role="option"], .madenna-dd-item, .madenna-dd-opt, .madenna-dd-option, .mdn-dd-item, .mdn-dd-opt, .mdn-dd-option, [class*="dd-item"], [class*="dd-opt"], .dd-item, .dd-option, button, li, a'));
-                        if (explicit.length > 0) return explicit;
+                        const isVaultUi = (el) => el.closest && el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper');
+                        const rawExplicit = Array.from(menu.querySelectorAll('[data-value], [data-val], [data-mdn-val], [data-mdn-value], [data-mdn-day], [data-mdn-month], [data-mdn-year], [data-day], [data-month], [data-year], [data-option], [data-num], [data-item], [data-key], [role="option"], .madenna-dd-item, .madenna-dd-opt, .madenna-dd-option, .mdn-dd-item, .mdn-dd-opt, .mdn-dd-option, [class*="dd-item"], [class*="dd-opt"], .dd-item, .dd-option, button, li, a'));
+                        const explicit = rawExplicit.filter((el, idx) => {
+                            if (isVaultUi(el)) return false;
+                            if (rawExplicit.some((other, oIdx) => oIdx !== idx && el.contains(other))) return false;
+                            const val = getOptionRawVal(el);
+                            const txt = normalizeFaText(el.textContent || '');
+                            if (!val && !txt) return false;
+                            if (!val && /^(بستن|پاک کردن|حذف|جستجو)$/.test(txt)) return false;
+                            return true;
+                        });
+                        if (explicit.length >= 6) return explicit;
 
                         let container = menu;
-                        for (let depth = 0; depth < 3; depth++) {
-                            const children = Array.from(container.children).filter(c => !['STYLE', 'SCRIPT'].includes(c.tagName));
+                        for (let depth = 0; depth < 4; depth++) {
+                            const children = Array.from(container.children).filter(c => !['STYLE', 'SCRIPT', 'INPUT'].includes(c.tagName));
                             if (children.length === 1 && children[0].children && children[0].children.length > 1) {
                                 container = children[0];
                             } else {
                                 break;
                             }
                         }
-                        const direct = Array.from(container.children).filter(c => !['STYLE', 'SCRIPT', 'INPUT'].includes(c.tagName));
+                        const direct = Array.from(container.children).filter(c => !['STYLE', 'SCRIPT', 'INPUT'].includes(c.tagName) && !isVaultUi(c));
                         if (direct.length >= 6) return direct;
 
                         const richListContainer = Array.from(menu.querySelectorAll('div, ul')).find(box => {
-                            const kids = Array.from(box.children).filter(c => !['STYLE', 'SCRIPT'].includes(c.tagName));
-                            return kids.length >= 10 && !kids[0].querySelector('ul, div > div > div');
+                            if (isVaultUi(box)) return false;
+                            const kids = Array.from(box.children).filter(c => !['STYLE', 'SCRIPT', 'INPUT'].includes(c.tagName));
+                            return kids.length >= 6 && !kids[0].querySelector('ul, div > div > div');
                         });
                         if (richListContainer) {
-                            return Array.from(richListContainer.children).filter(c => !['STYLE', 'SCRIPT'].includes(c.tagName));
+                            return Array.from(richListContainer.children).filter(c => !['STYLE', 'SCRIPT', 'INPUT'].includes(c.tagName));
                         }
 
-                        if (direct.length > 0 && direct.every(d => d.children.length <= 2)) return direct;
+                        if (direct.length > 0 && direct.every(d => d.children.length <= 2)) {
+                            return explicit.length > direct.length ? explicit : direct;
+                        }
 
-                        return Array.from(menu.querySelectorAll('div, span, p')).filter(d => d.children.length === 0 && (d.textContent || '').trim().length > 0);
+                        const leafNodes = Array.from(menu.querySelectorAll('div, span, p, li, button, a')).filter(d => d.children.length === 0 && (d.textContent || '').trim().length > 0 && !isVaultUi(d));
+                        if (leafNodes.length >= 6) return leafNodes;
+                        return explicit.length > 0 ? explicit : leafNodes;
+                    }
+
+                    function classifyMenuByContent(menu) {
+                        if (!menu) return '';
+                        const candidates = collectMenuCandidates(menu);
+                        if (candidates.length < 6) return '';
+
+                        let monthWordHits = 0;
+                        const matchedMonths = new Set();
+                        let yearHits = 0;
+                        let dayHits = 0;
+                        let explicitDayPhraseHits = 0;
+
+                        const sampleLimit = Math.min(candidates.length, 40);
+                        for (let i = 0; i < sampleLimit; i++) {
+                            const opt = candidates[i];
+                            const rawTxt = (opt.textContent || '').trim();
+                            const normTxt = normalizeFaText(rawTxt);
+                            const rawVal = getOptionRawVal(opt);
+                            const nums = extractCleanNumbers(rawTxt + ' ' + rawVal);
+
+                            monthWordList.forEach(mw => {
+                                const escaped = mw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                if (new RegExp('(?:^|\\s)' + escaped + '(?:$|\\s)').test(normTxt)) {
+                                    matchedMonths.add(mw);
+                                }
+                            });
+                            if (nums.some(n => n >= 1300 && n <= 1430)) {
+                                yearHits++;
+                            }
+                            if (/^روز\s*\d{1,2}$/.test(normTxt)) {
+                                explicitDayPhraseHits++;
+                            }
+                            if (nums.length > 0 && nums.every(n => n >= 1 && n <= 31)) {
+                                dayHits++;
+                            }
+                        }
+
+                        monthWordHits = matchedMonths.size;
+                        const isMonth = monthWordHits >= 3;
+                        const isYear = yearHits >= 5;
+                        const isDay = (explicitDayPhraseHits >= 2) || (dayHits >= 10 && !isYear && !isMonth);
+
+                        const typeCount = [isMonth, isYear, isDay].filter(Boolean).length;
+                        if (typeCount !== 1) return '';
+                        if (isMonth) return 'month';
+                        if (isYear) return 'year';
+                        if (isDay) return 'day';
+                        return '';
                     }
 
                     function findMenuOptionMatch(menu, ddType) {
@@ -758,9 +874,9 @@
 
                         for (let i = 0; i < candidates.length; i++) {
                             const opt = candidates[i];
-                            if (opt.children && opt.children.length > 4 && opt.querySelector('[data-value], [data-val], [role="option"], button, li')) continue;
+                            if (opt.children && opt.children.length > 4 && opt.querySelector('[data-value], [data-val], [data-mdn-val], [role="option"], button, li')) continue;
 
-                            const rawVal = opt.getAttribute('data-value') || opt.getAttribute('data-val') || opt.getAttribute('data-option') || opt.getAttribute('data-num') || opt.getAttribute('value') || '';
+                            const rawVal = getOptionRawVal(opt);
                             const rawTxt = (opt.textContent || '').trim();
                             if (!rawTxt && !rawVal) continue;
                             if (isPlaceholderLabel(rawTxt) && !rawVal) continue;
@@ -785,17 +901,32 @@
                         return null;
                     }
 
+                    function resolveClickableOption(opt, menu) {
+                        if (!opt || !opt.closest) return opt;
+                        const clickable = opt.closest('[data-value], [data-val], [data-mdn-val], [data-mdn-value], [data-mdn-day], [data-mdn-month], [data-mdn-year], [data-day], [data-month], [data-year], [data-option], [data-num], [data-item], [data-key], [role="option"], button, li, a, .cursor-pointer');
+                        if (clickable && (!menu || (menu.contains(clickable) && clickable !== menu))) {
+                            return clickable;
+                        }
+                        return opt;
+                    }
+
                     function findDropdownTrigger(dd) {
                         const t = dd.querySelector('.madenna-dd-trigger, .mdn-dd-trigger, [class*="dd-trigger"], [id*="dd-trigger"], [role="combobox"]');
                         if (t) return t;
                         if (dd.matches && dd.matches('button, [role="button"], [role="combobox"]')) return dd;
-                        const candidates = Array.from(dd.querySelectorAll('button, [role="button"]')).filter(b => !b.closest('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [id*="dd-menu"], [role="listbox"]'));
-                        return candidates[0] || null;
+                        const candidates = Array.from(dd.querySelectorAll('button, [role="button"], [tabindex], [onclick], .cursor-pointer')).filter(b => !b.closest('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [id*="dd-menu"], [role="listbox"]'));
+                        const dateCand = candidates.find(b => {
+                            const txt = normalizeFaText(b.textContent || '');
+                            return txt.length > 0 && txt.length <= 35 && (isPlaceholderLabel(txt) || detectDateFieldType(b, txt, '') !== '');
+                        });
+                        return dateCand || candidates[0] || (collectMenuCandidates(dd).length === 0 ? dd : null);
                     }
 
                     function findDropdownTriggerVal(dd, triggerBtn) {
-                        const explicitVal = dd.querySelector('.madenna-dd-Trigger-val, .madenna-dd-trigger-val, .mdn-dd-trigger-val, [class*="trigger-val"], [class*="dd-val"], [class*="dd-label"], [id*="dd-label"], [id*="dd-val"], [id*="lbl-day"], [id*="lbl-month"], [id*="lbl-year"], [id*="day-label"], [id*="month-label"], [id*="year-label"]');
-                        if (explicitVal) return explicitVal;
+                        const scope = dd || triggerBtn;
+                        if (!scope) return null;
+                        const explicitVal = scope.querySelector('.madenna-dd-Trigger-val, .madenna-dd-trigger-val, .mdn-dd-trigger-val, [class*="trigger-val"], [class*="dd-val"], [class*="dd-label"], [id*="dd-label"], [id*="dd-val"], [id*="lbl-day"], [id*="lbl-month"], [id*="lbl-year"], [id*="day-label"], [id*="month-label"], [id*="year-label"], [id*="day-text"], [id*="month-text"], [id*="year-text"]');
+                        if (explicitVal && (!triggerBtn || triggerBtn.contains(explicitVal) || explicitVal.closest('button, [role="button"]') === triggerBtn)) return explicitVal;
                         if (triggerBtn) {
                             const innerSpan = Array.from(triggerBtn.querySelectorAll('span, div, p')).find(s => (s.textContent || '').trim().length > 0 && !s.querySelector('svg'));
                             return innerSpan || triggerBtn;
@@ -804,74 +935,202 @@
                     }
 
                     function findDropdownMenu(dd, triggerBtn, ddType) {
-                        const isMenuCandidate = (m) => m && m !== triggerBtn && !m.contains(triggerBtn);
-                        let menu = Array.from(dd.querySelectorAll('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [id*="dd-menu"], [id*="-menu"], [id*="menu-"], [role="listbox"], ul, [class*="dropdown-menu"], [class*="dd-list"], [class*="dd-options"]')).find(isMenuCandidate);
-                        if (menu) return menu;
+                        const isMenuCandidate = (m) => m && m !== triggerBtn && !m.contains(triggerBtn) && !m.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper');
+                        const scopes = [];
+                        if (dd && dd !== triggerBtn) scopes.push(dd);
+                        if (triggerBtn && triggerBtn.parentElement && triggerBtn.parentElement !== toolWrap && !scopes.includes(triggerBtn.parentElement)) {
+                            scopes.push(triggerBtn.parentElement);
+                        }
+
+                        for (let sIdx = 0; sIdx < scopes.length; sIdx++) {
+                            const sc = scopes[sIdx];
+                            const byAttr = Array.from(sc.querySelectorAll('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [id*="dd-menu"], [id*="-menu"], [id*="menu-"], [id*="dropdown"], [id*="-list"], [id*="list-"], [id*="opts"], [id*="options"], [role="listbox"], ul, [class*="dropdown-menu"], [class*="dd-list"], [class*="dd-options"]')).find(isMenuCandidate);
+                            if (byAttr) return byAttr;
+
+                            const byContent = Array.from(sc.querySelectorAll('div, ul')).find(ch => {
+                                if (!isMenuCandidate(ch)) return false;
+                                const cls = classifyMenuByContent(ch);
+                                return ddType ? cls === ddType : cls !== '';
+                            });
+                            if (byContent) return byContent;
+                        }
 
                         if (triggerBtn) {
                             const ctrlId = triggerBtn.getAttribute('aria-controls') || triggerBtn.getAttribute('data-target') || '';
                             if (ctrlId) {
                                 const byCtrl = document.getElementById(ctrlId.replace(/^#/, ''));
-                                if (byCtrl && toolWrap.contains(byCtrl)) return byCtrl;
+                                if (byCtrl && isMenuCandidate(byCtrl)) return byCtrl;
                             }
                         }
 
                         if (ddType) {
-                            menu = toolWrap.querySelector(`#enn-dd-menu-${ddType}, #mdn-enn-dd-menu-${ddType}, #mdn-enn-menu-${ddType}, [data-dd-menu="${ddType}"], [id*="menu"][id*="${ddType}"], [class*="menu"][id*="${ddType}"]`);
-                            if (menu && isMenuCandidate(menu)) return menu;
+                            const explicitById = toolWrap.querySelector(`#enn-dd-menu-${ddType}, #mdn-enn-dd-menu-${ddType}, #mdn-enn-menu-${ddType}, #mdn-enn-${ddType}-menu, #mdn-enn-${ddType}-dropdown, #mdn-enn-${ddType}-list, #mdn-enn-list-${ddType}, #mdn-enn-${ddType}-opts, [data-dd-menu="${ddType}"], [id*="menu"][id*="${ddType}"], [id*="list"][id*="${ddType}"], [id*="drop"][id*="${ddType}"], [id*="opt"][id*="${ddType}"], [class*="menu"][id*="${ddType}"]`);
+                            if (explicitById && isMenuCandidate(explicitById)) return explicitById;
                         }
 
-                        if (triggerBtn && triggerBtn.parentElement) {
-                            const sibMenu = Array.from(triggerBtn.parentElement.children).find(ch => ch !== triggerBtn && !ch.contains(triggerBtn) && collectMenuCandidates(ch).length >= 6);
-                            if (sibMenu) return sibMenu;
+                        let currParent = triggerBtn ? triggerBtn.parentElement : null;
+                        for (let lvl = 0; lvl < 3 && currParent && currParent !== toolWrap; lvl++) {
+                            const sibMatches = Array.from(currParent.children).filter(ch => ch !== triggerBtn && !ch.contains(triggerBtn) && isMenuCandidate(ch));
+                            const contentSib = sibMatches.find(ch => ddType ? classifyMenuByContent(ch) === ddType : classifyMenuByContent(ch) !== '');
+                            if (contentSib) return contentSib;
+                            if (lvl === 0) {
+                                const richSib = sibMatches.find(ch => collectMenuCandidates(ch).length >= 6);
+                                if (richSib) return richSib;
+                            }
+                            currParent = currParent.parentElement;
                         }
+
+                        if (ddType) {
+                            const allBoxes = [
+                                ...Array.from(toolWrap.querySelectorAll('div, ul, section')),
+                                ...Array.from(document.body.children).filter(el => el.tagName === 'DIV' || el.tagName === 'UL')
+                            ];
+                            const contentMatches = allBoxes.filter(box => isMenuCandidate(box) && classifyMenuByContent(box) === ddType);
+                            if (contentMatches.length > 0) {
+                                const innermost = contentMatches.find(box => !contentMatches.some(other => other !== box && box.contains(other)));
+                                return innermost || contentMatches[0];
+                            }
+                        }
+
                         return null;
                     }
 
-                    // الف) دراپ‌داون‌های کاستوم (پشتیبانی کامل از madenna-custom-dd، mdn-custom-dd و الگوهای عمومی)
-                    const ddSelectorMatches = Array.from(
+                    // الف) دراپ‌داون‌های کاستوم (پشتیبانی کامل از الگوهای کلاس/آیدی و کشف هوشمند بر اساس متن)
+                    const isExcludedVaultEl = (el) => !el || !el.closest || !!el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper');
+                    const wrapperMatches = Array.from(
                         toolWrap.querySelectorAll('.madenna-custom-dd, .mdn-custom-dd, .mdn-dd, [class*="custom-dd"], [class*="dd-wrap"], [class*="dropdown-wrap"], [data-dd-type="day"], [data-dd-type="month"], [data-dd-type="year"], [data-dd="day"], [data-dd="month"], [data-dd="year"], [id*="dd-day"], [id*="dd-month"], [id*="dd-year"], [id*="day-dd"], [id*="month-dd"], [id*="year-dd"]')
-                    );
-                    const genericDdTriggers = Array.from(
-                        toolWrap.querySelectorAll('button, [role="button"], [role="combobox"], [class*="dd-trigger"], [id*="dd-trigger"], [id*="btn-day"], [id*="btn-month"], [id*="btn-year"]')
-                    ).filter(el => !el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper, .madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [role="listbox"]'));
+                    ).filter(el => !isExcludedVaultEl(el));
 
-                    genericDdTriggers.forEach(tr => {
-                        const tTxt = normalizeFaText(tr.textContent || '');
-                        const isDateBtn = isPlaceholderLabel(tTxt) && (tTxt.includes('روز') || tTxt.includes('ماه') || tTxt.includes('سال'));
-                        const trType = detectDateFieldType(tr, tTxt, '');
-                        if (!isDateBtn && !trType) return;
-                        let wrapper = tr.parentElement;
-                        if (wrapper && wrapper !== toolWrap) {
-                            const alreadyTracked = ddSelectorMatches.some(existing => existing === wrapper || existing.contains(tr));
-                            if (!alreadyTracked) {
-                                ddSelectorMatches.push(wrapper);
+                    const triggerCandidates = Array.from(
+                        toolWrap.querySelectorAll('button, [role="button"], [role="combobox"], [tabindex], [onclick], .cursor-pointer, [class*="dd-trigger"], [id*="dd-trigger"], [id*="day-trigger"], [id*="month-trigger"], [id*="year-trigger"], [id*="trigger-day"], [id*="trigger-month"], [id*="trigger-year"], [id*="btn-day"], [id*="btn-month"], [id*="btn-year"], [id*="day-btn"], [id*="month-btn"], [id*="year-btn"], [id*="select-day"], [id*="select-month"], [id*="select-year"], [id*="day-select"], [id*="month-select"], [id*="year-select"]')
+                    ).filter(el => !isExcludedVaultEl(el) && !el.closest('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [role="listbox"]'));
+
+                    const isSemanticInteractive = (el) => !!(el && el.matches && el.matches('button, [role="button"], [role="combobox"], [tabindex], [onclick], .cursor-pointer'));
+
+                    // کشف عمومی تریگرها بر اساس متن placeholder بدون نیاز به کلاس یا آیدی خاص
+                    Array.from(toolWrap.querySelectorAll('button, div, span, p, a')).forEach(el => {
+                        if (isExcludedVaultEl(el) || el.closest('.madenna-dd-menu, .mdn-dd-menu, [class*="dd-menu"], [role="listbox"]')) return;
+                        if (el.children.length > 3) return;
+                        if (!isSemanticInteractive(el) && el.querySelector('button, [role="button"], [role="combobox"], [tabindex], [onclick], .cursor-pointer')) return;
+                        const tTxt = normalizeFaText(el.textContent || '');
+                        if (!tTxt || tTxt.length > 28) return;
+                        if (!isPlaceholderLabel(tTxt)) return;
+                        if (!(tTxt.includes('روز') || tTxt.includes('ماه') || tTxt.includes('سال'))) return;
+                        if (detectDateFieldType(null, tTxt, '') === '') return;
+
+                        let clickBox = el.closest('button, [role="button"], [role="combobox"], [tabindex], [onclick], .cursor-pointer');
+                        if (!clickBox || !toolWrap.contains(clickBox) || clickBox === toolWrap || normalizeFaText(clickBox.textContent || '').length > 40) {
+                            clickBox = el.closest('[id*="day"], [id*="month"], [id*="year"], [id*="trigger"], [id*="btn"], [id*="dd"]');
+                        }
+                        if (!clickBox || !toolWrap.contains(clickBox) || clickBox === toolWrap || normalizeFaText(clickBox.textContent || '').length > 40) {
+                            clickBox = el;
+                            let up = el.parentElement;
+                            for (let step = 0; step < 3 && up && up !== toolWrap; step++) {
+                                if (up.children.length > 3) break;
+                                const upHasMenuSib = Array.from(up.children).some(ch => ch !== clickBox && !ch.contains(clickBox) && (classifyMenuByContent(ch) !== '' || ch.classList.contains('hidden')));
+                                if (upHasMenuSib) break;
+                                const upTxt = normalizeFaText(up.textContent || '');
+                                if (upTxt.length <= 30 && detectDateFieldType(null, upTxt, '') !== '') {
+                                    clickBox = up;
+                                    if (up.querySelector('svg')) break;
+                                    up = up.parentElement;
+                                } else {
+                                    break;
+                                }
                             }
+                        }
+                        if (clickBox && !triggerCandidates.includes(clickBox)) {
+                            triggerCandidates.push(clickBox);
                         }
                     });
 
-                    const customDropdowns = ddSelectorMatches.filter((el, idx) => {
-                        if (el.closest('.mad-vault-header-auth-wrap, #madenna-vault-modal, .mad-vault-dashboard-wrapper')) return false;
-                        return !ddSelectorMatches.some((other, oIdx) => oIdx !== idx && other.contains(el));
+                    const discoveredItems = [];
+                    const seenTriggers = new Set();
+
+                    wrapperMatches.forEach(rawDd => {
+                        if (wrapperMatches.some(other => other !== rawDd && other.contains(rawDd) && collectMenuCandidates(other).length > 0)) return;
+                        let dd = rawDd;
+                        let triggerBtn = findDropdownTrigger(dd);
+                        if (!triggerBtn) return;
+                        if (dd === triggerBtn && dd.parentElement && dd.parentElement !== toolWrap) {
+                            const pTxt = normalizeFaText(dd.parentElement.textContent || '');
+                            const multiTypes = ['سال', 'ماه', 'روز'].filter(w => pTxt.includes(w + ' تولد') || pTxt.includes('انتخاب ' + w)).length;
+                            if (multiTypes <= 1) {
+                                dd = dd.parentElement;
+                            }
+                        }
+                        if (seenTriggers.has(triggerBtn)) return;
+                        seenTriggers.add(triggerBtn);
+                        const triggerVal = findDropdownTriggerVal(dd, triggerBtn);
+                        const triggerTxt = triggerVal ? triggerVal.textContent : (triggerBtn ? triggerBtn.textContent : '');
+                        let ddType = detectDateFieldType(rawDd, triggerTxt, '');
+                        if (!ddType && dd !== rawDd) ddType = detectDateFieldType(dd, triggerTxt, '');
+                        if (!ddType) ddType = detectDateFieldType(triggerBtn, triggerTxt, '');
+                        discoveredItems.push({ dd, triggerBtn, triggerVal, triggerTxt, ddType });
                     });
 
-                    if (customDropdowns.length > 0) {
-                        const ddByType = { year: [], month: [], day: [] };
-                        customDropdowns.forEach(dd => {
-                            const triggerBtn = findDropdownTrigger(dd);
-                            const triggerVal = findDropdownTriggerVal(dd, triggerBtn);
-                            const triggerTxt = triggerVal ? triggerVal.textContent : (triggerBtn ? triggerBtn.textContent : '');
-                            let ddType = detectDateFieldType(dd, triggerTxt, '');
-                            if (!ddType && triggerBtn) {
-                                ddType = detectDateFieldType(triggerBtn, triggerTxt, '');
+                    const validRawTriggers = triggerCandidates.filter(tr => {
+                        const tTxt = normalizeFaText(tr.textContent || '');
+                        const isDateBtn = tTxt.length <= 35 && isPlaceholderLabel(tTxt) && (tTxt.includes('روز') || tTxt.includes('ماه') || tTxt.includes('سال'));
+                        const trType = detectDateFieldType(tr, tTxt, '');
+                        return isDateBtn || !!trType;
+                    });
+                    const cleanTriggers = validRawTriggers.filter((tr, idx) => {
+                        // اگر عنصر فعلی غیرتعاملی است و درونش یک دکمه/المان تعاملی معتبر وجود دارد، کانتینر بیرونی را حذف کن
+                        if (!isSemanticInteractive(tr) && validRawTriggers.some((inner, iIdx) => iIdx !== idx && tr.contains(inner) && isSemanticInteractive(inner))) {
+                            return false;
+                        }
+                        // اگر درون یک تریگر معتبر دیگر قرار دارد که خود آن تریگر هم‌سطح یا تعاملی است، عنصر درونی تکراری را حذف کن
+                        if (validRawTriggers.some((other, oIdx) => {
+                            if (oIdx === idx || !other.contains(tr)) return false;
+                            if (!isSemanticInteractive(other) && isSemanticInteractive(tr)) return false;
+                            const oTxt = normalizeFaText(other.textContent || '');
+                            return oTxt.length <= 35 && detectDateFieldType(other, oTxt, '') !== '';
+                        })) {
+                            return false;
+                        }
+                        return true;
+                    });
+
+                    cleanTriggers.forEach(tr => {
+                        if (seenTriggers.has(tr) || Array.from(seenTriggers).some(s => s.contains(tr) || tr.contains(s))) return;
+                        let wrapper = tr.parentElement;
+                        if (!wrapper || wrapper === toolWrap) wrapper = tr;
+                        else {
+                            const wTxt = normalizeFaText(wrapper.textContent || '');
+                            const multiTriggersInWrapper = cleanTriggers.filter(other => other !== tr && wrapper.contains(other));
+                            if (multiTriggersInWrapper.length > 0 && wTxt.length > 45) {
+                                wrapper = tr;
                             }
-                            let menu = findDropdownMenu(dd, triggerBtn, ddType);
+                        }
+                        seenTriggers.add(tr);
+                        const triggerVal = findDropdownTriggerVal(wrapper, tr);
+                        const triggerTxt = triggerVal ? triggerVal.textContent : (tr.textContent || '');
+                        let ddType = detectDateFieldType(tr, triggerTxt, '');
+                        if (!ddType && wrapper !== tr) ddType = detectDateFieldType(wrapper, triggerTxt, '');
+                        discoveredItems.push({ dd: wrapper, triggerBtn: tr, triggerVal, triggerTxt, ddType });
+                    });
+
+                    if (discoveredItems.length > 0) {
+                        const ddByType = { year: [], month: [], day: [] };
+                        discoveredItems.forEach(item => {
+                            let ddType = item.ddType;
+                            let menu = findDropdownMenu(item.dd, item.triggerBtn, ddType);
                             if (!ddType && menu) {
-                                const menuSample = Array.from(collectMenuCandidates(menu)).slice(0, 8).map(o => (o.textContent || '').trim()).join(' ');
-                                ddType = detectDateFieldType(menu, triggerTxt, menuSample);
+                                ddType = classifyMenuByContent(menu);
+                                if (!ddType) {
+                                    const menuSample = Array.from(collectMenuCandidates(menu)).slice(0, 8).map(o => (o.textContent || '').trim()).join(' ');
+                                    ddType = detectDateFieldType(menu, item.triggerTxt, menuSample);
+                                }
                             }
                             if (ddType && ddByType[ddType]) {
-                                ddByType[ddType].push({ dd, triggerBtn, triggerVal, triggerTxt, menu });
+                                ddByType[ddType].push({
+                                    dd: item.dd,
+                                    triggerBtn: item.triggerBtn,
+                                    triggerVal: item.triggerVal,
+                                    triggerTxt: item.triggerTxt,
+                                    menu
+                                });
                             }
                         });
 
@@ -881,8 +1140,9 @@
                             if (!targetNum || targetNum <= 0) return;
 
                             ddByType[ddType].forEach(item => {
-                                const { dd, triggerBtn, triggerVal, triggerTxt } = item;
-                                let menu = item.menu || findDropdownMenu(dd, triggerBtn, ddType);
+                                const { dd, triggerBtn } = item;
+                                let triggerVal = item.triggerVal || findDropdownTriggerVal(dd, triggerBtn);
+                                const triggerTxt = triggerVal ? triggerVal.textContent : (triggerBtn ? triggerBtn.textContent : item.triggerTxt);
                                 const isPlaceholderLbl = isPlaceholderLabel(triggerTxt);
                                 const matchingHidden = Array.from(toolWrap.querySelectorAll('input[type="hidden"]')).find(inp => {
                                     const key = ((inp.id || '') + ' ' + (inp.name || '') + ' ' + (inp.getAttribute('data-field') || '')).replace(/birthday/gi, 'birth').toLowerCase();
@@ -897,24 +1157,26 @@
                                     return;
                                 }
 
-                                if (!menu) return;
-
-                                const hadHiddenClass = menu.classList.contains('hidden');
-                                let matchedOpt = findMenuOptionMatch(menu, ddType);
+                                let menu = item.menu || findDropdownMenu(dd, triggerBtn, ddType);
+                                let hadHiddenClass = menu ? menu.classList.contains('hidden') : false;
+                                let hadDisplayNone = menu ? menu.style.display === 'none' : false;
+                                let matchedOpt = menu ? findMenuOptionMatch(menu, ddType) : null;
                                 let weOpenedMenu = false;
 
-                                if (!matchedOpt && collectMenuCandidates(menu).length === 0) {
-                                    const openTries = parseInt(dd.getAttribute('data-madenna-open-tries') || '0', 10);
-                                    if (openTries < 4 && triggerBtn) {
-                                        dd.setAttribute('data-madenna-open-tries', String(openTries + 1));
+                                if (!matchedOpt && triggerBtn) {
+                                    const openTries = parseInt(triggerBtn.getAttribute('data-madenna-open-tries') || '0', 10);
+                                    if (openTries < 4) {
+                                        triggerBtn.setAttribute('data-madenna-open-tries', String(openTries + 1));
                                         triggerBtn.click();
                                         weOpenedMenu = true;
                                         menu = findDropdownMenu(dd, triggerBtn, ddType) || menu;
-                                        matchedOpt = findMenuOptionMatch(menu, ddType);
-                                        if (!matchedOpt && collectMenuCandidates(menu).length === 0) {
+                                        if (menu && !hadHiddenClass && menu.classList.contains('hidden')) hadHiddenClass = true;
+                                        matchedOpt = menu ? findMenuOptionMatch(menu, ddType) : null;
+                                        if (!matchedOpt) {
                                             dispatchPointerClickSequence(triggerBtn);
                                             triggerBtn.click();
-                                            matchedOpt = findMenuOptionMatch(menu, ddType);
+                                            menu = findDropdownMenu(dd, triggerBtn, ddType) || menu;
+                                            matchedOpt = menu ? findMenuOptionMatch(menu, ddType) : null;
                                         }
                                         if (!matchedOpt) {
                                             scheduledRetry = true;
@@ -924,26 +1186,46 @@
 
                                 if (matchedOpt) {
                                     try {
+                                        let clickTarget = resolveClickableOption(matchedOpt, menu);
                                         const beforeHidden = matchingHidden ? (matchingHidden.value || '').trim() : '';
-                                        const beforeLbl = triggerVal ? (triggerVal.textContent || '').trim() : '';
-                                        matchedOpt.click();
-                                        const afterHidden = matchingHidden ? (matchingHidden.value || '').trim() : '';
-                                        const afterLbl = triggerVal ? (triggerVal.textContent || '').trim() : '';
+                                        const beforeLblEl = findDropdownTriggerVal(dd, triggerBtn) || triggerVal;
+                                        const beforeLbl = beforeLblEl ? (beforeLblEl.textContent || '').trim() : '';
+
+                                        clickTarget.click();
+
+                                        let afterHidden = matchingHidden ? (matchingHidden.value || '').trim() : '';
+                                        let afterLblEl = findDropdownTriggerVal(dd, triggerBtn) || triggerVal;
+                                        let afterLbl = afterLblEl ? (afterLblEl.textContent || '').trim() : '';
+
                                         if (afterHidden === beforeHidden && afterLbl === beforeLbl) {
                                             if (!weOpenedMenu && triggerBtn) {
                                                 triggerBtn.click();
                                                 weOpenedMenu = true;
+                                                menu = findDropdownMenu(dd, triggerBtn, ddType) || menu;
+                                                const refreshedOpt = menu ? (findMenuOptionMatch(menu, ddType) || matchedOpt) : matchedOpt;
+                                                matchedOpt = refreshedOpt;
+                                                clickTarget = resolveClickableOption(matchedOpt, menu);
                                             }
-                                            dispatchPointerClickSequence(matchedOpt);
-                                            matchedOpt.click();
+                                            dispatchPointerClickSequence(clickTarget);
+                                            clickTarget.click();
+                                            afterHidden = matchingHidden ? (matchingHidden.value || '').trim() : '';
+                                            afterLblEl = findDropdownTriggerVal(dd, triggerBtn) || triggerVal;
+                                            afterLbl = afterLblEl ? (afterLblEl.textContent || '').trim() : '';
+                                            if (afterHidden === beforeHidden && afterLbl === beforeLbl && clickTarget !== matchedOpt) {
+                                                dispatchPointerClickSequence(matchedOpt);
+                                                matchedOpt.click();
+                                            }
                                         }
-                                        if (weOpenedMenu && menu) {
+
+                                        if (weOpenedMenu && menu && document.body.contains(menu)) {
                                             const mStyle = window.getComputedStyle(menu);
                                             if (mStyle.display !== 'none' && !menu.classList.contains('hidden')) {
                                                 dd.classList.remove('open', 'is-open', 'active');
                                                 menu.classList.remove('open', 'is-open', 'active');
                                                 if (hadHiddenClass) {
                                                     menu.classList.add('hidden');
+                                                } else if (hadDisplayNone) {
+                                                    menu.style.display = 'none';
                                                 }
                                             }
                                         }
