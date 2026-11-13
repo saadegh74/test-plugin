@@ -45,20 +45,13 @@ if ( ! class_exists( 'Jet_CW_Compare_Integration' ) ) {
 		}
 
 		/**
-		 * Add compare button.
+		 * Add widgets compare button
 		 *
-		 * Renders the widget in JetWooBuilder plugin widgets.
-		 *
-		 * @since 1.0.0
-		 * @since 1.5.8.1 Added style enqueue.
-		 *
-		 * @param array $settings List of widget settings.
-		 *
-		 * @return void
+		 * @param array $settings
 		 */
-		public function add_compare_button( $settings = [] ) {
+		public function add_compare_button( $settings = array() ) {
 
-			$widget_settings = [
+			$widget_settings = array(
 				'button_icon_position' => $settings['compare_button_icon_position'],
 				'use_button_icon'      => $settings['compare_use_button_icon'],
 				'button_icon_normal'   => $settings['selected_compare_button_icon_normal'],
@@ -67,11 +60,9 @@ if ( ! class_exists( 'Jet_CW_Compare_Integration' ) ) {
 				'button_icon_added'    => $settings['selected_compare_button_icon_added'],
 				'button_label_added'   => $settings['compare_button_label_added'],
 				'_widget_id'           => $settings['_widget_id'],
-			];
+			);
 
 			jet_cw()->compare_render->render_compare_button( $widget_settings );
-
-			wp_enqueue_style( 'jet-cw-widget-cw-button' );
 
 		}
 
@@ -97,18 +88,11 @@ if ( ! class_exists( 'Jet_CW_Compare_Integration' ) ) {
 		}
 
 		/**
-		 * Add compare button default.
-		 *
-		 * Renders the widget in default WooCommerce templates.
-		 *
-		 * @since 1.0.0
-		 * @since 1.5.8 Added style enqueue.
-		 *
-		 * @return void
+		 * Add default compare button
 		 */
 		public function add_compare_button_default() {
 
-			$widget_settings = [
+			$widget_settings = array(
 				'button_icon_position' => 'left',
 				'use_button_icon'      => false,
 				'button_icon_normal'   => '',
@@ -117,11 +101,9 @@ if ( ! class_exists( 'Jet_CW_Compare_Integration' ) ) {
 				'button_icon_added'    => '',
 				'button_label_added'   => __( 'View Compare', 'jet-cw' ),
 				'_widget_id'           => 'default',
-			];
+			);
 
 			jet_cw()->compare_render->render_compare_button( $widget_settings );
-
-			wp_enqueue_style( 'jet-cw-widget-cw-button' );
 
 		}
 
@@ -151,8 +133,8 @@ if ( ! class_exists( 'Jet_CW_Compare_Integration' ) ) {
 					[
 						'label'     => __( 'Compare Button', 'jet-cw' ),
 						'type'      => Elementor\Controls_Manager::SWITCHER,
-						'label_on'  => __( 'Show', 'jet-cw' ),
-						'label_off' => __( 'Hide', 'jet-cw' ),
+						'label_on'  => __( 'Show', 'jet-woo-builder' ),
+						'label_off' => __( 'Hide', 'jet-woo-builder' ),
 					]
 				);
 			} else {
@@ -171,8 +153,8 @@ if ( ! class_exists( 'Jet_CW_Compare_Integration' ) ) {
 				[
 					'label'     => __( 'Icon', 'jet-cw' ),
 					'type'      => Elementor\Controls_Manager::SWITCHER,
-					'label_on'  => __( 'Show', 'jet-cw' ),
-					'label_off' => __( 'Hide', 'jet-cw' ),
+					'label_on'  => __( 'Show', 'jet-woo-builder' ),
+					'label_off' => __( 'Hide', 'jet-woo-builder' ),
 					'default'   => 'yes',
 					'condition' => [
 						'show_compare!' => '',

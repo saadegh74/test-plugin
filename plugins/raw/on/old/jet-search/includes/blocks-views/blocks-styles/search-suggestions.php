@@ -1,6 +1,6 @@
 <?php
 function search_suggestions_block_add_style() {
-    if( ! function_exists('jet_search_register_style_for_block') ){
+    if( ! function_exists('jet_sm_register_style_for_block') ){
         return;
     }
 
@@ -29,11 +29,7 @@ function search_suggestions_block_add_style() {
         )
     );
 
-    $controls_manager = jet_search_register_style_for_block( 'jet-search/search-suggestions' );
-
-    if ( ! $controls_manager ) {
-        return;
-    }
+    $controls_manager = jet_sm_register_style_for_block( 'jet-search/search-suggestions' );
 
     /**
      * `Search Form` Style Section
@@ -474,6 +470,10 @@ function search_suggestions_block_add_style() {
         'type'      => 'choose',
         'label'     => esc_html__( 'Vertical Align', 'jet-search' ),
         'options'   => array(
+            '' => array(
+                'shortcut' => esc_html__( 'Default', 'jet-search' ),
+                'icon'     => 'dashicons-text-page',
+            ),
             'flex-start' => array(
                 'shortcut' => esc_html__( 'Top', 'jet-search' ),
                 'icon'     => 'dashicons-arrow-up-alt',
@@ -485,6 +485,10 @@ function search_suggestions_block_add_style() {
             'flex-end' => array(
                 'shortcut' => esc_html__( 'Bottom', 'jet-search' ),
                 'icon'     => 'dashicons-arrow-down-alt',
+            ),
+            'stretch' => array(
+                'shortcut' => esc_html__( 'Stretch', 'jet-search' ),
+                'icon'     => 'dashicons-editor-justify',
             ),
         ),
         'css_selector' => array(
@@ -1347,12 +1351,20 @@ function search_suggestions_block_add_style() {
 
     $controls_manager->add_responsive_control(
         array(
-            'id'    => 'focus_area_gap',
-            'type'  => 'range',
-            'label' => esc_html__( 'Gap', 'jet-search' ),
+            'id'         => 'focus_area_gap',
+            'type'       => 'range',
+            'label'      => esc_html__( 'Gap', 'jet-search' ),
+            // 'attributes' => array(
+            //     'default' => array(
+            //         'value' => array(
+            //             'value' => 10,
+            //             'unit' => 'px',
+            //             )
+            //     )
+            // ),
             'units' => array(
                 array(
-                    'value'     => 'px',
+                    'value' => 'px',
                     'intervals' => array(
                         'step' => 1,
                         'min'  => 0,

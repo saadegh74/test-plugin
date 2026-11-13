@@ -10,6 +10,8 @@ namespace Elementor;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Typography;
+use Elementor\Core\Schemes\Color as Scheme_Color;
+use Elementor\Core\Schemes\Typography as Scheme_Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,19 +37,6 @@ class Jet_Wishlist_Count_Button extends Jet_CW_Base {
 
 	public function get_categories() {
 		return array( 'jet-cw' );
-	}
-
-	/**
-	 * Get style dependencies.
-	 *
-	 * Retrieve the list of style dependencies the widget requires.
-	 *
-	 * @since 1.5.8
-	 *
-	 * @return array Widget style dependencies.
-	 */
-	public function get_style_depends(): array {
-		return [ 'jet-cw-widget-cw-count-button' ];
 	}
 
 	protected function register_controls() {
@@ -763,7 +752,7 @@ class Jet_Wishlist_Count_Button extends Jet_CW_Base {
 
 		$this->__open_wrap();
 
-		echo wp_kses_post( self::render_callback( $widget_settings ) ?? '' );
+		echo self::render_callback( $widget_settings );
 
 		$this->__close_wrap();
 

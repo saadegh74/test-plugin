@@ -32,21 +32,12 @@ class Jet_Woo_Builder_Single_Rating extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-and-set-a-single-product-page-template/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-
-		$deps[] = 'jet-woo-builder-frontend-font';
-
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
+	public function get_jet_style_depends() {
+		return [ 'jet-woo-builder', 'jet-woo-builder-frontend-font' ];
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'single' );
+		return jet_woo_builder()->documents->is_document_type( 'single' );
 	}
 
 	protected function register_controls() {

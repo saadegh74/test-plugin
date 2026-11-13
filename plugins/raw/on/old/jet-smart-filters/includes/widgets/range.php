@@ -437,15 +437,15 @@ class Jet_Smart_Filters_Range_Widget extends Jet_Smart_Filters_Base_Widget {
 				'toggle'    => false,
 				'options' => array(
 					'left' => array(
-						'title' => esc_html__( 'Left', 'jet-smart-filters' ),
+						'title' => esc_html__( 'Left', 'posts-grid-builder' ),
 						'icon'  => 'eicon-text-align-left',
 					),
 					'center' => array(
-						'title' => esc_html__( 'Center', 'jet-smart-filters' ),
+						'title' => esc_html__( 'Center', 'posts-grid-builder' ),
 						'icon'  => 'eicon-text-align-center',
 					),
 					'right' => array(
-						'title' => esc_html__( 'Right', 'jet-smart-filters' ),
+						'title' => esc_html__( 'Right', 'posts-grid-builder' ),
 						'icon'  => 'eicon-text-align-right',
 					),
 				),

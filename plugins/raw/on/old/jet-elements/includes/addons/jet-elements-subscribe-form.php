@@ -47,18 +47,6 @@ class Jet_Elements_Subscribe_Form extends Jet_Elements_Base {
 	public function get_categories() {
 		return array( 'cherry' );
 	}
-	
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-subscribe-form', 'jet-subscribe-form-skin' ); 
-	}
-
-	public function get_script_depends() {
-		return array( 'jet-subscribe-form' );
-	}
 
 	protected function register_controls() {
 
@@ -139,7 +127,7 @@ class Jet_Elements_Subscribe_Form extends Jet_Elements_Base {
 			)
 		);
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$repeater->add_control(
 			'type',
@@ -1429,17 +1417,14 @@ class Jet_Elements_Subscribe_Form extends Jet_Elements_Base {
 
 		$settings = array(
 			'redirect'           => filter_var( $module_settings['use_redirect_url'], FILTER_VALIDATE_BOOLEAN ),
-			'redirect_url'       => esc_url_raw( $module_settings['redirect_url'] ),
+			'redirect_url'       => $module_settings['redirect_url'],
 			'use_target_list_id' => filter_var( $module_settings['use_target_list_id'], FILTER_VALIDATE_BOOLEAN ),
-			'target_list_id'     => sanitize_text_field( $module_settings['target_list_id'] ),
+			'target_list_id'     => $module_settings['target_list_id'],
 		);
 
-		$settings = wp_json_encode( $settings );
+		$settings = json_encode( $settings );
 
-		// Escape the JSON string for safe use in HTML attributes
-		$data_settings_attribute = esc_attr( $settings );
-
-		return $data_settings_attribute;
+		return htmlspecialchars( $settings );
 	}
 
 	/**
@@ -1492,8 +1477,7 @@ class Jet_Elements_Subscribe_Form extends Jet_Elements_Base {
 
 		foreach ( $additional_filds as $key => $data ) {
 
-			$type        = isset( $data['type'] ) ? $data['type'] : '';
-			if ( ! is_string( $type ) || ! isset( $default_fields_data[ $type ] ) ) { continue; }
+			$type        = $data['type'];
 			$placeholder = $data['placeholder'];
 
 			$data = $default_fields_data[ $type ];
@@ -1503,7 +1487,7 @@ class Jet_Elements_Subscribe_Form extends Jet_Elements_Base {
 			}
 
 			$this->add_render_attribute( $key, $data );?>
-				<input <?php echo $this->get_render_attribute_string( $key ); // phpcs:ignore ?>><?php
+				<input <?php echo $this->get_render_attribute_string( $key ); ?>><?php
 		}
 
 	}

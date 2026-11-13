@@ -56,7 +56,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_control( $element,
+			$element->add_control(
 				'jet_family_column_orientaion',
 				[
 					'label'        => esc_html__( 'Content Orientation', 'jet-elements' ),
@@ -68,7 +68,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_column_flex_orientation',
 				[
 					'label'   => esc_html__( 'Orientation Direction', 'jet-elements' ),
@@ -92,7 +92,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_column_flex_row_align',
 				[
 					'label'   => esc_html__( 'Content Align', 'jet-elements' ),
@@ -115,7 +115,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_column_flex_column_align',
 				[
 					'label'   => esc_html__( 'Content Align', 'jet-elements' ),
@@ -138,7 +138,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_control( $element,
+			$element->add_control(
 				'jet_family_column_orientaion_wrap',
 				[
 					'label'        => esc_html__( 'Content Wrap', 'jet-elements' ),
@@ -155,7 +155,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_control( $element,
+			$element->add_control(
 				'jet_family_use_column_order',
 				[
 					'label'        => esc_html__( 'Content Order', 'jet-elements' ),
@@ -168,7 +168,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_column_order',
 				[
 					'label'       => esc_html__( 'Column Order', 'jet-elements' ),
@@ -184,7 +184,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_control( $element,
+			$element->add_control(
 				'jet_family_column_vertical_scroll',
 				[
 					'label'       => esc_html__( 'Column Vertical Scrollbar', 'jet-elements' ),
@@ -193,12 +193,12 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 					'default'     => '',
 					'separator'   => 'before',
 					'selectors'   => [
-						'{{WRAPPER}}.elementor-column > .elementor-widget-wrap' => 'overflow-y: auto;',
+						'{{WRAPPER}}.elementor-column' => 'overflow-y: auto;',
 					],
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_column_max_height',
 				[
 					'label'      => esc_html__( 'Maximum Height', 'jet-elements' ),
@@ -215,7 +215,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 						],
 					],
 					'selectors' => [
-						'{{WRAPPER}}.elementor-column > .elementor-widget-wrap' => 'max-height: {{SIZE}}{{UNIT}}',
+						'{{WRAPPER}}.elementor-column' => 'max-height: {{SIZE}}{{UNIT}}',
 					],
 					'condition' => array(
 						'jet_family_column_vertical_scroll' => 'yes',
@@ -242,7 +242,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_control( $element,
+			$element->add_control(
 				'jet_family_widget_is_order_orientaion',
 				[
 					'label'        => esc_html__( 'Use Order', 'jet-elements' ),
@@ -254,7 +254,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_widget_order_orientaion',
 				[
 					'label'       => esc_html__( 'Column Order', 'jet-elements' ),
@@ -276,7 +276,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_control( $element,
+			$element->add_control(
 				'jet_family_widget_is_flex_basis',
 				[
 					'label'        => esc_html__( 'Use Flex Basis Width', 'jet-elements' ),
@@ -288,7 +288,7 @@ if ( ! class_exists( 'Jet_Family_Column_Orientation_Ext' ) ) {
 				]
 			);
 
-			\Jet_Elements_Settings_Validator::add_extension_responsive_control( $element,
+			$element->add_responsive_control(
 				'jet_family_widget_flex_basis',
 				[
 					'label'      => esc_html__( 'Flex Basis Width', 'jet-elements' ),

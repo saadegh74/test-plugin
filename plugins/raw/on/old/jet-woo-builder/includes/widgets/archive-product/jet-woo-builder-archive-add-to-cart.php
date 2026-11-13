@@ -8,6 +8,7 @@
 namespace Elementor;
 
 use Elementor\Group_Control_Border;
+use Elementor\Core\Schemes\Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -31,19 +32,8 @@ class Jet_Woo_Builder_Archive_Add_To_Cart extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/woocommerce-jetwoobuilder-settings-how-to-create-and-set-a-custom-categories-archive-template/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-		
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'archive' );
+		return jet_woo_builder()->documents->is_document_type( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -83,7 +73,7 @@ class Jet_Woo_Builder_Archive_Add_To_Cart extends Jet_Woo_Builder_Base {
 				'options'   => jet_woo_builder_tools()->get_available_display_types(),
 				'default'   => 'inline-block',
 				'selectors' => [
-					$this->css_selector( ' .button' ) => 'display: {{VALUE}}; --display-type: {{VALUE}};',
+					$this->css_selector( ' .button' ) => 'display: {{VALUE}};',
 				],
 			]
 		);
@@ -342,18 +332,6 @@ class Jet_Woo_Builder_Archive_Add_To_Cart extends Jet_Woo_Builder_Base {
 		);
 
 		$this->add_responsive_control(
-			'archive_add_to_cart_margin',
-			[
-				'type'       => Controls_Manager::DIMENSIONS,
-				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
-				'selectors'  => [
-					$this->css_selector( ' .button' ) => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
 			'archive_add_to_cart_padding',
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
@@ -595,7 +573,7 @@ class Jet_Woo_Builder_Archive_Add_To_Cart extends Jet_Woo_Builder_Base {
 
 		$attributes = apply_filters( 'jet-woo-builder/jet-woo-archive-add-to-cart/widget-attributes', '', $settings );
 
-		echo '<div class="jet-woo-builder-archive-add-to-cart"' . esc_attr( $attributes ) . '>';
+		echo '<div class="jet-woo-builder-archive-add-to-cart"' . $attributes . '>';
 
 		jet_woo_builder_template_functions()->get_product_add_to_cart_button( [], $settings['quantity'] );
 
@@ -604,8 +582,6 @@ class Jet_Woo_Builder_Archive_Add_To_Cart extends Jet_Woo_Builder_Base {
 	}
 
 	protected function render() {
-
-		jet_woo_builder_assets()->add_inline_widget_script( 'jet-woo-builder-archive-add-to-cart.default' );
 
 		$this->__open_wrap();
 
@@ -621,9 +597,9 @@ class Jet_Woo_Builder_Archive_Add_To_Cart extends Jet_Woo_Builder_Base {
 		}
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings ) );
+			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings );
 		} else {
-			echo wp_kses_post( self::render_callback( $macros_settings ) ?: '' );
+			echo self::render_callback( $macros_settings );
 		}
 
 		$this->__close_wrap();

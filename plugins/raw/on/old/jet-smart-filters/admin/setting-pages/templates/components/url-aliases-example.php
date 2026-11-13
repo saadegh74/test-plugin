@@ -1,11 +1,8 @@
 <div class="url-aliases-example">
 	<div class="url-aliases-example-string">
-		<div class="url-aliases-example-string-prefix">
-			{{urlPrefix}}
-		</div>
+		<div class="url-aliases-example-string-prefix">{{urlPrefix}}</div>
 		<div class="url-aliases-example-string-editor"
-			 :class="{ editing: isUrlEdite }"
-		>
+			 :class="{ editing: isUrlEdite }">
 			<input class="url-aliases-example-string-editor-input"
 				   type="text"
 				   :value="url"
@@ -34,15 +31,13 @@
 		</div>
 	</div>
 	<div v-if="isUrl && isMatches"
-		 class="url-aliases-example-changes"
-	>
+		 class="url-aliases-example-changes">
 		<div class="url-aliases-example-changes-transformation direct-transformation"
-			:class="{ opened: directOpened }"
-		>
+			:class="{ opened: directOpened }">
 			<div class="url-aliases-example-changes-transformation-resalt">
 				<div class="url-aliases-example-changes-transformation-resalt-label"
 					@click="onDirectClick">
-					<?php esc_html_e( 'Direct transformation', 'jet-smart-filters' ); ?>
+					<?php _e( 'Direct transformation', 'jet-smart-filters' ); ?>
 				</div>
 				{{urlPrefix + directUrl}}
 			</div>
@@ -57,33 +52,31 @@
 							-> 
 							<span class="replacement-to">{{alias.replacement.to}}</span>
 						</div>
-						<div class="url">{{urlPrefix + alias.before}}<span class="highlight">{{alias.match}}</span>{{alias.after}}</div>
+						<div class="url"
+							 v-html="urlPrefix + alias.html" />
 					</div>
 				</div>
 			</div>
 			<div v-else
 				 class="url-aliases-example-changes-transformation-chain">
 				<div class="url-aliases-example-message">
-					<p><?php esc_html_e( 'No matches found', 'jet-smart-filters' ); ?></p>
+					<p><?php _e( 'No matches found', 'jet-smart-filters' ); ?></p>
 				</div>
 			</div>
 		</div>
 		<div class="url-aliases-example-changes-transformation reverse-transformation"
-			:class="{ opened: reverseOpened }"
-		>
+			:class="{ opened: reverseOpened }">
 			<div class="url-aliases-example-changes-transformation-resalt">
 				<div class="url-aliases-example-changes-transformation-resalt-label"
 					@click="onReverseClick">
-					<?php esc_html_e( 'Reverse transformation', 'jet-smart-filters' ); ?>
+					<?php _e( 'Reverse transformation', 'jet-smart-filters' ); ?>
 				</div>
 				{{urlPrefix + reverseUrl}}
 			</div>
 			<div v-if="reverseTransformations.length"
-				 class="url-aliases-example-changes-transformation-chain"
-			>
+				 class="url-aliases-example-changes-transformation-chain">
 				<div v-for="( alias, index ) in reverseTransformations"
-					 class="url-aliases-example-changes-transformation-chain-iteration"
-				>
+					 class="url-aliases-example-changes-transformation-chain-iteration">
 					<div class="index">{{alias.index}}:</div>
 					<div class="resalt">
 						<div class="replacement">
@@ -91,32 +84,34 @@
 							-> 
 							<span class="replacement-to">{{alias.replacement.to}}</span>
 						</div>
-						<div class="url">{{urlPrefix + alias.before}}<span class="highlight">{{alias.match}}</span>{{alias.after}}</div>
+						<div class="url"
+							 v-html="urlPrefix + alias.html" />
 					</div>
 				</div>
 			</div>
-			<div v-else class="url-aliases-example-changes-transformation-chain">
+			<div v-else
+				 class="url-aliases-example-changes-transformation-chain">
 				<div class="url-aliases-example-message">
-					<p><?php esc_html_e( 'No matches found', 'jet-smart-filters' ); ?></p>
+					<p><?php _e( 'No matches found', 'jet-smart-filters' ); ?></p>
 				</div>
 			</div>
 		</div>
 		<div v-if="url !== reverseUrl"
-			 class="url-aliases-example-error"
-		>
-			<p><?php esc_html_e( 'After reverse transformation, the URL does not match the incoming value', 'jet-smart-filters' ); ?></p>
-			<p><?php esc_html_e( 'Check uniqueness of keys', 'jet-smart-filters' ); ?></p>
+			 class="url-aliases-example-error">
+			<p><?php _e( 'After reverse transformation, the URL does not match the incoming value', 'jet-smart-filters' ); ?></p>
+			<p><?php _e( 'Check uniqueness of keys', 'jet-smart-filters' ); ?></p>
 		</div>
 	</div>
-	<div v-else class="url-aliases-example-message">
+	<div v-else
+		 class="url-aliases-example-message">
 		<p v-if="!url">
-			<?php esc_html_e( 'Enter URL with JetSmartFilters parameters to check aliases', 'jet-smart-filters' ); ?>
+			<?php _e( 'Enter URL with JetSmartFilters parameters to check aliases', 'jet-smart-filters' ); ?>
 		</p>
 		<p v-else-if="!isUrl">
-			<?php esc_html_e( 'URL does not contain JetSmartFilters parameters', 'jet-smart-filters' ); ?>
+			<?php _e( 'URL does not contain JetSmartFilters parameters', 'jet-smart-filters' ); ?>
 		</p>
 		<p v-else>
-			<?php esc_html_e( 'No matches found', 'jet-smart-filters' ); ?>
+			<?php _e( 'No matches found', 'jet-smart-filters' ); ?>
 		</p>
 	</div>
 </div>

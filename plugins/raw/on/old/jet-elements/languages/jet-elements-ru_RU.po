@@ -9675,6 +9675,10 @@ msgstr "Добавить расстояние между колонками"
 msgid "Add gap between rows"
 msgstr "Добавить расстояние между строками"
 
+#: includes/template-library/class-jet-elements-templates-source.php:30
+msgid "Jet Templates"
+msgstr "Шаблоны Jet"
+
 #: includes/updater/class-jet-elements-plugin-changelog.php:127
 #, php-format
 msgid "More information about %s"
@@ -9711,6 +9715,14 @@ msgstr ""
 #: templates/admin-templates/settings-page.php:24
 msgid "Enable or disable SVG images uploading"
 msgstr "Разрешите или запретите загрузку SVG изображений"
+
+#: templates/admin-templates/settings-page.php:33
+msgid "Use Jet Templates"
+msgstr ""
+
+#: templates/admin-templates/settings-page.php:34
+msgid "Add Jet page templates and blocks to Elementor templates library."
+msgstr "Добавить шаблоны страниц Jet и блоки в библиотеку шаблонов Elementor."
 
 #: templates/admin-templates/settings-page.php:43
 msgid "Editor Load Level"
@@ -10193,6 +10205,9 @@ msgstr "Максимум:"
 
 #~ msgid "SVG images upload status:"
 #~ msgstr "Статус загрузки изображение SVG:"
+
+#~ msgid "Use Jet Templates:"
+#~ msgstr "Использовать шаблоны Jet:"
 
 #~ msgid "API Key:"
 #~ msgstr "API ключ:"

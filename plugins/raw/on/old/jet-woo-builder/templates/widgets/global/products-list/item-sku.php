@@ -16,4 +16,4 @@ if ( empty( $sku ) ) {
 }
 ?>
 
-<div class="jet-woo-product-sku"><?php echo wp_kses_post( $sku ); ?></div>
+<div class="jet-woo-product-sku"><?php echo $sku; ?></div>

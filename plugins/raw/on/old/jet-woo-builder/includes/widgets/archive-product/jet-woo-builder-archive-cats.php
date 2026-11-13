@@ -7,6 +7,9 @@
 
 namespace Elementor;
 
+use Elementor\Core\Schemes\Typography;
+use Elementor\Core\Schemes\Color;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 } // Exit if accessed directly
@@ -29,19 +32,8 @@ class Jet_Woo_Builder_Archive_Cats extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/woocommerce-jetwoobuilder-settings-how-to-create-and-set-a-custom-categories-archive-template/?utm_source=need-help&utm_medium=jet-woo-categories&utm_campaign=jetwoobuilder';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-		
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'archive' );
+		return jet_woo_builder()->documents->is_document_type( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -165,7 +157,7 @@ class Jet_Woo_Builder_Archive_Cats extends Jet_Woo_Builder_Base {
 	public static function render_callback( $settings = [] ) {
 
 		echo '<div class="jet-woo-builder-archive-cats"><ul>';
-		echo wp_kses_post( jet_woo_builder_template_functions()->get_product_terms_list( 'product_cat', $settings['count'] ) );
+		echo jet_woo_builder_template_functions()->get_product_terms_list( 'product_cat', $settings['count'] );
 		echo '</ul></div>';
 
 	}
@@ -181,9 +173,9 @@ class Jet_Woo_Builder_Archive_Cats extends Jet_Woo_Builder_Base {
 		];
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings ) );
+			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings );
 		} else {
-			echo wp_kses_post( self::render_callback( $macros_settings ) ?: '' );
+			echo self::render_callback( $macros_settings );
 		}
 
 		$this->__close_wrap();

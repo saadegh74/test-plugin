@@ -33,7 +33,7 @@ class Jet_Woo_Builder_Products_Description extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'shop' );
+		return jet_woo_builder()->documents->is_document_type( 'shop' );
 	}
 
 	protected function register_controls() {
@@ -105,7 +105,7 @@ class Jet_Woo_Builder_Products_Description extends Jet_Woo_Builder_Base {
 		if ( jet_woo_builder()->elementor_views->in_elementor() ) {
 			$description = __( 'The description is not prominent by default; however, some themes may show it.', 'jet-woo-builder' );
 
-			printf( '<div class="page-description"><p>%s</p></div>', esc_html( $description ) );
+			printf( '<div class="page-description"><p>%s</p></div>', $description );
 		} else {
 			woocommerce_taxonomy_archive_description();
 			woocommerce_product_archive_description();

@@ -65,26 +65,12 @@ if ( ! class_exists( 'Jet_Search_Settings' ) ) {
 		 */
 		public function generate_frontend_config_data() {
 
-			$rest_api_url      = apply_filters( 'jet-search/rest/frontend/url', get_rest_url() );
-			$postTypes         = \Jet_Search_Tools::get_post_types();
-			$taxonomies        = \Jet_Search_Tools::get_taxonomies();
-			$taxonomies_ext    = \Jet_Search_Tools::get_taxonomies( false, true );
-
-			$request_type_list = array(
-				array(
-					'value' => 'rest_api',
-					'label' => 'Rest API',
-				),
-				array(
-					'value' => 'ajax',
-					'label' => 'Default (ajax admin-ajax.php request)',
-				)
-			);
+			$rest_api_url = apply_filters( 'jet-search/rest/frontend/url', get_rest_url() );
 
 			$this->settings_page_config = [
 				'messages' => [
-					'saveSuccess' => esc_html__( 'Saved', 'jet-search' ),
-					'saveError'   => esc_html__( 'Error', 'jet-search' ),
+					'saveSuccess' => esc_html__( 'Saved', 'jet-elements' ),
+					'saveError'   => esc_html__( 'Error', 'jet-elements' ),
 				],
 				'settingsApiUrl'      => $rest_api_url . 'jet-search-api/v1/plugin-settings',
 				'getSuggestionsUrl'   => $rest_api_url . 'jet-search/v1/get-suggestions',
@@ -94,44 +80,9 @@ if ( ! class_exists( 'Jet_Search_Settings' ) ) {
 				'ajaxUrl'             => esc_url( admin_url( 'admin-ajax.php' ) ),
 				'nonce'               => wp_create_nonce( $this->key ),
 				'settingsData' => [
-					'postTypes'  => array_map(
-						function ( $value, $label ) {
-							return [ 'value' => $value, 'label' => $label ];
-						},
-						array_keys( $postTypes ),
-						array_values( $postTypes )
-					),
-					'taxonomies' => array_map(
-						function ( $value, $label ) {
-							return [ 'value' => $value, 'label' => $label ];
-						},
-						array_keys( $taxonomies ),
-						array_values( $taxonomies )
-					),
-					'taxonomiesListExtended' => array_map(
-						function ( $value, $label ) {
-							return [ 'value' => $value, 'label' => $label ];
-						},
-						array_keys( $taxonomies_ext ),
-						array_values( $taxonomies_ext )
-					),
-					'request_type_list' => $request_type_list,
+
 				],
 			];
-
-			$request_options = get_option( 'jet_ajax_search_request_settings' );
-
-			if ( false != $request_options ) {
-
-				$request_type = isset( $request_options['request_type'] ) ? $request_options['request_type'] : '';
-
-				if ( 'ajax' === $request_type ) {
-					$this->settings_page_config['addSuggestionUrl']    = $this->settings_page_config['ajaxUrl'];
-					$this->settings_page_config['getSuggestionsUrl']   = $this->settings_page_config['ajaxUrl'];
-					$this->settings_page_config['updateSuggestionUrl'] = $this->settings_page_config['ajaxUrl'];
-					$this->settings_page_config['deleteSuggestionUrl'] = $this->settings_page_config['ajaxUrl'];
-				}
-			}
 
 			return $this->settings_page_config;
 		}
@@ -152,15 +103,6 @@ if ( ! class_exists( 'Jet_Search_Settings' ) ) {
 				esc_url( admin_url( 'admin.php' ) )
 			);
 
-		}
-
-		/**
-		 * Return JetEngine Listings admin URL
-		 *
-		 * @return string
-		 */
-		public function get_jetengine_listings_admin_url() {
-			return esc_url( admin_url( 'edit.php?post_type=jet-engine' ) );
 		}
 
 		/**

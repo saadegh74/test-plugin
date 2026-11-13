@@ -2,11 +2,11 @@
 /**
  * Bricks views manager
  */
-
 namespace Jet_Smart_Filters\Bricks_Views;
 
-define( 'BRICKS_QUERY_LOOP_PROVIDER_ID', 'bricks-query-loop' );
-define( 'BRICKS_QUERY_LOOP_PROVIDER_NAME', 'Bricks query loop' );
+use Bricks\Api;
+use Bricks\Database;
+use Bricks\Helpers;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -25,34 +25,30 @@ class Manager {
 	public $frontend = null;
 
 	/**
-	 * Dynamic tags component
-	 */
-	public $dynamic_tags;
-
-	/**
 	 * Constructor for the class
 	 */
 	function __construct() {
+
 		if ( ! $this->has_bricks() ) {
 			return;
 		}
 
-		add_action( 'init', [ $this, 'register_elements' ], 11 );
-		add_action( 'init', [ $this, 'add_control_to_elements' ], 40 );
-		add_action( 'init', [ $this, 'enqueue_styles_for_builder' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ], 9);
+		add_action( 'init', array( $this, 'register_elements' ), 11 );
+		add_action( 'wp_enqueue_scripts', [$this, 'enqueue_styles_for_builder'] );
 		add_action( 'jet-smart-filters/render/ajax/before', [ $this, 'register_bricks_dynamic_data_on_ajax' ] );
-		add_action( 'init', array( $this, 'register_dynamic_tags' ), 90 );
 
-		add_filter( 'bricks/builder/i18n', function ( $i18n ) {
+		add_filter( 'bricks/builder/i18n', function( $i18n ) {
 			$i18n['jetsmartfilters'] = esc_html__( 'JetSmartFilters', 'jet-smart-filters' );
-
 			return $i18n;
 		} );
 
-		add_action( 'jet-smart-filters/providers/register', [ $this, 'register_provider_for_filters' ] );
-		add_action( 'jet-smart-filters/assets/before-print-style', [ $this, 'ensure_bricks_ajax_popup_assets_registered' ] );
-		add_filter( 'jet-engine/query-builder/filters/allowed-providers', [ $this, 'add_provider_to_query_builder' ] );
+		add_filter( 'bricks/posts/query_vars', [ $this, 'merge_query_vars' ], 10, 3 );
+		add_filter( 'bricks/terms/query_vars', [ $this, 'merge_query_vars' ], 10, 3 );
+		add_filter( 'bricks/users/query_vars', [ $this, 'merge_query_vars' ], 10, 3 );
+
+		require jet_smart_filters()->plugin_path( 'includes/bricks/filters/manager.php' );
+		new Filters\Manager();
+
 	}
 
 	public function component_path( $relative_path = '' ) {
@@ -60,6 +56,7 @@ class Manager {
 	}
 
 	public function register_elements() {
+
 		if ( ! class_exists( '\Jet_Engine\Bricks_Views\Elements\Base' ) ) {
 			require $this->component_path( 'compatibility/elements/base.php' );
 			require $this->component_path( 'compatibility/helpers/options-converter.php' );
@@ -78,7 +75,6 @@ class Manager {
 		require $this->component_path( 'elements/base-checkbox.php' );
 
 		$element_files = array(
-			jet_smart_filters()->plugin_path( 'includes/listing/views/bricks/listing.php' ),
 			$this->component_path( 'elements/active-filters.php' ),
 			$this->component_path( 'elements/active-tags.php' ),
 			$this->component_path( 'elements/alphabet.php' ),
@@ -96,16 +92,18 @@ class Manager {
 			$this->component_path( 'elements/select.php' ),
 			$this->component_path( 'elements/search.php' ),
 			$this->component_path( 'elements/sorting.php' ),
-			$this->component_path( 'elements/hidden.php' ),
 		);
 
 		foreach ( $element_files as $file ) {
 			\Bricks\Elements::register_element( $file );
 		}
+
 	}
 
 	public function enqueue_styles_for_builder() {
+
 		if ( bricks_is_builder() ) {
+
 			jet_smart_filters()->set_filters_used();
 
 			// Add JetSmartFilters icons font
@@ -120,22 +118,13 @@ class Manager {
 		}
 	}
 
-	public function enqueue_scripts() {
-		wp_enqueue_script(
-			'jet-smart-filters-bricks',
-			jet_smart_filters()->plugin_url( 'assets/js/bricks.js' ),
-			['jquery'],
-			jet_smart_filters()->get_version(),
-			true
-		);
-	}
-
 	public function register_bricks_dynamic_data_on_ajax() {
+
 		if ( ! function_exists( 'jet_engine' ) ) {
 			// Backup if JetEngine is not installed
 			global $wp_filter;
 			if ( isset( $wp_filter['wp'][8] ) ) {
-				foreach ( $wp_filter['wp'][8] as $callback ) {
+				foreach( $wp_filter['wp'][8] as $callback ) {
 					if ( is_array( $callback['function'] ) && is_object( $callback['function'][0] ) ) {
 						if ( 'Bricks\Integrations\Dynamic_Data\Providers' === get_class( $callback['function'][0] ) ) {
 							call_user_func( $callback['function'] );
@@ -147,10 +136,61 @@ class Manager {
 		}
 	}
 
-	public function register_dynamic_tags() {
-		require_once $this->component_path( 'dynamic-tags/manager.php' );
+	// Combine JetSmartFilters $query_vars with Bricks $query_vars
+	// for the correct operation of Load more and Infinite scroll.
+	public function merge_query_vars( $query_vars, $settings, $element_id ) {
 
-		$this->dynamic_tags = new Dynamic_Data\Manager();
+		$post_id = Database::$page_data['preview_or_post_id'];
+		$bricks_data = Helpers::get_bricks_data( $post_id );
+		$isLoadMore = false;
+
+		if ( ! empty( $bricks_data ) ) {
+			foreach ( $bricks_data as $element ) {
+				$interactions = $element['settings']['_interactions'] ?? false;
+
+				if ( ! empty( $interactions ) && isset( $interactions[0]['loadMoreQuery'] ) && $interactions[0]['loadMoreQuery'] === $element_id ) {
+					$isLoadMore = true;
+				}
+			}
+		}
+
+		if ( isset( $settings['query']['infinite_scroll'] ) || $isLoadMore ) {
+
+			$jsf_query_args = jet_smart_filters()->query->get_query_args();
+
+			if ( ! empty( $jsf_query_args ) ) {
+
+				$query_vars = wp_parse_args( $jsf_query_args, $query_vars );
+
+			}
+
+		}
+
+		/**
+		 * Check if current request is a load more/infinite scroll request
+		 *
+		 * If so, do not render wrappers.
+		 *
+		 * @since 1.8.1
+		 */
+		$is_load_more_request = Api::is_current_endpoint( 'load_query_page' );
+
+		// Additional merge in case Bricks loop has default meta or tax query
+		// and Bricks loop is also filtered by meta or tax query.
+		if ( $is_load_more_request ) {
+
+			$merge_vars = $settings['query']['_merge_vars'];
+
+			if ( ! empty ( $merge_vars['meta_query'] ) && ! empty ( $query_vars['meta_query'] ) ) {
+				$query_vars['meta_query'] = array_merge( $query_vars['meta_query'], $merge_vars['meta_query'] );
+			}
+
+			if ( ! empty ( $merge_vars['tax_query'] ) && ! empty ( $query_vars['tax_query'] ) ) {
+				$query_vars['tax_query'] = array_merge( $query_vars['tax_query'], $merge_vars['tax_query'] );
+			}
+		}
+
+		return $query_vars;
 	}
 
 	public function has_bricks() {
@@ -158,18 +198,18 @@ class Manager {
 	}
 
 	public static function get_allowed_providers() {
+
 		$provider_allowed = [
-			'bricks-query-loop' => true,
+			'bricks-query-loop'   => true,
 		];
 
 		if ( function_exists( 'jet_engine' ) ) {
 			$provider_allowed = array_merge(
 				$provider_allowed,
 				[
-					'jsf-listing'         => true,
 					'jet-engine'          => true,
-					'jet-engine-maps'     => jet_engine()->modules->is_module_active( 'maps-listings' ),
-					'jet-engine-calendar' => jet_engine()->modules->is_module_active( 'calendar' ),
+					'jet-engine-maps'     => jet_engine()->modules->is_module_active('maps-listings'),
+					'jet-engine-calendar' => jet_engine()->modules->is_module_active('calendar'),
 				]
 			);
 		}
@@ -177,74 +217,4 @@ class Manager {
 		return apply_filters( 'jet-smart-filters/bricks/allowed-providers', $provider_allowed );
 	}
 
-	public function register_provider_for_filters( $providers_manager ) {
-		$providers_manager->register_provider(
-			'\Jet_Smart_Filters\Bricks_Views\Provider', // Custom provider class name
-			jet_smart_filters()->plugin_path( 'includes/bricks/provider.php' ) // Path to file where this class defined
-		);
-	}
-
-	public function add_control_to_elements() {
-		// Only container, block and div element have query controls
-		$elements = [ 'container', 'block', 'div' ];
-
-		foreach ( $elements as $name ) {
-			add_filter( "bricks/elements/{$name}/controls", [ $this, 'add_jet_smart_filters_controls' ], 40 );
-		}
-	}
-
-	public function add_jet_smart_filters_controls( $controls ) {
-		$jet_smart_filters_control['jsfb_is_filterable'] = [
-			'tab'         => 'content',
-			'label'       => esc_html__( 'Is filterable', 'jet-smart-filters' ),
-			'type'        => 'checkbox',
-			'required'    => [
-				[ 'hasLoop', '=', true ],
-			],
-			'rerender'    => true,
-			'description' => esc_html__( 'Please check this option if you will use with JetSmartFilters.', 'jet-smart-filters' ),
-		];
-
-		$jet_smart_filters_control['jsfb_query_id'] = [
-			'tab'            => 'content',
-			'label'          => esc_html__( 'Query ID for filters', 'jet-smart-filters' ),
-			'type'           => 'text',
-			'placeholder'    => esc_html__( 'Please enter query id.', 'jet-smart-filters' ),
-			'hasDynamicData' => false,
-			'required'       => [
-				[ 'hasLoop', '=', true ],
-				[ 'jsfb_is_filterable', '=', true ]
-			],
-			'rerender'       => true,
-		];
-
-		// Below 2 lines is just some php array functions to force my new control located after the query control
-		$query_key_index = absint( array_search( 'query', array_keys( $controls ) ) );
-		$new_controls    = array_slice( $controls, 0, $query_key_index + 1, true ) + $jet_smart_filters_control + array_slice( $controls, $query_key_index + 1, null, true );
-
-		return $new_controls;
-	}
-
-	public function add_provider_to_query_builder( $providers ) {
-		$providers[] = BRICKS_QUERY_LOOP_PROVIDER_ID;
-
-		return $providers;
-	}
-
-	/**
-	 * Ensure filter assets are registered before printing styles
-	 * for Bricks AJAX popup content requests.
-	 */
-	public function ensure_bricks_ajax_popup_assets_registered( $handle ) {
-
-		if ( 'jet-smart-filters' !== $handle ) {
-			return;
-		}
-
-		if ( ! class_exists( '\Bricks\Api' ) || ! \Bricks\Api::is_current_endpoint( 'load_popup_content' ) ) {
-			return;
-		}
-
-		jet_smart_filters()->register_assets();
-	}
 }

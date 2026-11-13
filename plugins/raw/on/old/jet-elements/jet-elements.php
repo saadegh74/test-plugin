@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: افزونه جت المنت
+ * Plugin Name: JetElements For Elementor
  * Plugin URI:  https://crocoblock.com/plugins/jetelements/
- * Description: افزونه‌ای جدید برای صفحه‌ساز المنتور که مجموعه‌ای از ماژول‌ها را برای ایجاد انواع محتوا فراهم می‌کند، ماژول‌های سفارشی به سایت شما اضافه می‌کند و تنها با چند کلیک ظاهر جذابی به آن می‌بخشد
- * Version:     2.9.2.8
- * Author:      ترجمه : المنتورسایت
- * Author URI:  https://elementor-site.ir
+ * Description: Brand new addon for Elementor Page builder. It provides the set of modules to create different kinds of content, adds custom modules to your website and applies attractive styles in the matter of several clicks!
+ * Version:     2.6.13.1
+ * Author:      Crocoblock
+ * Author URI:  https://crocoblock.com/
  * Text Domain: jet-elements
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -65,7 +65,7 @@ if ( ! class_exists( 'Jet_Elements' ) ) {
 		 *
 		 * @var string
 		 */
-		private $version = '2.9.2.8';
+		private $version = '2.6.13.1';
 
 		/**
 		 * Framework component
@@ -116,7 +116,6 @@ if ( ! class_exists( 'Jet_Elements' ) ) {
 					$this->plugin_path( 'includes/modules/db-updater/cx-db-updater.php' ),
 					$this->plugin_path( 'includes/modules/jet-dashboard/jet-dashboard.php' ),
 					$this->plugin_path( 'includes/modules/jet-elementor-extension/jet-elementor-extension.php' ),
-					$this->plugin_path( 'includes/modules/jet-cache/jet-cache.php' ),
 				)
 			);
 		}
@@ -148,13 +147,10 @@ if ( ! class_exists( 'Jet_Elements' ) ) {
 			jet_elements_integration()->init();
 			jet_elements_shortocdes()->init();
 			jet_elements_svg_manager()->init();
+			jet_elements_templates_manager()->init();
 			jet_elements_compatibility()->init();
 			jet_elements_ext_section()->init();
 			jet_family_column_orientation_ext()->init();
-
-			// Init Jet Cache Module
-			$cache_module_data = $this->module_loader->get_included_module_data( 'jet-cache.php' );
-			\Jet_Cache\Manager::get_instance( $cache_module_data );
 
 			//Init Rest Api
 			new \Jet_Elements\Rest_Api();
@@ -166,10 +162,6 @@ if ( ! class_exists( 'Jet_Elements' ) ) {
 				require $this->plugin_path( 'includes/class-jet-elements-db-upgrader.php' );
 				// Init DB upgrader
 				new Jet_Elements_DB_Upgrader();
-			}
-
-			if ( file_exists( $this->plugin_path( 'vendor/autoload.php' ) ) ) {
-				require_once $this->plugin_path( 'vendor/autoload.php' );
 			}
 		}
 
@@ -281,19 +273,15 @@ if ( ! class_exists( 'Jet_Elements' ) ) {
 		public function load_files() {
 			require $this->plugin_path( 'includes/class-jet-elements-assets.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-download-handler.php' );
-			require_once $this->plugin_path( 'includes/class-jet-elements-settings-validator.php' );
-			Jet_Elements_Settings_Validator::init();
-			add_action( 'elementor/init', function() { require_once $this->plugin_path( 'includes/base/class-jet-elements-repeater.php' ); }, 1 );
 			require $this->plugin_path( 'includes/class-jet-elements-tools.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-post-tools.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-integration.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-shortcodes.php' );
-			require $this->plugin_path( 'includes/class-jet-elements-advanced-map-geocode-providers.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-settings.php' );
-			require $this->plugin_path( 'includes/class-jet-elements-advanced-map-providers.php' );
 			require $this->plugin_path( 'includes/settings/manager.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-svg-manager.php' );
 			require $this->plugin_path( 'includes/class-jet-elements-ajax-handlers.php' );
+			require $this->plugin_path( 'includes/template-library/class-jet-elements-templates-manager.php' );
 			require $this->plugin_path( 'includes/lib/compatibility/class-jet-elements-compatibility.php' );
 			require $this->plugin_path( 'includes/ext/class-jet-elements-ext-section.php' );
 			require $this->plugin_path( 'includes/ext/class-jet-family-column-orientation-ext.php' );
@@ -359,10 +347,6 @@ if ( ! class_exists( 'Jet_Elements' ) ) {
 		 */
 		public function get_template( $name = null ) {
 
-			if ( ! is_string( $name ) || ! preg_match( '#^[a-zA-Z0-9_-]+(?:/[a-zA-Z0-9_-]+)*\.php$#D', $name ) ) {
-				return false;
-			}
-
 			$template = locate_template( $this->template_path() . $name );
 
 			if ( ! $template ) {
@@ -425,6 +409,7 @@ if ( ! function_exists( 'jet_elements' ) ) {
 }
 
 jet_elements();
+include_once 'inc/management-menus.php';
 function ES_jetelement_update_checker() {
 
 	$ES_json_url 	= 'https://esdownload.ir/json/jetelement23434232341.json' ;

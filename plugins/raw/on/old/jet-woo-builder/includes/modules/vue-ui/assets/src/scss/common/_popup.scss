@@ -1,6 +1,6 @@
 .cx-vui-popup {
 	position: fixed;
-	z-index: 9999;
+	z-index: 999;
 	left: 0;
 	right: 0;
 	top: 0;
@@ -48,9 +48,6 @@
 		align-items: center;
 		.cx-vui-button + .cx-vui-button {
 			margin: 0 0 0 10px;
-			.rtl & {
-				margin: 0 10px 0 0;
-			}
 		}
 	}
 	&__close {
@@ -58,10 +55,6 @@
 		right: 12px;
 		top: 15px;
 		cursor: pointer;
-		.rtl & {
-			left: 12px;
-			right: auto;
-		}
 		path {
 			fill: $color__border-off-panel;
 		}

@@ -17,6 +17,6 @@ if ( filter_var( $this->get_attr( 'button_use_ajax_style' ), FILTER_VALIDATE_BOO
 }
 ?>
 
-<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+<div class="<?php echo implode( ' ', $classes ); ?>">
 	<?php jet_woo_builder_template_functions()->get_product_add_to_cart_button( [], $enable_quantity ); ?>
 </div>

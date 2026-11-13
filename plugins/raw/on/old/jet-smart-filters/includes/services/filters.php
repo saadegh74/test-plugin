@@ -25,7 +25,6 @@ class Jet_Smart_Filters_Service_Filters {
 	public function get( $args ) {
 
 		global $wpdb;
-		$args = is_array( $args ) ? $args : array();
 
 		$args = array_merge( array(
 			'status'   => 'publish',
@@ -40,16 +39,21 @@ class Jet_Smart_Filters_Service_Filters {
 			'language' => false
 		), $args );
 
-		$status = is_scalar( $args['status'] ) ? sanitize_text_field( (string) $args['status'] ) : 'publish';
+		// escapes data for use in a MySQL query
+		foreach ( $args as $key => $value ) {
+			$args[$key] = esc_sql( $value );
+		}
+
+		$status = $args['status'];
 
 		// Pagination
-		$page     = is_scalar( $args['page'] ) ? max( 1, absint( $args['page'] ) ) : 1;
-		$per_page = is_scalar( $args['per_page'] ) ? max( 1, absint( $args['per_page'] ) ) : 20;
+		$page     = absint( $args['page'] );
+		$per_page = absint( $args['per_page'] );
 		$offset   = $per_page * ( $page - 1 );
 
 		// Sort
-		$order_by = is_scalar( $args['orderby'] ) ? sanitize_text_field( (string) $args['orderby'] ) : 'title';
-		$order    = is_scalar( $args['order'] ) ? sanitize_text_field( (string) $args['order'] ) : 'asc';
+		$order_by = $args['orderby'];
+		$order    = $args['order'];
 
 		$allowed_orderby = [ 'title', 'date' ];
 		$allowed_order   = [ 'asc', 'desc' ];
@@ -58,45 +62,43 @@ class Jet_Smart_Filters_Service_Filters {
 		$order    = in_array( $order, $allowed_order ) ? $order : 'asc';
 
 		// Search
-		$searchSql   = '';
-		$search      = is_scalar( $args['search'] ) ? (string) $args['search'] : '';
-		$query_values = array( $status );
+		$searchSql = '';
+		$search    = $args['search'];
 
+		// escaped above
 		if ( $search ) {
-			$searchSql = "AND {$wpdb->posts}.post_title LIKE %s";
-			$query_values[] = '%' . $wpdb->esc_like( $search ) . '%';
+			$searchSql = "AND $wpdb->posts.post_title LIKE '%{$search}%'";
 		}
 
 		// Filtration
 		$filtrationSql = '';
-		$filter_values = array();
-		$type          = is_scalar( $args['type'] ) ? (string) $args['type'] : '';
-		$source        = is_scalar( $args['source'] ) ? (string) $args['source'] : '';
+		$type          = $args['type'];
+		$source        = $args['source'];
 		$date          = $args['date'];
 
+		// escaped above
 		if ( $type ) {
-			$filtrationSql .= 'AND postmeta_type.meta_value = %s ';
-			$filter_values[] = $type;
+			$filtrationSql .= "AND postmeta_type.meta_value = '$type' ";
 		}
 
+		// escaped above
 		if ( $source ) {
-			$filtrationSql .= 'AND postmeta_source.meta_value = %s ';
-			$filter_values[] = $source;
+			$filtrationSql .= "AND postmeta_source.meta_value = '$source' ";
 		}
 
-		if ( is_array( $date ) ) {
-			if ( ! empty( $date['from'] ) && is_scalar( $date['from'] ) ) {
-				$filtrationSql .= "AND $wpdb->posts.post_date >= %s ";
-				$filter_values[] = (string) $date['from'] . ' 00:00:00';
+		if ( $date ) {
+			if ( $date['from'] ) {
+				$date['from'] = esc_sql( $date['from'] );
+				$filtrationSql .= "AND $wpdb->posts.post_date >= '" . $date['from'] . " 00:00:00' ";
 			}
-			if ( ! empty( $date['to'] ) && is_scalar( $date['to'] ) ) {
-				$filtrationSql .= "AND $wpdb->posts.post_date <= %s ";
-				$filter_values[] = (string) $date['to'] . ' 23:59:59';
+			if ( $date['to'] ) {
+				$date['to'] = esc_sql( $date['to'] );
+				$filtrationSql .= "AND $wpdb->posts.post_date <= '" . $date['to'] . " 23:59:59' ";
 			}
 		}
 
 		// Multilingual
-		$current_language = is_scalar( $args['language'] ) ? sanitize_text_field( (string) $args['language'] ) : false;
+		$current_language = $args['language'];
 
 		// Display all languages
 		if ( $status === 'trash' || $current_language === 'all' ) {
@@ -104,40 +106,35 @@ class Jet_Smart_Filters_Service_Filters {
 		}
 
 		$ml_SQL_parts = $this->_multilingual->get_SQL_filters_parts( $current_language );
-		$ml_join       = $ml_SQL_parts['join'];
-		$ml_where      = isset( $ml_SQL_parts['where_format'] ) ? $ml_SQL_parts['where_format'] : $ml_SQL_parts['where'];
-		$ml_values     = isset( $ml_SQL_parts['where_values'] ) ? $ml_SQL_parts['where_values'] : array();
+		$ml_join      = $ml_SQL_parts['join'];
+		$ml_where     = $ml_SQL_parts['where'];
 
-		$sql_main = $wpdb->prepare( "
+		$sql_main = "
 		SELECT $wpdb->posts.ID, $wpdb->posts.post_title as title, $wpdb->posts.post_date as date, postmeta_type.meta_value as type, postmeta_source.meta_value as source
 		FROM $wpdb->posts
 			LEFT JOIN $wpdb->postmeta as postmeta_type ON ($wpdb->posts.ID = postmeta_type.post_ID AND postmeta_type.meta_key = '_filter_type')
 			LEFT JOIN $wpdb->postmeta as postmeta_source ON ($wpdb->posts.ID = postmeta_source.post_ID AND postmeta_source.meta_key = '_data_source')
 			$ml_join
 			WHERE $wpdb->posts.post_type = 'jet-smart-filters'
-				AND $wpdb->posts.post_status = %s
+				AND $wpdb->posts.post_status = '$status'
 				$searchSql
 				$filtrationSql
 				$ml_where
 			ORDER BY $order_by $order
-			LIMIT %d, %d",
-			array_merge( $query_values, $filter_values, $ml_values, array( $offset, $per_page ) )
-		);
+			LIMIT $offset, $per_page";
 		$filters_result = $wpdb->get_results( $sql_main, ARRAY_A );
 
-		$sql_count = $wpdb->prepare( "
+		$sql_count = "
 		SELECT COUNT(*) as count
 		FROM $wpdb->posts
 		LEFT JOIN $wpdb->postmeta as postmeta_type ON ($wpdb->posts.ID = postmeta_type.post_ID AND postmeta_type.meta_key = '_filter_type')
 		LEFT JOIN $wpdb->postmeta as postmeta_source ON ($wpdb->posts.ID = postmeta_source.post_ID AND postmeta_source.meta_key = '_data_source')
 			$ml_join
 			WHERE $wpdb->posts.post_type = 'jet-smart-filters'
-				AND $wpdb->posts.post_status = %s
+				AND $wpdb->posts.post_status = '$status'
 				$searchSql
 				$filtrationSql
-				$ml_where",
-			array_merge( $query_values, $filter_values, $ml_values )
-		);
+				$ml_where";
 		$count_result = $wpdb->get_results( $sql_count, ARRAY_A );
 
 		$sql_total_count = "
@@ -185,23 +182,13 @@ class Jet_Smart_Filters_Service_Filters {
 			$ids = array( $ids );
 		}
 
-		if ( $ids !== 'all' ) {
-			$ids = wp_parse_id_list( $ids );
-
-			if ( empty( $ids ) ) {
-				return 0;
-			}
-		}
-
 		$sql = "
 		UPDATE $wpdb->posts
 		SET post_status = 'publish'
 			WHERE $wpdb->posts.post_type = 'jet-smart-filters'
 				AND $wpdb->posts.post_status = 'trash'";
 		if ( $ids !== 'all' ) {
-			$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-			$sql .= " AND $wpdb->posts.ID IN ( $placeholders )";
-			$sql = $wpdb->prepare( $sql, $ids );
+			$sql .= " AND $wpdb->posts.ID IN ('" . implode( "','", $ids ) . "')";
 		}
 
 		$result = $wpdb->query( $sql );
@@ -217,27 +204,18 @@ class Jet_Smart_Filters_Service_Filters {
 			$ids = array( $ids );
 		}
 
-		$ids = wp_parse_id_list( $ids );
-
-		if ( empty( $ids ) ) {
-			return 0;
-		}
-
-		$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-
-		$sql = $wpdb->prepare( "
+		$sql = "
 		UPDATE $wpdb->posts
 		SET post_status = 'trash'
 			WHERE $wpdb->posts.post_type = 'jet-smart-filters'
 				AND $wpdb->posts.post_status = 'publish'
-				AND $wpdb->posts.ID IN ( $placeholders )",
-			$ids
-		);
+				AND $wpdb->posts.ID IN ('" . implode( "','", $ids ) . "')";
 
 		$result = $wpdb->query( $sql );
 
 		return $result;
 	}
+
 	public function delete( $ids ) {
 
 		global $wpdb;
@@ -258,8 +236,6 @@ class Jet_Smart_Filters_Service_Filters {
 			$ids = array_map( function($row) {
 				return $row['ID'];
 			}, $result );
-		} else {
-			$ids = wp_parse_id_list( $ids );
 		}
 
 		foreach ( $ids as $id ) {

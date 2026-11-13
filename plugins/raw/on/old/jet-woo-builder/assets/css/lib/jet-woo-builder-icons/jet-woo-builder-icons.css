@@ -8,7 +8,8 @@
 	font-style: normal;
 }
 
-.jet-woo-builder-icon {
+.jet-woo-builder-icon,
+i[class*="jet-woo-builder-"] {
 	/* use !important to prevent issues with browser extensions that change fonts */
 	font-family: 'jet-woo-builder-icons' !important;
 	speak: none;

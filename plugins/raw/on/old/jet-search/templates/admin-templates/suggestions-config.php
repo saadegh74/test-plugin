@@ -20,51 +20,22 @@
 		v-show="configVisible"
 	>
 		<div class="jet-search-suggestions-config-popup-setting">
-			<div class="jet-search-suggestions-config-popup-setting-wrapper">
-				<div class="jet-search-suggestions-config-popup-setting-item jet-search-suggestions-config-popup-setting-item--widget-suggestion-save-permission">
-					<div class="jet-search-suggestions-config-popup-setting-item__label">{{ generalSettingsLabels.widget_suggestion_save_permission.label }}</div>
+			<h4 class="jet-search-suggestions-config-popup-setting__title" >{{ generalSettingsLabels.records_limit.title }}</h4>
+			<p class="jet-search-suggestions-config-popup-setting__desc">{{ generalSettingsLabels.records_limit.desc }}</p>
+			<p class="jet-search-suggestions-config-popup-setting__info" v-html="generalSettingsLabels.records_limit.info"></p>
+
+			<div class="jet-search-suggestions-config-popup-setting-fields">
+				<div class="jet-search-suggestions-config-popup-setting-item">
+					<div class="jet-search-suggestions-config-popup-setting-item__label">{{ generalSettingsLabels.records_limit.label }}</div>
 					<div class="jet-search-suggestions-config-popup-setting-item__content">
-						<input
-							name="widget_suggestion_save_permission"
-							type="checkbox"
-							@change="checkboxValidation"
-							v-model="settings['widget_suggestion_save_permission']"
-						>
-					</div>
-				</div>
-				<p class="jet-search-suggestions-config-popup-setting__desc">{{ generalSettingsLabels.widget_suggestion_save_permission.desc }}</p>
-			</div>
-
-			<div class="jet-search-suggestions-config-popup-setting-wrapper" v-show="settings['widget_suggestion_save_permission']">
-
-				<div class="jet-search-suggestions-config-popup-setting-item jet-search-suggestions-config-popup-setting-item--use-session">
-					<div class="jet-search-suggestions-config-popup-setting-item__label">{{ generalSettingsLabels.use_session.label }}</div>
-					<div class="jet-search-suggestions-config-popup-setting-item__content">
-						<input
-							name="use_session"
-							type="checkbox"
-							@change="checkboxValidation"
-							v-model="settings['use_session']"
-						>
-					</div>
-				</div>
-				<p class="jet-search-suggestions-config-popup-setting__desc">{{ generalSettingsLabels.use_session.desc }}</p>
-			</div>
-
-			<div class="jet-search-suggestions-config-popup-setting-wrapper" v-show="settings['use_session'] && settings['widget_suggestion_save_permission']">
-				<div class="jet-search-suggestions-config-popup-setting-fields">
-					<div class="jet-search-suggestions-config-popup-setting-item jet-search-suggestions-config-popup-setting-item--records-limit">
-						<div class="jet-search-suggestions-config-popup-setting-item__label">{{ generalSettingsLabels.records_limit.label }}</div>
-						<div class="jet-search-suggestions-config-popup-setting-item__content">
-							<cx-vui-input
-								type="number"
-								v-model="settings['records_limit']"
-								:min="0"
-								:step="1"
-								@input-validation="limitValidationHandler"
-								@on-blur-validation="limitBlurValidationHandler"
-							></cx-vui-input>
-						</div>
+						<cx-vui-input
+							type="number"
+							v-model="settings['records_limit']"
+							:min="0"
+							:step="1"
+							@input-validation="validationHandler"
+							@on-blur-validation="blurValidationHandler"
+						></cx-vui-input>
 					</div>
 				</div>
 			</div>

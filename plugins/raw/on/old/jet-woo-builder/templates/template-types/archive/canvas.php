@@ -12,12 +12,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<head>
 		<meta charset="<?php bloginfo( 'charset' ); ?>">
 		<?php if ( ! current_theme_supports( 'title-tag' ) ) : ?>
-			<title><?php echo esc_html( wp_get_document_title() ); ?></title>
+			<title><?php echo wp_get_document_title(); ?></title>
 		<?php endif; ?>
 		<?php wp_head(); ?>
 		<?php
 		// Keep the following line after `wp_head()` call, to ensure it's not overridden by another templates.
-		echo \Elementor\Utils::get_meta_viewport( 'canvas' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo \Elementor\Utils::get_meta_viewport( 'canvas' );
 		?>
 	</head>
 	<body <?php body_class(); ?>>
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		jet_woo_builder()->admin_bar->register_post_item( $template );
 
-		echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo jet_woo_builder_template_functions()->get_woo_builder_content( $template );
 
 		do_action( 'jet-woo-builder/blank-page/after-content' );
 

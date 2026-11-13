@@ -41,14 +41,6 @@ class Jet_Elements_Download_Button extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-download-button' ); 
-	}
-
 	protected function register_controls() {
 
 		$this->start_controls_section(
@@ -111,16 +103,6 @@ class Jet_Elements_Download_Button extends Jet_Elements_Base {
 		);
 
 		$this->add_control(
-			'download_file_name',
-			array(
-				'label'        => esc_html__( 'Add Download Name', 'jet-elements' ),
-				'type'         => Controls_Manager::SWITCHER,
-				'return_value' => 'true',
-				'default'      => '',
-			)
-		);
-
-		$this->add_control(
 			'download_link_rel',
 			array(
 				'label'        => esc_html__( 'Add nofollow', 'jet-elements' ),
@@ -148,7 +130,6 @@ class Jet_Elements_Download_Button extends Jet_Elements_Base {
 				'icon'            => '.jet-download__icon',
 				'button_label'    => '.jet-download__label',
 				'button_sublabel' => '.jet-download__sub-label',
-				'button_filename' => '.jet-download__file-name',
 			)
 		);
 
@@ -442,40 +423,6 @@ class Jet_Elements_Download_Button extends Jet_Elements_Base {
 			50
 		);
 
-		$this->_add_control(
-			'button_filename',
-			array(
-				'label'     => esc_html__( 'Button Download Name', 'jet-elements' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-			),
-			25
-		);
-
-		$this->_add_control(
-			'button_filename_color',
-			array(
-				'label'     => esc_html__( 'Text Color', 'jet-elements' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['button_filename'] => 'color: {{VALUE}}',
-				),
-			),
-			25
-		);
-
-		$this->_add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'     => 'button_filename_typography',
-				'selector' => '{{WRAPPER}}  ' . $css_scheme['button_filename'],
-				'global' => array(
-					'default' => Global_Typography::TYPOGRAPHY_ACCENT,
-				),
-			),
-			50
-		);
-
 		$this->_end_controls_tab();
 
 		$this->_start_controls_tab(
@@ -655,8 +602,6 @@ class Jet_Elements_Download_Button extends Jet_Elements_Base {
 			$size = jet_elements_download_handler()->get_file_size( $id );
 			$text = str_replace( '%size%', $size, $text );
 		}
-
-		$text = apply_filters( 'jet-elements/download-button/label', $text, $id );
 
 		return $text;
 	}

@@ -12,6 +12,7 @@ use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
+use Elementor\Core\Schemes\Typography as Scheme_Typography;
 use Elementor\Widget_Base;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
@@ -255,7 +256,7 @@ class Jet_Search_Search_Suggestions_Widget extends Jet_Search_Widget_Base {
 				'max'       => 50,
 				'min'       => 1,
 				'condition' => array(
-					'search_suggestions_list_inline!'     => 'manual',
+					'search_suggestions_list_inline!' => 'manual',
 					'show_search_suggestions_list_inline' => 'yes',
 				),
 			)
@@ -270,22 +271,7 @@ class Jet_Search_Search_Suggestions_Widget extends Jet_Search_Widget_Base {
 				'type'        => Controls_Manager::TEXTAREA,
 				'default'     => esc_html__( '', 'jet-search' ),
 				'condition'   => array(
-					'search_suggestions_list_inline'      => 'manual',
-					'show_search_suggestions_list_inline' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'search_suggestions_list_inline_item_title_length',
-			array(
-				'label'       => esc_html__( 'Maximum Word Length for Suggestion Item Titles', 'jet-search' ),
-				'description' => esc_html__( 'Set 0 to show full length.', 'jet-search' ),
-				'type'        => Controls_Manager::NUMBER,
-				'default'     => 0,
-				'min'         => 0,
-				'condition'   => array(
-					'search_suggestions_list_inline!'     => 'manual',
+					'search_suggestions_list_inline' => 'manual',
 					'show_search_suggestions_list_inline' => 'yes',
 				),
 			)
@@ -349,33 +335,28 @@ class Jet_Search_Search_Suggestions_Widget extends Jet_Search_Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'search_suggestions_list_on_focus_item_title_length',
-			array(
-				'label'       => esc_html__( 'Maximum Word Length for Suggestion Item Titles', 'jet-search' ),
-				'description' => esc_html__( 'Set 0 to show full length.', 'jet-search' ),
-				'type'        => Controls_Manager::NUMBER,
-				'default'     => 0,
-				'min'         => 0,
-				'condition'   => array(
-					'search_suggestions_list_on_focus!'     => 'manual',
-					'show_search_suggestions_list_on_focus' => 'yes',
-				),
-				'separator'   => 'before',
-			)
-		);
+		// $this->add_control(
+		// 	'search_results_url',
+		// 	array(
+		// 		'label'       => esc_html__( 'Search results URL', 'jet-search' ),
+		// 		'label_block' => true,
+		// 		'type'        => Controls_Manager::TEXTAREA,
+		// 		'default'     => esc_html__( '', 'jet-search' ),
+		// 		'separator' => 'before',
+		// 	)
+		// );
 
 		$this->add_control(
 			'manage_saved_suggestions',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => sprintf(
-					esc_html__( 'Manage Saved Suggestions %1$s', 'jet-search' ),
-					'<a target="_blank" href="' . jet_search_settings()->get_settings_page_link() . '">' . esc_html__( 'here', 'jet-search' ) . '</a>'
-				),
-				'separator' => 'before',
-			)
-		);
+				array(
+					'type' => Controls_Manager::RAW_HTML,
+					'raw'  => sprintf(
+						esc_html__( 'Manage Saved Suggestions %1$s', 'jet-search' ),
+						'<a target="_blank" href="' . jet_search_settings()->get_settings_page_link() . '">' . esc_html__( 'here', 'jet-search' ) . '</a>'
+					),
+					'separator' => 'before',
+				)
+			);
 
 		$this->end_controls_section();
 
@@ -1478,7 +1459,7 @@ class Jet_Search_Search_Suggestions_Widget extends Jet_Search_Widget_Base {
 		$this->add_responsive_control(
 			'inline_area_item_rows_gap',
 			array(
-				'label'      => esc_html__( 'Rows Gap', 'jet-search' ),
+				'label'      => esc_html__( 'Rows gap', 'jet-search' ),
 				'type'       => Controls_Manager::SLIDER,
 				'size_units' => array( 'px' ),
 				'range' => array(

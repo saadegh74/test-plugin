@@ -42,12 +42,8 @@ class Jet_Elements_Images_Layout extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
-	public function get_style_depends() { 
-		return array( 'jet-images-layout', 'jet-images-layout-skin' ); 
-	}
-
 	public function get_script_depends() {
-		return array( 'imagesloaded', 'jet-salvattore', 'jet-images-layout' );
+		return array( 'imagesloaded', 'jet-salvattore' );
 	}
 
 	/**
@@ -84,7 +80,7 @@ class Jet_Elements_Images_Layout extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'image_list' );
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$repeater->add_control(
 			'item_image',
@@ -964,16 +960,13 @@ class Jet_Elements_Images_Layout extends Jet_Elements_Base {
 		$module_settings = $this->get_settings();
 
 		$settings = array(
-			'layoutType'    => $this->ensure_allowed_value( $module_settings['layout_type'], array( 'masonry', 'grid', 'justify', 'list' ) ),
-			'justifyHeight' => absint( $module_settings['justify_height'] ),
+			'layoutType'    => $module_settings['layout_type'],
+			'justifyHeight' => $module_settings['justify_height'],
 		);
 
-		$settings = wp_json_encode( $settings );
+		$settings = json_encode( $settings );
 
-		// Escape the JSON string for safe use in HTML attributes
-		$data_settings_attribute = esc_attr( $settings );
-
-		return sprintf( 'data-settings=\'%1$s\'', $data_settings_attribute );
+		return sprintf( 'data-settings=\'%1$s\'', $settings );
 	}
 
 	/**
@@ -999,15 +992,12 @@ class Jet_Elements_Images_Layout extends Jet_Elements_Base {
 			$params[] = $image_data[1];
 			$params[] = $image_data[2];
 		} else {
-			$params[] = esc_url( $image_item['url'] );
+			$params[] = $image_item['url'];
 			$params[] = 1200;
 			$params[] = 800;
 		}
 
-		$params[0] = esc_url( $params[0] );
-		$params[1] = absint( $params[1] );
-		$params[2] = absint( $params[2] );
-		$alt       = esc_attr( Control_Media::get_image_alt( $image_item ) );
+		$alt = esc_attr( Control_Media::get_image_alt( $image_item ) );
 
 		$settings = $this->get_settings_for_display();
 

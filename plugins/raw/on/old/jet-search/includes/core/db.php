@@ -41,16 +41,6 @@ if ( ! class_exists( 'Jet_Search_DB' ) ) {
 						term text,
 						PRIMARY KEY  (id)
 					",
-				),
-				'search_suggestions_sessions' => array(
-					'name'        => $wpdb->prefix . $prefix . 'search_suggestions_sessions',
-					'export_name' => $prefix . 'search_suggestions_sessions',
-					'query'       => "
-						id int NOT NULL AUTO_INCREMENT,
-						token VARCHAR(255),
-						created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-						PRIMARY KEY  (id)
-					",
 				)
 			);
 
@@ -180,11 +170,9 @@ if ( ! class_exists( 'Jet_Search_DB' ) ) {
 
 			global $wpdb;
 
-			$table = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
-
-			if ( NULL != $table ) {
-				$result = ( strtolower( $table_name ) === strtolower( $table ) );
-			} else {
+			try {
+				$result = ( strtolower( $table_name ) === strtolower( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) ) );
+			} catch (Exception $e) {
 				$result = false;
 			}
 
@@ -249,36 +237,25 @@ if ( ! class_exists( 'Jet_Search_DB' ) ) {
 				return;
 			}
 
-			global $wpdb;
-
-			$where = array();
+			$query = ' WHERE ';
+			$glue  = '';
 
 			foreach ( $args as $key => $value ) {
 
-				$key = preg_replace( '/[^a-zA-Z0-9_]/', '', $key );
-
-				if ( empty( $key ) ) {
-					continue;
-				}
+				$query .= $glue;
 
 				if ( ! is_array( $value ) ) {
-					$where[] = $wpdb->prepare( "`{$key}` = %s", $value );
+					$query .= sprintf( '`%1$s` = \'%2$s\'', esc_sql( $key ), esc_sql( $value ) );
 				} else {
-					if ( empty( $value ) ) {
-						continue;
-					}
-
-					$placeholders = implode( ',', array_fill( 0, count( $value ), '%s' ) );
-					$where[]      = $wpdb->prepare( "`{$key}` IN ({$placeholders})", $value );
+					$value  = array_map( 'esc_sql', $value );
+					$query .= sprintf( '`%1$s` IN (%2$s)', esc_sql( $key ), implode( ',' , $value ) );
 				}
 
+				$glue   = ' AND ';
+
 			}
 
-			if ( empty( $where ) ) {
-				return;
-			}
-
-			return ' WHERE ' . implode( ' AND ', $where );
+			return $query;
 
 		}
 

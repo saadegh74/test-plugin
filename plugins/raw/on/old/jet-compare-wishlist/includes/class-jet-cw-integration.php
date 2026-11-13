@@ -3,10 +3,16 @@
  * Class Compare & Wishlist Integration
  */
 
-defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 
+	/**
+	 * Define Jet_CW_Integration class
+	 */
 	class Jet_CW_Integration {
 
 		/**
@@ -16,33 +22,47 @@ if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 		 */
 		private $is_elementor_ajax = false;
 
+		/**
+		 * Localize data array
+		 *
+		 * @var array
+		 */
+		public $localize_data = array();
+
+		/**
+		 * Initialize integration hooks
+		 *
+		 * @return void
+		 */
 		public function __construct() {
 
-			add_action( 'elementor/elements/categories_registered', [ $this, 'register_category' ] );
-			add_action( 'wp_ajax_elementor_render_widget', [ $this, 'set_elementor_ajax' ], 10, - 1 );
+			add_action( 'elementor/elements/categories_registered', array( $this, 'register_category' ) );
+
+			add_action( 'wp_ajax_elementor_render_widget', array( $this, 'set_elementor_ajax' ), 10, -1 );
 
 			if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '3.5.0', '>=' ) ) {
 				add_action( 'elementor/widgets/register', [ $this, 'register_cw_widgets' ], 10 );
+				add_action( 'elementor/widgets/register', [ $this, 'jet_cw_fix_wc_hooks' ], 10 );
 			} else {
 				add_action( 'elementor/widgets/widgets_registered', [ $this, 'register_cw_widgets' ], 10 );
+				add_action( 'elementor/widgets/widgets_registered', [ $this, 'jet_cw_fix_wc_hooks' ], 10 );
 			}
-
-			add_action( 'elementor/editor/after_enqueue_styles', [ $this, 'enqueue_icons_styles' ] );
-			add_action( 'elementor/preview/enqueue_styles', [ $this, 'enqueue_icons_styles' ] );
 
 		}
 
 		/**
-		 * Set $this->is_elementor_ajax to true on Elementor AJAX processing.
+		 * Set $this->is_elementor_ajax to true on Elementor AJAX processing
+		 *
+		 * @return  void
 		 */
 		public function set_elementor_ajax() {
 			$this->is_elementor_ajax = true;
 		}
 
 		/**
-		 * Check if we currently in Elementor mode.
+		 * Check if we currently in Elementor mode
 		 *
-		 * @return mixed|void
+		 * @return void
 		 */
 		public function in_elementor() {
 
@@ -50,7 +70,8 @@ if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 
 			if ( wp_doing_ajax() ) {
 				$result = $this->is_elementor_ajax;
-			} elseif ( Elementor\Plugin::instance()->editor->is_edit_mode() || Elementor\Plugin::instance()->preview->is_preview_mode() ) {
+			} elseif ( Elementor\Plugin::instance()->editor->is_edit_mode()
+				|| Elementor\Plugin::instance()->preview->is_preview_mode() ) {
 				$result = true;
 			}
 
@@ -63,8 +84,10 @@ if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 		/**
 		 * Register addon by file name
 		 *
-		 * @param string                     $file            File name.
-		 * @param \Elementor\Widgets_Manager $widgets_manager Widgets manager instance.
+		 * @param string $file            File name.
+		 * @param object $widgets_manager Widgets manager instance.
+		 *
+		 * @return void
 		 */
 		public function register_widgets( $file, $widgets_manager ) {
 
@@ -86,66 +109,47 @@ if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 		}
 
 		/**
-		 * Register cherry category for elementor if not exists.
+		 * Register cherry category for elementor if not exists
+		 *
+		 * @return void
 		 */
 		public function register_category() {
-			\Elementor\Plugin::instance()->elements_manager->add_category(
-				'jet-cw',
-				[
-					'title' => __( 'Jet Compare Wishlist', 'jet-cw' ),
+
+			$elements_manager = Elementor\Plugin::instance()->elements_manager;
+			$cherry_cat       = 'jet-cw';
+
+			$elements_manager->add_category(
+				$cherry_cat,
+				array(
+					'title' => esc_html__( 'Jet Compare Wishlist', 'jet-cw' ),
 					'icon'  => 'font',
-				]
+				)
 			);
+
 		}
 
 		/**
-		 * Widgets with styles.
+		 * Fix WooCommerce hooks for wordpress themes
 		 *
-		 * This method returns the list of all the widgets that have styles.
-		 *
-		 * @since 1.5.8
-		 *
-		 * @return array The names of the widgets that have styles.
+		 * @return void
 		 */
-		public function widgets_with_styles(): array {
-			return [
-				'compare',
-				'cw-button',
-				'cw-count-button',
-				'wishlist',
-			];
-		}
-
-		/**
-		 * Enqueue icons styles.
-		 *
-		 * @since 1.5.7
-		 */
-		public function enqueue_icons_styles() {
-			wp_enqueue_style(
-				'jet-cw-icons',
-				jet_cw()->plugin_url( 'assets/lib/jet-cw-icons/icons.css' ),
-				false,
-				jet_cw()->get_version()
-			);
-		}
-
-		/**
-		 * Register plugin widgets.
-		 *
-		 * @since 1.0.0
-		 * @since 1.5.6 Added theme fix and fixed typos.
-		 *
-		 * @param \Elementor\Widgets_Manager $widgets_manager Elementor widgets manager instance.
-		 */
-		public function register_cw_widgets( $widgets_manager ) {
-
-			// Fix WooCommerce hooks for Kava theme.
+		public function jet_cw_fix_wc_hooks() {
+			// Fix WooCommerce hooks for kava theme
 			if ( function_exists( 'kava_theme' ) ) {
 				remove_action( 'woocommerce_after_shop_loop_item', 'woocommerce_template_loop_rating', 20 );
 			}
+		}
 
-			$available_widgets = jet_cw()->settings->get( 'avaliable_widgets' );
+		/**
+		 * Register plugin addons
+		 *
+		 * @param object $widgets_manager Elementor widgets manager instance.
+		 *
+		 * @return void
+		 */
+		public function register_cw_widgets( $widgets_manager ) {
+
+			$avaliable_widgets = jet_cw()->settings->get( 'avaliable_widgets' );
 
 			require jet_cw()->plugin_path( 'includes/base/class-jet-cw-base.php' );
 
@@ -153,8 +157,8 @@ if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 				foreach ( glob( jet_cw()->plugin_path( 'includes/widgets/compare/' ) . '*.php' ) as $file ) {
 					$slug = basename( $file, '.php' );
 
-					if ( filter_var( $available_widgets[ $slug ], FILTER_VALIDATE_BOOLEAN ) || ! $available_widgets ) {
-						$this->register_widgets( $file, $widgets_manager );
+					if ( filter_var( $avaliable_widgets[ $slug ], FILTER_VALIDATE_BOOLEAN ) || ! $avaliable_widgets ) {
+						jet_cw()->integration->register_widgets( $file, $widgets_manager );
 					}
 				}
 			}
@@ -163,8 +167,8 @@ if ( ! class_exists( 'Jet_CW_Integration' ) ) {
 				foreach ( glob( jet_cw()->plugin_path( 'includes/widgets/wishlist/' ) . '*.php' ) as $file ) {
 					$slug = basename( $file, '.php' );
 
-					if ( filter_var( $available_widgets[ $slug ], FILTER_VALIDATE_BOOLEAN ) || ! $available_widgets ) {
-						$this->register_widgets( $file, $widgets_manager );
+					if ( filter_var( $avaliable_widgets[ $slug ], FILTER_VALIDATE_BOOLEAN ) || ! $avaliable_widgets ) {
+						jet_cw()->integration->register_widgets( $file, $widgets_manager );
 					}
 				}
 			}

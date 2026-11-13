@@ -34,19 +34,8 @@ class Jet_Woo_Builder_Products_Ordering extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-and-set-a-shop-page-template/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ]; 
-
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'shop' );
+		return jet_woo_builder()->documents->is_document_type( 'shop' );
 	}
 
 	protected function register_controls() {
@@ -68,15 +57,6 @@ class Jet_Woo_Builder_Products_Ordering extends Jet_Woo_Builder_Base {
 			[
 				'label' => __( 'Select', 'jet-woo-builder' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
-			]
-		);
-
-		$this->add_control(
-			'ordering_notice',
-			[
-				'type'            => Controls_Manager::RAW_HTML,
-				'raw'             => __( "Note: If you're using this widget with Product Grid or Product List, make sure the “Use Current Query” option is turned on in those widgets so the sorting works correctly.", 'jet-woo-builder' ),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 			]
 		);
 

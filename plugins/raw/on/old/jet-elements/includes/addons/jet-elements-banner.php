@@ -42,14 +42,6 @@ class Jet_Elements_Banner extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-banner' ); 
-	}
-	
 	protected function register_controls() {
 
 		$this->start_controls_section(
@@ -615,11 +607,11 @@ class Jet_Elements_Banner extends Jet_Elements_Base {
 		$format = apply_filters( 'jet-elements/banner/image-format', '<img src="%1$s" alt="%2$s" width="%3$s" height="%3$s" class="jet-banner__img">' );
 
 		if ( empty( $image['id'] ) && empty( $image['url'] ) ) {
-			return sprintf( $format, esc_url( Utils::get_placeholder_image_src() ), '', '' );
+			return sprintf( $format, Utils::get_placeholder_image_src(), '', '' );
 		}
 
 		if ( empty( $image['id'] ) ) {
-			return sprintf( $format, esc_url( $image['url'] ), '', '');
+			return sprintf( $format, $image['url'], '', '');
 		}
 
 		$size = $this->get_settings_for_display( 'banner_image_size' );
@@ -632,7 +624,7 @@ class Jet_Elements_Banner extends Jet_Elements_Base {
 		$alt       = esc_attr( Control_Media::get_image_alt( $image ) );
 		$attr      = '100%';
 
-		return sprintf( $format, esc_url( $image_url ), $alt, esc_attr( $attr ) );
+		return sprintf( $format, $image_url, $alt, $attr );
 	}
 
 }

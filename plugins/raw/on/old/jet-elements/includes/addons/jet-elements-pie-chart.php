@@ -53,21 +53,13 @@ class Jet_Elements_Pie_Chart extends Jet_Elements_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetelements-pie-chart-widget-how-to-display-your-statistical-data-with-a-chart/';
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-charts' ); 
-	}
-
 	/**
 	 * Retrieve the list of scripts the widget depended on.
 	 *
 	 * @return array
 	 */
 	public function get_script_depends() {
-		return array( 'chart-js', 'jet-pie-chart' );
+		return array( 'chart-js' );
 	}
 
 	/**
@@ -101,7 +93,7 @@ class Jet_Elements_Pie_Chart extends Jet_Elements_Base {
 			)
 		);
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$repeater->add_control(
 			'label',
@@ -743,7 +735,7 @@ class Jet_Elements_Pie_Chart extends Jet_Elements_Base {
 		}
 
 		if ( 'before' === $settings['chart_title_position'] ) {
-			echo $this->get_chart_title(); // phpcs:ignore
+			echo $this->get_chart_title();
 		}
 		?>
 
@@ -754,7 +746,7 @@ class Jet_Elements_Pie_Chart extends Jet_Elements_Base {
 		<?php
 
 		if ( 'after' === $settings['chart_title_position'] ) {
-			echo $this->get_chart_title(); // phpcs:ignore
+			echo $this->get_chart_title();
 		}
 
 		$this->_close_wrap();
@@ -988,14 +980,6 @@ class Jet_Elements_Pie_Chart extends Jet_Elements_Base {
 			'<div class="jet-pie-chart-title-container"><%1$s class="jet-pie-chart-title">%2$s</%1$s></div>'
 		);
 
-		$title_control = $this->get_controls( 'chart_title_size' );
-		$title_options = $title_control['options'];
-		$title_tag = $settings['chart_title_size'];
-
-		if ( ! is_string( $title_tag ) || ! array_key_exists( $title_tag, $title_options ) ) {
-			$title_tag = $title_control['default'];
-		}
-
-		return sprintf( $title_format, jet_elements_tools()->validate_html_tag( $title_tag ), wp_kses_post( $settings['chart_title'] ) );
+		return sprintf( $title_format, jet_elements_tools()->validate_html_tag( $settings['chart_title_size'] ), $settings['chart_title'] );
 	}
 }

@@ -21,7 +21,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Jet_Engine' ) ) {
 
 			if ( ! jet_smart_filters()->query->is_ajax_filter() ) {
 				add_filter('jet-engine/listing/grid/posts-query-args', array( $this, 'store_default_query' ), 0, 2 );
-				add_filter('jet-engine/listing/grid/terms-query-args', array( $this, 'store_default_query' ), 0, 2 );
 			}
 		}
 
@@ -51,14 +50,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Jet_Engine' ) ) {
 			$is_archive_template = isset( $settings['is_archive_template'] ) ? filter_var( $settings['is_archive_template'], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			if ( $is_archive_template ) {
-				$args['is_archive_template'] = true;
-
 				jet_smart_filters()->query->set_props(
 					$this->get_id(),
 					array(
-						'found_posts'   => isset( $args['found_posts'] ) ? absint( $args['found_posts'] ) : 0,
-						'max_num_pages' => isset( $args['max_num_pages'] ) ? absint( $args['max_num_pages'] ) : 1,
-						'page'          => jet_smart_filters()->query->get_current_page( ! empty( $args['paged'] ) ? $args['paged'] : false ),
+						'found_posts'   => $args['found_posts'],
+						'max_num_pages' => $args['max_num_pages'],
+						'page'          => $args['paged'],
 					),
 					$query_id
 				);
@@ -139,17 +136,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Jet_Engine' ) ) {
 			}
 
 			add_filter( 'jet-engine/listing/grid/posts-query-args', array( $this, 'add_query_args' ), 10, 2 );
-			add_filter( 'jet-engine/listing/grid/terms-query-args', array( $this, 'add_alphabet_terms_query_args' ), 10, 2 );
 
 			if ( jet_engine()->has_elementor() ) {
 				Elementor\Plugin::instance()->frontend->start_excerpt_flag( null );
 			}
 
-			$verified_settings = jet_smart_filters()->query->get_query_settings();
-			$attrs = $verified_settings
-				? $this->sanitize_settings( $verified_settings )
-				: array();
-
+			$attrs  = isset( $_REQUEST['settings'] ) ? $this->sanitize_settings( $_REQUEST['settings'] ) : array();
 			$render = jet_engine()->listings->get_render_instance( 'listing-grid', $attrs );
 
 			$render->render();
@@ -211,35 +203,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Jet_Engine' ) ) {
 			}
 
 			add_filter( 'jet-engine/listing/grid/posts-query-args', array( $this, 'add_query_args' ), 20, 2 );
-			add_filter( 'jet-engine/listing/grid/terms-query-args', array( $this, 'add_alphabet_terms_query_args' ), 20, 2 );
-		}
-
-		/**
-		 * Add Alphabet arguments to JetEngine term listing queries.
-		 */
-		public function add_alphabet_terms_query_args( $args, $widget ) {
-
-			if ( 'jet-listing-grid' !== $widget->get_name() ) {
-				return $args;
-			}
-
-			if ( ! jet_smart_filters()->query->is_ajax_filter() ) {
-				$settings = $widget->get_settings();
-				$query_id = empty( $settings['_element_id'] ) ? 'default' : $settings['_element_id'];
-
-				if ( $query_id !== jet_smart_filters()->query->get_current_provider( 'query_id' ) ) {
-					return $args;
-				}
-			}
-
-			$args = jet_smart_filters()->query->merge_alphabet_query_args( $args );
-
-			if ( jet_smart_filters()->query->is_ajax_filter() ) {
-				remove_filter( 'jet-engine/listing/grid/terms-query-args', array( $this, 'add_alphabet_terms_query_args' ), 10 );
-				remove_filter( 'jet-engine/listing/grid/posts-query-args', array( $this, 'add_query_args' ), 10 );
-			}
-
-			return $args;
 		}
 
 		/**
@@ -311,52 +274,21 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Jet_Engine' ) ) {
 				if ( $is_archive_template ) {
 					global $wp_query;
 
-					$is_wc_products_query = $wp_query->get( 'wc_query' ) || jet_smart_filters()->utils->is_wc_products_query( $wp_query );
-					$archive_query_vars   = $is_wc_products_query
-						? jet_smart_filters()->utils->merge_query_args( $wp_query->query_vars, jet_smart_filters()->query->get_query_args() )
-						: array_merge( $wp_query->query_vars, jet_smart_filters()->query->get_query_args() );
-
+					$archive_query_vars = array_merge( $wp_query->query_vars, jet_smart_filters()->query->get_query_args() );
 					$archive_query_vars = $this->query_maybe_has_offset( $archive_query_vars );
 
-					if ( $is_wc_products_query ) {
-						$archive_query_vars['suppress_filters'] = true;
-					}
-
 					$wp_query = new WP_Query( $archive_query_vars );
-
-					jet_smart_filters()->query->set_props(
-						$this->get_id(),
-						array(
-							'found_posts'   => absint( $wp_query->found_posts ),
-							'max_num_pages' => absint( $wp_query->max_num_pages ),
-							'page'          => jet_smart_filters()->query->get_current_page( $wp_query->get( 'paged' ) ),
-						),
-						$query_id
-					);
 
 					return $archive_query_vars;
 				}
 			}
 
-			$query_args = jet_smart_filters()->utils->merge_query_args( $args, jet_smart_filters()->query->get_query_args() );
-			$query_args = $this->query_maybe_has_offset( $query_args );
-
 			if ( jet_smart_filters()->query->is_ajax_filter() ) {
 				remove_filter( 'jet-engine/listing/grid/posts-query-args', array( $this, 'add_query_args' ), 10, 2 );
-				remove_filter( 'jet-engine/listing/grid/terms-query-args', array( $this, 'add_alphabet_terms_query_args' ), 10 );
-
-				if (
-					isset( $query_args['is_archive_template'] )
-					&&
-					isset( $query_args['meta_key'] ) && $query_args['meta_key'] === 'total_sales'
-				) {
-					add_filter('posts_orderby', function( $orderby ) {
-						return $orderby
-							? $orderby . ', wp_posts.ID DESC'
-							: $orderby;
-					} );
-				}
 			}
+
+			$query_args = jet_smart_filters()->utils->merge_query_args( $args, jet_smart_filters()->query->get_query_args() );
+			$query_args = $this->query_maybe_has_offset( $query_args );
 
 			return $query_args;
 		}

@@ -32,7 +32,7 @@ class Jet_Woo_Builder_Single_Sharing extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'single' );
+		return jet_woo_builder()->documents->is_document_type( 'single' );
 	}
 
 	protected function register_controls() {

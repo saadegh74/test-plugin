@@ -40,7 +40,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Compare_Wishlist_Package' ) ) {
 				add_filter( 'jet-woo-builder/shortcodes/query-types', [ $this, 'add_cw_products_query_type' ] );
 				add_filter( 'jet-woo-builder/shortcodes/jet-woo-products/query-type/query-args', [ $this, 'handle_cw_products_query_type_args' ], 10, 2 );
 				add_filter( 'jet-woo-builder/shortcodes/jet-woo-products-list/query-type/query-args', [ $this, 'handle_cw_products_query_type_args' ], 10, 2 );
-				add_filter( 'jet-woo-builder/compatibility/jet-popup/style-dependencies', [ $this, 'add_cw_quickview_style_dependencies' ] );
 
 				$this->update_templates_options();
 			}
@@ -189,25 +188,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Compare_Wishlist_Package' ) ) {
 
 		}
 
-		/**
-		 * Add Compare & Wishlist style dependencies for JetPopup Quick View.
-		 *
-		 * Adds required styles from JetCompareWishlist plugin
-		 * to ensure proper styling of buttons and frontend elements
-		 * inside JetPopup quick view templates.
-		 *
-		 * @since  2.1.20
-		 * @access public
-		 *
-		 * @param array $deps List of current style dependencies.
-		 *
-		 * @return array Modified list with added CW styles.
-		 */
-		public function add_cw_quickview_style_dependencies( $deps ) {
-
-			return array_merge( $deps, [ 'jet-cw-frontend', 'jet-cw-widget-cw-button' ] );
-
-		}
 	}
 
 }

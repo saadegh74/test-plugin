@@ -31,10 +31,10 @@ if ( isset( $settings['is_linked_image'] ) && 'yes' === $settings['is_linked_ima
 	<?php
 	do_action( 'jet-woo-builder/templates/products-list/before-item-thumbnail' );
 
-	echo wp_kses_post( $open_link . $thumbnail . $close_link );
+	echo $open_link . $thumbnail . $close_link;
 
 	if ( ! empty( $sale_badge ) && 'yes' === $this->get_attr( 'show_badges' ) ) {
-		echo sprintf( '<div class="jet-woo-product-badges">%s</div>', wp_kses_post( $sale_badge ) );
+		echo sprintf( '<div class="jet-woo-product-badges">%s</div>', $sale_badge );
 	}
 
 	do_action( 'jet-woo-builder/templates/products-list/after-item-thumbnail' );

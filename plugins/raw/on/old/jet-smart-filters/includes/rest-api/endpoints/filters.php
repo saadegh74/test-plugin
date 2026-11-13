@@ -64,25 +64,25 @@ class Filters extends Base {
 		$args = $request->get_params();
 
 		// Actions
-		$restore = ! empty( $args['restore'] ) ? $args['restore'] : false;
+		$restore = $args['restore'];
 		if ( $restore ) {
 			unset( $args['restore'] );
 			jet_smart_filters()->services->filters->restore( $restore );
 		}
 
-		$move_to_trash = ! empty( $args['move_to_trash'] ) ? $args['move_to_trash'] : false;
+		$move_to_trash = $args['move_to_trash'];
 		if ( $move_to_trash ) {
 			unset( $args['move_to_trash'] );
 			jet_smart_filters()->services->filters->move_to_trash( $move_to_trash );
 		}
 
-		$delete = ! empty( $args['delete'] ) ? $args['delete'] : false;
+		$delete = $args['delete'];
 		if ( $delete ) {
 			unset( $args['delete'] );
 			jet_smart_filters()->services->filters->delete( $delete );
 		}
 
-		$update = ! empty( $args['update'] ) ? $args['update'] : false;
+		$update = $args['update'];
 		if ( $update ) {
 			unset( $args['update'] );
 			if ( isset( $update['id'] ) && isset( $update['data'] ) ) {

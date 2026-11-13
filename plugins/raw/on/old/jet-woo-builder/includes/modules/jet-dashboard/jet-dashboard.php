@@ -2,7 +2,7 @@
 /**
  * Jet Dashboard Module
  *
- * Version: 2.2.0
+ * Version: 2.1.5.1
  */
 
 namespace Jet_Dashboard;
@@ -46,7 +46,7 @@ class Dashboard {
 	 *
 	 * @var string
 	 */
-	protected $version = '2.1.7';
+	protected $version = '2.1.5.1';
 
 	/**
 	 * [$dashboard_slug description]
@@ -250,8 +250,8 @@ class Dashboard {
 	public function register_page() {
 
 		add_menu_page(
-			esc_html__( 'افزونه های جت', 'jet-dashboard' ),
-			esc_html__( 'افزونه های جت', 'jet-dashboard' ),
+			esc_html__( 'Crocoblock', 'jet-dashboard' ),
+			esc_html__( 'Crocoblock', 'jet-dashboard' ),
 			'manage_options',
 			$this->dashboard_slug,
 			function() {
@@ -263,13 +263,11 @@ class Dashboard {
 
 		add_submenu_page(
 			$this->dashboard_slug,
-			esc_html__( 'داشبورد', 'jet-dashboard' ),
-			esc_html__( 'داشبورد', 'jet-dashboard' ),
+			esc_html__( 'Dashboard', 'jet-dashboard' ),
+			esc_html__( 'Dashboard', 'jet-dashboard' ),
 			'manage_options',
 			$this->dashboard_slug
 		);
-		
-		
 
 		do_action( 'jet-dashboard/after-page-registration', $this );
 	}

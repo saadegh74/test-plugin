@@ -34,7 +34,7 @@ class Jet_Woo_Builder_ThankYou_Customer_Address_Details extends Jet_Woo_Builder_
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'thankyou' );
+		return jet_woo_builder()->documents->is_document_type( 'thankyou' );
 	}
 
 	protected function register_controls() {

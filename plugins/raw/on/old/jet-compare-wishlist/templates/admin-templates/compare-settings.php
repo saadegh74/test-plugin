@@ -9,8 +9,8 @@
 <div id="jet-cw-settings-page jet-cw-settings-page__compare">
 	<cx-vui-switcher
 		name="enable_compare"
-		label="<?php esc_html_e( 'Enable Compare', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Enable compare functionality.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Enable Compare', 'jet-cw' ); ?>"
+		description="<?php _e( 'Enable compare functionality.', 'jet-cw' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"
@@ -20,8 +20,8 @@
 	<cx-vui-select
 		v-if="pageOptions.enable_compare.value === 'true'"
 		name="compare_store_type"
-		label="<?php esc_html_e( 'Store type', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Select store type for compare.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Store type', 'jet-cw' ); ?>"
+		description="<?php _e( 'Select store type for compare.', 'jet-cw' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		size="fullwidth"
 		:options-list="pageOptions.compare_store_type.options"
@@ -31,8 +31,8 @@
 	<cx-vui-switcher
 		v-if="pageOptions.enable_compare.value === 'true'"
 		name="save_user_compare_list"
-		label="<?php esc_html_e( 'Save the list for logged users', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Enable this option if you want save compare list for logged users.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Save the list for logged users', 'jet-cw' ); ?>"
+		description="<?php _e( 'Enable this option if you want save compare list for logged users.', 'jet-cw' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"
@@ -42,8 +42,8 @@
 	<cx-vui-select
 		v-if="pageOptions.enable_compare.value === 'true'"
 		name="compare_page"
-		label="<?php esc_html_e( 'Compare Page', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Choose compare page.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Compare Page', 'jet-cw' ); ?>"
+		description="<?php _e( 'Choose compare page.', 'jet-cw' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		size="fullwidth"
 		:options-list="pageOptions.compare_page.options"
@@ -53,8 +53,8 @@
 	<cx-vui-select
 		v-if="pageOptions.enable_compare.value === 'true'"
 		name="compare_page_max_items"
-		label="<?php esc_html_e( 'Count products to compare', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Count products to show in compare widget.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Count products to compare', 'jet-cw' ); ?>"
+		description="<?php _e( 'Count products to show in compare widget.', 'jet-cw' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		size="fullwidth"
 		:options-list="pageOptions.compare_page_max_items.options"
@@ -64,8 +64,8 @@
 	<cx-vui-input
 		v-if="pageOptions.enable_compare.value === 'true'"
 		name="compare_message_max_items"
-		label="<?php esc_html_e( 'Compare Message', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Message that will show when you reach max products count in compare list.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Compare Message', 'jet-engine' ); ?>"
+		description="<?php _e( 'Message that will show when you reach max products count in compare list.', 'jet-engine' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		size="fullwidth"
 		v-model="pageOptions.compare_message_max_items.value"
@@ -74,8 +74,8 @@
 	<cx-vui-switcher
 		v-if="pageOptions.enable_compare.value === 'true'"
 		name="add_default_compare_button"
-		label="<?php esc_html_e( 'Add default Compare Button', 'jet-cw' ); ?>"
-		description="<?php esc_html_e( 'Add compare button to default WooCommerce templates.', 'jet-cw' ); ?>"
+		label="<?php _e( 'Add default Compare Button', 'jet-cw' ); ?>"
+		description="<?php _e( 'Add compare button to default WooCommerce templates.', 'jet-cw' ); ?>"
 		:wrapper-css="[ 'equalwidth' ]"
 		return-true="true"
 		return-false="false"

@@ -58,8 +58,7 @@
 						data: {
 							action:     self.model.get( 'action' ),
 							query_type: self.model.get( 'query_type' ),
-							post_type:  self.elementSettingsModel.attributes['search_source'],
-							ids:        query_ids
+							ids:  query_ids
 						},
 						beforeSend: function() {
 							self.ui.select.prop( 'disabled', true );

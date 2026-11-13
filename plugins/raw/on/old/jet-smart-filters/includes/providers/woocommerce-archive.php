@@ -1,7 +1,7 @@
 <?php
 /**
  * Class: Jet_Smart_Filters_Provider_WooCommerce_Archive
- * Name: WooCommerce Archive (JetWooBuilder)
+ * Name: WooCommerce Archive (Jet Woo Builder)
  */
 
 // If this file is called directly, abort.
@@ -21,8 +21,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 
 			if ( ! jet_smart_filters()->query->is_ajax_filter() ) {
 				//add_filter( 'posts_pre_query', array( $this, 'store_archive_query' ), 0, 2 );
-				//add_action( 'woocommerce_product_loop_start', array( $this, 'store_props' ) );
-				add_filter( 'the_posts', array( $this, 'store_props' ), 999, 2 );
 				add_filter( 'woocommerce_product_query', array( $this, 'store_archive_query' ) );
 				add_filter( 'woocommerce_shop_loop', array( $this, 'set_loop_props' ) );
 				add_action( 'elementor/widget/before_render_content', array( $this, 'store_default_settings' ), 0 );
@@ -38,15 +36,23 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 				return;
 			}
 
-			$query_id         = $this->helpers->elementor->get_widget_query_id( $widget );
+			$settings         = $widget->get_settings();
 			$store_settings   = $this->settings_to_store();
-			$default_settings = $this->helpers->elementor->get_widget_settings_for_storage( $widget, $store_settings, function( $key, $settings ) {
-				if ( 'switcher_enable' !== $key ) {
-					return null;
-				}
+			$default_settings = array();
 
-				return isset( $settings[ $key ] ) ? filter_var( $settings[ $key ], FILTER_VALIDATE_BOOLEAN ) : '';
-			} );
+			if ( ! empty( $settings['_element_id'] ) ) {
+				$query_id = $settings['_element_id'];
+			} else {
+				$query_id = 'default';
+			}
+
+			foreach ( $store_settings as $key ) {
+				if ( $key === 'switcher_enable' ) {
+					$default_settings[ $key ] = isset( $settings[ $key ] ) ? filter_var( $settings[$key], FILTER_VALIDATE_BOOLEAN ) : '';
+				} else {
+					$default_settings[ $key ] = isset( $settings[ $key ] ) ? $settings[ $key ] : '';
+				}
+			}
 
 			$default_settings['_el_widget_id'] = $widget->get_id();
 
@@ -116,6 +122,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 
 			$default_query = array(
 				'post_type'         => $query->get( 'post_type' ),
+				'post_status'       => 'publish',
 				'wc_query'          => $query->get( 'wc_query' ),
 				'tax_query'         => $query->get( 'tax_query' ),
 				'orderby'           => $query->get( 'orderby' ),
@@ -125,11 +132,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 				'jet_smart_filters' => $this->get_id(),
 			);
 
-			if ( $query->get( 'post_status' ) ) {
-				$default_query['post_status'] = $query->get( 'post_status' );
-			}
-
-			if ( ! empty( $query->queried_object ) && $query->queried_object instanceof WP_Term ) {
+			if ( ! empty( $query->queried_object ) ) {
 				$default_query['taxonomy'] = $query->queried_object->taxonomy;
 				$default_query['term']     = $query->queried_object->slug;
 			}
@@ -252,43 +255,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 			Elementor\Jet_Woo_Builder_Products_Loop::products_loop();
 
 			remove_action( 'woocommerce_before_shop_loop', array( $this, 'add_loop_data' ), 0 );
-			add_filter( 'jet-smart-filters/render/ajax/data', array( $this, 'add_result_count_fragment' ), 99999 );
 
 			do_action( 'jet-smart-filters/providers/woocommerce-archive/after-ajax-content' );
-		}
-
-		/**
-		 * Check if current Woo loop represents the main archive query.
-		 *
-		 * JetWooBuilder stores `is_shortcode` in loop props. For the main archive
-		 * query this value is false, while shortcode-based loops set it to true.
-		 *
-		 * @return bool
-		 */
-		public function is_main_archive_loop() {
-
-			$query_props = jet_smart_filters()->query->get_current_query_props();
-
-			if ( ! array_key_exists( 'is_shortcode', $query_props ) ) {
-				return true;
-			}
-
-			return ! filter_var( $query_props['is_shortcode'], FILTER_VALIDATE_BOOLEAN );
-		}
-
-		/**
-		 * Append updated WooCommerce result count fragment to AJAX response.
-		 *
-		 * @param array $data AJAX response data.
-		 * @return array
-		 */
-		public function add_result_count_fragment( $data ) {
-
-			if ( ! $this->is_main_archive_loop() ) {
-				return $data;
-			}
-
-			return $this->helpers->woocommerce->add_result_count_fragment( $data );
 		}
 
 		/**
@@ -309,28 +277,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 		/**
 		 * Store query ptoperties
 		 */
-		public function store_props( $posts, $query ) {
+		public function store_props() {
 
-			if ( ! $query->get( 'wc_query' ) && ! $query->get( 'jet_smart_filters' ) ) {
-				return $posts;
-			}
-
-			if ( ! in_array( $query->get( 'jet_smart_filters' ), array( 'woocommerce-archive', 'default-woo-archive' ) ) ) {
-				return $posts;
-			}
-
-			jet_smart_filters()->query->set_props(
-				$this->get_id(),
-				array(
-					'found_posts'   => $query->found_posts,
-					'max_num_pages' => $query->max_num_pages,
-					'page'          => jet_smart_filters()->query->get_current_page(
-						$query->get( 'paged' )
-					),
-				)
-			);
-
-			/* global $woocommerce_loop;
+			global $woocommerce_loop;
 
 			jet_smart_filters()->query->set_props(
 				$this->get_id(),
@@ -339,9 +288,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 					'max_num_pages' => $woocommerce_loop['total_pages'],
 					'page'          => $woocommerce_loop['current_page'],
 				)
-			); */
-
-			return $posts;
+			);
 		}
 
 		/**
@@ -395,13 +342,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 		 */
 		public function add_query_args( $query ) {
 
-			if ( ! $query->is_main_query() || ! $query->get( 'wc_query' ) ) {
+			if ( ! $query->get( 'wc_query' ) ) {
 				return;
 			}
 
-			$jet_query_args = jet_smart_filters()->query->get_query_args();
-
-			foreach ( $jet_query_args as $query_var => $value ) {
+			foreach ( jet_smart_filters()->query->get_query_args() as $query_var => $value ) {
 				if ( in_array( $query_var, array( 'tax_query', 'meta_query' ) ) ) {
 					$current = $query->get( $query_var );
 
@@ -412,13 +357,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_WooCommerce_Archive' ) ) {
 					$query->set( $query_var, $value );
 				} else {
 					$query->set( $query_var, $value );
-				}
-			}
-
-			foreach ( ['orderby', 'order'] as $value ) {
-				if ( array_key_exists( $value, $jet_query_args ) ) {
-					WC()->query->remove_ordering_args();
-					break;
 				}
 			}
 		}

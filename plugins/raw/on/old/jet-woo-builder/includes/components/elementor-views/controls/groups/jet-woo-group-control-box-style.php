@@ -222,43 +222,40 @@ class Jet_Woo_Group_Control_Box_Style extends Elementor\Group_Control_Base {
 		];
 
 		$fields['box_size'] = [
-			'type'        => Controls_Manager::SLIDER,
-			'label'       => __( 'Box Size', 'jet-woo-builder' ),
-			'size_units'  => [ 'px', 'em', '%' ],
-			'responsive'  => true,
-			'render_type' => 'template',
-			'selectors'   => [
+			'label'      => __( 'Box Size', 'jet-woo-builder' ),
+			'type'       => Controls_Manager::SLIDER,
+			'size_units' => [ 'px', 'em', '%' ],
+			'responsive' => true,
+			'selectors'  => [
 				'{{SELECTOR}}' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
 			],
-			'condition'   => [
+			'condition'  => [
 				'separate_box_sizes' => '',
 			],
 		];
 
 		$fields['box_width'] = [
-			'type'        => Controls_Manager::SLIDER,
-			'label'       => __( 'Box Width', 'jet-woo-builder' ),
-			'size_units'  => [ 'px', 'em', '%' ],
-			'responsive'  => true,
-			'render_type' => 'template',
-			'selectors'   => [
+			'label'      => __( 'Box Width', 'jet-woo-builder' ),
+			'type'       => Controls_Manager::SLIDER,
+			'size_units' => [ 'px', 'em', '%' ],
+			'responsive' => true,
+			'selectors'  => [
 				'{{SELECTOR}}' => 'width: {{SIZE}}{{UNIT}};',
 			],
-			'condition'   => [
+			'condition'  => [
 				'separate_box_sizes!' => '',
 			],
 		];
 
 		$fields['box_height'] = [
-			'type'        => Controls_Manager::SLIDER,
-			'label'       => __( 'Box Height', 'jet-woo-builder' ),
-			'size_units'  => [ 'px', 'em', '%' ],
-			'responsive'  => true,
-			'render_type' => 'template',
-			'selectors'   => [
+			'label'      => __( 'Box Height', 'jet-woo-builder' ),
+			'type'       => Controls_Manager::SLIDER,
+			'size_units' => [ 'px', 'em', '%' ],
+			'responsive' => true,
+			'selectors'  => [
 				'{{SELECTOR}}' => 'height: {{SIZE}}{{UNIT}};',
 			],
-			'condition'   => [
+			'condition'  => [
 				'separate_box_sizes!' => '',
 			],
 		];

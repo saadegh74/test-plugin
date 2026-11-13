@@ -3,7 +3,10 @@
  * Compare Data Class
  */
 
-defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 if ( ! class_exists( 'Jet_CW_Compare_Data' ) ) {
 
@@ -73,10 +76,11 @@ if ( ! class_exists( 'Jet_CW_Compare_Data' ) ) {
 		function update_data_compare( $pid, $context ) {
 
 			$compare_list  = $this->get_compare_list();
+			$product_index = array_search( $pid, $compare_list );
 
 			switch ( $context ) {
 				case 'add':
-					if ( ! in_array( $pid, $compare_list ) ) {
+					if ( ! $product_index ) {
 						$compare_list[] = $pid;
 					}
 
@@ -111,11 +115,11 @@ if ( ! class_exists( 'Jet_CW_Compare_Data' ) ) {
 			switch ( $this->store_type ) {
 				case 'session':
 					$this->start_session();
-					$compare_list = isset( $_SESSION['jet-compare-list'] ) ? sanitize_text_field( $_SESSION['jet-compare-list'] ) : '';
+					$compare_list = isset( $_SESSION['jet-compare-list'] ) ? $_SESSION['jet-compare-list'] : '';
 
 					break;
 				case 'cookies':
-					$compare_list = isset( $_COOKIE['jet-compare-list'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['jet-compare-list'] ) ) : '';
+					$compare_list = isset( $_COOKIE['jet-compare-list'] ) ? $_COOKIE['jet-compare-list'] : '';
 					break;
 				default:
 					$compare_list = '';

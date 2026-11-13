@@ -7,4 +7,4 @@ if ( 'default' !== $widget_settings['thumbnail_position'] && 'preset-1' === $wid
 	return;
 }
 
-echo wp_kses_post( jet_cw_functions()->get_thumbnail( $_product, $widget_settings ) ?? '' );
+echo jet_cw_functions()->get_thumbnail( $_product, $widget_settings );

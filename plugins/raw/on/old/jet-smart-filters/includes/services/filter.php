@@ -2,11 +2,10 @@
 /**
  * Filter service class
  */
-#[AllowDynamicProperties]
+
 class Jet_Smart_Filters_Service_Filter {
 
 	public $serialized_data_keys;
-	public $multilingual;
 	private $_adata;
 
 	/**
@@ -32,10 +31,10 @@ class Jet_Smart_Filters_Service_Filter {
 			}
 
 			if ( isset( jet_smart_filters()->admin->multilingual_support ) ) {
-				$this->multilingual = jet_smart_filters()->admin->multilingual_support;
+				$this->_multilingual = jet_smart_filters()->admin->multilingual_support;
 			} else {
 				require_once jet_smart_filters()->plugin_path( 'admin/includes/multilingual-support.php' );
-				$this->multilingual = new Jet_Smart_Filters_Admin_Multilingual_Support();
+				$this->_multilingual = new Jet_Smart_Filters_Admin_Multilingual_Support();
 			}
 		}, 9999 );
 	}
@@ -44,26 +43,18 @@ class Jet_Smart_Filters_Service_Filter {
 		global $wpdb;
 
 		// escapes data for use in a MySQL query
-		$id = is_scalar( $id ) ? absint( $id ) : 0;
+		$id = absint( $id );
 
 		$output_data               = false;
 		$registered_settings_names = $this->_adata->registered_settings_names();
 
-		if ( empty( $registered_settings_names ) ) {
-			return $output_data;
-		}
-
-		$settings_placeholders = implode( ', ', array_fill( 0, count( $registered_settings_names ), '%s' ) );
-
-		$sql = $wpdb->prepare( "
+		$sql = "
 		SELECT $wpdb->posts.ID, $wpdb->posts.post_title as title, $wpdb->posts.post_date as date, $wpdb->postmeta.meta_key, $wpdb->postmeta.meta_value
 			FROM $wpdb->posts, $wpdb->postmeta
-			WHERE $wpdb->posts.ID = %d
+			WHERE $wpdb->posts.ID = '$id'
 			AND $wpdb->posts.ID = $wpdb->postmeta.post_ID
-			AND $wpdb->postmeta.meta_key IN ( $settings_placeholders )
-			AND $wpdb->posts.post_type='jet-smart-filters'",
-			array_merge( array( $id ), $registered_settings_names )
-		);
+			AND $wpdb->postmeta.meta_key IN ('" . implode( "','", $registered_settings_names ) . "')
+			AND $wpdb->posts.post_type='jet-smart-filters'";
 		$sql_result = $wpdb->get_results( $sql, ARRAY_A );
 
 		if ( count( $sql_result ) ) {
@@ -78,16 +69,15 @@ class Jet_Smart_Filters_Service_Filter {
 				$value = $filter['meta_value'];
 
 				if ( $value && in_array( $key, $this->serialized_data_keys ) ) {
-					$unserialized_value = jet_smart_filters()->utils->safe_unserialize( $value, array() );
-					$value              = is_array( $unserialized_value ) ? $unserialized_value : array();
+					$value = unserialize($value);
 				}
 
 				$output_data[$key] = $value;
 			}
 		}
 
-		if ( $this->multilingual->is_Enabled ) {
-			$this->multilingual->add_data_to_filter( $output_data );
+		if ( $this->_multilingual->is_Enabled ) {
+			$this->_multilingual->add_data_to_filter( $output_data );
 		}
 
 		return $output_data;
@@ -103,23 +93,6 @@ class Jet_Smart_Filters_Service_Filter {
 		$new_data['ID'] = $id;
 
 		return wp_update_post( $new_data );
-	}
-
-	public function duplicate( $id, $args = array() ) {
-
-		$args = wp_parse_args( $args, array(
-			'title_suffix' => ' (Copy)',
-		) );
-
-		$filter_data = $this->get( $id );
-
-		if ( empty( $filter_data ) ) {
-			return false;
-		}
-
-		$filter_data = $this->prepare_duplicate_data( $filter_data, $args );
-
-		return $this->update( 'new', $filter_data );
 	}
 
 	public function add_new( $data ) {
@@ -143,18 +116,6 @@ class Jet_Smart_Filters_Service_Filter {
 		);
 
 		return wp_insert_post( $new_data );
-	}
-
-	private function prepare_duplicate_data( $data, $args = array() ) {
-
-		unset( $data['ID'] );
-		unset( $data['date'] );
-		unset( $data['translations'] );
-
-		$title         = ! empty( $data['title'] ) ? $data['title'] : '';
-		$data['title'] = $title . $args['title_suffix'];
-
-		return $data;
 	}
 
 	private function process_data( $data ) {

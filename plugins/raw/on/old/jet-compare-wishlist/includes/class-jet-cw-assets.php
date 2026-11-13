@@ -3,53 +3,78 @@
  * Compare & Wishlist Assets class
  */
 
-defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 if ( ! class_exists( 'Jet_CW_Assets' ) ) {
 
+	/**
+	 * Define Jet_CW_Assets class
+	 */
 	class Jet_CW_Assets {
 
+		/**
+		 * Constructor for the class
+		 */
 		public function __construct() {
-			add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
+
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+
+			add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
+
+			add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'editor_styles' ) );
+
 		}
 
 		/**
-		 * Enqueue styles.
-		 *
-		 * Enqueue public-facing stylesheets.
-		 *
-		 * @since  1.0.0
-		 * @since  1.5.8 Updated stylesheets registration.
+		 * Admin styles
 		 *
 		 * @return void
 		 */
+		public function admin_styles() {
+		}
+
+		/**
+		 * Enqueue public-facing stylesheets.
+		 *
+		 * @return void
+		 * @since  1.0.0
+		 * @access public
+		 */
 		public function enqueue_styles() {
 
-			wp_register_style(
+			wp_enqueue_style(
+				'jet-cw',
+				jet_cw()->plugin_url( 'assets/css/jet-cw.css' ),
+				false,
+				jet_cw()->get_version()
+			);
+
+			wp_enqueue_style(
 				'jet-cw-frontend',
-				jet_cw()->plugin_url( 'assets/css/frontend.css' ),
+				jet_cw()->plugin_url( 'assets/css/lib/jet-cw-frontend-font/css/jet-cw-frontend-font.css' ),
 				false,
 				jet_cw()->get_version()
 			);
 
-			$widgets_with_styles = jet_cw()->integration->widgets_with_styles();
+		}
 
-			foreach ( $widgets_with_styles as $widget_name ) {
-				wp_register_style(
-					"jet-cw-widget-{$widget_name}",
-					jet_cw()->plugin_url( "assets/css/widgets/{$widget_name}.css" ),
-					[ 'jet-cw-frontend' ],
-					jet_cw()->get_version()
-				);
-			}
-
-			wp_register_style(
-				'jet-cw-frontend-font',
-				jet_cw()->plugin_url( 'assets/lib/jet-cw-frontend-font/frontend-font.css' ),
-				false,
+		/**
+		 * Enqueue editor-facing stylesheets.
+		 *
+		 * @return void
+		 * @since  1.0.0
+		 * @access public
+		 */
+		public function editor_styles() {
+			wp_enqueue_style(
+				'jet-cw-icons-font',
+				jet_cw()->plugin_url( 'assets/css/jet-cw-icons.css' ),
+				array(),
 				jet_cw()->get_version()
 			);
-
 		}
 
 	}

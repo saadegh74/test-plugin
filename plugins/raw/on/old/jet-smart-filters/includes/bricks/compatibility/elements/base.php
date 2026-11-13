@@ -105,14 +105,12 @@ class Base extends \Bricks\Element {
 	}
 
 	public function jet_get_request_data() {
-
-		$request = jet_smart_filters()->data->get_request();
 		$data = false;
 
 		if ( bricks_is_rest_call() ) {
 			$data = file_get_contents( 'php://input' );
-		} elseif ( wp_doing_ajax() && 'bricks_render_element' === $request['action'] ) {
-			$data = $request;
+		} elseif ( wp_doing_ajax() && 'bricks_render_element' === $_REQUEST['action'] ) {
+			$data = $_REQUEST;
 		}
 
 		if ( ! $data ) {
@@ -121,10 +119,6 @@ class Base extends \Bricks\Element {
 
 		if ( is_string( $data ) ) {
 			$data = json_decode( $data, true );
-
-			if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $data ) ) {
-				return false;
-			}
 		}
 
 		return $data;

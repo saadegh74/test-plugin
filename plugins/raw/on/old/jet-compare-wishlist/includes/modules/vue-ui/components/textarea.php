@@ -24,5 +24,4 @@
 		@input="handleInput"
 		@change="handleChange"
 	></textarea>
-	<slot></slot>
 </cx-vui-component-wrapper>

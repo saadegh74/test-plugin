@@ -27,12 +27,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				'jet-smart-filters/widgets/active-filters/css-scheme',
 				[
 					'filters'       => '.jet-smart-filters-active',
-					'filters-list'  => '.jet-active-filters__list',
-					'filters-title' => '.jet-active-filters__title',
-					'filter'        => '.jet-active-filter',
-					'filter-label'  => '.jet-active-filter__label',
-					'filter-value'  => '.jet-active-filter__val',
-					'filter-remove' => '.jet-active-filter__remove',
+					'filters-list'  => '.jet-smart-filters-active .jet-active-filters__list',
+					'filters-title' => '.jet-smart-filters-active .jet-active-filters__title',
+					'filter'        => '.jet-smart-filters-active .jet-active-filter',
+					'filter-label'  => '.jet-smart-filters-active .jet-active-filter__label',
+					'filter-value'  => '.jet-smart-filters-active .jet-active-filter__val',
+					'filter-remove' => '.jet-smart-filters-active .jet-active-filter__remove',
 				]
 			);
 		}
@@ -106,7 +106,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'css_selector' => [
 					'{{WRAPPER}} ' . $this->css_scheme['filters']      => 'flex-direction: {{VALUE}};',
-					'{{WRAPPER}}' . $this->css_scheme['filters']       => 'flex-direction: {{VALUE}};',
 					'{{WRAPPER}} ' . $this->css_scheme['filters-list'] => 'flex-direction: {{VALUE}};',
 				],
 				'attributes' => [
@@ -135,7 +134,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -153,6 +152,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				'css_selector' => [
 					'{{WRAPPER}} ' . $this->css_scheme['filter'] => 'margin-bottom: {{VALUE}}{{UNIT}};',
 				],
+				'condition' => [
+					'filters_position' => 'column',
+				],
 				'attributes' => [
 					'default' => [
 						'value' => 5,
@@ -161,7 +163,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -205,7 +207,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 			$this->controls_manager->add_control([
 				'id'        => 'filters_alignment_column',
 				'type'      => 'choose',
-				'label'     => esc_html__( 'Alignment', 'jet-smart-filters' ),
+				'label'     => esc_html__( 'Vertical Alignment', 'jet-smart-filters' ),
 				'separator' => 'after',
 				'options'   =>[
 					'flex-start'    => [
@@ -224,9 +226,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				'css_selector' => [
 					'{{WRAPPER}} ' . $this->css_scheme['filters-list'] => 'align-items: {{VALUE}};',
 				],
-				'condition' => array(
-					'filters_position' => 'column'
-				),
 				'attributes' => [
 					'default' => [
 						'value' => 'flex-start',
@@ -237,7 +236,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 			$this->controls_manager->add_control([
 				'id'        => 'filters_alignment_line',
 				'type'      => 'choose',
-				'label'     => esc_html__( 'Alignment', 'jet-smart-filters' ),
+				'label'     => esc_html__( 'Horizontal Alignment', 'jet-smart-filters' ),
 				'options'   =>[
 					'flex-start'    => [
 						'shortcut' => esc_html__( 'Left', 'jet-smart-filters' ),
@@ -283,23 +282,21 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				'css_selector' => [
 					'{{WRAPPER}} ' . $this->css_scheme['filter'] => 'min-width: {{VALUE}}{{UNIT}};',
 				],
+				'attributes' => [
+					'default' => [
+						'value' => 10,
+						'unit' => 'px'
+					]
+				],
 				'units' => [
 					[
-						'value'     => 'px',
-						'intervals' => [
-							'step' => 1,
-							'min'  => 0,
-							'max'  => 500,
-						]
-					],
-					[
-						'value' => '%',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
 							'max'  => 100,
 						]
-					]
+					],
 				],
 			]);
 
@@ -344,7 +341,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -369,7 +366,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -603,7 +600,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -629,7 +626,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -654,7 +651,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
+						'value' => 'px',
 						'intervals' => [
 							'step' => 1,
 							'min'  => 0,
@@ -767,11 +764,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 		 */
 		public function render_callback( $settings = array() ) {
 
+			jet_smart_filters()->set_filters_used();
+
 			if ( empty( $settings['content_provider'] ) || $settings['content_provider'] === 'not-selected' ) {
 				return $this->is_editor() ? __( 'Please select a provider', 'jet-smart-filters' ) : false;
 			}
-
-			jet_smart_filters()->set_filters_used();
 
 			$base_class           = 'jet-smart-filters-' . $this->get_name();
 			$provider             = $settings['content_provider'];
@@ -782,13 +779,13 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Active_Filters' ) ) {
 
 			printf(
 				'<div class="%1$s jet-active-filters jet-filter" data-is-block="jet-smart-filters/%2$s" data-label="%3$s" data-content-provider="%4$s" data-apply-type="%5$s" data-query-id="%6$s">',
-				esc_attr( $base_class ),
-				esc_attr( $this->get_name() ),
-				esc_attr( wp_kses_post( $settings['filters_label'] ) ),
-				esc_attr( $provider ),
-				esc_attr( $settings['apply_type'] ),
-				esc_attr( $query_id ),
-				esc_attr( $additional_providers )
+				$base_class,
+				$this->get_name(),
+				$settings['filters_label'],
+				$provider,
+				$settings['apply_type'],
+				$query_id,
+				$additional_providers,
 			);
 
 			if ( $this->is_editor() ) {

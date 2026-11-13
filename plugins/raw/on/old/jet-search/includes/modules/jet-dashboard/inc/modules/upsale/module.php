@@ -71,6 +71,19 @@ class Module extends Page_Module_Base {
 	 */
 	public function create() {
 		add_action( 'admin_menu', array( $this, 'register_page' ), 9999 );
+		add_action( 'admin_head', array( $this, 'modify_item_styles') );
+	}
+
+	/**
+	 * [modify_item_styles description]
+	 * @return [type] [description]
+	 */
+	public function modify_item_styles() {
+		echo '<style type="text/css">
+			#adminmenu #toplevel_page_jet-dashboard a[href*="admin.php?page=jet-dashboard-license-page&subpage=license-manager"] { color: #4aa5f5; }
+			#adminmenu #toplevel_page_jet-dashboard a[href="admin.php?page=jet-dashboard-upsale-page"] { color: #F5C546; }
+			#adminmenu #toplevel_page_jet-dashboard a[href*="https://account.crocoblock.com/upgrade"] { color: #F5C546; }
+		</style>';
 	}
 
 	/**
@@ -128,7 +141,16 @@ class Module extends Page_Module_Base {
 			return false;
 		}
 
-		 
+		add_submenu_page(
+			Dashboard::get_instance()->dashboard_slug,
+			$this->get_upsale_page_label(),
+			$this->get_upsale_page_label(),
+			'manage_options',
+			Dashboard::get_instance()->dashboard_slug . '-upsale-page',
+			function() {
+				include Dashboard::get_instance()->get_view( 'common/dashboard' );
+			}
+		);
 
 		return false;
 	}
@@ -152,7 +174,20 @@ class Module extends Page_Module_Base {
 	 * [get_upsale_page_label description]
 	 * @return [type] [description]
 	 */
-	 
+	public function get_upsale_page_label() {
+		$primary_license_data = $this->get_primary_license_data();
+
+		if ( 'crocoblock' === $primary_license_data['type'] ) {
+
+			if ( 'all-inclusive' === $primary_license_data['product'] ) {
+				return esc_html__( 'Go Lifetime', 'jet-dashboard' );
+			}
+
+			return esc_html__( 'Go All-Inclusive', 'jet-dashboard' );
+		}
+
+		return esc_html__( 'Get Crocoblock', 'jet-dashboard' );
+	}
 
 	/**
 	 * Enqueue module-specific assets

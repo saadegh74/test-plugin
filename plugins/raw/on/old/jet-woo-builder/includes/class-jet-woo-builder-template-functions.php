@@ -24,19 +24,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 		private static $instance = null;
 
 		/**
-		 * Elementor page settings cache.
-		 *
-		 * @since 2.3.0
-		 * @var array
-		 */
-		private $elementor_page_settings_cache = [];
-
-		/**
 		 * Get product sale flash.
 		 *
 		 * @since 1.0.0
 		 * @since 2.1.1 Added check for empty badge label.
-		 * @since 2.1.8 Added `woocommerce_sale_flash` filter hook for better compatibility with third party plugins.
 		 *
 		 * @param string $badge_text Sale flash label.
 		 * @param array  $settings   Widget settings list.
@@ -49,7 +40,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 				return '';
 			}
 
-			global $post, $product;
+			global $product;
 
 			if ( ! is_a( $product, 'WC_Product' ) ) {
 				return '';
@@ -61,19 +52,14 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 				return '';
 			}
 
-			$html = apply_filters( 'woocommerce_sale_flash', '<div class="jet-woo-product-badge jet-woo-product-badge__sale">' . $badge_text . '</div>', $post, $product );
+			$html = sprintf( '<div class="jet-woo-product-badge jet-woo-product-badge__sale">%s</div>', $badge_text );
 
-			return apply_filters( 'jet-woo-builder/template-functions/product-sale-flash', $html, $product, $settings, $badge_text );
+			return apply_filters( 'jet-woo-builder/template-functions/product-sale-flash', $html, $product, $settings );
 
 		}
 
 		/**
-		 * Get product stock status.
-		 *
-		 * Returns product stock status html.
-		 *
-		 * @since 1.2.0
-		 * @since 2.1.8 Added `jet-woo-builder/template-functions/stock-status` filter hook.
+		 * Returns stock status html
 		 *
 		 * @return string
 		 */
@@ -85,7 +71,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 				return null;
 			}
 
-			return apply_filters( 'jet-woo-builder/template-functions/stock-status', wc_get_stock_html( $product ) );
+			return wc_get_stock_html( $product );
 
 		}
 
@@ -362,7 +348,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 				$icons       = '';
 				$rated_icons = '';
 
-				for ( $i = 1; $i <= 5; $i ++ ) {
+				for ( $i = 1; $i <= 5; $i++ ) {
 					$icons       .= sprintf( '<span class="product-rating__icon %s"></span>', $icon );
 					$rated_icons .= sprintf( '<span class="product-rating__icon %s active"></span>', $icon );
 				}
@@ -431,37 +417,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 			$args = [];
 
 			if ( $product ) {
-				$initial_qty = 1;
-
-				if ( $product->is_sold_individually() ) {
-					$initial_qty = 1;
-				} else {
-					$initial_qty = max( 1, (int) $product->get_min_purchase_quantity() );
-
-					// Align with WooCommerce Min/Max Quantities plugin if active.
-					if (
-						class_exists( '\WC_Min_Max_Quantities' )
-						&& class_exists( '\WC_Min_Max_Quantities_Quantity_Rules' )
-						&& method_exists( \WC_Min_Max_Quantities::get_instance(), 'get_quantity_rules_for_product' )
-					) {
-						$rules = \WC_Min_Max_Quantities::get_instance()->get_quantity_rules_for_product( $product );
-
-						$min   = isset( $rules[ \WC_Min_Max_Quantities_Quantity_Rules::MINIMUM ] ) ? (int) $rules[ \WC_Min_Max_Quantities_Quantity_Rules::MINIMUM ] : 0;
-						$group = isset( $rules[ \WC_Min_Max_Quantities_Quantity_Rules::GROUP_OF ] ) ? (int) $rules[ \WC_Min_Max_Quantities_Quantity_Rules::GROUP_OF ] : 0;
-
-						// If group-of is defined and greater than min — prefer group-of; else use min when > 0.
-						if ( $group > 0 && $group > $min ) {
-							$initial_qty = $group;
-						} elseif ( $min > 0 ) {
-							$initial_qty = $min;
-						}
-					}
-				}
-
 				$defaults = apply_filters(
 					'jet-woo-builder/template-functions/product-add-to-cart-settings',
 					[
-						'quantity'   => $initial_qty,
+						'quantity'   => 1,
 						'class'      => implode( ' ', array_filter(
 							[
 								'button',
@@ -470,7 +429,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 								$product->is_purchasable() && $product->is_in_stock() ? 'add_to_cart_button' : '',
 								$product->supports( 'ajax_add_to_cart' ) && $product->is_purchasable() && $product->is_in_stock() ? 'ajax_add_to_cart' : '',
 							] ) ),
-						'aria-describedby_text' => $product->add_to_cart_aria_describedby(),
 						'attributes' => [
 							'data-product_id'  => $product->get_id(),
 							'data-product_sku' => $product->get_sku(),
@@ -520,7 +478,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 					'min_value' => $product->get_min_purchase_quantity(),
 					'max_value' => $product->get_max_purchase_quantity(),
 				], $product, false );
-				$html .= '<button type="submit" class="alt ' . $args['class'] . '" data-product_id="' . $product->get_id() . '" data-product_sku="' . $product->get_sku() . '" data-product_url="' . esc_url( $product->add_to_cart_url() ) . '" data-quantity="' . $quantity . '"><span class="jet-woo-product-button__label">' . esc_html( $product->add_to_cart_text() ) . '</span></button>';
+				$html .= '<button type="submit" class="alt ' . $args['class'] . '" data-product_id="' . $product->get_id() . '" data-quantity="' . $quantity . '">' . esc_html( $product->add_to_cart_text() ) . '</button>';
 				$html .= '</form>';
 			}
 
@@ -595,14 +553,8 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 				return null;
 			}
 
-			$order = wc_get_order( $order_received_id );
+			return wc_get_order( $order_received_id );
 
-			if ( $order instanceof \WC_Order_Refund ) {
-				$parent_id = method_exists( $order, 'get_parent_id' ) ? $order->get_parent_id() : 0;
-				$order     = $parent_id ? wc_get_order( $parent_id ) : null;
-			}
-
-			return ( $order instanceof \WC_Order ) ? $order : null;
 		}
 
 		/**
@@ -626,7 +578,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 				$results = $wpdb->get_col( "
 					SELECT MAX(id) FROM " . Automattic\WooCommerce\Internal\DataStores\Orders\OrdersTableDataStore::get_orders_table_name() . "
 					WHERE status IN ( '$statuses' )
-					AND type = 'shop_order'
 				" );
 			} else {
 				$results = $wpdb->get_col( "
@@ -698,37 +649,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Template_Functions' ) ) {
 			$custom_field = apply_filters( 'jet-woo-builder/template-functions/cart-table-custom-field/' . $field_key, $field_value );
 
 			return sprintf( '<span class="jet-woo-custom-field">%s</span>', $custom_field );
-
-		}
-
-		/**
-		 * Get Elementor page settings for template.
-		 *
-		 * Cached per request to avoid repeated meta reads.
-		 *
-		 * @since 2.3.0
-		 *
-		 * @param int $template_id Template post ID.
-		 *
-		 * @return array
-		 */
-		public function get_elementor_page_settings( $template_id ) {
-
-			$template_id = absint( $template_id );
-
-			if ( ! $template_id ) {
-				return [];
-			}
-
-			if ( isset( $this->elementor_page_settings_cache[ $template_id ] ) ) {
-				return $this->elementor_page_settings_cache[ $template_id ];
-			}
-
-			$settings = get_post_meta( $template_id, '_elementor_page_settings', true );
-
-			$this->elementor_page_settings_cache[ $template_id ] = is_array( $settings ) ? $settings : [];
-
-			return $this->elementor_page_settings_cache[ $template_id ];
 
 		}
 

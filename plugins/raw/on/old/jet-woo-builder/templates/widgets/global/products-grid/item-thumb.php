@@ -27,13 +27,13 @@ if ( 'yes' === $this->get_attr( 'add_thumb_link' ) ) {
 <div class="jet-woo-product-thumbnail">
 	<?php do_action( 'jet-woo-builder/templates/products/before-item-thumbnail' ) ?>
 
-	<?php echo wp_kses_post( $open_link . $thumbnail . $close_link ); ?>
+	<?php echo $open_link . $thumbnail . $close_link; ?>
 
 	<div class="jet-woo-product-img-overlay"></div>
 
 	<?php
 	if ( ! empty( $sale_badge ) && 'yes' === $this->get_attr( 'show_badges' ) ) {
-		echo sprintf( '<div class="jet-woo-product-badges">%s</div>', wp_kses_post( $sale_badge ) );
+		echo sprintf( '<div class="jet-woo-product-badges">%s</div>', $sale_badge );
 	}
 	?>
 

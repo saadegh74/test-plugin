@@ -64,9 +64,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Search_Filter' ) ) {
 				return false;
 			}
 
-			$placeholder      = get_post_meta( $filter_id, '_s_placeholder', true );
-			$search_by        = get_post_meta( $filter_id, '_s_by', true );
-			$predefined_value = $this->get_predefined_value( $filter_id );
+			$placeholder = get_post_meta( $filter_id, '_s_placeholder', true );
+			$search_by   = get_post_meta( $filter_id, '_s_by', true );
 
 			if ( ! $search_by ) {
 				$search_by = 'default';
@@ -80,7 +79,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Search_Filter' ) ) {
 				$query_var  = get_post_meta( $filter_id, '_query_var', true );
 			}
 
-			$result = array(
+			return array(
 				'options'              => false,
 				'query_type'           => $query_type,
 				'query_var'            => $query_var,
@@ -97,12 +96,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Search_Filter' ) ) {
 				'min_letters_count'    => $min_letters_count,
 				'accessibility_label'  => $this->get_accessibility_label( $filter_id )
 			);
-
-			if ( $predefined_value !== false ) {
-				$result['predefined_value'] = $predefined_value;
-			}
-
-			return $result;
 		}
 	}
 }

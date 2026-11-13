@@ -9,4 +9,4 @@ if ( 'yes' !== $widget_settings['show_item_rating'] ) {
 	return;
 }
 
-echo wp_kses_post( $rating ?? '' );
+echo $rating;

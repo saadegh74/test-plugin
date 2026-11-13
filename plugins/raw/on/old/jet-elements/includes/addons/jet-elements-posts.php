@@ -49,16 +49,8 @@ class Jet_Elements_Posts extends Jet_Elements_Base {
 		return true;
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-posts', 'jet-carousel', 'jet-carousel-skin' ); 
-	}
-
 	public function get_script_depends() {
-		return array( 'jet-slick', 'jet-posts' );
+		return array( 'jet-slick' );
 	}
 
 	protected function register_controls() {
@@ -2483,8 +2475,8 @@ class Jet_Elements_Posts extends Jet_Elements_Base {
 			filter_var( $settings['carousel_enabled'], FILTER_VALIDATE_BOOLEAN )
 			&& filter_var( $settings['arrows'], FILTER_VALIDATE_BOOLEAN )
 		) {
-				$arrows_html .= sprintf( '<div class="jet-posts__prev-arrow-%s jet-arrow prev-arrow">%s</div>', esc_attr( $this->get_id() ), $this->_render_icon( 'prev_arrow', '%s', '', false ) );
-				$arrows_html .= sprintf( '<div class="jet-posts__next-arrow-%s jet-arrow next-arrow">%s</div>', esc_attr( $this->get_id() ), $this->_render_icon( 'next_arrow', '%s', '', false ) );
+			$arrows_html .= sprintf( '<div class="jet-posts__prev-arrow-%s jet-arrow prev-arrow">%s</div>', $this->get_id(), $this->_render_icon( 'prev_arrow', '%s', '', false ) );
+			$arrows_html .= sprintf( '<div class="jet-posts__next-arrow-%s jet-arrow next-arrow">%s</div>', $this->get_id(), $this->_render_icon( 'next_arrow', '%s', '', false ) );
 		}
 
 		$options = apply_filters( 'jet-elements/jet-posts/carousel-options', $options, $settings, $widget_id );
@@ -2529,18 +2521,7 @@ class Jet_Elements_Posts extends Jet_Elements_Base {
 				$attr_val = $this->_get_icon( $attr );
 			} else {
 				$attr_val = isset( $settings[ $attr ] ) ? $settings[ $attr ] : '';
-				
-				if ( is_array( $attr_val ) ) {
-					if ( isset( $attr_val['size'] ) ) {						
-						if ( isset( $attr_val['unit'] ) && ! empty( $attr_val['unit'] ) ) {
-							$attr_val = $attr_val['size'] . $attr_val['unit'];
-						} else {
-							$attr_val = $attr_val['size'];
-						}
-					} else {
-						$attr_val = implode( ',', $attr_val );
-					}
-				}
+				$attr_val = ! is_array( $attr_val ) ? $attr_val : implode( ',', $attr_val );
 			}
 
 			$attributes[ $attr ] = $attr_val;
@@ -2551,7 +2532,7 @@ class Jet_Elements_Posts extends Jet_Elements_Base {
 			$attributes[ $attr ] = isset( $settings[ $attr ] ) ? $settings[ $attr ] : false;
 		}
 
-		echo $this->maybe_apply_carousel_wrappers( $shortcode_obj->do_shortcode( $attributes ), $settings ); // phpcs:ignore
+		echo $this->maybe_apply_carousel_wrappers( $shortcode_obj->do_shortcode( $attributes ), $settings );
 
 		$this->_close_wrap();
 	}
@@ -2597,7 +2578,7 @@ class Jet_Elements_Posts extends Jet_Elements_Base {
 			)
 		);
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$repeater->add_control(
 			'meta_key',

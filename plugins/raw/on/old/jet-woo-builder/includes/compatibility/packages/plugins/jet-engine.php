@@ -3,9 +3,10 @@
  * JetEngine compatibility package
  */
 
-use \Jet_Engine\Query_Builder\Manager;
-
-defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 if ( ! class_exists( 'Jet_Woo_Builder_Engine_Package' ) ) {
 
@@ -39,49 +40,9 @@ if ( ! class_exists( 'Jet_Woo_Builder_Engine_Package' ) ) {
 
 			add_action( 'jet-woo-builder/shortcodes/jet-woo-products/loop-start', [ $this, 'set_local_current_object' ] );
 			add_action( 'jet-woo-builder/shortcodes/jet-woo-products-list/loop-start', [ $this, 'set_local_current_object' ] );
+
 			add_action( 'jet-woo-builder/shortcodes/jet-woo-products/loop-end', [ $this, 'set_current_listing_object' ] );
 			add_action( 'jet-woo-builder/shortcodes/jet-woo-products-list/loop-end', [ $this, 'set_current_listing_object' ] );
-			add_filter( 'jet-woo-builder/shortcodes/query-products', [ $this, 'set_custom_query_products' ], 10, 3 );
-
-		}
-
-		/**
-		 * Set custom product query.
-		 *
-		 * Set custom product for query if JetEngine custom builder query used.
-		 *
-		 * @since 2.1.10
-		 *
-		 * @param boolean $products  Products enables.
-		 * @param array   $settings  Widgets settings list.
-		 * @param object  $shortcode Widget instance.
-		 *
-		 * @return mixed
-		 */
-		public function set_custom_query_products( $products, $settings, $shortcode ) {
-
-			if ( ! isset( $settings['enable_custom_query'] ) || ! filter_var( $settings['enable_custom_query'], FILTER_VALIDATE_BOOLEAN ) ) {
-				return $products;
-			}
-
-			$query_id = ! empty( $settings['custom_query_id'] ) ? absint( $settings['custom_query_id'] ) : null;
-			$query_id = apply_filters( 'jet-engine/query-builder/listings/query-id', $query_id, null, $settings );
-
-			if ( ! $query_id ) {
-				return $products;
-			}
-
-			$query = Manager::instance()->get_query_by_id( $query_id );
-
-			if ( ! $query ) {
-				return $products;
-			}
-
-			$query->setup_query();
-
-			do_action( 'jet-engine/query-builder/listings/on-query', $query, $settings, $shortcode, false );
-
-			return $query->get_items();
 
 		}
 
@@ -153,7 +114,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Engine_Package' ) ) {
 				return $valid;
 			}
 
-			$settings = jet_woo_builder_template_functions()->get_elementor_page_settings( $listing_id );
+			$settings = get_post_meta( $listing_id, '_elementor_page_settings', true );
 
 			if ( ! $settings ) {
 				return $valid;
@@ -169,9 +130,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Engine_Package' ) ) {
 						$query_id = $settings['_query_id'] ?? '';
 						$query    = \Jet_Engine\Query_Builder\Manager::instance()->get_query_by_id( $query_id );
 
-						$post_types = is_array( $query->query['post_type'] ?? '' ) ? $query->query['post_type'] : [];
-
-						if ( $query && ( 'wc-product-query' === $query->query_type || 'posts' === $query->query_type && in_array( 'product', $post_types ) ) ) {
+						if ( $query && ( 'wc-product-query' === $query->query_type || 'posts' === $query->query_type && in_array( 'product', $query->query['post_type'] ) ) ) {
 							$valid = true;
 						}
 					}

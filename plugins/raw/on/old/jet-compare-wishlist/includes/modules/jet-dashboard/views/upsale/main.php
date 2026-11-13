@@ -35,7 +35,7 @@
 				target="_blank"
 			>
 				<span slot="label">
-					 
+					<span><?php _e( 'Get Crocoblock', 'jet-dashboard' ); ?></span>
 					<span class="button-dropdown-icon">
 						<svg width="7" height="10" viewBox="0 0 7 10" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path d="M0.158203 1.175L3.97487 5L0.158203 8.825L1.3332 10L6.3332 5L1.3332 -1.40117e-08L0.158203 1.175Z" fill="white"/>

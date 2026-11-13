@@ -1,6 +1,19 @@
-.jet-woo-builder-archive-add-to-cart {
-	.add_to_cart_button.added {
-		display: var(--display-type) !important;
+.add_to_cart_button.button {
+	float: none;
+	display: inline-block;
+	background-color: transparent;
+	color: #848494;
+	padding: 5px 12px;
+	border: 3px double #e4e4e4;
+	font-size: 12px;
+	line-height: 1.5;
+	border-radius: 0;
+	text-transform: none;
+
+	&:hover {
+		background-color: transparent;
+		color: #13aff0;
+		border-color: #13aff0;
 	}
 }
 
@@ -62,35 +75,4 @@
 
 .woocommerce div.product.quick-view-product {
 	position: fixed;
-}
-
-.woocommerce {
-	.elementor-jet-cart-totals {
-		.cart_totals {
-			h1,
-			h2,
-			h3,
-			h4,
-			h5,
-			h6,
-			th,
-			td {
-				a,
-				span,
-				strong,
-				bdi,
-				small,
-				label,
-				.amount,
-				.woocommerce-Price-amount,
-				.woocommerce-Price-currencySymbol {
-					color: inherit !important;
-				}
-			}
-
-			.shipping-calculator-button {
-				color: inherit !important;
-			}
-		}
-	}
 }

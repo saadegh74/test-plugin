@@ -20,12 +20,7 @@ class Jet_Smart_Filters_Compatibility_Manager {
 
 		if ( defined( 'WPML_ST_VERSION' ) ) {
 			require jet_smart_filters()->plugin_path( 'includes/compatibility/wpml.php' );
-			new Jet_Smart_Filters_Compatibility_WPML();
-		}
-
-		if ( function_exists( 'pll_languages_list' ) ) {
-			require jet_smart_filters()->plugin_path( 'includes/compatibility/polylang.php' );
-			new Jet_Smart_Filters_Compatibility_Polylang();
+			new Jet_Smart_Filters_Compatibility_WMPL();
 		}
 
 		if ( class_exists( 'WooCommerce' ) ) {
@@ -34,21 +29,12 @@ class Jet_Smart_Filters_Compatibility_Manager {
 		}
 
 		if ( function_exists( 'jet_engine' ) ) {
-			require jet_smart_filters()->plugin_path( 'includes/compatibility/jet-engine/manager.php' );
+			require jet_smart_filters()->plugin_path( 'includes/compatibility/jet-engine.php' );
 			new Jet_Smart_Filters_Compatibility_JE();
 		}
 
-		if ( defined( 'WEGLOT_VERSION' ) ) {
-			require jet_smart_filters()->plugin_path( 'includes/compatibility/weglot.php' );
-			new Jet_Smart_Filters_Compatibility_Weglot();
-		}
-
-		if ( class_exists( 'RankMath' ) ) {
-			require jet_smart_filters()->plugin_path( 'includes/compatibility/rank-math-seo.php' );
-			new Jet_Smart_Filters_Compatibility_Rank_Math_SEO();
-		}
-
 		add_filter( 'jet-smart-filters/filters/localized-data',  array( $this, 'datepicker_texts' ) );
+
 	}
 
 	public function datepicker_texts( $args ) {
@@ -118,4 +104,5 @@ class Jet_Smart_Filters_Compatibility_Manager {
 
 		return $args;
 	}
+
 }

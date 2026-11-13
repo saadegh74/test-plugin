@@ -31,20 +31,12 @@ class Jet_Search_Rest_Form_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 			return;
 		}
 
-		if ( false === get_option( 'jet_search_suggestions_widget_suggestion_save_permission') ) {
-			$save_permission = add_option( 'jet_search_suggestions_widget_suggestion_save_permission' , "true" );
-			$save_permission = "true";
-		} else {
-			$save_permission = get_option( 'jet_search_suggestions_widget_suggestion_save_permission' );
-		}
-
 		global $wpdb;
 
-		$prefix              = 'jet_';
-		$table_name          = $wpdb->prefix . $prefix . 'search_suggestions';
-		$sessions_table_name = $wpdb->prefix . $prefix . 'search_suggestions_sessions';
+		$prefix     = 'jet_';
+		$table_name = $wpdb->prefix . $prefix . 'search_suggestions';
 
-		$suggestion_name = sanitize_text_field( trim( $params['data']['name'] ) );
+		$suggestion_name = esc_sql( $params['data']['name'] );
 
 		$query = $wpdb->prepare( "SELECT * FROM {$table_name} WHERE name = %s ", $suggestion_name );
 
@@ -58,38 +50,20 @@ class Jet_Search_Rest_Form_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 			$where_format = array( '%d' );
 
 			$wpdb->update( $table_name, $get_request, $where, $format, $where_format );
-		} else if ( "true" === $save_permission )  {
-			$use_session = get_option( 'jet_search_suggestions_use_session' );
+		} else {
+			if ( false === get_option( 'jet_search_suggestions_records_limit') ) {
+				$records_limit = add_option( 'jet_search_suggestions_records_limit' , 5 );
+				$records_limit = 5;
+			} else {
+				$records_limit = get_option( 'jet_search_suggestions_records_limit' );
+			}
 
-			if ( false != $use_session && 'true' === $use_session ) {
-				if ( false === get_option( 'jet_search_suggestions_records_limit') ) {
-					$records_limit = add_option( 'jet_search_suggestions_records_limit' , 5 );
-					$records_limit = 5;
-				} else {
-					$records_limit = get_option( 'jet_search_suggestions_records_limit' );
-
-					if ( '0' === $records_limit ) {
-						update_option( 'jet_search_suggestions_records_limit' , 5 );
-						update_option( 'jet_search_suggestions_use_session' , "false" );
-					}
-				}
-
-				$token         = jet_search_token_manager()->generate_token();
-				$count_records = jet_search_token_manager()->check_token_records( $token );
-
-				if ( $count_records >= $records_limit && 0 != $records_limit ) {
-					return true;
-				}
-
-				$session_record = array(
-					"token" => $token
-				);
-
-				jet_search_token_manager()->add_token( $session_record );
+			if ( $_SESSION['search_suggestions_num_records'] >= $records_limit && 0 != $records_limit ) {
+				return true;
 			}
 
 			$suggestion = array(
-				"name"   => $suggestion_name,
+				"name"   => $params['data']['name'],
 				"weight" => 1,
 				"parent" => 0,
 				"term"   => NULL
@@ -97,6 +71,17 @@ class Jet_Search_Rest_Form_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 
 			$wpdb->insert( $table_name, $suggestion, '%s' );
 
+			$session_id = $_COOKIE['search_suggestions_session_id'];
+
+			if ( isset( $session_id ) ) {
+				session_id( $session_id );
+
+				session_start();
+
+				$_SESSION['search_suggestions_num_records']++;
+
+				session_write_close();
+			}
 		}
 	}
 
@@ -106,19 +91,21 @@ class Jet_Search_Rest_Form_Add_Suggestion extends Jet_Search_Rest_Base_Route {
 	 * @return bool
 	 */
 	public function permission_callback( $request ) {
+		if ( isset( $_SERVER['HTTP_REFERER'] ) ) {
+			$referer         = parse_url( $_SERVER['HTTP_REFERER'] );
+			$currentSiteHost = parse_url( $_SERVER['HTTP_HOST'] );
+			$currentSite     = isset( $currentSiteHost['host'] ) ? parse_url( $_SERVER['HTTP_HOST'] ) : parse_url( '//' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] );
 
-		if ( isset( $_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST'] ) ) {
-			$referer         = parse_url( $_SERVER['HTTP_REFERER'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-			$currentSiteHost = parse_url( $_SERVER['HTTP_HOST'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-
-			if ( isset( $currentSiteHost['host'] ) || isset( $currentSiteHost['path'] ) ) {
-				$currentSite['host'] = isset( $currentSiteHost['host'] ) ? $currentSiteHost['host'] : $currentSiteHost['path'];
-			} elseif ( isset( $_SERVER['SERVER_NAME'], $_SERVER['REQUEST_URI'] ) ) {
-				$currentSite = parse_url( '//' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+			if ( $referer['host'] !== $currentSite['host'] ) {
+				die("Sorry, you are not allowed to create entries from external sites.");
 			}
+		}
 
-			if ( $referer['host'] !== ( $currentSite['host'] ) ) {
-				die( "Sorry, you are not allowed to create entries from external sites." );
+		if ( isset( $_POST['data']['user_id'] ) ) {
+			$user_id = $_POST['data']['user_id'];
+
+			if ( $user_id !== $_SESSION['search_suggestions_user_id'] ) {
+				die("Sorry, the provided user ID does not match the current session.");
 			}
 
 			return true;

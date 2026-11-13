@@ -7,9 +7,7 @@
 	v-if="isVisible()"
 >
 	<div class="cx-vui-f-select">
-		<div
-			v-if="false === selectedLabelInside"
-			:class="{
+		<div :class="{
 			'cx-vui-f-select__selected': true,
 			'cx-vui-f-select__selected-not-empty': this.currentValues.length > 0
 		}">
@@ -38,7 +36,6 @@
 		>
 			<input
 				:id="currentId"
-				:placeholder="placeholder"
 				:autocomplete="autocomplete"
 				type="text"
 				:value="query"
@@ -52,7 +49,7 @@
 					'has-error': error,
 				}"
 			>
-			<div class="cx-vui-f-select__results" v-if="inFocus && ( false === selectedLabelInside || query.length >= remoteTrigger )">
+			<div class="cx-vui-f-select__results" v-if="inFocus">
 				<div v-if="remote && loading" class="cx-vui-f-select__results-loading" v-html="loadingMessage"></div>
 				<div
 					v-else-if="remote && charsDiff > 0"
@@ -94,5 +91,4 @@
 			></option>
 		</select>
 	</div>
-	<slot></slot>
 </cx-vui-component-wrapper>

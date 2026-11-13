@@ -12,6 +12,7 @@ use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
+use Elementor\Core\Schemes\Typography as Scheme_Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -37,19 +38,6 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 
 	public function get_categories() {
 		return array( 'jet-cw' );
-	}
-
-	/**
-	 * Get style dependencies.
-	 *
-	 * Retrieve the list of style dependencies the widget requires.
-	 *
-	 * @since 1.5.8
-	 *
-	 * @return array Widget style dependencies.
-	 */
-	public function get_style_depends(): array {
-		return [ 'jet-cw-widget-compare', 'jet-cw-frontend-font' ];
 	}
 
 	protected function register_controls() {
@@ -159,20 +147,20 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 
 		$this->__add_advanced_icon_control(
 			'compare_table_data_remove_icon',
-			[
+			array(
+				'label'       => esc_html__( 'Button Icon', 'jet-cw' ),
 				'type'        => Controls_Manager::ICON,
-				'label'       => __( 'Button Icon', 'jet-cw' ),
 				'label_block' => true,
 				'file'        => '',
-				'default'     => 'fa fa-trash-o',
-				'fa5_default' => [
-					'value'   => 'fas fa-trash-alt',
+				'default'     => 'fa fa-remove',
+				'fa5_default' => array(
+					'value'   => 'fas fa-remove',
 					'library' => 'fa-solid',
-				],
-				'condition'   => [
+				),
+				'condition'   => array(
 					'compare_table_data_type' => 'compare_remove_button',
-				],
-			],
+				),
+			),
 			$table_data_list
 		);
 
@@ -264,8 +252,8 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 			[
 				'label'     => __( 'Icon', 'jet-cw' ),
 				'type'      => Controls_Manager::SWITCHER,
-				'label_on'  => __( 'Show', 'jet-cw' ),
-				'label_off' => __( 'Hide', 'jet-cw' ),
+				'label_on'  => __( 'Show', 'jet-woo-builder' ),
+				'label_off' => __( 'Hide', 'jet-woo-builder' ),
 				'default'   => 'yes',
 				'condition' => [
 					'compare_table_data_type' => 'wishlist_button',
@@ -719,7 +707,7 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 		$settings = $this->get_settings_for_display();
 
 		$widget_settings = [
-			'empty_compare_text'    => esc_html__( $settings['empty_compare_text'], 'jet-cw' ),
+			'empty_compare_text'    => esc_html__( $settings['empty_compare_text'], 'jet_cw' ),
 			'compare_table_data'    => $this->new_icon_render( $settings['compare_table_data'] ),
 			'scrolled_table'        => $settings['scrolled_table'] ?? '',
 			'scrolled_table_on'     => $settings['scrolled_table_on'],
@@ -1538,82 +1526,20 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 		$this->start_controls_section(
 			'section_thumbnail_style',
 			[
-				'tab'   => Controls_Manager::TAB_STYLE,
 				'label' => __( 'Thumbnail', 'jet-cw' ),
-			]
-		);
-
-		$this->add_responsive_control(
-			'thumbnail_width',
-			[
-				'type'           => Controls_Manager::SLIDER,
-				'label'          => __( 'Width', 'jet-cw' ),
-				'default'        => [
-					'unit' => '%',
-				],
-				'tablet_default' => [
-					'unit' => '%',
-				],
-				'mobile_default' => [
-					'unit' => '%',
-				],
-				'size_units'     => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
-				'range'          => [
-					'%'  => [
-						'min' => 1,
-						'max' => 100,
-					],
-					'px' => [
-						'min' => 1,
-						'max' => 1000,
-					],
-				],
-				'selectors'      => [
-					'{{WRAPPER}} ' . $css_scheme['item-thumbnail'] => 'width: {{SIZE}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->add_responsive_control(
-			'thumbnail_max_width',
-			[
-				'type'           => Controls_Manager::SLIDER,
-				'label'          => __( 'Max Width', 'jet-cw' ),
-				'default'        => [
-					'unit' => '%',
-				],
-				'tablet_default' => [
-					'unit' => '%',
-				],
-				'mobile_default' => [
-					'unit' => '%',
-				],
-				'size_units'     => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
-				'range'          => [
-					'%'  => [
-						'min' => 1,
-						'max' => 100,
-					],
-					'px' => [
-						'min' => 1,
-						'max' => 1000,
-					],
-				],
-				'selectors'      => [
-					'{{WRAPPER}} ' . $css_scheme['item-thumbnail'] => 'max-width: {{SIZE}}{{UNIT}};',
-				],
+				'tab'   => Controls_Manager::TAB_STYLE,
 			]
 		);
 
 		$this->add_control(
 			'thumbnail_background_color',
-			[
+			array(
+				'label'     => esc_html__( 'Background Color', 'jet-cw' ),
 				'type'      => Controls_Manager::COLOR,
-				'label'     => __( 'Background Color', 'jet-cw' ),
-				'selectors' => [
+				'selectors' => array(
 					'{{WRAPPER}} ' . $css_scheme['item-thumbnail'] => 'background-color: {{VALUE}}',
-				],
-			]
+				),
+			)
 		);
 
 		$this->add_group_control(
@@ -1638,10 +1564,10 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 
 		$this->add_group_control(
 			Group_Control_Box_Shadow::get_type(),
-			[
+			array(
 				'name'     => 'thumbnail_shadow',
 				'selector' => '{{WRAPPER}} ' . $css_scheme['item-thumbnail'],
-			]
+			)
 		);
 
 		$this->add_responsive_control(
@@ -3569,7 +3495,6 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 			[
 				'label'     => esc_html__( 'Color', 'jet-cw' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ff2239',
 				'selectors' => [
 					'{{WRAPPER}} ' . $css_scheme['compare-highlight-cell'] . ' > *' => 'color: {{VALUE}} !important;',
 				],
@@ -3581,7 +3506,6 @@ class Jet_Compare_Widget extends Jet_CW_Base {
 			[
 				'label'     => esc_html__( 'Background Color', 'jet-cw' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#ffcfcf',
 				'selectors' => [
 					'{{WRAPPER}} ' . $css_scheme['compare-highlight-cell'] => 'background-color: {{VALUE}} !important;',
 				],

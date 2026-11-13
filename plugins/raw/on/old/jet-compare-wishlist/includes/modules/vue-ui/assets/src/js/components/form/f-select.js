@@ -1,15 +1,13 @@
 import { oneOf, arraysEqual } from '../../utils/assist';
-import { clickOutsideDirective as clickOutside } from '../../utils/v-click-outside';
 import { checkConditions } from '../../mixins/check-conditions';
+import { directive as clickOutside } from 'v-click-outside-x';
 
 const FilterableSelect = {
 
 	name: 'cx-vui-f-select',
 	template: '#cx-vui-f-select',
 	mixins: [ checkConditions ],
-	directives: {
-		clickOutside
-	},
+	directives: { clickOutside },
 	props: {
 		value: {
 			type: [String, Number, Array],
@@ -48,7 +46,9 @@ const FilterableSelect = {
 			type: String
 		},
 		autocomplete: {
-			type: String,
+			validator (value) {
+				return oneOf( value, ['on', 'off'] );
+			},
 			default: 'off'
 		},
 		conditions: {
@@ -88,10 +88,6 @@ const FilterableSelect = {
 		label: {
 			type: String
 		},
-		selectedLabelInside: {
-			type: Boolean,
-			default: false
-		},
 		description: {
 			type: String
 		},
@@ -123,11 +119,13 @@ const FilterableSelect = {
 				if ( arraysEqual( newValue, oldValue ) ) {
 					return;
 				}
+
 			} else {
 
 				if ( newValue === oldValue ) {
 					return;
 				}
+
 			}
 
 			this.storeValues( newValue );
@@ -176,10 +174,7 @@ const FilterableSelect = {
 					if ( this.remote ) {
 						return true;
 					} else {
-						let optionValue = '' + option.value,
-						    optionLabel = option.label;
-
-						return optionLabel.includes( this.query ) || optionValue.includes( this.query );
+						return option.label.includes( this.query ) || option.value.includes( this.query );
 					}
 				});
 			}
@@ -211,14 +206,6 @@ const FilterableSelect = {
 						this.selectedOptions = options;
 						this.loaded          = true;
 						this.loading         = false;
-
-						if ( true === this.selectedLabelInside ) {
-							if ( options.length ) {
-								this.query = options[0].label;
-							}
-						}
-
-						this.$emit( 'on-change-remote-options', options );
 					}
 				} );
 			}
@@ -237,10 +224,6 @@ const FilterableSelect = {
 		handleFocus( event ) {
 			this.inFocus = true;
 			this.$emit( 'on-focus', event );
-
-			if ( true === this.selectedLabelInside ) {
-				this.handleInput( event );
-			}
 		},
 		handleOptionsNav( event ) {
 
@@ -261,7 +244,7 @@ const FilterableSelect = {
 			}
 
 			let index     = this.optionInFocus + direction;
-			let maxLength = this.filteredOptions.length - 1;
+			let maxLength = this.options.length - 1;
 
 			if ( maxLength < 0 ) {
 				maxLength = 0;
@@ -279,24 +262,10 @@ const FilterableSelect = {
 		onClickOutside( event ) {
 
 			if ( this.inFocus ) {
-				if ( true === this.selectedLabelInside ) {
-					const selection    = window.getSelection();
-					const selectedText = selection.toString();
-
-					if ( selectedText.length === 0 ) {
-						this.inFocus = false;
-						this.$emit( 'on-blur', event );
-						this.$emit( 'on-blur-query', this.query, this.setQuery );
-					}
-				} else {
-					this.inFocus = false;
-					this.$emit( 'on-blur', event );
-				}
+				this.inFocus = false;
+				this.$emit( 'on-blur', event );
 			}
 
-		},
-		setQuery( query) {
-			this.query = query;
 		},
 		handleInput( event ) {
 
@@ -305,14 +274,13 @@ const FilterableSelect = {
 			this.query = value;
 
 			this.$emit( 'input', this.currentValues );
-			this.$emit( 'query-change', [ value, this.currentValues ] );
 			this.$emit( 'on-change', event );
 
 			if ( ! this.inFocus ) {
 				this.inFocus = true;
 			}
 
-			if ( this.remote && this.remoteCallback && this.charsDiff <= 0 && ! this.loading ) {
+			if ( this.remote && this.remoteCallback && this.charsDiff <= 0 && ! this.loading && ! this.loaded ) {
 
 				this.loading = true;
 
@@ -324,8 +292,6 @@ const FilterableSelect = {
 							this.options = options;
 							this.loaded  = true;
 							this.loading = false;
-
-							this.$emit( 'on-change-remote-options', options );
 						}
 					} );
 				}
@@ -341,7 +307,7 @@ const FilterableSelect = {
 				return;
 			}
 
-			let value = this.filteredOptions[ this.optionInFocus ].value;
+			let value = this.options[ this.optionInFocus ].value;
 
 			this.handleResultClick( value );
 
@@ -355,23 +321,11 @@ const FilterableSelect = {
 			}
 
 			this.$emit( 'input', this.currentValues );
-			this.$emit( 'query-change', [ this.query, this.currentValues ] );
-			this.$emit( 'on-input', this.currentValues );
 			this.$emit( 'on-change', this.currentValues );
-
-			if ( true === this.selectedLabelInside ) {
-				this.$emit( 'selected-options', this.selectedOptions );
-
-				if ( this.selectedOptions.length > 0 ) {
-					let label = this.selectedOptions[0].label;
-					this.query = label;
-				}
-			} else {
-				this.query = '';
-			}
 
 			this.inFocus       = false;
 			this.optionInFocus = false;
+			this.query         = '';
 
 			if ( this.remote && this.remoteCallback && this.loaded ) {
 				this.resetRemoteOptions();
@@ -381,8 +335,6 @@ const FilterableSelect = {
 		resetRemoteOptions() {
 			this.options = [];
 			this.loaded  = false;
-
-			this.$emit( 'on-reset-remote-options', [] );
 		},
 		removeValue( value ) {
 			this.currentValues.splice( this.currentValues.indexOf( value ), 1 );
@@ -418,17 +370,12 @@ const FilterableSelect = {
 
 					if ( '[object Array]' === Object.prototype.toString.call( value ) ) {
 
-						if ( value.length ) {
-							value.forEach( singleVal => {
-								if ( ! oneOf( singleVal, this.currentValues ) ) {
-									this.currentValues.push( singleVal );
-									this.pushToSelected( singleVal );
-								}
-							} );
-						} else {
-							this.selectedOptions = [];
-							this.currentValues   = [];
-						}
+						value.forEach( singleVal => {
+							if ( ! oneOf( singleVal, this.currentValues ) ) {
+								this.currentValues.push( singleVal );
+								this.pushToSelected( singleVal );
+							}
+						} );
 
 					} else {
 

@@ -797,15 +797,6 @@ class Plugin_Manager {
 			);
 		}
 
-		if ( ! Utils::is_site_activated() ) {
-			wp_send_json(
-				array(
-					'status'  => 'error',
-					'message' => 'These licenses are invalid. Deactivate the license and activate it again.'
-				)
-			);
-		}
-
 		if ( ! $plugin_url ) {
 			$package = Utils::package_url( $plugin_file );
 		} else {
@@ -813,6 +804,7 @@ class Plugin_Manager {
 		}
 
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
+		//include_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
 
 		$skin     = new \WP_Ajax_Upgrader_Skin();
 		$upgrader = new \Plugin_Upgrader( $skin );
@@ -903,15 +895,6 @@ class Plugin_Manager {
 			);
 		}
 
-		if ( ! Utils::is_site_activated() ) {
-			wp_send_json(
-				array(
-					'status'  => 'error',
-					'message' => 'These licenses are invalid. Deactivate the license and activate it again.'
-				)
-			);
-		}
-
 		$plugin = plugin_basename( sanitize_text_field( wp_unslash( $plugin_file ) ) );
 		$slug   = dirname( $plugin );
 
@@ -922,7 +905,7 @@ class Plugin_Manager {
 			'newVersion' => '',
 		);
 
-		if ( 0 !== validate_file( $plugin ) ) {
+		if ( ! current_user_can( 'update_plugins' ) || 0 !== validate_file( $plugin ) ) {
 
 			wp_send_json(
 				array(
@@ -1051,15 +1034,6 @@ class Plugin_Manager {
 			);
 		}
 
-		if ( ! Utils::is_site_activated() ) {
-			wp_send_json(
-				array(
-					'status'  => 'error',
-					'message' => 'These licenses are invalid. Deactivate the license and activate it again.'
-				)
-			);
-		}
-
 		$package = Utils::package_url( $plugin_file );
 
 		include_once( ABSPATH . 'wp-admin/includes/class-wp-upgrader.php' );
@@ -1172,5 +1146,4 @@ class Plugin_Manager {
 
 		return $args;
 	}
-
 }

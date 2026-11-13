@@ -87,7 +87,6 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 				[
 					'action'                  => 'jet_woo_builder_export_template',
 					'woo_builder_template_id' => $template_id,
-					'nonce'                => wp_create_nonce( 'jet_woo_builder_export_template' ),
 				],
 				admin_url( 'admin-ajax.php' )
 			);
@@ -102,30 +101,19 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 		 * @access public
 		 */
 		public function export_woo_builder_template() {
-			if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['nonce'] ) ), 'jet_woo_builder_export_template' ) ) {
+
+			if ( ! isset( $_GET['action'] ) ) {
 				return;
 			}
 
-			if ( ! current_user_can( 'manage_options' ) ) {
+			if ( 'jet_woo_builder_export_template' !== $_GET['action'] && ! isset( $_GET['woo_builder_template_id'] ) ) {
 				return;
 			}
 
-			if ( ! isset( $_GET['action'], $_GET['woo_builder_template_id'] ) ) {
-				return;
-			}
-
-			if ( 'jet_woo_builder_export_template' !== $_GET['action'] ) {
-				return;
-			}
-
-			$template_id = absint( $_GET['woo_builder_template_id'] );
-
-			if ( ! $template_id ) {
-				return;
-
-			}
+			$template_id = $_GET['woo_builder_template_id'];
 
 			$this->export_template( $template_id );
+
 		}
 
 		/**
@@ -161,7 +149,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 			flush();
 
 			// Output file contents.
-			echo $file_data['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo $file_data['content'];
 
 			die();
 
@@ -193,7 +181,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 			$template_data['content']       = $content;
 			$template_data['template_type'] = $document->get_name();
 
-			$page_settings = jet_woo_builder_template_functions()->get_elementor_page_settings( $template_id );
+			$page_settings = get_post_meta( $template_id, '_elementor_page_settings', true );
 
 			if ( $page_settings ) {
 				$template_data['page_settings'] = $page_settings;
@@ -224,25 +212,24 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 		public function import_woo_builder_template() {
 
 			if ( ! current_user_can( 'import' ) ) {
-				wp_die( esc_html__( 'You don\'t have permissions to do this', 'jet-woo-builder' ) );
+				wp_die( __( 'You don\'t have permissions to do this', 'jet-woo-builder' ) );
 			}
 
-			if ( empty( $_FILES ) ) { // phpcs:ignore WordPress.Security.NonceVerification
-				wp_die( esc_html__( 'File not passed', 'jet-woo-builder' ) );
+			if ( empty( $_FILES ) ) {
+				wp_die( __( 'File not passed', 'jet-woo-builder' ) );
 			}
 
-			// phpcs:ignore WordPress.Security.NonceVerification, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$file = ( isset( $_FILES['file'] ) && is_array( $_FILES['file'] ) ) ? wc_clean( wp_unslash( $_FILES['file'] ) ) : array();
+			$file = $_FILES['file'];
 
 			if ( 'application/json' !== $file['type'] ) {
-				wp_die( esc_html__( 'Format not allowed', 'jet-woo-builder' ) );
+				wp_die( __( 'Format not allowed', 'jet-woo-builder' ) );
 			}
 
 			$content = file_get_contents( $file['tmp_name'] );
 			$content = json_decode( $content, true );
 
 			if ( ! $content ) {
-				wp_die( esc_html__( 'No data found in file', 'jet-woo-builder' ) );
+				wp_die( __( 'No data found in file', 'jet-woo-builder' ) );
 			}
 
 			$documents         = Elementor\Plugin::instance()->documents;
@@ -261,7 +248,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 				],
 			];
 
-			$post_data['post_title'] = ! empty( $content['title'] ) ? $content['title'] : esc_html__( 'New Template', 'jet-woo-builder' );
+			$post_data['post_title'] = ! empty( $content['title'] ) ? $content['title'] : __( 'New Template', 'jet-woo-builder' );
 
 			$template_id = wp_insert_post( $post_data );
 
@@ -272,9 +259,9 @@ if ( ! class_exists( 'Jet_Woo_Builder_Export_Import' ) ) {
 				);
 			}
 
-			wp_safe_redirect( jet_woo_builder()->elementor()->documents->get( $template_id )->get_edit_url() );
+			wp_redirect( jet_woo_builder()->elementor()->documents->get( $template_id )->get_edit_url() );
 
-			exit;
+			die();
 
 		}
 

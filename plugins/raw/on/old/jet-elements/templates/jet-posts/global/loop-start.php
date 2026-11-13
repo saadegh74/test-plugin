@@ -15,12 +15,12 @@ if ( $equal ) {
 	$classes[] = 'jet-equal-cols';
 }
 
-$elementor_widget = $this->elementor_widget; // phpcs:ignore
+$elementor_widget = $this->elementor_widget;
 
-?><div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"><?php
+?><div class="<?php echo implode( ' ', $classes ); ?>"><?php
 
-	if ( filter_var( $elementor_widget->get_settings_for_display( 'arrows' ), FILTER_VALIDATE_BOOLEAN )
-		&& filter_var( $elementor_widget->get_settings_for_display( 'carousel_enabled' ), FILTER_VALIDATE_BOOLEAN ) ) {
-		echo sprintf( '<div class="jet-posts__prev-arrow-%s jet-arrow prev-arrow">%s</div>', esc_attr( $elementor_widget->get_id() ), $elementor_widget->_render_icon( 'prev_arrow', '%s', '', false ) ); // phpcs:ignore
-		echo sprintf( '<div class="jet-posts__next-arrow-%s jet-arrow next-arrow">%s</div>', esc_attr( $elementor_widget->get_id() ), $elementor_widget->_render_icon( 'next_arrow', '%s', '', false ) ); // phpcs:ignore
-	}
+if ( filter_var( $elementor_widget->get_settings_for_display( 'arrows' ), FILTER_VALIDATE_BOOLEAN )
+	&& filter_var( $elementor_widget->get_settings_for_display( 'carousel_enabled' ), FILTER_VALIDATE_BOOLEAN ) ) {
+	echo sprintf( '<div class="jet-posts__prev-arrow-%s jet-arrow prev-arrow">%s</div>', $elementor_widget->get_id(), $elementor_widget->_render_icon( 'prev_arrow', '%s', '', false ) );
+	echo sprintf( '<div class="jet-posts__next-arrow-%s jet-arrow next-arrow">%s</div>', $elementor_widget->get_id(), $elementor_widget->_render_icon( 'next_arrow', '%s', '', false ) );
+}

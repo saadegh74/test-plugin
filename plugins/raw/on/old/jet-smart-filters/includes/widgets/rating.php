@@ -3,7 +3,7 @@
 namespace Elementor;
 
 use Elementor\Group_Control_Border;
-use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Global_Typography;
+use Elementor\Core\Schemes\Typography as Scheme_Typography;
 
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,11 +25,6 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 	public function get_icon() {
 
 		return 'jet-smart-filters-icon-rating-filter';
-	}
-
-	public function get_style_depends() {
-
-		return array( 'font-awesome' );
 	}
 
 	public function get_help_url() {
@@ -117,6 +112,9 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 					'value'  => __( 'Value change', 'jet-smart-filters' ),
 					'submit' => __( 'Click on apply button', 'jet-smart-filters' ),
 				),
+				'condition' => array(
+					'apply_type' => array( 'ajax', 'mixed' ),
+				),
 			)
 		);
 
@@ -130,9 +128,6 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 				'label_off'    => esc_html__( 'No', 'jet-smart-filters' ),
 				'return_value' => 'yes',
 				'default'      => '',
-				'condition'    => array(
-					'apply_on' => 'submit'
-				),
 			)
 		);
 
@@ -143,9 +138,8 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 				'type'      => Controls_Manager::TEXT,
 				'default'   => __( 'Apply filter', 'jet-smart-filters' ),
 				'condition' => array(
-					'apply_on'     => 'submit',
 					'apply_button' => 'yes'
-				)
+				),
 			)
 		);
 
@@ -431,9 +425,7 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => 'filter_apply_button_typography',
-				'global'   => array(
-					'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
-				),
+				'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
 				'selector' => '{{WRAPPER}} ' . $css_scheme['apply-filters-button'],
 			)
 		);
@@ -609,9 +601,12 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 
 	protected function render() {
 
-		$settings = $this->get_settings();
+		jet_smart_filters()->set_filters_used();
 
-		if ( ! jet_smart_filters()->utils->is_filter_published( $settings['filter_id'] ) ) {
+		$base_class = $this->get_name();
+		$settings   = $this->get_settings();
+
+		if ( empty( $settings['filter_id'] ) ) {
 			/* if ( Plugin::instance()->editor->is_edit_mode() ) {
 				echo '<div></div>';
 			} */
@@ -619,38 +614,35 @@ class Jet_Smart_Filters_Rating_Widget extends Jet_Smart_Filters_Base_Widget {
 			return;
 		}
 
-		jet_smart_filters()->set_filters_used();
+		printf( '<div class="%1$s jet-filter">', $base_class );
 
 		$filter_id            = apply_filters( 'jet-smart-filters/render_filter_template/filter_id', $settings['filter_id'] );
-		$base_class           = $this->get_name();
 		$provider             = ! empty( $settings['content_provider'] ) ? $settings['content_provider'] : '';
 		$query_id             = ! empty( $settings['query_id'] ) ? $settings['query_id'] : 'default';
-		$apply_type           = ! empty( $settings['apply_type'] ) ? $settings['apply_type'] : 'ajax';
-		$apply_on             = ! empty( $settings['apply_on'] ) ? $settings['apply_on'] : 'value';
 		$show_label           = ! empty( $settings['show_label'] ) ? filter_var( $settings['show_label'], FILTER_VALIDATE_BOOLEAN ) : false;
 		$additional_providers = jet_smart_filters()->utils->get_additional_providers( $settings );
 		$icon                 = ! empty( $settings['rating_icon'] ) ? $settings['rating_icon'] : 'fa fa-star';
 		$format               = '<i class="jet-rating-icon %s"></i>';
-		$rating_icon          = sprintf( $format, esc_attr( $icon ) );
+		$rating_icon          = sprintf( $format, $icon );
 
 		jet_smart_filters()->admin_bar_register_item( $filter_id );
 
-		printf(
-			'<div class="%1$s jet-filter">',
-			esc_attr( $base_class )
-		);
+		if ( 'submit' === $settings['apply_on'] && in_array( $settings['apply_type'], ['ajax', 'mixed'] ) ) {
+			$apply_type = $settings['apply_type'] . '-reload';
+		} else {
+			$apply_type = $settings['apply_type'];
+		}
 
 		include jet_smart_filters()->get_template( 'common/filter-label.php' );
 
 		jet_smart_filters()->filter_types->render_filter_template( $this->get_widget_fiter_type(), array(
 			'filter_id'            => $filter_id,
 			'content_provider'     => $provider,
+			'additional_providers' => $additional_providers,
 			'query_id'             => $query_id,
 			'apply_type'           => $apply_type,
-			'apply_on'             => $apply_on,
 			'button_text'          => $settings['apply_button_text'],
 			'rating_icon'          => $rating_icon,
-			'additional_providers' => $additional_providers,
 			'__widget_id'          => $this->get_id()
 		) );
 

@@ -10048,6 +10048,10 @@ msgstr ""
 msgid "Add gap between rows"
 msgstr ""
 
+#: includes/template-library/class-jet-elements-templates-source.php:30
+msgid "Jet Templates"
+msgstr ""
+
 #: jet-elements.php:232
 msgid "JetElements requires Elementor to be activated."
 msgstr ""
@@ -10074,6 +10078,14 @@ msgstr ""
 
 #: templates/admin-templates/settings-page.php:24
 msgid "Enable or disable SVG images uploading"
+msgstr ""
+
+#: templates/admin-templates/settings-page.php:33
+msgid "Use Jet Templates"
+msgstr ""
+
+#: templates/admin-templates/settings-page.php:34
+msgid "Add Jet page templates and blocks to Elementor templates library."
 msgstr ""
 
 #: templates/admin-templates/settings-page.php:43

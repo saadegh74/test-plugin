@@ -22,4 +22,4 @@ $classes = [
 
 $attributes = apply_filters( 'jet-woo-builder/templates/jet-woo-products/widget-attributes', '', $settings, $query, $this );
 
-printf( '<div class="%s" data-mobile-hover="%s" %s>', esc_attr( implode( ' ', $classes ) ), esc_attr( $hover_on_touch ), $attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+printf( '<div class="%s" data-mobile-hover="%s" %s>', implode( ' ', $classes ), $hover_on_touch, $attributes );

@@ -71,11 +71,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 				'settings'        => jet_smart_filters()->providers->get_provider_settings(),
 				'misc'            => array(
 					'week_start'       => get_option( 'start_of_week' ),
-					'url_type'         => jet_smart_filters()->settings->url_structure_type,
+					'url_type'         => jet_smart_filters()->settings->get( 'url_structure_type' ),
 					'valid_url_params' => $this->get_valid_url_params(),
 				),
 				'props'           => jet_smart_filters()->query->get_query_props(),
-				'extra_props'     => new stdClass(),
+				'extra_props'     => array(),
 				'templates'       => $this->get_localization_templates(),
 				'plugin_settings' => array(
 					'use_tabindex'       => jet_smart_filters()->settings->get( 'use_tabindex', false ),
@@ -87,116 +87,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 							: '',
 						'fixed_position' => jet_smart_filters()->provider_preloader->fixed_position,
 						'fixed_edge_gap' => jet_smart_filters()->provider_preloader->fixed_edge_gap
-					),
-					'url_custom_symbols' => $this->get_url_custom_symbols()
+					)
 				)
 			) );
-
-			$use_signature_verification = jet_smart_filters()->request_signature->is_enabled();
-
-			if ( ! empty( $localized_data['queries'] ) && is_array( $localized_data['queries'] ) ) {
-				foreach ( $localized_data['queries'] as $provider => $provider_queries ) {
-					if ( ! is_array( $provider_queries ) ) {
-						continue;
-					}
-
-					foreach ( $provider_queries as $query_id => $query_args ) {
-						if ( ! is_array( $query_args ) ) {
-							continue;
-						}
-
-						unset(
-							$query_args[ Jet_Smart_Filters_Request_Signature::QUERY_SIGNATURE_KEY ],
-							$query_args[ Jet_Smart_Filters_Request_Signature::QUERY_CONTEXT_KEY ]
-						);
-
-						if ( $use_signature_verification ) {
-							$query_args[ Jet_Smart_Filters_Request_Signature::QUERY_SIGNATURE_KEY ] = jet_smart_filters()->request_signature->create_query(
-								$query_args,
-								$provider,
-								$query_id
-							);
-						}
-
-						$localized_data['queries'][ $provider ][ $query_id ] = $query_args;
-					}
-				}
-			}
-
-			$localized_data['query_context'] = jet_smart_filters()->filter_request_validator->get_query_contexts(
-				isset( $localized_data['queries'] ) && is_array( $localized_data['queries'] ) ? $localized_data['queries'] : array(),
-				isset( $localized_data['referrer_data'] ) && is_array( $localized_data['referrer_data'] ) ? $localized_data['referrer_data'] : array(),
-				isset( $localized_data['props'] ) && is_array( $localized_data['props'] ) ? $localized_data['props'] : array()
-			);
-
-			foreach ( $localized_data['query_context'] as $provider => $provider_contexts ) {
-				foreach ( $provider_contexts as $query_id => $context ) {
-					// Providers may intentionally omit large default queries from localized data.
-					if ( ! isset( $localized_data['queries'][ $provider ] ) ) {
-						$localized_data['queries'][ $provider ] = array();
-					}
-
-					if ( ! isset( $localized_data['queries'][ $provider ][ $query_id ] ) ) {
-						$localized_data['queries'][ $provider ][ $query_id ] = array();
-
-						if ( $use_signature_verification ) {
-							$localized_data['queries'][ $provider ][ $query_id ][ Jet_Smart_Filters_Request_Signature::QUERY_SIGNATURE_KEY ] = jet_smart_filters()->request_signature->create_query(
-								array(),
-								$provider,
-								$query_id
-							);
-						}
-					}
-
-					$localized_data['queries'][ $provider ][ $query_id ][ Jet_Smart_Filters_Request_Signature::QUERY_CONTEXT_KEY ] = $context;
-				}
-			}
-
-			$localized_settings = isset( $localized_data['settings'] ) && is_array( $localized_data['settings'] )
-				? $localized_data['settings']
-				: array();
-			$localized_queries = isset( $localized_data['queries'] ) && is_array( $localized_data['queries'] )
-				? $localized_data['queries']
-				: array();
-
-			foreach ( $localized_queries as $provider => $provider_queries ) {
-				if ( ! is_array( $provider_queries ) ) {
-					continue;
-				}
-
-				if ( ! isset( $localized_settings[ $provider ] ) || ! is_array( $localized_settings[ $provider ] ) ) {
-					$localized_settings[ $provider ] = array();
-				}
-
-				foreach ( $provider_queries as $query_id => $query_args ) {
-					if ( ! isset( $localized_settings[ $provider ][ $query_id ] ) || ! is_array( $localized_settings[ $provider ][ $query_id ] ) ) {
-						$localized_settings[ $provider ][ $query_id ] = array();
-					}
-				}
-			}
-
-			foreach ( $localized_settings as $provider => $provider_queries ) {
-				if ( ! is_array( $provider_queries ) ) {
-					continue;
-				}
-
-				foreach ( $provider_queries as $query_id => $query_settings ) {
-					$query_settings = is_array( $query_settings ) ? $query_settings : array();
-					unset( $query_settings[ Jet_Smart_Filters_Request_Signature::SETTINGS_SIGNATURE_KEY ] );
-
-					if ( $use_signature_verification ) {
-						$query_settings[ Jet_Smart_Filters_Request_Signature::SETTINGS_SIGNATURE_KEY ] = jet_smart_filters()->request_signature->create_provider_settings(
-							$query_settings,
-							$provider,
-							$query_id
-						);
-					}
-
-					$localized_settings[ $provider ][ $query_id ] = $query_settings;
-				}
-			}
-
-			$localized_data['settings'] = $localized_settings;
 
 			wp_localize_script( 'jet-smart-filters', 'JetSmartFilterSettings', $localized_data );
 		}
@@ -234,9 +127,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 				'sort',
 				'alphabet',
 				'_s',
-				'_sm',
 				'pagenum',
-				'plain_query',
 				// backward compatibility
 				'jet-smart-filters',
 				'jet_paged',
@@ -249,35 +140,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 			) );
 		}
 
-		public function get_url_custom_symbols() {
-
-			if ( ! jet_smart_filters()->settings->use_url_custom_symbols ) {
-				return '';
-			}
-
-			$custom_symbols = array();
-
-			if ( jet_smart_filters()->settings->url_provider_id_delimiter ) {
-				$custom_symbols['provider_id'] = jet_smart_filters()->settings->url_provider_id_delimiter;
-			}
-			if ( jet_smart_filters()->settings->url_items_separator ) {
-				$custom_symbols['items_separator'] = jet_smart_filters()->settings->url_items_separator;
-			}
-			if ( jet_smart_filters()->settings->url_key_value_delimiter ) {
-				$custom_symbols['key_value'] = jet_smart_filters()->settings->url_key_value_delimiter;
-			}
-			if ( jet_smart_filters()->settings->url_value_separator ) {
-				$custom_symbols['value_separator'] = jet_smart_filters()->settings->url_value_separator;
-			}
-			if ( jet_smart_filters()->settings->url_var_suffix_separator ) {
-				$custom_symbols['var_suffix'] = jet_smart_filters()->settings->url_var_suffix_separator;
-			}
-
-			return ! empty( $custom_symbols )
-				? $custom_symbols
-				: '';
-		}
-
 		/**
 		 * Enqueue filter styles
 		 */
@@ -287,7 +149,35 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 				return;
 			}
 
-			wp_enqueue_style( 'jet-smart-filters' );
+			wp_register_style(
+				'font-awesome',
+				jet_smart_filters()->plugin_url( 'assets/lib/font-awesome/font-awesome.min.css' ),
+				array(),
+				'4.7.0'
+			);
+
+			wp_enqueue_style(
+				'jet-smart-filters',
+				jet_smart_filters()->plugin_url( 'assets/css/public.css' ),
+				array('font-awesome'),
+				jet_smart_filters()->get_version()
+			);
+
+			// Filter inline styles
+			$tabindex_color = jet_smart_filters()->settings->get( 'tabindex_color', '#0085f2' );
+
+			$filter_inline_styles = "
+				.jet-filter {
+					--tabindex-color: $tabindex_color;
+					--tabindex-shadow-color: " . jet_smart_filters()->utils->hex2rgba( $tabindex_color, 0.4 ) . ";
+				}
+			";
+
+			if ( jet_smart_filters()->provider_preloader->is_enabled ) {
+				$filter_inline_styles .= jet_smart_filters()->provider_preloader->css;
+			}
+
+			wp_add_inline_style( 'jet-smart-filters', $filter_inline_styles );
 		}
 
 		/**
@@ -327,7 +217,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 				'Jet_Smart_Filters_Sorting_Filter'     => $base_path . 'sorting.php',
 				'Jet_Smart_Filters_Active_Filters'     => $base_path . 'active-filters.php',
 				'Jet_Smart_Filters_Pagination_Filter'  => $base_path . 'pagination.php',
-				'Jet_Smart_Filters_Hidden_Filter'      => $base_path . 'hidden.php',
 			);
 
 			require $base_path . 'base.php';
@@ -395,24 +284,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Filter_Manager' ) ) {
 				$is_custom_checkbox = true;
 			}
 
-			if ( 'search' === $type ) {
-				if ( strpos( $query_var, '_plain_query::' ) === false ) {
-					$query_var_suffix[] = $type;
-				}
-			}
-
-			if ( in_array( $type, ['range', 'check-range', 'rating'] ) ) {
+			if ( in_array( $type, ['search', 'range', 'check-range', 'rating'] ) ) {
 				$query_var_suffix[] = $type;
 			}
 
 			if ( in_array( $type, ['date-range', 'date-period'] ) ) {
-				$date_type = get_post_meta( $filter, '_date_type', true );
-				if ( strpos( $query_var, '_plain_query::' ) === false ) {
-					$query_var_suffix[] = $date_type
-						? $date_type
-						: 'date';
-				}
-				
+				$query_var_suffix[] = 'date';
 			}
 
 			if ( $is_custom_checkbox ) {

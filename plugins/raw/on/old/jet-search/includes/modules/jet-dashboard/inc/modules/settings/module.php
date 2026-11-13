@@ -71,8 +71,8 @@ class Module extends Page_Module_Base {
 
 		add_submenu_page(
 			Dashboard::get_instance()->dashboard_slug,
-			esc_html__( 'تنظیمات افزونه ها', 'jet-dashboard' ),
-			esc_html__( 'تنظیمات افزونه ها', 'jet-dashboard' ),
+			esc_html__( 'JetPlugins Settings', 'jet-dashboard' ),
+			esc_html__( 'JetPlugins Settings', 'jet-dashboard' ),
 			'manage_options',
 			Dashboard::get_instance()->dashboard_slug . '-settings-page',
 			function() {

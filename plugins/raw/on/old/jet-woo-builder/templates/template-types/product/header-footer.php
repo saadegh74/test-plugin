@@ -13,7 +13,7 @@ do_action( 'jet-woo-builder/full-width-page/before-content' );
 while ( have_posts() ) {
 	the_post();
 
-	if ( \Elementor\Plugin::$instance->editor->is_edit_mode() || \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+	if ( ! empty( $_GET['elementor-preview'] ) ) {
 		the_content();
 	} else {
 		wc_get_template_part( 'content', 'single-product' );

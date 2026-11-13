@@ -44,11 +44,10 @@ if ( ! class_exists( 'Jet_Woo_Builder_Ajax_Handlers' ) ) {
 		 */
 		public function get_switcher_template() {
 
-			$post                = wp_unslash( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification
-			$args                = json_decode( isset( $post['query'] ) ? (string) $post['query'] : '[]', true );
+			$args                = json_decode( stripslashes( $_POST['query'] ), true );
 			$args['post_status'] = 'publish';
-			$layout              = isset(  $post['layout'] ) ? absint(  $post['layout'] ) : 0;
-			$filters_query       = ! empty( $post['filters'] ) ? (array) $post['filters'] : array();
+			$layout              = isset( $_POST['layout'] ) ? absint( $_POST['layout'] ) : '';
+			$filters_query       = ! empty( $_POST['filters'] ) ? $_POST['filters'] : [];
 			$response            = [];
 
 			switch ( $args['orderby'] ) {

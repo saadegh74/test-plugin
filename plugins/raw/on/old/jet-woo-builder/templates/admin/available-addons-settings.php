@@ -1,8 +1,8 @@
 <div class="jet-woo-builder-settings-page jet-woo-builder-settings-page__available-addons">
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Global Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the shop page', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Global Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the shop page', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -25,8 +25,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Single Product Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the product single template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Single Product Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the product single template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -49,8 +49,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Archive Product Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the archive product template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Archive Product Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the archive product template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -73,8 +73,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Archive Category Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the archive category template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Archive Category Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the archive category template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -97,8 +97,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Shop Product Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the archive product template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Shop Product Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the archive product template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -121,8 +121,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Cart Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the cart template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Cart Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the cart template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -145,8 +145,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Checkout Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the checkout template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Checkout Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the checkout template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -169,8 +169,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'Thank You Page Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the thank you page template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'Thank You Page Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the thank you page template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div
@@ -193,8 +193,8 @@
 
 	<div class="available-widgets">
 		<div class="available-widgets__option-info">
-			<div class="available-widgets__option-info-name"><?php esc_html_e( 'My Account Page Widgets', 'jet-woo-builder' ); ?></div>
-			<div class="available-widgets__option-info-desc"><?php esc_html_e( 'These widgets will be available when editing the my account page template', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-name"><?php _e( 'My Account Page Widgets', 'jet-woo-builder' ); ?></div>
+			<div class="available-widgets__option-info-desc"><?php _e( 'These widgets will be available when editing the my account page template', 'jet-woo-builder' ); ?></div>
 		</div>
 		<div class="available-widgets__controls">
 			<div

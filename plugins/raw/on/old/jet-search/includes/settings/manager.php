@@ -47,10 +47,6 @@ class Settings {
 				'class' => '\\Jet_Search\\Settings\\Suggestions',
 				'args'  => array(),
 			),
-			'jet-search-ajax-search-settings' => array(
-				'class' => '\\Jet_Search\\Settings\\Ajax_Search_Settings',
-				'args'  => array(),
-			),
 		) );
 
 		add_action( 'init', array( $this, 'register_settings_category' ), 10 );
@@ -77,7 +73,6 @@ class Settings {
 	 */
 	public function init_plugin_subpage_modules() {
 		require jet_search()->plugin_path( 'includes/settings/subpage-modules/suggestions.php' );
-		require jet_search()->plugin_path( 'includes/settings/subpage-modules/ajax-search-settings.php' );
 
 		foreach ( $this->subpage_modules as $subpage => $subpage_data ) {
 			\Jet_Dashboard\Dashboard::get_instance()->module_manager->register_subpage_module( $subpage, $subpage_data );

@@ -12,14 +12,14 @@ if ( ! class_exists( 'Jet_Smart_Filters_Rewrite_Rules' ) ) {
 	class Jet_Smart_Filters_Rewrite_Rules {
 
 		/**
-		 * Jet Smart Filters query variable
-		 */
-		private $query_var = 'jsf';
-
-		/**
 		 * Jet Smart Filters query pattern
 		 */
 		private $pattern = 'jsf/(.*)/?$';
+
+		/**
+		 * Jet Smart Filters query variable
+		 */
+		private $query_var = 'jsf';
 
 		/**
 		 * Jet Smart Filters query variable value
@@ -79,8 +79,16 @@ if ( ! class_exists( 'Jet_Smart_Filters_Rewrite_Rules' ) ) {
 				$this->pattern => 'index.php?' . $this->query_var . '=$matches[1]'
 			);
 
-			$rewritable_post_types = jet_smart_filters()->settings->get( 'rewritable_post_types' );
+			if ( class_exists( 'WooCommerce' ) ) {
+				$shop_page_id = wc_get_page_id( 'shop' );
 
+				if ( current_theme_supports( 'woocommerce' ) ) {
+					$shop_page_slug = $shop_page_id && get_post( $shop_page_id ) ? urldecode( get_page_uri( $shop_page_id ) ) : 'shop';
+					$rewrites[$shop_page_slug . '/' . $this->pattern] = 'index.php?post_type=product&' . $this->query_var . '=$matches[1]';
+				}
+			}
+
+			$rewritable_post_types = jet_smart_filters()->settings->get( 'rewritable_post_types' );
 			if ( is_array( $rewritable_post_types ) ) {
 				foreach ( $rewritable_post_types as $post_type => $post_type_enabled ) {
 					if ( $post_type_enabled === 'true' ) {
@@ -94,9 +102,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Rewrite_Rules' ) ) {
 						$taxonomies   = get_object_taxonomies( $post_type_object->name, 'objects ' );
 
 						if ( $rewrite_slug ) {
-							$rewrites[$rewrite_slug . '/' . $this->pattern]                 = 'index.php?post_type=' . $post_type . '&' . $this->query_var . '=$matches[1]';
-							$rewrites[$rewrite_slug . '/([^/]+)/' . $this->pattern]         = 'index.php?' . $rewrite_slug . '=$matches[1]&' . $this->query_var . '=$matches[2]';
-							$rewrites[$rewrite_slug . '/([^/]+)/([^/]+)/' . $this->pattern] = 'index.php?post_type=' . $post_type . '&name=$matches[2]&' . $this->query_var . '=$matches[3]';
+							$rewrites["$rewrite_slug/$this->pattern"] = 'index.php?post_type=' . $post_type . '&jsf=$matches[1]';
 						}
 
 						foreach ( $taxonomies as $taxonomy ) {
@@ -106,48 +112,23 @@ if ( ! class_exists( 'Jet_Smart_Filters_Rewrite_Rules' ) ) {
 								// product cat & tag default taxonomy
 								if ( $post_type_object->name === 'product' ) {
 									if ( in_array( $taxonomy->name, array( 'product_cat', 'product_tag' ) ) ) {
-										$rewrites[$tax_rewrite_slug . '/(.+?)/' . $this->pattern] =  'index.php?' . $taxonomy->name . '=$matches[1]&' . $this->query_var . '=$matches[2]';
+										$rewrites["$tax_rewrite_slug/(.+?)/$this->pattern"] =  'index.php?' . $taxonomy->name . '=$matches[1]&jsf=$matches[2]';
 
 										continue;
 									}
 								}
 
 								// custom taxonomy
-								$rewrites[$tax_rewrite_slug . '/(.+?)/' . $this->pattern] = 'index.php?taxonomy=' . $taxonomy->name . '&term=$matches[1]&' . $this->query_var . '=$matches[2]';
+								$rewrites["$tax_rewrite_slug/(.+?)/$this->pattern"] =  'index.php?taxonomy=' . $taxonomy->name . '&term=$matches[1]&jsf=$matches[2]';
 							}
 						}
 					}
 				}
 			}
 
-			if ( class_exists( 'WooCommerce' ) ) {
-				$shop_page_id   = wc_get_page_id( 'shop' );
-				$shop_page_slug = $shop_page_id && get_post( $shop_page_id ) ? urldecode( get_page_uri( $shop_page_id ) ) : 'shop';
-
-				$rewrites[$shop_page_slug . '/' . $this->pattern]                 = 'index.php?post_type=product&' . $this->query_var . '=$matches[1]';
-				$rewrites['product/([^/]*)/' . $this->pattern]                    = 'index.php?product=$matches[1]&' . $this->query_var . '=$matches[2]';
-				$rewrites[$shop_page_slug . '/([^/]*)/' . $this->pattern]         = 'index.php?product=$matches[1]&' . $this->query_var . '=$matches[2]';
-				$rewrites[$shop_page_slug . '/([^/]*)/([^/]*)/' . $this->pattern] = 'index.php?product_cat=$matches[1]&product=$matches[2]&' . $this->query_var . '=$matches[3]';
-
-				$attribute_taxonomies = wc_get_attribute_taxonomies();
-				if ( $attribute_taxonomies ) {
-					foreach ( $attribute_taxonomies as $attribute ) {
-						$taxonomy = wc_attribute_taxonomy_name( $attribute->attribute_name );
-						$slug     = $attribute->attribute_name; // e.g. "color"
-
-						// Create rewrite rule for URLs like /color/blue/jsf/...
-						$rewrites[$slug . '/([^/]+)/' . $this->pattern] =
-							'index.php?' . $taxonomy . '=$matches[1]&' . $this->query_var . '=$matches[2]';
-					}
-				}
-			}
-
-			$rewrites['([0-9]{4})/([0-9]{2})/([0-9]{2})/([^/]+)/' . $this->pattern] = 'index.php?year=$matches[1]&monthnum=$matches[2]&day=$matches[3]&name=$matches[4]&' . $this->query_var . '=$matches[5]';
-			$rewrites['([0-9]{4})/([0-9]{2})/([^/]+)/' . $this->pattern]            = 'index.php?year=$matches[1]&monthnum=$matches[2]&name=$matches[3]&' . $this->query_var . '=$matches[4]';
-			$rewrites['archives/([0-9]+)/' . $this->pattern]                        = 'index.php?p=$matches[1]&' . $this->query_var . '=$matches[2]';
-			$rewrites['([0-9]+)/' . $this->pattern]                                 = 'index.php?p=$matches[1]&' . $this->query_var . '=$matches[2]';
-			$rewrites['(.?.+?)/' . $this->pattern]                                  = 'index.php?pagename=$matches[1]&' . $this->query_var . '=$matches[2]';
-			$rewrites['([^/]+)/' . $this->pattern]                                  = 'index.php?name=$matches[1]&' . $this->query_var . '=$matches[2]';
+			$rewrites['([0-9]+)/' . $this->pattern] = 'index.php?p=$matches[1]&' . $this->query_var . '=$matches[2]';
+			$rewrites['(.?.+?)/' . $this->pattern]  = 'index.php?pagename=$matches[1]&' . $this->query_var . '=$matches[2]';
+			$rewrites['([^/]+)/' . $this->pattern]  = 'index.php?name=$matches[1]&' . $this->query_var . '=$matches[2]';
 
 			return array_merge( $rewrites, $rules );
 		}

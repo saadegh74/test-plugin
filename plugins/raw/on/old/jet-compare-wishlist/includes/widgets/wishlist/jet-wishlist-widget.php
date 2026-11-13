@@ -38,19 +38,6 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 		return array( 'jet-cw' );
 	}
 
-	/**
-	 * Get style dependencies.
-	 *
-	 * Retrieve the list of style dependencies the widget requires.
-	 *
-	 * @since 1.5.8
-	 *
-	 * @return array Widget style dependencies.
-	 */
-	public function get_style_depends(): array {
-		return [ 'jet-cw-widget-wishlist', 'jet-cw-frontend-font' ];
-	}
-
 	protected function register_controls() {
 
 		$css_scheme = apply_filters(
@@ -97,7 +84,18 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 				'type'    => 'select',
 				'label'   => esc_html__( 'Product Presets', 'jet-cw' ),
 				'default' => 'preset-1',
-				'options' => jet_cw_tools()->get_presets(),
+				'options' => [
+					'preset-1'  => esc_html__( 'Preset 1', 'jet-cw' ),
+					'preset-2'  => esc_html__( 'Preset 2', 'jet-cw' ),
+					'preset-3'  => esc_html__( 'Preset 3', 'jet-cw' ),
+					'preset-4'  => esc_html__( 'Preset 4', 'jet-cw' ),
+					'preset-5'  => esc_html__( 'Preset 5', 'jet-cw' ),
+					'preset-6'  => esc_html__( 'Preset 6', 'jet-cw' ),
+					'preset-7'  => esc_html__( 'Preset 7 ', 'jet-cw' ),
+					'preset-8'  => esc_html__( 'Preset 8 ', 'jet-cw' ),
+					'preset-9'  => esc_html__( 'Preset 9 ', 'jet-cw' ),
+					'preset-10' => esc_html__( 'Preset 10', 'jet-cw' ),
+				],
 			]
 		);
 
@@ -165,8 +163,8 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 				'label'     => __( 'Trim Type', 'jet-cw' ),
 				'default'   => 'word',
 				'options'   => [
-					'word'    => __( 'Words', 'jet-cw' ),
-					'letters' => __( 'Letters', 'jet-cw' ),
+					'word'    => __( 'Words', 'jet-woo-builder' ),
+					'letters' => __( 'Letters', 'jet-woo-builder' ),
 				],
 				'condition' => [
 					'show_item_title' => 'yes',
@@ -387,13 +385,13 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 		$settings = $this->get_settings_for_display();
 
 		$widget_settings = [
-			'presets'                => $settings['presets'] ?? null, 
+			'presets'                => $settings['presets'],
 			'empty_wishlist_text'    => esc_html__( $settings['empty_wishlist_text'], 'jet-cw' ),
 			'remove_button_text'     => $settings['remove_button_text'],
 			'wishlist_remove_icon'   => htmlspecialchars( $this->__render_icon( 'remove_button_icon', '%s', '', false ) ),
 			'equal_height_cols'      => $settings['equal_height_cols'],
 			'show_item_title'        => $settings['show_item_title'],
-			'title_html_tag'         => ( ! empty( $settings['show_item_title'] ) && 'yes' === $settings['show_item_title'] ) ? jet_cw_tools()->sanitize_html_tag( $settings['title_html_tag'] ?? '' ) : '',
+			'title_html_tag'         => jet_cw_tools()->sanitize_html_tag( $settings['title_html_tag'] ),
 			'enable_image_link'      => $settings['enable_image_link'],
 			'enable_image_overlay'   => $settings['enable_image_overlay'],
 			'title_trim_type'        => $settings['title_trim_type'],
@@ -403,7 +401,7 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 			'cw_thumbnail_size_size' => $settings['cw_thumbnail_size_size'],
 			'show_item_rating'       => $settings['show_item_rating'],
 			'cw_rating_icon'         => $settings['cw_rating_icon'],
-			'wishlist_columns'       => isset( $settings['wishlist_columns'] ) ? $settings['wishlist_columns'] : 3,
+			'wishlist_columns'       => $settings['wishlist_columns'],
 			'show_item_excerpt'      => $settings['show_item_excerpt'],
 			'show_item_categories'   => $settings['show_item_categories'],
 			'show_item_tags'         => $settings['show_item_tags'],
@@ -1119,11 +1117,11 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 		$this->add_control(
 			'price_sale_display_type',
 			[
-				'label'     => __( 'Display Type', 'jet-cw' ),
+				'label'     => __( 'Display Type', 'jet-woo-builder' ),
 				'type'      => Controls_Manager::SELECT,
 				'options'   => [
-					'block'        => __( 'Block', 'jet-cw' ),
-					'inline-block' => __( 'Inline', 'jet-cw' ),
+					'block'        => __( 'Block', 'jet-woo-builder' ),
+					'inline-block' => __( 'Inline', 'jet-woo-builder' ),
 				],
 				'default'   => 'inline-block',
 				'selectors' => [
@@ -1156,7 +1154,7 @@ class Jet_Wishlist_Widget extends Jet_CW_Base {
 		$this->add_responsive_control(
 			'price_space_between_block',
 			[
-				'label'     => __( 'Space Between', 'jet-cw' ),
+				'label'     => __( 'Space Between', 'jet-woo-builder' ),
 				'type'      => Controls_Manager::SLIDER,
 				'range'     => [
 					'px' => [

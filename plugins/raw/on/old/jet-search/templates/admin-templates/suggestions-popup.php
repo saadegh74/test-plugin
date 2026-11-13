@@ -8,13 +8,7 @@
 	>
 		<div class="cx-vui-subtitle" slot="title">
 			<template v-if="popUpState === 'delete'">
-                <span v-if="isBulkDelete">
-                   <?php esc_html_e('Are you sure? Deleted suggestion can\'t be restored.', 'jet-search'); ?>
-                       {{ ' (' + popUpContent.ids.length + ')' }}
-                 </span>
-                <span v-else>
-				    <?php esc_html_e('Are you sure? Deleted suggestion can\'t be restored.', 'jet-search'); ?>
-                </span>
+				<?php esc_html_e('Are you sure? Deleted suggestion can\'t be restored.', 'jet-search'); ?>
 			</template>
 			<template v-else-if="popUpState === 'update'">
 				<?php esc_html_e('Edit Suggestion:', 'jet-search'); ?>
@@ -134,7 +128,7 @@
 
 					<cx-vui-button
 						class="jet-search-suggestions-popup-button-delete"
-                        @click="isBulkDelete ? bulkDelete() : deleteItem()"
+						@click="deleteItem()"
 						button-style="accent"
 						size="mini"
 					>

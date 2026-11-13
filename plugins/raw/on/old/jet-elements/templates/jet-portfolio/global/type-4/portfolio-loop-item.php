@@ -38,12 +38,9 @@ if ( $is_lightbox ) {
 	$is_external = $this->_loop_item( array( 'item_button_url', 'is_external') );
 	$link_target = 'on' === $is_external ? '_blank' : '';
 	$this->add_render_attribute( $link_instance, 'target', $link_target );
-	$is_nofollow = $this->_loop_item( array( 'item_button_url', 'nofollow') );
-	$rel = 'on' === $is_nofollow ? 'nofollow' : '';
-	$this->add_render_attribute( $link_instance, 'rel', $rel );
 }
 
-$this->add_render_attribute( $link_instance, 'href', esc_url( $link_href ) );
+$this->add_render_attribute( $link_instance, 'href', $link_href );
 
 if ( $is_lightbox ) {
 	$this->add_render_attribute( $link_instance, 'data-elementor-open-lightbox', 'yes' );
@@ -58,11 +55,11 @@ if ( $is_lightbox ) {
 }
 
 ?>
-<article <?php echo $this->get_render_attribute_string( $item_instance ); // phpcs:ignore ?>>
+<article <?php echo $this->get_render_attribute_string( $item_instance ); ?>>
 	<div class="jet-portfolio__inner <?php if ( $this->trp_edit_mode() ) : ?>trp-edit-mode<?php endif;?>">
-		<a <?php echo $this->get_render_attribute_string( $link_instance ); // phpcs:ignore ?>>
+		<a <?php echo $this->get_render_attribute_string( $link_instance ); ?>>
 			<div class="jet-portfolio__image">
-				<?php echo $this->_loop_image_item(); // phpcs:ignore ?>
+				<?php echo $this->_loop_image_item(); ?>
 				<div class="jet-portfolio__image-loader"><span></span></div>
 			</div>
 		</a>
@@ -70,10 +67,10 @@ if ( $is_lightbox ) {
 			<div class="jet-portfolio__content-inner"><?php
 				$title_tag = $this->_get_html( 'title_html_tag', '%s' );
 				$title_tag = jet_elements_tools()->validate_html_tag( $title_tag );
-				echo $this->_loop_item( array( 'item_title' ), '<' . $title_tag . ' class="jet-portfolio__title">%s</' . $title_tag . '>' ); // phpcs:ignore
-				echo $this->_get_item_category(); // phpcs:ignore
-				echo $this->_loop_item( array( 'item_desc' ), '<p class="jet-portfolio__desc">%s</p>' ); // phpcs:ignore
-				echo $this->_generate_item_button(); // phpcs:ignore ?></div>
+				echo $this->_loop_item( array( 'item_title' ), '<' . $title_tag . ' class="jet-portfolio__title">%s</' . $title_tag . '>' );
+				echo $this->_get_item_category();
+				echo $this->_loop_item( array( 'item_desc' ), '<p class="jet-portfolio__desc">%s</p>' );
+				echo $this->_generate_item_button(); ?></div>
 		</div>
 	</div>
 </article><?php

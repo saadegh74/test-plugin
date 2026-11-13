@@ -33,38 +33,3 @@
 		display: var(--cart-update-automatically-display, inline-block);
 	}
 }
-
-.jet-woo-builder-products--columns.products {
-	column-gap: 0 !important;
-}
-
-.woocommerce {
-	.elementor-jet-cart-totals {
-		.cart_totals {
-			h1,
-			h2,
-			h3,
-			h4,
-			h5,
-			h6,
-			th,
-			td {
-				a,
-				span,
-				strong,
-				bdi,
-				small,
-				label,
-				.amount,
-				.woocommerce-Price-amount,
-				.woocommerce-Price-currencySymbol {
-					color: inherit !important;
-				}
-			}
-
-			.shipping-calculator-button {
-				color: inherit !important;
-			}
-		}
-	}
-}

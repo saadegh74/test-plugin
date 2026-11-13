@@ -21,6 +21,6 @@ jet_woo_builder()->admin_bar->register_post_item( $template );
 		do_action( 'woocommerce_account_content' );
 	}
 
-	echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped;
+	echo jet_woo_builder_template_functions()->get_woo_builder_content( $template );
 	?>
 </div>

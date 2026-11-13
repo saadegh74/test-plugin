@@ -14,7 +14,7 @@ const Button = {
 		},
 		buttonStyle: {
 			validator ( value ) {
-				return oneOf( value, [ 'default', 'accent', 'link-accent', 'link-error', 'accent-border', 'default-border' ] );
+				return oneOf( value, [ 'default', 'accent', 'link-accent', 'link-error' ] );
 			},
 			default: 'default'
 		},
@@ -114,7 +114,6 @@ const Button = {
 			}
 
 			this.$emit( 'click', event );
-			this.$emit( 'on-click', event );
 		}
 	},
 };

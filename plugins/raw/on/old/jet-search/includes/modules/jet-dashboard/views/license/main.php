@@ -62,7 +62,21 @@
 		</div>
 	</div>
 
- 
+	<div
+		class="more-plugins jet-dashboard-page__panel"
+		v-if="morePluginListVisible"
+	>
+		<div class="cx-vui-subtitle">
+			<span class="cx-vui-subtitle__label"><?php _e( 'Get More Plugins', 'jet-dashboard' ); ?></span>
+		</div>
+		<div class="plugin-list plugin-list--more-plugins">
+			<plugin-item-more
+				v-for="( pluginData, index ) in morePluginList"
+				:key="index"
+				:plugin-data="pluginData"
+			></plugin-item-more>
+		</div>
+	</div>
 
 	<transition name="popup">
 		<cx-vui-popup

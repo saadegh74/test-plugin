@@ -33,23 +33,13 @@ class Jet_Elements_Pricing_Table extends Jet_Elements_Base {
 		return 'jet-elements-icon-pricing-table';
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-pricing-table', 'jet-pricing-table-skin' ); 
-	}
-
 	public function get_script_depends() {
 
-		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) { // phpcs:ignore
-			return array( 'tippy-bundle', 'jet-anime-js', 'jet-pricing-table' );
+		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) {
+			return array( 'tippy-bundle', 'jet-anime-js' );
 		}
 
 		$scripts = array();
-
-		$scripts[] = 'jet-pricing-table';
 
 		if ( $this->_pricing_features_items_tooltips_check() ) {
 			$scripts[] = 'tippy-bundle';
@@ -363,7 +353,7 @@ class Jet_Elements_Pricing_Table extends Jet_Elements_Base {
 			)
 		);
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$repeater->add_control(
 			'item_text',
@@ -3037,13 +3027,8 @@ class Jet_Elements_Pricing_Table extends Jet_Elements_Base {
 			$check         = false;
 
 			foreach ( $features_list as $item ) {
-				
 				if ( ! empty( $item['item_tooltip'] ) ) {
 					$check = true;
-				}
-
-				if ( ! empty( $item['__dynamic__']['item_tooltip'] ) ) {
-					return true;
 				}
 			}
 

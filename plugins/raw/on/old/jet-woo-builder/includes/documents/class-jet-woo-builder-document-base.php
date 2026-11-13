@@ -271,7 +271,6 @@ class Jet_Woo_Builder_Document_Base extends Elementor\Core\Base\Document {
 
 		$this->save_template_type();
 		$this->save_version();
-		$this->delete_cache();
 		$this->save_template_item_to_meta( $this->post->ID );
 
 		// Update Post CSS
@@ -338,7 +337,7 @@ class Jet_Woo_Builder_Document_Base extends Elementor\Core\Base\Document {
 	 */
 	public function get_elements_data( $status = 'publish' ) {
 
-		if ( ! isset( $_GET[ jet_woo_builder_post_type()->slug() ] ) || ! isset( $_GET['preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		if ( ! isset( $_GET[ jet_woo_builder_post_type()->slug() ] ) || ! isset( $_GET['preview'] ) ) {
 			return parent::get_elements_data( $status );
 		}
 
@@ -355,7 +354,9 @@ class Jet_Woo_Builder_Document_Base extends Elementor\Core\Base\Document {
 	public function __construct( array $data = [] ) {
 
 		add_filter( 'body_class', [ $this, 'set_body_class' ] );
-		add_filter( 'the_content', [ $this, 'add_template_wrapper' ], 9999999 );
+		add_filter( 'the_content', [ $this, 'add_template_wrapper' ], 999999 );
+
+		jet_woo_builder()->documents->set_current_type( $this->get_name() );
 
 		parent::__construct( $data );
 

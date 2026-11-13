@@ -6,6 +6,6 @@ $settings = $this->get_settings_for_display();
 ?>
 <div class="jet-animated-text__before-text">
 	<?php
-		echo $this->str_to_spanned_html( $settings['before_text_content'], 'word' ) . '&nbsp;'; // phpcs:ignore
+		echo $this->str_to_spanned_html( $settings['before_text_content'], 'word' ) . '&nbsp;';
 	?>
 </div>

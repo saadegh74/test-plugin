@@ -17,5 +17,5 @@ if ( empty( $price ) ) {
 ?>
 
 <div class="jet-woo-product-price">
-	<span class="price"><?php echo wp_kses_post( $price ); ?></span>
+	<span class="price"><?php echo $price; ?></span>
 </div>

@@ -10,14 +10,10 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
-
 	/**
 	 * Define Jet_Smart_Filters_Provider_EPro_Archive class
 	 */
 	class Jet_Smart_Filters_Provider_EPro_Archive extends Jet_Smart_Filters_Provider_Base {
-
-		protected $has_container_wrapper = null;
-
 		/**
 		 * Watch for default query
 		 */
@@ -116,9 +112,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
 				return;
 			}
 
-			$query_id         = $this->helpers->elementor->get_widget_query_id( $widget );
+			$settings         = $widget->get_settings();
 			$store_settings   = $this->settings_to_store();
-			$default_settings = $this->helpers->elementor->get_widget_settings_for_storage( $widget, $store_settings );
+			$default_settings = array();
+
+			if ( ! empty( $settings['_element_id'] ) ) {
+				$query_id = $settings['_element_id'];
+			} else {
+				$query_id = 'default';
+			}
+
+			foreach ( $store_settings as $key ) {
+				$default_settings[ $key ] = isset( $settings[ $key ] ) ? $settings[ $key ] : '';
+			}
 
 			$default_settings['_el_widget_id'] = $widget->get_id();
 
@@ -134,11 +140,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
 				//'post_type'    => get_post_type(), - removed to filter taxonomy with multiple post types
 				'paged'          => ! empty( $query['paged'] ) ? $query['paged'] : 1,
 				'posts_per_page' => ! empty( $query['posts_per_page'] ) ? $query['posts_per_page'] : 10,
+				'post_status'    => 'publish'
 			);
-
-			if ( ! empty( $query['post_status'] ) ) {
-				$default_query['post_status'] = $query['post_status'];
-			}
 
 			if ( ! empty( $query['post_type'] ) ) {
 				$default_query['post_type'] = $query['post_type'];
@@ -185,7 +188,17 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
 		 */
 		public function ensure_settings( $settings ) {
 
-			return $this->helpers->elementor->ensure_settings( $settings, $this->settings_to_store() );
+			foreach ( $this->settings_to_store() as $setting ) {
+				if ( ! isset( $settings[ $setting ] ) ) {
+					if ( false !== strpos( $setting, '_meta_data' ) ) {
+						$settings[ $setting ] = array();
+					} else {
+						$settings[ $setting ] = false;
+					}
+				}
+			}
+
+			return $settings;
 		}
 
 		/**
@@ -193,14 +206,24 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
 		 */
 		public function ajax_get_content() {
 
-			$settings = $this->ensure_settings( jet_smart_filters()->query->get_query_settings() );
+			$settings  = jet_smart_filters()->query->get_query_settings();
+			$settings  = $this->ensure_settings( $settings );
+			$widget_id = $settings['_el_widget_id'];
+
+			unset( $settings['_el_widget_id'] );
+
+			$data = array(
+				'id'         => $widget_id,
+				'elType'     => 'widget',
+				'settings'   => $this->sanitize_settings( $settings ),
+				'elements'   => array(),
+				'widgetType' => $this->widget_name(),
+			);
 
 			$this->hook_apply_query();
 
-			$widget = $this->helpers->elementor->create_widget_instance(
-				$this->widget_name(),
-				$this->sanitize_settings( $settings )
-			);
+			$attributes = jet_smart_filters()->query->get_query_settings();
+			$widget     = Elementor\Plugin::$instance->elements_manager->create_element_instance( $data );
 
 			if ( ! $widget ) {
 				throw new \Exception( 'Widget not found.' );
@@ -211,11 +234,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
 			$content = ob_get_clean();
 
 			if ( $content ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $content;
 			} else {
-				$container_class = $this->has_container_wrapper() ? 'elementor-widget-container' : 'elementor-posts';
-				echo '<div class="' . esc_attr( $container_class ) . '"></div>';
+				echo '<div class="elementor-widget-container"></div>';
 			}
 		}
 
@@ -223,23 +244,8 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive' ) ) {
 		 * Get provider wrapper selector
 		 */
 		public function get_wrapper_selector() {
-			if ( $this->has_container_wrapper() ) {
-				return '.elementor-widget-archive-posts .elementor-widget-container';
-			} else {
-				return '.elementor-widget-archive-posts .elementor-posts';
-			}
-		}
 
-		/**
-		 * Check if provider has .elementor-widget-container wrapper
-		 */
-		public function has_container_wrapper() {
-
-			if ( null === $this->has_container_wrapper ) {
-				$this->has_container_wrapper = ! Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
-			}
-
-			return $this->has_container_wrapper;
+			return '.elementor-widget-archive-posts .elementor-widget-container';
 		}
 
 		/**

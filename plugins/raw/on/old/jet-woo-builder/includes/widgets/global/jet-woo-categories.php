@@ -10,8 +10,9 @@ namespace Elementor;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
-use Elementor\Group_Control_Css_Filter;
 use Elementor\Group_Control_Typography;
+use Elementor\Core\Schemes\Color;
+use Elementor\Core\Schemes\Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,18 +36,8 @@ class Jet_Woo_Categories extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-categories-grid-widget-overview/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-
-		$deps[] = 'elementor-icons-fa-solid';
-		$deps[] = 'e-swiper';
-
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
+	public function get_jet_style_depends() {
+		return [ 'jet-woo-builder', 'elementor-icons-fa-solid' ];
 	}
 
 	public function __shortcode() {
@@ -257,19 +248,11 @@ class Jet_Woo_Categories extends Jet_Woo_Builder_Base {
 		$this->add_control(
 			'thumb_background',
 			[
-				'type'      => Controls_Manager::COLOR,
 				'label'     => __( 'Background Color', 'jet-woo-builder' ),
+				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} ' . $css_scheme['thumb'] => 'background-color: {{VALUE}}',
 				],
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Css_Filter::get_type(),
-			[
-				'name'     => 'thumb_css_filters',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['thumb'] . ' img',
 			]
 		);
 
@@ -293,19 +276,11 @@ class Jet_Woo_Categories extends Jet_Woo_Builder_Base {
 		$this->add_control(
 			'thumb_background_hover',
 			[
-				'type'      => Controls_Manager::COLOR,
 				'label'     => __( 'Background Color', 'jet-woo-builder' ),
+				'type'      => Controls_Manager::COLOR,
 				'selectors' => [
 					'{{WRAPPER}} ' . $css_scheme['inner-box'] . ':hover .jet-woo-category-thumbnail' => 'background-color: {{VALUE}}',
 				],
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Css_Filter::get_type(),
-			[
-				'name'     => 'thumb_css_filters_hover',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['inner-box'] . ':hover .jet-woo-category-thumbnail img',
 			]
 		);
 
@@ -1097,8 +1072,6 @@ class Jet_Woo_Categories extends Jet_Woo_Builder_Base {
 
 	protected function render() {
 
-		jet_woo_builder_assets()->add_inline_widget_script( 'jet-woo-categories.default' );
-
 		$attributes    = [];
 		$settings      = $this->get_settings_for_display();
 		$shortcode_obj = $this->__shortcode();
@@ -1121,7 +1094,7 @@ class Jet_Woo_Categories extends Jet_Woo_Builder_Base {
 
 		$this->__open_wrap();
 
-		echo jet_woo_builder_tools()->get_carousel_wrapper_atts( $shortcode_obj->do_shortcode( $attributes ), $settings ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo jet_woo_builder_tools()->get_carousel_wrapper_atts( $shortcode_obj->do_shortcode( $attributes ), $settings );
 
 		$this->__close_wrap();
 

@@ -62,21 +62,13 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Sorting' ) ) {
 				],
 				'units' => [
 					[
-						'value'     => 'px',
-						'intervals' => [
-							'step' => 1,
-							'min'  => 0,
-							'max'  => 500
-						]
-					],
-					[
 						'value' => '%',
 						'intervals' => [
 							'step' => 1,
-							'min'  => 0,
-							'max'  => 100
+							'min'  => 10,
+							'max'  => 100,
 						]
-					]
+					],
 				],
 			]);
 
@@ -184,25 +176,30 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Sorting' ) ) {
 				'label'     => esc_html__( 'Alignment', 'jet-smart-filters' ),
 				'separator'    => 'before',
 				'options'   =>[
-					'flex-start'=> [
+					'left'    => [
 						'shortcut' => esc_html__( 'Left', 'jet-smart-filters' ),
 						'icon'  => 'dashicons-editor-alignleft',
 					],
-					'center' => [
+					'center'    => [
 						'shortcut' => esc_html__( 'Center', 'jet-smart-filters' ),
 						'icon'  => 'dashicons-editor-aligncenter',
 					],
-					'flex-end' => [
+					'right'    => [
 						'shortcut' => esc_html__( 'Right', 'jet-smart-filters' ),
 						'icon'  => 'dashicons-editor-alignright',
 					],
 				],
+				'return_value' => array(
+					'left'   => 'align-self: flex-start;',
+					'center' => 'align-self: center;',
+					'right'  => 'align-self: flex-end;',
+				),
 				'css_selector' => [
-					'{{WRAPPER}} ' . $this->css_scheme['label']  => 'align-self: {{VALUE}}',
+					'{{WRAPPER}} ' . $this->css_scheme['label']  => '{{VALUE}}',
 				],
 				'attributes' => [
 					'default' => [
-						'value' => 'flex-start',
+						'value' => 'left',
 					]
 				],
 			]);
@@ -420,11 +417,11 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Sorting' ) ) {
 		 */
 		public function render_callback( $settings = array() ) {
 
+			jet_smart_filters()->set_filters_used();
+
 			if ( empty( $settings['content_provider'] ) || $settings['content_provider'] === 'not-selected' ) {
 				return $this->is_editor() ? __( 'Please select a provider', 'jet-smart-filters' ) : false;
 			}
-
-			jet_smart_filters()->set_filters_used();
 
 			$base_class              = 'jet-smart-filters-' . $this->get_name();
 			$sorting_filter          = jet_smart_filters()->filter_types->get_filter_types( 'sorting' );
@@ -438,17 +435,17 @@ if ( ! class_exists( 'Jet_Smart_Filters_Block_Sorting' ) ) {
 
 			printf(
 				'<div class="%1$s jet-filter" data-is-block="jet-smart-filters/%2$s">',
-				esc_attr( $base_class ),
-				esc_attr( $this->get_name() )
+				$base_class,
+				$this->get_name()
 			);
 
 			include jet_smart_filters()->get_template( 'filters/sorting.php' );
 
-			echo '</div>';
-
 			if ( $settings['apply_button'] ) {
 				include jet_smart_filters()->get_template( 'common/apply-filters.php' );
 			}
+
+			echo '</div>';
 
 			$filter_layout = ob_get_clean();
 

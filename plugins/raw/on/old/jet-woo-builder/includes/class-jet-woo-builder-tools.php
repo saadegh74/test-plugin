@@ -3,6 +3,7 @@
  * JetWooBuilder tools class
  */
 
+// If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
@@ -212,8 +213,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Tools' ) ) {
 		public function get_carousel_arrow( $classes, $html ) {
 			$format = apply_filters( 'jet_woo_builder/carousel/arrows_format', '<div class="%s jet-arrow">%s</div>' );
 
-			// $html sanitized & escaped by Jet_Woo_Builder_Base::__render_icon()
-			return sprintf( $format, esc_attr( implode( ' ', $classes ) ), htmlspecialchars_decode( $html ) );
+			return sprintf( $format, implode( ' ', $classes ), htmlspecialchars_decode( $html ) );
 		}
 
 		/**
@@ -382,23 +382,14 @@ if ( ! class_exists( 'Jet_Woo_Builder_Tools' ) ) {
 				$prev_arrow_classes[] = 'swiper-button-disabled';
 			}
 
-			$pagination = $carousel_settings['dots'] ? '<div class="' . implode( ' ', $pagination_classes ) . '"></div>' : '';
-
-			// Sanitized above when filled $carousel_settings array
+			$pagination        = $carousel_settings['dots'] ? '<div class="' . implode( ' ', $pagination_classes ) . '"></div>' : '';
 			$swiper_prev_arrow = $carousel_settings['arrows'] ? $this->get_carousel_arrow( $prev_arrow_classes, $carousel_settings['prev_arrow'] ) : '';
-
-			// Sanitized above when filled $carousel_settings array
 			$swiper_next_arrow = $carousel_settings['arrows'] ? $this->get_carousel_arrow( [ 'next-arrow', 'jet-swiper-button-next' ], $carousel_settings['next_arrow'] ) : '';
-			$is_rtl = is_rtl() ? 'rtl' : 'ltr';
-
-			// Sanitized above when filled $carousel_settings array
-			$swiper_class      = [ 'jet-woo-carousel', $carousel_settings['carousel_direction'] ];
-
-			$swiper_class[] = jet_woo_builder()->elementor_views->is_swiper_upgrade_experiment_state_inactive() ? 'swiper-container' : 'swiper' ;
+			$is_rtl            = is_rtl() ? 'rtl' : 'ltr';
 
 			return sprintf(
-				'<div class="%7$s" data-slider_options="%1$s" dir="%6$s"> %2$s %3$s %4$s %5$s </div>',
-				htmlspecialchars( json_encode( $options ) ), $content, $pagination, $swiper_prev_arrow, $swiper_next_arrow, $is_rtl, implode( ' ', $swiper_class )
+				'<div class="jet-woo-carousel swiper-container %7$s" data-slider_options="%1$s" dir="%6$s"> %2$s %3$s %4$s %5$s </div>',
+				htmlspecialchars( json_encode( $options ) ), $content, $pagination, $swiper_prev_arrow, $swiper_next_arrow, $is_rtl, $carousel_settings['carousel_direction']
 			);
 
 		}
@@ -451,15 +442,15 @@ if ( ! class_exists( 'Jet_Woo_Builder_Tools' ) ) {
 		 */
 		public function is_builder_content_save() {
 
-			if ( ! isset( $_REQUEST['action'] ) || 'elementor_ajax' !== $_REQUEST['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification
+			if ( ! isset( $_REQUEST['action'] ) || 'elementor_ajax' !== $_REQUEST['action'] ) {
 				return false;
 			}
 
-			if ( empty( $_REQUEST['actions'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			if ( empty( $_REQUEST['actions'] ) ) {
 				return false;
 			}
 
-			if ( false === strpos( isset( $_REQUEST['actions'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['actions'] ) ) : '', 'save_builder' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			if ( false === strpos( $_REQUEST['actions'], 'save_builder' ) ) {
 				return false;
 			}
 

@@ -268,17 +268,9 @@ class Jet_Smart_Filters_Bricks_Sorting extends Jet_Smart_Filters_Bricks_Base {
 			$settings['apply_button_text'] = '';
 		}
 
-		// render_attributes() returns pre-escaped and validated HTML attributes.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-		printf(
-			'<div class="%1$s jet-filter">',
-			esc_attr( $this->name )
-		);
 		include jet_smart_filters()->get_template( 'filters/sorting.php' );
-		echo '</div>';
-
 		include jet_smart_filters()->get_template( 'common/apply-filters.php' );
 
 		echo "</div>";

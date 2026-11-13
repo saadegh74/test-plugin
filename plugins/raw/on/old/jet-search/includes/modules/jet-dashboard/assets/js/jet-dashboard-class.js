@@ -771,8 +771,7 @@ class JetDasboardClass {
 						data: {
 							action: 'jet_dashboard_debug_action',
 							data: {
-								action: self.serviceAction,
-								nonce: window.JetDashboardConfig.nonce,
+								action: self.serviceAction
 							}
 						},
 						beforeSend: function( jqXHR, ajaxSettings ) {

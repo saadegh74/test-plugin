@@ -14,7 +14,7 @@ $this->add_render_attribute( 'button', array(
 		'pricing-table-button',
 		'button-' . $button_size . '-size',
 	),
-	'href' => esc_url( $settings['button_url'] ),
+	'href' => $settings['button_url'],
 ) );
 
 if ( isset( $settings['button_is_external'] ) && filter_var( $settings['button_is_external'], FILTER_VALIDATE_BOOLEAN ) ) {
@@ -26,19 +26,19 @@ if ( isset( $settings['button_nofollow'] ) && filter_var( $settings['button_nofo
 }
 
 ?>
-<a <?php echo $this->get_render_attribute_string( 'button' ); // phpcs:ignore ?>><?php
+<a <?php echo $this->get_render_attribute_string( 'button' ); ?>><?php
 
 	$position = $settings['button_icon_position'];
 	$icon     = $settings['add_button_icon'];
 
 	if ( $icon && 'left' === $position ) {
-		echo $this->_icon( 'button_icon', '<span class="jet-elements-icon button-icon">%s</span>' ); // phpcs:ignore
+		echo $this->_icon( 'button_icon', '<span class="jet-elements-icon button-icon">%s</span>' );
 	}
 
-	echo $this->_html( 'button_text' ); // phpcs:ignore
+	echo $this->_html( 'button_text' );
 
 	if ( $icon && 'right' === $position ) {
-		echo $this->_icon( 'button_icon', '<span class="jet-elements-icon button-icon">%s</span>' ); // phpcs:ignore
+		echo $this->_icon( 'button_icon', '<span class="jet-elements-icon button-icon">%s</span>' );
 	}
 
 ?></a>

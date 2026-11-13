@@ -128,7 +128,16 @@ class Module extends Page_Module_Base {
 			return false;
 		}
 
-		 
+		add_submenu_page(
+			Dashboard::get_instance()->dashboard_slug,
+			$this->get_upsale_page_label(),
+			$this->get_upsale_page_label(),
+			'manage_options',
+			Dashboard::get_instance()->dashboard_slug . '-upsale-page',
+			function() {
+				include Dashboard::get_instance()->get_view( 'common/dashboard' );
+			}
+		);
 
 		return false;
 	}
@@ -152,7 +161,20 @@ class Module extends Page_Module_Base {
 	 * [get_upsale_page_label description]
 	 * @return [type] [description]
 	 */
-	 
+	public function get_upsale_page_label() {
+		$primary_license_data = $this->get_primary_license_data();
+
+		if ( 'crocoblock' === $primary_license_data['type'] ) {
+
+			if ( 'all-inclusive' === $primary_license_data['product'] ) {
+				return esc_html__( 'Go Lifetime', 'jet-dashboard' );
+			}
+
+			return esc_html__( 'Go All-Inclusive', 'jet-dashboard' );
+		}
+
+		return esc_html__( 'Get Crocoblock', 'jet-dashboard' );
+	}
 
 	/**
 	 * Enqueue module-specific assets

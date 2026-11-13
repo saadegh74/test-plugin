@@ -15,9 +15,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 	 */
 	class Jet_Smart_Filters_Provider_EPro_Products extends Jet_Smart_Filters_Provider_Base {
 
-		public $current_query_id  = 'default';
-		private $is_epro_products = false;
-		private $has_nothing_found_message = false;
+		public $current_query_id = 'default';
 
 		/**
 		 * Watch for default query
@@ -26,7 +24,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 
 			if ( ! jet_smart_filters()->query->is_ajax_filter() ) {
 				add_filter( 'woocommerce_shortcode_products_query', array( $this, 'store_shortcode_query' ), 0, 3 );
-				add_filter( 'woocommerce_shortcode_products_query_results', array( $this, 'preserve_empty_filtered_shortcode_results' ), 10, 2 );
 				add_action( 'woocommerce_product_query', array( $this, 'store_archive_query' ) );
 				add_action( 'pre_get_posts', array( $this, 'store_search_query' ) );
 				add_action( 'elementor/widget/before_render_content', array( $this, 'store_default_settings' ), 0 );
@@ -38,12 +35,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 		 */
 		public function store_shortcode_query( $args, $attributes, $type ) {
 
-			if ( ! $this->is_epro_products ) {
-				return $args;
-			}
-
-			$this->is_epro_products = false;
-			$query_id               = $this->current_query_id;
+			$query_id = $this->current_query_id;
 			
 			$args['suppress_filters']  = false;
 			$args['post_type']         = 'product';
@@ -55,64 +47,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 
 			jet_smart_filters()->query->store_provider_default_query( $this->get_id(), $args, $query_id, true );
 
+			/* if ( isset( $_REQUEST['product-page'] ) ) {
+				$attributes['page'] = absint( $_REQUEST['product-page'] );
+			}
+
+			jet_smart_filters()->providers->store_provider_settings( $this->get_id(), array(
+				'query_type'     => 'shortcode',
+				'shortcode_type' => $type,
+				'attributes'     => $attributes,
+			), $query_id );
+
+			add_action( "woocommerce_shortcode_before_{$type}_loop", array( $this, 'store_props' ) ); */
+
 			return $args;
-		}
-
-		/**
-		 * Preserve Elementor Pro Products wrapper for empty filtered requests.
-		 *
-		 * Elementor Pro returns an empty string before the widget wrapper is rendered
-		 * when a Products query has zero results. JetSmartFilters still needs this
-		 * wrapper on request-filtered pages to clear or replace the provider.
-		 */
-		public function preserve_empty_filtered_shortcode_results( $results, $shortcode ) {
-
-			if (
-				! empty( $results->total )
-				|| ! is_callable( array( $shortcode, 'get_query_args' ) )
-			) {
-				return $results;
-			}
-
-			$query_args = $shortcode->get_query_args();
-
-			if ( empty( $query_args['jet_smart_filters'] ) ) {
-				return $results;
-			}
-
-			if ( $query_args['jet_smart_filters'] !== jet_smart_filters()->render->request_provider( 'raw' ) ) {
-				return $results;
-			}
-
-			if ( $this->get_id() !== jet_smart_filters()->render->request_provider( 'provider' ) ) {
-				return $results;
-			}
-
-			if ( $this->current_query_id !== jet_smart_filters()->render->request_provider( 'query_id' ) ) {
-				return $results;
-			}
-
-			remove_action( 'woocommerce_shortcode_before_products_loop', array( $this, 'store_props' ) );
-			remove_action( 'woocommerce_shortcode_before_current_query_loop', array( $this, 'store_props' ) );
-
-			jet_smart_filters()->query->set_props(
-				$this->get_id(),
-				array(
-					'found_posts'   => 0,
-					'max_num_pages' => 0,
-					'page'          => ! empty( $results->current_page ) ? absint( $results->current_page ) : 1,
-				),
-				$this->current_query_id
-			);
-
-			if ( $this->has_nothing_found_message ) {
-				return $results;
-			}
-
-			$results->total       = 1;
-			$results->total_pages = 1;
-
-			return $results;
 		}
 
 		public function store_archive_query( $query ) {
@@ -146,6 +93,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 
 			$default_query = array(
 				//'post_type'       => $query->get( 'post_type' ),
+				'post_status'       => 'publish',
 				'wc_query'          => $query->get( 'wc_query' ),
 				'orderby'           => $query->get( 'orderby' ),
 				'order'             => $query->get( 'order' ),
@@ -155,11 +103,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 				'jet_smart_filters' => $this->get_id(),
 			);
 
-			if ( $query->get( 'post_status' ) ) {
-				$default_query['post_status'] = $query->get( 'post_status' );
-			}
-
-			if ( ! empty( $query->queried_object ) && $query->queried_object instanceof WP_Term ) {
+			if ( ! empty( $query->queried_object ) ) {
 				$default_query['taxonomy'] = $query->queried_object->taxonomy;
 				$default_query['term']     = $query->queried_object->slug;
 			}
@@ -198,13 +142,21 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 				return;
 			}
 
-			$this->is_epro_products = true;
-			$this->has_nothing_found_message = ! empty( $widget->get_settings_for_display( 'nothing_found_message' ) );
-			$store_settings         = $this->settings_to_store();
-			$default_settings       = $this->helpers->elementor->get_widget_settings_for_storage( $widget, $store_settings );
-			$query_id               = $this->helpers->elementor->get_widget_query_id( $widget );
+			$settings         = $widget->get_settings();
+			$store_settings   = $this->settings_to_store();
+			$default_settings = array();
+
+			if ( ! empty( $settings['_element_id'] ) ) {
+				$query_id = $settings['_element_id'];
+			} else {
+				$query_id = 'default';
+			}
 
 			$this->current_query_id = $query_id;
+
+			foreach ( $store_settings as $key ) {
+				$default_settings[ $key ] = isset( $settings[ $key ] ) ? $settings[ $key ] : '';
+			}
 
 			$default_settings['_el_widget_id'] = $widget->get_id();
 
@@ -281,7 +233,17 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 		 */
 		public function ensure_settings( $settings ) {
 
-			return $this->helpers->elementor->ensure_settings( $settings, $this->settings_to_store() );
+			foreach ( $this->settings_to_store() as $setting ) {
+				if ( ! isset( $settings[ $setting ] ) ) {
+					if ( false !== strpos( $setting, '_meta_data' ) ) {
+						$settings[ $setting ] = array();
+					} else {
+						$settings[ $setting ] = false;
+					}
+				}
+			}
+
+			return $settings;
 		}
 
 		public function ajax_get_content() {
@@ -292,21 +254,28 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 
 			$this->сlear_store_props();
 
-			$settings = $this->ensure_settings( jet_smart_filters()->query->get_query_settings() );
+			$settings  = $this->ensure_settings( jet_smart_filters()->query->get_query_settings() );
+			$widget_id = $settings['_el_widget_id'];
+			unset( $settings['_el_widget_id'] );
 
 			if ( ! empty( $settings['_element_id'] ) ) {
 				$this->current_query_id = $settings['_element_id'];
 			}
+
+			$data = array(
+				'id'         => $widget_id,
+				'elType'     => 'widget',
+				'settings'   => $this->sanitize_settings( $settings ),
+				'elements'   => array(),
+				'widgetType' => $this->widget_name(),
+			);
 
 			do_action( 'jet-smart-filters/providers/epro-products/before-ajax-content' );
 
 			add_action( 'woocommerce_shortcode_before_products_loop', array( $this, 'store_props' ) );
 			add_action( 'woocommerce_shortcode_before_current_query_loop', array( $this, 'store_props' ) );
 
-			$widget = $this->helpers->elementor->create_widget_instance(
-				$this->widget_name(),
-				$this->sanitize_settings( $settings )
-			);
+			$widget = Elementor\Plugin::$instance->elements_manager->create_element_instance( $data );
 
 			if ( ! $widget ) {
 				throw new \Exception( 'Widget not found.' );
@@ -326,7 +295,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 			$content = ob_get_clean();
 
 			if ( $content ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $content;
 			} else {
 				echo '<div class="elementor-widget-container"></div>';
@@ -468,10 +436,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Products' ) ) {
 
 		public function add_archive_query_args( $query ) {
 
-			if ( ! $query->get( 'wc_query' ) || strpos( $query->get('jsf'), $this->get_id() ) !== 0 ) {
+			if ( $query->get('jsf') !== $this->get_id() && ! $query->get( 'wc_query' ) && ! $query->is_search ) {
 				return;
 			}
-	
+
 			$jet_query_args = jet_smart_filters()->query->get_query_args();
 
 			foreach ( $jet_query_args as $query_var => $value ) {

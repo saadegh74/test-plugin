@@ -8,6 +8,7 @@
 namespace Elementor;
 
 use Elementor\Group_Control_Border;
+use Elementor\Core\Schemes\Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,7 +33,7 @@ class Jet_Woo_Builder_Archive_Sku extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'archive' );
+		return jet_woo_builder()->documents->is_document_type( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -147,16 +148,16 @@ class Jet_Woo_Builder_Archive_Sku extends Jet_Woo_Builder_Base {
 			return;
 		}
 
-		printf( '<div class="jet-woo-builder-archive-product-sku">%s</div>', wp_kses_post( $sku ) );
+		printf( '<div class="jet-woo-builder-archive-product-sku">%s</div>', $sku );
 
 	}
 
 	protected function render() {
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo wp_kses_post(jet_woo_builder()->parser->get_macros_string( $this->get_name() ) );
+			echo jet_woo_builder()->parser->get_macros_string( $this->get_name() );
 		} else {
-			echo wp_kses_post( self::render_callback() ?: '');
+			echo self::render_callback();
 		}
 
 	}

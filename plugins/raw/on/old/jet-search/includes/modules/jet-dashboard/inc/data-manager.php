@@ -205,30 +205,12 @@ class Data_Manager {
 			);
 		}
 
-		if ( ! isset( $data['nonce'] ) || ! wp_verify_nonce( $data['nonce'], 'jet-dashboard' ) ) {
-			wp_send_json( [
-				'status'  => 'error',
-				'code'    => 'server_error',
-				'message' => __( 'Page has expired. Please reload this page.', 'jet-dashboard' ),
-				'data'    => [],
-			] );
-		}
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json( [
-				'status'  => 'error',
-				'code'    => 'server_error',
-				'message' => __( 'Sorry, you are not allowed to do that on this site.', 'jet-dashboard' ),
-				'data'    => [],
-			] );
-		}
-
 		$license_action = $data['action'];
 
 		switch ( $license_action ) {
 
 			case 'check-plugin-update':
-				delete_site_transient( 'update_plugins' );
+				set_site_transient( 'update_plugins', null );
 
 				wp_send_json(
 					array(

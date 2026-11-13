@@ -24,31 +24,10 @@
 			value=""
 			disabled
 		>{{ placeholder }}</option>
-		<template v-if="groups.length">
-			<optgroup v-for="group in groups" :label="group.label">
-				<option
-					v-for="option in group.options"
-					:value="option.value"
-					:selected="isOptionSelected( option )"
-				>{{ option.label }}</option>
-			</optgroup>
-		</template>
-		<template v-else>
-            <template v-for="option in options">
-                <optgroup v-if="option.hasOwnProperty('options')" :label="option.label">
-                    <option
-                        v-for="option in option.options"
-                        :value="option.value"
-                        :selected="isOptionSelected( option )"
-                    >{{ option.label }}</option>
-                </optgroup>
-                <option
-                    v-if="!option.hasOwnProperty('options')"
-                    :value="option.value"
-                    :selected="isOptionSelected( option )"
-                >{{ option.label }}</option>
-            </template>
-		</template>
+		<option
+			v-for="option in options"
+			:value="option.value"
+			:selected="isOptionSelected( option )"
+		>{{ option.label }}</option>
 	</select>
-	<slot></slot>
 </cx-vui-component-wrapper>

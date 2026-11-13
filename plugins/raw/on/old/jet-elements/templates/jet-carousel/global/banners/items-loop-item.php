@@ -16,7 +16,7 @@
 		return;
 	}
 
-	$lightbox = sprintf( 'data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="%s"', esc_attr( $this->get_id() ) );
+	$lightbox = 'data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="' . $this->get_id() . '"';
 	$settings = $this->get_settings_for_display();
 ?>
 <div class="jet-carousel__item">
@@ -32,30 +32,30 @@
 					$lightbox_desc = '';
 
 					if ( "true" === $show_lightbox_title ) {
-						$lightbox_title = sprintf( 'data-elementor-lightbox-title="%s"', esc_attr( wp_strip_all_tags( $this->_loop_item( array( 'item_title' ) ) ) ) );
+						$lightbox_title = 'data-elementor-lightbox-title="' . $this->_loop_item( array( 'item_title' ) ) . '"';
 					}
 
 					if ( "true" === $show_lightbox_desc ) {
-						$lightbox_desc = sprintf( 'data-elementor-lightbox-description="%s"', esc_attr( wp_strip_all_tags( $this->_loop_item( array( 'item_text' ) ) ) ) );
+						$lightbox_desc = 'data-elementor-lightbox-description="' . wp_strip_all_tags( $this->_loop_item( array( 'item_text' ) ) ) . '"';
 					}
 
-					printf( '<a href="%1$s" class="jet-banner__link" %2$s %3$s %4$s>', esc_url( $item_settings['item_image']['url'] ), $lightbox, $lightbox_title, $lightbox_desc ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					printf( '<a href="%1$s" class="jet-banner__link" %2$s %3$s %4$s>', $item_settings['item_image']['url'], $lightbox, $lightbox_title, $lightbox_desc );
 				} else {
-					echo $this->_loop_item( array( 'item_link' ), '<a href="%s" class="jet-banner__link"' . $target . $rel . '>' ); // phpcs:ignore
+					echo $this->_loop_item( array( 'item_link' ), '<a href="%s" class="jet-banner__link"' . $target . $rel . '>' );
 				}
 			}
 
 			echo '<div class="jet-banner__overlay"></div>';
-			echo $img; // phpcs:ignore
+			echo $img;
 			echo '<figcaption class="jet-banner__content">';
 				echo '<div class="jet-banner__content-wrap">';
 					switch ( $content_type ) {
 						case 'default':
-							echo $this->_loop_item( array( 'item_title' ), '<' . $title_tag . ' class="jet-banner__title">%s</' . $title_tag . '>' );  // phpcs:ignore
-							echo $this->_loop_item( array( 'item_text' ), '<div class="jet-banner__text">%s</div>' );  // phpcs:ignore
+							echo $this->_loop_item( array( 'item_title' ), '<' . $title_tag . ' class="jet-banner__title">%s</' . $title_tag . '>' );
+							echo $this->_loop_item( array( 'item_text' ), '<div class="jet-banner__text">%s</div>' );
 							break;
 						case 'template':
-							echo $this->_loop_item_template_content();  // phpcs:ignore
+							echo $this->_loop_item_template_content();
 							break;
 					}
 				echo '</div>';
@@ -65,7 +65,7 @@
 			if ( $settings['item_link_type'] === 'lightbox' && $img ) {
 				printf( '</a>' );
 			} else {
-				echo $this->_loop_item( array( 'item_link' ), '</a>' );  // phpcs:ignore
+				echo $this->_loop_item( array( 'item_link' ), '</a>' );
 			}
 		}
 	?></figure>

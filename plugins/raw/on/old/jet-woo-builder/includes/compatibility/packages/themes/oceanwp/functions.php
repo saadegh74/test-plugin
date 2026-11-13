@@ -18,7 +18,6 @@ if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '3.5.
 
 // Enqueue styles
 add_action( 'wp_enqueue_scripts', 'jet_woo_oceanwp_enqueue_styles' );
-add_action( 'wp_enqueue_scripts', 'jet_woo_oceanwp_enqueue_scripts' );
 
 // Sidebar displaying
 add_filter( 'ocean_post_layout_class', 'jet_woo_oceanwp_display_sidebar' );
@@ -37,6 +36,7 @@ function woocommerce_init() {
 		add_action( 'jet-woo-builder/woocommerce/before-main-content', [ 'OceanWP_WooCommerce_Config', 'content_wrapper' ], 10 );
 		add_action( 'jet-woo-builder/woocommerce/after-main-content', [ 'OceanWP_WooCommerce_Config', 'content_wrapper_end' ], 10 );
 	}
+
 }
 
 /**
@@ -105,20 +105,5 @@ function jet_woo_oceanwp_enqueue_styles() {
 		jet_woo_builder()->plugin_url( 'includes/compatibility/packages/themes/oceanwp/assets/css/style.css' ),
 		false,
 		jet_woo_builder()->get_version()
-	);
-}
-
-/**
- * Enqueue OceanWP theme integration scripts.
- *
- * @return void
- */
-function jet_woo_oceanwp_enqueue_scripts() {
-	wp_enqueue_script(
-		'jet-woo-builder-oceanwp',
-		jet_woo_builder()->plugin_url( 'includes/compatibility/packages/themes/oceanwp/assets/js/script.js' ),
-		[ 'jquery' ],
-		jet_woo_builder()->get_version(),
-		true
 	);
 }

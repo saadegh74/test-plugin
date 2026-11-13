@@ -54,6 +54,36 @@ class Jet_Smart_Filters_Select_Widget extends Jet_Smart_Filters_Base_Widget {
 		);
 
 		$this->add_responsive_control(
+			'content_position',
+			array(
+				'label'       => esc_html__( 'Position', 'jet-smart-filters' ),
+				'type'        => Controls_Manager::CHOOSE,
+				'toggle'      => false,
+				'label_block' => false,
+				'default'     => 'column',
+				'options'     => array(
+					'line' => array(
+						'title' => esc_html__( 'Line', 'jet-smart-filters' ),
+						'icon'  => 'eicon-ellipsis-h',
+					),
+					'column' => array(
+						'title' => esc_html__( 'Columns', 'jet-smart-filters' ),
+						'icon'  => 'eicon-menu-bar',
+					),
+				),
+				'selectors_dictionary' => array(
+					'line'   => 'display:flex;',
+					'column' => 'display:block;',
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .jet-smart-filters-select.jet-filter' => '{{VALUE}}',
+					'{{WRAPPER}} .jet-smart-filters-hierarchy.jet-filter ' . $css_scheme['filter'] => '{{VALUE}}',
+				),
+				'prefix_class' => 'jet-smart-filter-content-position-',
+			)
+		);
+
+		$this->add_responsive_control(
 			'select_width',
 			array(
 				'label'      => esc_html__( 'Select Width', 'jet-smart-filters' ),
@@ -78,7 +108,7 @@ class Jet_Smart_Filters_Select_Widget extends Jet_Smart_Filters_Base_Widget {
 				),
 				'selectors'  => array(
 					'{{WRAPPER}} .jet-smart-filters-select.jet-filter ' . $css_scheme['filter'] => 'max-width: {{SIZE}}{{UNIT}}; flex-basis: {{SIZE}}{{UNIT}}',
-					'{{WRAPPER}} .jet-smart-filters-hierarchy.jet-filter ' . $css_scheme['filter'] => 'width: {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .jet-smart-filters-hierarchy.jet-filter ' . $css_scheme['select'] => 'max-width: {{SIZE}}{{UNIT}}; flex-basis: {{SIZE}}{{UNIT}}',
 				),
 			)
 		);
@@ -277,10 +307,10 @@ class Jet_Smart_Filters_Select_Widget extends Jet_Smart_Filters_Base_Widget {
 				),
 				'selectors_dictionary' => array(
 					'line'   => 'display:flex; flex-direction:row;',
-					'column' => 'display:flex; flex-direction:column; --jet-smart-filters-group-item-width: auto;',
+					'column' => 'display:flex; flex-direction:column;',
 				),
 				'selectors' => array(
-					'{{WRAPPER}} .jet-filters-group.jet-filters-group' => '{{VALUE}}',
+					'{{WRAPPER}} .jet-filters-group' => '{{VALUE}}',
 				),
 				'prefix_class' => 'jet-smart-filter-group-position-',
 			)
@@ -310,9 +340,8 @@ class Jet_Smart_Filters_Select_Widget extends Jet_Smart_Filters_Base_Widget {
 					'unit' => '%'
 				),
 				'selectors'   => array(
-					'{{WRAPPER}} .jet-filters-group'                         => '--jet-smart-filters-group-item-width: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} .jet-filters-group .jet-filter'             => 'width: var(--jet-smart-filters-group-item-width);',
-					'{{WRAPPER}} .jet-filter .jet-filters-group .jet-select' => 'width: var(--jet-smart-filters-group-item-width);',
+					'{{WRAPPER}} .jet-filters-group .jet-filter'             => 'width: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} .jet-filter .jet-filters-group .jet-select' => 'width: {{SIZE}}{{UNIT}}',
 				),
 				'condition'   => array(
 					'group_filters_content_position' => 'line'

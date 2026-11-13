@@ -40,26 +40,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Active_Filters' ) ) {
 			$title = isset( $settings['filters_label'] ) ? $settings['filters_label'] : '';
 
 			echo '<div class="jet-active-filters__list">';
-			echo '<div class="jet-active-filters__title">' . wp_kses_post( $title ) . '</div>';
+			echo '<div class="jet-active-filters__title">' . $title . '</div>';
 			foreach ( $active_filters as $_filter ) {
 				echo '<div class="jet-active-filter">';
-				echo wp_kses_post(
-					jet_smart_filters()->utils->template_replace_with_value(
-						'for-js/active-filter/label.php',
-						$_filter['label']
-					)
-				);
-				echo wp_kses_post(
-					jet_smart_filters()->utils->template_replace_with_value(
-						'for-js/active-filter/value.php',
-						$_filter['value']
-					)
-				);
-				echo wp_kses_post(
-					jet_smart_filters()->utils->get_template_html(
-						'for-js/active-filter/remove.php'
-					)
-				);
+				echo jet_smart_filters()->utils->template_replace_with_value( 'for-js/active-filter/label.php', $_filter['label'] );
+				echo jet_smart_filters()->utils->template_replace_with_value( 'for-js/active-filter/value.php', $_filter['value'] );
+				echo jet_smart_filters()->utils->get_template_html( 'for-js/active-filter/remove.php' );
 				echo '</div>';
 			}
 			echo '<div>';
@@ -86,41 +72,18 @@ if ( ! class_exists( 'Jet_Smart_Filters_Active_Filters' ) ) {
 			$clear_label = ! empty( $settings['clear_item_label'] ) ? $settings['clear_item_label'] : false;
 
 			echo '<div class="jet-active-tags__list">';
-			echo '<div class="jet-active-tags__title">' . wp_kses_post( $title ) . '</div>';
+			echo '<div class="jet-active-tags__title">' . $title . '</div>';
 			if ( $clear_item && $clear_label ) {
 				echo '<div class="jet-active-tag jet-active-tag--clear">';
-				echo wp_kses_post(
-					jet_smart_filters()->utils->template_replace_with_value(
-						'for-js/active-tag/value.php',
-						$clear_label
-					)
-				);
-				echo wp_kses_post(
-					jet_smart_filters()->utils->get_template_html(
-						'for-js/active-tag/remove.php'
-					)
-				);
+				echo jet_smart_filters()->utils->template_replace_with_value( 'for-js/active-tag/value.php', $clear_label );
+				echo jet_smart_filters()->utils->get_template_html( 'for-js/active-tag/remove.php' );
 				echo '</div>';
 			}
 			foreach ( $active_tags as $_tag ) {
 				echo '<div class="jet-active-tag">';
-				echo wp_kses_post(
-					jet_smart_filters()->utils->template_replace_with_value(
-						'for-js/active-tag/label.php',
-						$_tag['label']
-					)
-				);
-				echo wp_kses_post(
-					jet_smart_filters()->utils->template_replace_with_value(
-						'for-js/active-tag/value.php',
-						$_tag['value']
-					)
-				);
-				echo wp_kses_post(
-					jet_smart_filters()->utils->get_template_html(
-						'for-js/active-tag/remove.php'
-					)
-				);
+				echo jet_smart_filters()->utils->template_replace_with_value( 'for-js/active-tag/label.php', $_tag['label'] );
+				echo jet_smart_filters()->utils->template_replace_with_value( 'for-js/active-tag/value.php', $_tag['value'] );
+				echo jet_smart_filters()->utils->get_template_html( 'for-js/active-tag/remove.php' );
 				echo '</div>';
 			}
 			echo '<div>';

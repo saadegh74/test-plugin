@@ -40,16 +40,11 @@ if ( ! class_exists( 'Jet_Elements_Compatibility' ) ) {
 
 				// Translated Popup Actions
 				add_filter( 'elementor/frontend/builder_content_data', array( $this, 'convert_popup_id' ) );
-
 			}
 
 			// Polylang compatibility
 			if ( class_exists( 'Polylang' ) ) {
 				add_filter( 'jet-elements/widgets/template_id', array( $this, 'set_pll_translated_template_id' ) );
-			}
-
-			if ( defined( 'WPML_MEDIA_VERSION' ) ) {
-				add_filter( 'jet-elements/widgets/translate_image_id', array( $this, 'wpml_translate_media_id' ) );
 			}
 		}
 
@@ -58,7 +53,7 @@ if ( ! class_exists( 'Jet_Elements_Compatibility' ) ) {
 		 */
 		public function filter_jetpack_photon_skip_image( $val, $src, $tag ) {
 
-			if ( is_string( $tag ) && strpos( $tag, 'jet-instagram-gallery__image' ) ) {
+			if ( ! is_array( $tag ) && strpos( $tag, 'jet-instagram-gallery__image' ) ) {
 				return true;
 			}
 
@@ -99,23 +94,6 @@ if ( ! class_exists( 'Jet_Elements_Compatibility' ) ) {
 			require jet_elements()->plugin_path( 'includes/lib/compatibility/modules/class-wpml-jet-elements-pie-chart.php' );
 			require jet_elements()->plugin_path( 'includes/lib/compatibility/modules/class-wpml-jet-elements-line-chart.php' );
 		}
-
-		/**
-		 * WPML media translation helper
-		 *
-		 * @param int $media_id ID
-		 * @return mixed|void
-		 */
-		public function wpml_translate_media_id( $media_id ) {
-			if ( function_exists( 'apply_filters' ) && function_exists( 'wpml_object_id_filter' ) ) {
-
-				$translated_id = apply_filters( 'wpml_object_id', $media_id, 'attachment', true );
-				return $translated_id ? $translated_id : $media_id;
-			}
-
-			return $media_id;
-		}
-		
 
 		/**
 		 * Set WPML translated template.

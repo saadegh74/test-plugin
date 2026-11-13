@@ -291,16 +291,27 @@ class Jet_Woo_Categories_Grid_Shortcode extends Jet_Woo_Builder_Shortcode_Base {
 	 */
 	public function get_category_preset_template() {
 
-		$allowed_presets = $this->get_atts()['presets']['options'] ?? [];
-		$preset = isset($allowed_presets[$this->get_attr('presets')]) ? $this->get_attr('presets') : 'preset-1';
-		$template = jet_woo_builder()->get_template( $this->get_tag() . '/global/presets/' . $preset . '.php' );
+		$template = $this->get_legacy_category_preset_template();
 
-		if (!$template) {
-			$template = jet_woo_builder()->get_template('widgets/global/categories-grid/presets/' . $preset . '.php');
+		if ( ! $template ) {
+			$template = jet_woo_builder()->get_template( 'widgets/global/categories-grid/presets/' . $this->get_attr( 'presets' ) . '.php' );
 		}
-
 		return $template;
 
+	}
+
+	/**
+	 * Legacy template presets.
+	 *
+	 * Get categories grid legacy preset template.
+	 *
+	 * @since  1.12.0
+	 * @access public
+	 *
+	 * @return string
+	 */
+	public function get_legacy_category_preset_template() {
+		return jet_woo_builder()->get_template( $this->get_tag() . '/global/presets/' . $this->get_attr( 'presets' ) . '.php' );
 	}
 
 	/**

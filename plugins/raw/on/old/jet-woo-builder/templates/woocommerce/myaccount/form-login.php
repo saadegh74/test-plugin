@@ -4,7 +4,7 @@
  *
  * This template can be overridden by copying it to yourtheme/jet-woo-builder/woocommerce/myaccount/form-login.php.
  *
- * @version 9.9.0
+ * @version 7.0.1
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -19,7 +19,7 @@ jet_woo_builder()->admin_bar->register_post_item( $template );
 	<?php do_action( 'woocommerce_before_customer_login_form' ); ?>
 
 	<div id="customer_login">
-		<?php echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ); ?>
 	</div>
 
 	<?php do_action( 'woocommerce_after_customer_login_form' ); ?>

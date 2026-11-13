@@ -20,7 +20,9 @@
 
 		<div class="jet-dashboard-page__content">
 
-			
+			<jet-dashboard-header
+				:config="headerConfig"
+			></jet-dashboard-header>
 
 			<div class="jet-dashboard-page__component">
 

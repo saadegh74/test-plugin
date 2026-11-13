@@ -42,14 +42,6 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-headline', 'jet-headline-skin' ); 
-	}
-	
 	protected function register_controls() {
 
 		$css_scheme = apply_filters(
@@ -1875,7 +1867,7 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 			}
 
 			if ( 'image' === $settings['before_deco_type'] && ! empty( $settings['before_image']['url'] ) ) {
-				$before_deco_image = sprintf( '<img src="%s" alt="%s" loading="lazy">', esc_url( $settings['before_image']['url'] ), esc_attr( Control_Media::get_image_alt( $settings['before_image'] ) ) );
+				$before_deco_image = sprintf( '<img src="%s" alt="%s" loading="lazy">', $settings['before_image']['url'], esc_attr( Control_Media::get_image_alt( $settings['before_image'] ) ) );
 				$before_deco_html  = sprintf( '<span class="jet-headline__deco jet-headline__deco-image">%1$s</span>', $before_deco_image );
 			}
 		}
@@ -1889,7 +1881,7 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 			}
 
 			if ( 'image' === $settings['after_deco_type'] && ! empty( $settings['after_image']['url'] ) ) {
-				$after_deco_image = sprintf( '<img src="%s" alt="%s" loading="lazy">', esc_url( $settings['after_image']['url'] ), esc_attr( Control_Media::get_image_alt( $settings['after_image'] ) ) );
+				$after_deco_image = sprintf( '<img src="%s" alt="%s" loading="lazy">', $settings['after_image']['url'], esc_attr( Control_Media::get_image_alt( $settings['after_image'] ) ) );
 				$after_deco_html = sprintf( '<span class="jet-headline__deco jet-headline__deco-image">%1$s</span>', $after_deco_image );
 			}
 		}
@@ -1906,7 +1898,7 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 
 			$first_classes = implode( ' ', $first_classes_array );
 
-			$first_part = sprintf( '<span class="%1$s">%2$s<span class="jet-headline__label">%3$s</span></span>%4$s', esc_attr( $first_classes ), $before_deco_html, wp_kses_post( $settings['first_part'] ), $space );
+			$first_part = sprintf( '<span class="%1$s">%2$s<span class="jet-headline__label">%3$s</span></span>%4$s', $first_classes, $before_deco_html, $settings['first_part'], $space );
 		}
 
 		if ( ! empty( $settings['second_part'] ) ) {
@@ -1920,7 +1912,7 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 
 			$second_classes = implode( ' ', $second_classes_array );
 
-			$second_part = sprintf( '<span class="%1$s"><span class="jet-headline__label">%2$s</span>%3$s</span>', esc_attr( $second_classes ), wp_kses_post( $settings['second_part'] ), $after_deco_html );
+			$second_part = sprintf( '<span class="%1$s"><span class="jet-headline__label">%2$s</span>%3$s</span>', $second_classes, $settings['second_part'], $after_deco_html );
 		}
 
 		$deco_devider_left = '';
@@ -1946,9 +1938,9 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 		if ( ! empty( $settings['link']['url'] ) ) {
 
 			if ( method_exists( $this, 'add_link_attributes' ) ) {
-				$this->add_link_attributes( 'url', $this->sanitize_link_control( $settings['link'] ) );
+				$this->add_link_attributes( 'url', $settings['link'] );
 			} else {
-				$this->add_render_attribute( 'url', 'href', esc_url( $settings['link']['url'] ) );
+				$this->add_render_attribute( 'url', 'href', $settings['link']['url'] );
 
 				if ( $settings['link']['is_external'] ) {
 					$this->add_render_attribute( 'url', 'target', '_blank' );
@@ -1962,9 +1954,9 @@ class Jet_Elements_Headline extends Jet_Elements_Base {
 			$title = sprintf( '<a class="jet-headline__link" %1$s>%2$s</a>', $this->get_render_attribute_string( 'url' ), $title );
 		}
 
-		$title_html = sprintf( '<%1$s class="%2$s">%3$s</%1$s>', jet_elements_tools()->validate_html_tag( $settings['header_size'] ), esc_attr( $heading_classes ), $title );
+		$title_html = sprintf( '<%1$s class="%2$s">%3$s</%1$s>', jet_elements_tools()->validate_html_tag( $settings['header_size'] ), $heading_classes, $title );
 
-		echo $title_html; // phpcs:ignore
+		echo $title_html;
 	}
 
 }

@@ -28,18 +28,10 @@
 
 		&:first-child {
 			margin-left: 0;
-			.rtl & {
-				margin-left: 3px;
-				margin-right: 0;
-			}
 		}
 
 		&:last-child {
 			margin-right: 0;
-			.rtl & {
-				margin-left: 0;
-				margin-right: 3px;
-			}
 		}
 
 		&-active {
@@ -51,14 +43,5 @@
 	&-disabled {
 		cursor: not-allowed;
 		opacity: .5;
-	}
-
-	&-prev,
-	&-next {
-		svg {
-			.rtl & {
-				transform: scale(-1);
-			}
-		}
 	}
 }

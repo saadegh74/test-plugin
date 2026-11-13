@@ -3,7 +3,10 @@
  * Wishlist Data Class
  */
 
-defined( 'ABSPATH' ) || exit; // Exit if accessed directly.
+// If this file is called directly, abort.
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 if ( ! class_exists( 'Jet_CW_Wishlist_Data' ) ) {
 
@@ -73,23 +76,19 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Data' ) ) {
 		function update_data_wishlist( $pid, $context ) {
 
 			$wishlist_list = $this->get_wish_list();
+			$product_index = array_search( $pid, $wishlist_list );
 
 			switch ( $context ) {
 				case 'add':
-					if ( ! in_array( $pid, $wishlist_list ) ) {
+					if ( ! $product_index ) {
 						$wishlist_list[] = $pid;
 					}
-
 					break;
-
 				case 'remove':
-					if ( $pid ) {
+					if ( isset( $product_index ) ) {
 						$index = array_search( $pid, $wishlist_list );
 						unset( $wishlist_list[ $index ] );
-					} else {
-						$wishlist_list = [];
 					}
-
 					break;
 			}
 
@@ -111,11 +110,11 @@ if ( ! class_exists( 'Jet_CW_Wishlist_Data' ) ) {
 			switch ( $this->store_type ) {
 				case 'session':
 					$this->start_session();
-					$wishlist_list = isset( $_SESSION['jet-wish-list'] ) ? sanitize_text_field( $_SESSION['jet-wish-list'] ) : '';
+					$wishlist_list = isset( $_SESSION['jet-wish-list'] ) ? $_SESSION['jet-wish-list'] : '';
 
 					break;
 				case 'cookies':
-					$wishlist_list = isset( $_COOKIE['jet-wish-list'] ) ? sanitize_text_field( wp_unslash($_COOKIE['jet-wish-list'] ) ) : '';
+					$wishlist_list = isset( $_COOKIE['jet-wish-list'] ) ? $_COOKIE['jet-wish-list'] : '';
 					break;
 				default:
 					$wishlist_list = '';

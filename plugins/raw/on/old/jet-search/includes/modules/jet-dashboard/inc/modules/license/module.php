@@ -49,13 +49,29 @@ class Module extends Page_Module_Base {
 	 * [create description]
 	 * @return [type] [description]
 	 */
-	 
+	public function create() {
+		add_action( 'admin_menu', array( $this, 'register_plugins_page' ), -997 );
+		add_action( 'admin_menu', array( $this, 'register_license_page' ), 9999 );
+	}
 
 	/**
 	 * [register_page description]
 	 * @return [type] [description]
 	 */
-	
+	public function register_plugins_page() {
+
+		add_submenu_page(
+			Dashboard::get_instance()->dashboard_slug,
+			esc_html__( 'Update & Installation', 'jet-dashboard' ),
+			esc_html__( 'Update & Installation', 'jet-dashboard' ),
+			'manage_options',
+			Dashboard::get_instance()->dashboard_slug . '-license-page',
+			function() {
+				include Dashboard::get_instance()->get_view( 'common/dashboard' );
+			}
+		);
+
+	}
 
 	/**
 	 * [register_license_page description]

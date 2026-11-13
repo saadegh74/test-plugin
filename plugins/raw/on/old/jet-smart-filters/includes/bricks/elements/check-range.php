@@ -37,11 +37,9 @@ class Jet_Smart_Filters_Bricks_Check_Range extends Jet_Smart_Filters_Bricks_Base
 				'checkbox'              => '.jet-checkboxes-list__decorator',
 				'checkbox-checked'      => '.jet-checkboxes-list__input:checked ~ .jet-checkboxes-list__button .jet-checkboxes-list__decorator',
 				'checkbox-checked-icon' => '.jet-checkboxes-list__checked-icon',
+				'list-item'             => '.jet-checkboxes-list__row',
 				'list-wrapper'          => '.jet-checkboxes-list-wrapper',
 				'list-children'         => '.jet-list-tree__children',
-				'grouped-item'          => '.jet-list-tree .jet-checkboxes-list__row',
-				'grouped-wrapper'       => '.jet-list-tree',
-				'grouped-children'      => '.jet-list-tree__children',
 			]
 		);
 

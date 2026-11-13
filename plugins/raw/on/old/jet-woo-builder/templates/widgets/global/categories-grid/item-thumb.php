@@ -13,8 +13,8 @@ if ( ! $thumbnail ) {
 ?>
 
 <div class="jet-woo-category-thumbnail">
-	<a href="<?php echo esc_url( get_category_link( $category->term_id ) ); ?>" <?php echo esc_attr( $target_attr ); ?> rel="bookmark">
-		<?php echo wp_kses_post( $thumbnail ); ?>
+	<a href="<?php echo esc_url( get_category_link( $category->term_id ) ); ?>" <?php echo $target_attr; ?> rel="bookmark">
+		<?php echo $thumbnail; ?>
 	</a>
 	<div class="jet-woo-category-img-overlay"></div>
 	<div class="jet-woo-category-img-overlay__hover"></div>

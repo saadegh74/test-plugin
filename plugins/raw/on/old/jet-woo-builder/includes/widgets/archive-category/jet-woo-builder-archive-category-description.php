@@ -32,7 +32,7 @@ class Jet_Woo_Builder_Archive_Category_Description extends Jet_Woo_Builder_Base 
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'category' );
+		return jet_woo_builder()->documents->is_document_type( 'category' );
 	}
 
 	protected function register_controls() {
@@ -207,7 +207,7 @@ class Jet_Woo_Builder_Archive_Category_Description extends Jet_Woo_Builder_Base 
 			return null;
 		}
 
-		printf( '<div class="jet-woo-builder-archive-category-description">%s</div>', wp_kses_post( $description ) );
+		printf( '<div class="jet-woo-builder-archive-category-description">%s</div>', $description );
 
 	}
 
@@ -221,9 +221,9 @@ class Jet_Woo_Builder_Archive_Category_Description extends Jet_Woo_Builder_Base 
 		];
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings ) );
+			echo jet_woo_builder()->parser->get_macros_string( $this->get_name(), $macros_settings );
 		} else {
-			echo wp_kses_post( self::render_callback( $macros_settings, jet_woo_builder()->woocommerce->get_current_args() ) ?: '' );
+			echo self::render_callback( $macros_settings, jet_woo_builder()->woocommerce->get_current_args() );
 		}
 
 	}

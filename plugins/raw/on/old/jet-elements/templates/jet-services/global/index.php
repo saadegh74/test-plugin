@@ -16,9 +16,8 @@ if ( filter_var( $show_on_hover, FILTER_VALIDATE_BOOLEAN ) ) {
 $classes = implode( ' ', $classes_list );
 
 ?>
-<div class="<?php echo esc_attr( $classes ); ?>">
+<div class="<?php echo $classes; ?>">
 	<div class="jet-services__inner">
-		<?php // phpcs:disable ?>
 		<div class="jet-services__header">
 			<div class="jet-services__cover"><?php
 			echo $this->_generate_icon( true );
@@ -31,6 +30,5 @@ $classes = implode( ' ', $classes_list );
 			echo $this->_generate_title();
 			echo $this->_generate_description();
 			echo $this->_generate_action_button(); ?></div>
-		<?php // phpcs:enable ?>
 	</div>
 </div>

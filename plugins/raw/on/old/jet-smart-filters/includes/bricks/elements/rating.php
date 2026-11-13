@@ -180,14 +180,9 @@ class Jet_Smart_Filters_Bricks_Rating extends Jet_Smart_Filters_Bricks_Base {
 
 		$filter_id = apply_filters( 'jet-smart-filters/render_filter_template/filter_id', $filter_id );
 
-		// render_attributes() returns pre-escaped and validated HTML attributes.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-		printf(
-			'<div class="%1$s jet-filter">',
-			esc_attr( $base_class )
-		);
+		printf( '<div class="%1$s jet-filter">', $base_class );
 
 		$provider             = ! empty( $settings['content_provider'] ) ? $settings['content_provider'] : '';
 		$query_id             = ! empty( $settings['query_id'] ) ? $settings['query_id'] : 'default';
@@ -204,6 +199,10 @@ class Jet_Smart_Filters_Bricks_Rating extends Jet_Smart_Filters_Bricks_Base {
 		$apply_type = ! empty( $settings['apply_type'] ) ? $settings['apply_type'] : 'ajax';
 		$apply_on   = ! empty( $settings['apply_on'] ) ? $settings['apply_on'] : 'value';
 
+		if ( 'submit' === $apply_on && in_array( $apply_type, [ 'ajax', 'mixed' ] ) ) {
+			$apply_type = $apply_type . '-reload';
+		}
+
 		if ( empty( $settings['apply_button_text'] ) ) {
 			$settings['apply_button_text'] = '';
 		}
@@ -211,12 +210,11 @@ class Jet_Smart_Filters_Bricks_Rating extends Jet_Smart_Filters_Bricks_Base {
 		$filter_template_args = [
 			'filter_id'            => $filter_id,
 			'content_provider'     => $provider,
+			'additional_providers' => $additional_providers,
 			'query_id'             => $query_id,
 			'apply_type'           => $apply_type,
-			'apply_on'             => $apply_on,
 			'button_text'          => $settings['apply_button_text'],
 			'rating_icon'          => $rating_icon,
-			'additional_providers' => $additional_providers,
 			'__widget_id'          => $this->id
 		];
 

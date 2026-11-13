@@ -33,7 +33,7 @@ class Avaliable_Addons extends Page_Module_Base {
 	 * @return [type] [description]
 	 */
 	public function get_page_name() {
-		return esc_html__( 'ویجت ها اکستنشن ها', 'jet-dashboard' );
+		return esc_html__( 'Widgets & Extensions', 'jet-dashboard' );
 	}
 
 	/**

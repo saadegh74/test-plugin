@@ -22,4 +22,4 @@ if ( empty( $rating ) ) {
 }
 ?>
 
-<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"><?php echo wp_kses_post( $rating ); ?></div>
+<div class="<?php echo implode( ' ', $classes ); ?>"><?php echo $rating; ?></div>

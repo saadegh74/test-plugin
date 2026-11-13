@@ -18,5 +18,4 @@
 			{{{data.price}}}
 		</div>
 	</a>
-	{{{data.add_to_cart}}}
 </div>

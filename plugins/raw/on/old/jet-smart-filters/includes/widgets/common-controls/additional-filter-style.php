@@ -1,7 +1,7 @@
 <?php
 namespace Elementor;
 
-use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Global_Typography;
+use Elementor\Core\Schemes\Typography as Scheme_Typography;
 
 /**
  * Search items style controls
@@ -263,9 +263,7 @@ $this->add_group_control(
 	Group_Control_Typography::get_type(),
 	array(
 		'name'     => 'more_less_button_typography',
-		'global'   => array(
-			'default' => Global_Typography::TYPOGRAPHY_PRIMARY,
-		),
+		'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
 		'selector' => '{{WRAPPER}} ' . $css_items_moreless_scheme['more-less-toggle'],
 	)
 );
@@ -467,7 +465,6 @@ $css_items_dropdown_scheme = apply_filters(
 		'dropdown'              => '.jet-filter-items-dropdown',
 		'dropdown-label'        => '.jet-filter-items-dropdown__label',
 		'dropdown-body'         => '.jet-filter-items-dropdown__body',
-		'dropdown-footer'       => '.jet-filter-items-dropdown__footer',
 		'dropdown-active-items' => '.jet-filter-items-dropdown__active',
 		'dropdown-active-item'  => '.jet-filter-items-dropdown__active__item',
 		'dropdown-n-selected'   => '.jet-filter-items-dropdown__n-selected',
@@ -815,8 +812,7 @@ $this->add_responsive_control(
 			),
 		),
 		'selectors' => array(
-			'{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-body']                            => 'margin-top: {{SIZE}}{{UNIT}};',
-			'{{WRAPPER}} .jet-dropdown-position-top ' . $css_items_dropdown_scheme['dropdown-body'] => 'margin-top: -{{SIZE}}{{UNIT}};',
+			'{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-body'] => 'margin-top: {{SIZE}}{{UNIT}};'
 		)
 	)
 );
@@ -861,86 +857,6 @@ $this->add_responsive_control(
 		'size_units' => array( 'px', 'em', '%' ),
 		'selectors'  => array(
 			'{{WRAPPER}} ' . $css_scheme['list-wrapper'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-		)
-	)
-);
-
-$this->add_control(
-	'dropdown_footer_heading',
-	array(
-		'label'     => esc_html__( 'Dropdown Footer', 'jet-smart-filters' ),
-		'type'      => Controls_Manager::HEADING,
-		'separator' => 'before',
-	)
-);
-
-$this->add_control(
-	'dropdown_footer_background_color',
-	array(
-		'label'     => esc_html__( 'Background Color', 'jet-smart-filters' ),
-		'type'      => Controls_Manager::COLOR,
-		'selectors' => array(
-			'{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-footer'] => 'background-color: {{VALUE}}',
-		),
-	)
-);
-
-$this->add_group_control(
-	Group_Control_Border::get_type(),
-	array(
-		'name'     => 'dropdown_footer_border',
-		'selector' => '{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-footer'],
-	)
-);
-
-$this->add_responsive_control(
-	'dropdown_footer_margin',
-	array(
-		'label'      => esc_html__( 'Margin', 'jet-smart-filters' ),
-		'type'       => Controls_Manager::DIMENSIONS,
-		'size_units' => array( 'px', '%' ),
-		'selectors'  => array(
-			'{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-footer'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-		),
-	)
-);
-
-$this->add_responsive_control(
-	'dropdown_footer_padding',
-	array(
-		'label'      => esc_html__( 'Padding', 'jet-smart-filters' ),
-		'type'       => Controls_Manager::DIMENSIONS,
-		'size_units' => array( 'px', '%' ),
-		'selectors'  => array(
-			'{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-footer'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-		)
-	)
-);
-
-$this->add_responsive_control(
-	'dropdown_footer_alignment',
-	array(
-		'label'     => esc_html__( 'Alignment', 'jet-smart-filters' ),
-		'type'      => Controls_Manager::CHOOSE,
-		'toggle'    => false,
-		'default'   => 'right',
-		'options'   => array(
-			'left'   => array(
-				'title' => esc_html__( 'Left', 'jet-smart-filters' ),
-				'icon'  => 'eicon-text-align-left',
-			),
-			'center' => array(
-				'title' => esc_html__( 'Center', 'jet-smart-filters' ),
-				'icon'  => 'eicon-text-align-center',
-			),
-			'right'  => array(
-				'title' => esc_html__( 'Right', 'jet-smart-filters' ),
-				'icon'  => 'eicon-text-align-right',
-			),
-		),
-		'separator' => 'before',
-		'selectors' => array(
-			'{{WRAPPER}} ' . $css_items_dropdown_scheme['dropdown-footer'] => 'justify-content: {{VALUE}};',
 		)
 	)
 );

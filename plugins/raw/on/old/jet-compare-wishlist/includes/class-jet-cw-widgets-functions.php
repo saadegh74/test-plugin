@@ -63,25 +63,23 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 				}
 			} ?>
 
-			<a href="<?php echo esc_url( $compare_page_link ); ?>" class="<?php echo esc_attr( implode( ' ', $button_classes ) ); ?>" data-widget-type="jet-compare-button" data-product-id="<?php echo absint( $product_id ) ?>" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
+			<a href="<?php echo $compare_page_link; ?>" class="<?php echo implode( ' ', $button_classes ); ?>" data-widget-type="jet-compare-button" data-product-id="<?php echo $product_id ?>" data-widget-id="<?php echo $widget_id ?>">
 				<div class="jet-compare-button__plane jet-compare-button__plane-normal"></div>
 				<div class="jet-compare-button__plane jet-compare-button__plane-added"></div>
 				<div class="jet-compare-button__state jet-compare-button__state-normal">
 					<?php
 					if ( filter_var( $display_settings['use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						printf( '<span class="jet-cw-icon jet-compare-button__icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_normal'] ) );
+						printf( '<span class="jet-compare-button__icon jet-cw-icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_normal'] ) );
 					}
-					printf( '<span class="jet-compare-button__label">%s</span>', esc_html( $display_settings['button_label_normal'] ) );
+					printf( '<span class="jet-compare-button__label">%s</span>', $display_settings['button_label_normal'] );
 					?>
 				</div>
 				<div class="jet-compare-button__state jet-compare-button__state-added">
 					<?php
 					if ( filter_var( $display_settings['use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						printf( '<span class="jet-cw-icon jet-compare-button__icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_added'] ) );
+						printf( '<span class="jet-compare-button__icon jet-cw-icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_added'] ) );
 					}
-					printf( '<span class="jet-compare-button__label">%s</span>', esc_html( $display_settings['button_label_added'] ) );
+					printf( '<span class="jet-compare-button__label">%s</span>', $display_settings['button_label_added'] );
 					?>
 				</div>
 			</a>
@@ -129,25 +127,23 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 				}
 			} ?>
 
-			<a href="<?php echo esc_url( $wishlist_page_link ); ?>" class="<?php echo esc_attr( implode( ' ', $button_classes ) ); ?>" data-widget-type="jet-wishlist-button" data-product-id="<?php echo absint( $product_id ) ?>" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
+			<a href="<?php echo $wishlist_page_link; ?>" class="<?php echo implode( ' ', $button_classes ); ?>" data-widget-type="jet-wishlist-button" data-product-id="<?php echo $product_id ?>" data-widget-id="<?php echo $widget_id ?>">
 				<div class="jet-wishlist-button__plane jet-wishlist-button__plane-normal"></div>
 				<div class="jet-wishlist-button__plane jet-wishlist-button__plane-added"></div>
 				<div class="jet-wishlist-button__state jet-wishlist-button__state-normal">
 					<?php
 					if ( filter_var( $display_settings['use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						printf( '<span class="jet-cw-icon jet-wishlist-button__icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_normal'] ) );
+						printf( '<span class="jet-wishlist-button__icon jet-cw-icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_normal'] ) );
 					}
-					printf( '<span class="jet-wishlist-button__label">%s</span>', esc_html( $display_settings['button_label_normal'] ) );
+					printf( '<span class="jet-wishlist-button__label">%s</span>', $display_settings['button_label_normal'] );
 					?>
 				</div>
 				<div class="jet-wishlist-button__state jet-wishlist-button__state-added">
 					<?php
 					if ( filter_var( $display_settings['use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						printf( '<span class="jet-cw-icon jet-wishlist-button__icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_added'] ) );
+						printf( '<span class="jet-wishlist-button__icon jet-cw-icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon_added'] ) );
 					}
-					printf( '<span class="jet-wishlist-button__label">%s</span>', esc_html( $display_settings['button_label_added'] ) );
+					printf( '<span class="jet-wishlist-button__label">%s</span>', $display_settings['button_label_added'] );
 					?>
 				</div>
 			</a>
@@ -179,24 +175,22 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 				$compare_page_link = esc_url( get_page_link( $compare_page_id ) );
 			} ?>
 
-			<a href="<?php echo esc_url( $compare_page_link ); ?>" class="<?php echo esc_attr( implode( ' ', $button_classes ) ); ?>" aria-label="<?php echo esc_attr( ! empty( $display_settings['button_label'] ) ? wp_strip_all_tags( $display_settings['button_label'] ) : __( 'Compare', 'jet-cw' ) ); ?>" data-widget-type="jet-compare-count-button" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
+			<a href="<?php echo $compare_page_link; ?>" class="<?php echo implode( ' ', $button_classes ); ?>" data-widget-type="jet-compare-count-button" data-widget-id="<?php echo $widget_id ?>">
 				<div class="jet-compare-count-button__content">
 					<?php
 					if ( filter_var( $display_settings['use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						printf( '<span class="jet-cw-icon jet-compare-count-button__icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon'] ) );
+						printf( '<span class="jet-compare-count-button__icon jet-cw-icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon'] ) );
 					}
 
-					printf( '<span class="jet-compare-count-button__label">%s</span>', esc_html( $display_settings['button_label'] ) );
+					printf( '<span class="jet-compare-count-button__label">%s</span>', $display_settings['button_label'] );
 
 					if ( filter_var( $display_settings['show_count'], FILTER_VALIDATE_BOOLEAN ) ) {
-						$count_button = sprintf( '<div class="jet-compare-count-button__count"><span>%s</span></div>',  esc_html( $count ) );
+						$count_button = sprintf( '<div class="jet-compare-count-button__count"><span>%s</span></div>', $count );
 
 						if ( filter_var( $display_settings['hide_empty_count'], FILTER_VALIDATE_BOOLEAN ) && 0 === count( $products_in_compare ) ) {
 							$count_button = '';
 						}
 
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $count_button is already escaped
 						echo $count_button;
 					}
 					?>
@@ -230,26 +224,22 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 				$wishlist_page_link = esc_url( get_page_link( $wishlist_page_id ) );
 			} ?>
 
-			<a href="<?php
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $wishlist_page_link is already escaped
-			echo $wishlist_page_link; ?>" class="<?php echo esc_attr( implode( ' ', $button_classes ) ); ?>" aria-label="<?php echo esc_attr( ! empty( $display_settings['button_label'] ) ? wp_strip_all_tags( $display_settings['button_label'] ) : __( 'Wishlist', 'jet-cw' ) ); ?>" data-widget-type="jet-wishlist-count-button" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
+			<a href="<?php echo $wishlist_page_link; ?>" class="<?php echo implode( ' ', $button_classes ); ?>" data-widget-type="jet-wishlist-count-button" data-widget-id="<?php echo $widget_id ?>">
 				<div class="jet-wishlist-count-button__content">
 					<?php
 					if ( filter_var( $display_settings['use_button_icon'], FILTER_VALIDATE_BOOLEAN ) ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						printf( '<span class="jet-cw-icon jet-wishlist-count-button__icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon'] ) );
+						printf( '<span class="jet-wishlist-count-button__icon jet-cw-icon">%s</span>', htmlspecialchars_decode( $display_settings['button_icon'] ) );
 					}
 
-					printf( '<span class="jet-wishlist-count-button__label">%s</span>', esc_html( $display_settings['button_label'] ) );
+					printf( '<span class="jet-wishlist-count-button__label">%s</span>', $display_settings['button_label'] );
 
 					if ( filter_var( $display_settings['show_count'], FILTER_VALIDATE_BOOLEAN ) ) {
-						$count_button = sprintf( '<div class="jet-wishlist-count-button__count"><span>%s</span></div>', esc_html( $count ) );
+						$count_button = sprintf( '<div class="jet-wishlist-count-button__count"><span>%s</span></div>', $count );
 
 						if ( filter_var( $display_settings['hide_empty_count'], FILTER_VALIDATE_BOOLEAN ) && 0 === count( $products_in_wishlist ) ) {
 							$count_button = '';
 						}
 
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $count_button is already escaped
 						echo $count_button;
 					}
 					?>
@@ -290,7 +280,7 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 				return null;
 			} ?>
 
-			<div class="<?php echo esc_attr( implode( ' ', $table_wrapper_classes ) ) ?>" data-widget-type="jet-compare" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
+			<div class="<?php echo implode( ' ', $table_wrapper_classes ) ?>" data-widget-type="jet-compare" data-widget-id="<?php echo $widget_id ?>">
 				<?php if ( $clear_table || $highlight_differences || $only_differences ) : ?>
 					<div class="jet-compare-table-actions">
 						<?php if ( $clear_table ) : ?>
@@ -353,8 +343,8 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 		 */
 		public function get_no_product_in_compare_content( $table_wrapper_classes, $widget_id, $empty_text ) { ?>
 
-			<div class="<?php echo esc_attr( implode( ' ', $table_wrapper_classes ) ) ?>" data-widget-type="jet-compare" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
-				<h5 class="jet-compare-table-empty"><?php echo esc_html( apply_filters( 'jet-cw/compare/empty_text', $empty_text ) ); ?></h5>
+			<div class="<?php echo implode( ' ', $table_wrapper_classes ) ?>" data-widget-type="jet-compare" data-widget-id="<?php echo $widget_id ?>">
+				<h5 class="jet-compare-table-empty"><?php echo apply_filters( 'jet-cw/compare/empty_text', $empty_text ); ?></h5>
 			</div>
 
 			<?php
@@ -383,15 +373,13 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 
 					$function_name = 'get_' . $display_settings['compare_table_data_type'];
 
-					echo '<td class="jet-compare-table-cell jet-compare-item" data-product-id="' . esc_attr( $_product->get_id() ) . '">';
+					echo '<td class="jet-compare-table-cell jet-compare-item" data-product-id="' . $_product->get_id() . '">';
 
 					if ( $function_name === 'get_title' ) {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						echo '<' . esc_attr( $heading_tag ) . ' class="jet-cw-product-title" >' . jet_cw_functions()->$function_name( $_product, $display_settings ) . '</' . esc_attr( $heading_tag ) . '>';
+						echo '<' . $heading_tag . ' class="jet-cw-product-title" >' . jet_cw_functions()->$function_name( $_product, $display_settings ) . '</' . $heading_tag . '>';;
 					} else {
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						echo jet_cw_functions()->$function_name( $_product, $display_settings ) ?? '';
-					} 
+						echo jet_cw_functions()->$function_name( $_product, $display_settings );
+					}
 
 					echo '</td>';
 				} ?>
@@ -420,7 +408,7 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 			$active_state = '';
 
 			if ( ! empty( $normal_icon ) || ! empty( $normal_label ) ) {
-				$normal_icon  = ! empty( $normal_icon ) ? sprintf( '<span class="jet-cw-icon jet-compare-table-action-control__icon">%s</span>', $normal_icon ) : '';
+				$normal_icon  = ! empty( $normal_icon ) ? sprintf( '<span class="jet-compare-table-action-control__icon jet-cw-icon">%s</span>', $normal_icon ) : '';
 				$normal_label = ! empty( $normal_label ) ? sprintf( '<span class="jet-compare-table-action-control__label">%s</span>', $normal_label ) : '';
 
 				$normal_state = sprintf(
@@ -434,7 +422,7 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 			}
 
 			if ( ! empty( $active_icon ) || ! empty( $active_label ) ) {
-				$active_icon  = ! empty( $active_icon ) ? sprintf( '<span class="jet-cw-icon jet-compare-table-action-control__icon">%s</span>', $active_icon ) : '';
+				$active_icon  = ! empty( $active_icon ) ? sprintf( '<span class="jet-compare-table-action-control__icon jet-cw-icon">%s</span>', $active_icon ) : '';
 				$active_label = ! empty( $active_label ) ? sprintf( '<span class="jet-compare-table-action-control__label">%s</span>', $active_label ) : '';
 
 				$active_state = sprintf(
@@ -446,7 +434,7 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 					$active_label
 				);
 			}
-			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
 			printf( '%s %s', $normal_state, $active_state );
 
 		}
@@ -485,13 +473,13 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 					continue;
 				}
 
-				echo '<tr class="jet-compare-table-row"> <th class="jet-compare-table-heading">' . esc_html( $value ) . '</th>';
+				echo '<tr class="jet-compare-table-row">';
+				echo '<th class="jet-compare-table-heading">' . $value . '</th>';
 
 				foreach ( $products as $_product ) {
 					$has_attributes = $_product->has_attributes();
 
 					global $product;
-
 					$product = $_product;
 
 					if ( ! is_a( $_product, 'WC_Product' ) ) {
@@ -499,13 +487,14 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 					}
 
 					if ( $has_attributes ) {
-						$attributes_value = '<div class="jet-cw-attributes">' . str_replace( "|", ",", $_product->get_attribute( $key ) ) . '</div>';
+						$attributes_value = $_product->get_attribute( $key );
+						$attributes_value = str_replace( "|", ",", $attributes_value );
+						$attributes_value = explode( ',', $attributes_value );
+						$attributes_value = '<div class="jet-cw-attributes"><span>' . implode( '</span>&#44;<span>', $attributes_value ) . '</span></div>';
 
-						echo '<td class="jet-compare-table-cell jet-compare-item" data-product-id="' . esc_attr( $_product->get_id() ) . '">' . wp_kses_post( $attributes_value ) . '</td>';
+						echo '<td class="jet-compare-table-cell jet-compare-item" data-product-id="' . $_product->get_id() . '">' . $attributes_value . '</td>';
 					} else {
-						$fallback = apply_filters( 'jet-cw/widgets/compare/empty-item-fallback', '-', $products );
-
-						echo '<td class="jet-compare-table-cell jet-compare-item jet-compare-item--empty" data-product-id="' . esc_attr( $_product->get_id() ) . '">' . wp_kses_post( $fallback ) . '</td>';
+						echo '<td class="jet-compare-table-cell jet-compare-item jet-compare-item--empty" data-product-id="' . $_product->get_id() . '">-</td>';
 					}
 				}
 
@@ -561,28 +550,25 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 			$widget_id          = $widget_settings['_widget_id'];
 			$empty_text         = $widget_settings['empty_wishlist_text'];
 			$heading_tag        = ! empty( $widget_settings['title_html_tag'] ) ? $widget_settings['title_html_tag'] : 'h5';
+			$thumbnail_position = 'preset-1' === $widget_settings['presets'] ? $widget_settings['thumbnail_position'] : 'default';
 			$equal              = filter_var( $widget_settings['equal_height_cols'], FILTER_VALIDATE_BOOLEAN );
-			$equal_class        = $equal ? 'jet-equal-cols' : '';
 
-			$allowed_presets = jet_cw_tools()->get_presets();
-			$preset = isset( $allowed_presets[ $widget_settings['presets'] ] ) ? $widget_settings['presets'] : 'preset-1';
-
-			$thumbnail_position = 'preset-1' === $preset ? $widget_settings['thumbnail_position'] : 'default';
+			$equal_class = $equal ? 'jet-equal-cols' : '';
 
 			$wishlist_classes = array(
 				'jet-wishlist__content',
 				'woocommerce',
-				'jet-wishlist-products--' . $preset,
+				'jet-wishlist-products--' . $widget_settings['presets'],
 			);
 
 			if ( empty( $products ) ) {
 				$this->get_no_product_in_wishlist_content( $wishlist_classes, $widget_id, $empty_text );
-				return;
-			} 
-			?>
 
-			<div class="<?php echo esc_attr( implode( ' ', $wishlist_classes ) ) ?>" data-widget-type="jet-wishlist" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
-				<div class="cw-col-row jet-wishlist-thumbnail-<?php echo esc_attr( $thumbnail_position ); ?> <?php echo esc_attr( $equal_class ); ?>">
+				return;
+			} ?>
+
+			<div class="<?php echo implode( ' ', $wishlist_classes ) ?>" data-widget-type="jet-wishlist" data-widget-id="<?php echo $widget_id ?>">
+				<div class="cw-col-row jet-wishlist-thumbnail-<?php echo $thumbnail_position; ?> <?php echo $equal_class; ?>">
 					<?php foreach ( $products as $_product ): ?>
 						<?php
 						global $product;
@@ -595,20 +581,17 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 								<?php $template_content = apply_filters( 'jet-compare-wishlist/wishlist-template/template-content', $template_content, $_product ); ?>
 								<?php if ( $template_content ) : ?>
 									<?php
-									// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									echo jet_cw_functions()->get_wishlist_remove_button( $_product, $widget_settings );
-									echo $template_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+									echo $template_content;
 									?>
 								<?php else : ?>
-									<?php if ( 'default' !== $widget_settings['thumbnail_position'] && 'preset-1' === $preset ) : ?>
+									<?php if ( 'default' !== $widget_settings['thumbnail_position'] && 'preset-1' === $widget_settings['presets'] ) : ?>
 										<div class="jet-wishlist-item__thumbnail">
-											<?php
-											// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-											echo jet_cw_functions()->get_thumbnail( $_product, $widget_settings ); ?>
+											<?php echo jet_cw_functions()->get_thumbnail( $_product, $widget_settings ); ?>
 										</div>
 									<?php endif; ?>
 									<div class="jet-wishlist-item__content">
-										<?php include jet_cw()->get_template( 'jet-wishlist/global/presets/' . $preset . '.php' ) ?>
+										<?php include jet_cw()->get_template( 'jet-wishlist/global/presets/' . $widget_settings['presets'] . '.php' ) ?>
 									</div>
 								<?php endif; ?>
 							</div>
@@ -639,8 +622,8 @@ if ( ! class_exists( 'Jet_CW_Widgets_Functions' ) ) {
 		 * @param $empty_text
 		 */
 		public function get_no_product_in_wishlist_content( $wishlist_classes, $widget_id, $empty_text ) { ?>
-			<div class="<?php echo esc_attr( implode( ' ', $wishlist_classes ) ) ?>" data-widget-type="jet-wishlist" data-widget-id="<?php echo esc_attr( $widget_id ) ?>">
-				<h5 class="jet-wishlist-empty"><?php echo esc_html( apply_filters( 'jet-cw/wishlist/empty_text', $empty_text ) ) ?></h5>
+			<div class="<?php echo implode( ' ', $wishlist_classes ) ?>" data-widget-type="jet-wishlist" data-widget-id="<?php echo $widget_id ?>">
+				<h5 class="jet-wishlist-empty"><?php echo apply_filters( 'jet-cw/wishlist/empty_text', $empty_text ) ?></h5>
 			</div>
 			<?php
 		}

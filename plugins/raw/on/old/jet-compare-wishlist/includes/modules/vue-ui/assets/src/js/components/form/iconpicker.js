@@ -91,6 +91,7 @@ const Iconpicker = {
 			currentId: this.elementId,
 			filterQuery: '',
 			panelActive: false,
+			prefixedIcons: [],
 		};
 	},
 	watch: {
@@ -104,17 +105,12 @@ const Iconpicker = {
 			this.currentId = 'cx_' + this.name;
 		}
 
+		this.icons.forEach( icon => {
+			this.prefixedIcons.push( this.iconPrefix + icon )
+		} );
+
 	},
 	computed: {
-		prefixedIcons() {
-			let prefixedIcons = [];
-
-			this.icons.forEach( icon => {
-				prefixedIcons.push( this.iconPrefix + icon )
-			} );
-
-			return prefixedIcons;
-		},
 		filteredIcons() {
 			if ( ! this.filterQuery ) {
 				return this.prefixedIcons;

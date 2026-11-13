@@ -1,0 +1,123 @@
+.jet-cw {
+	.jet-compare-table {
+		width: 100%;
+		table-layout: fixed;
+		border-collapse: collapse;
+		border-spacing: 0;
+		background-color: transparent;
+		
+		tr, td {
+			border: 1px none;
+		}
+		
+		.jet-compare-item--empty {
+			text-align: center;
+		}
+
+		&-actions {
+			display: flex;
+			justify-content: flex-end;
+			gap: 5px;
+			margin-bottom: 10px;
+		}
+
+		&-action-control {
+			position: relative;
+			cursor: pointer;
+			max-width: 100%;
+			transition: all 0.3s;
+
+			&__plane {
+				display: block;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+
+				&-normal{
+					opacity: 1;
+					z-index: 1;
+				}
+
+				&-active {
+					opacity: 0;
+					z-index: 3;
+				}
+			}
+
+			&__state {
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+
+				&-normal {
+					position: relative;
+					width: 100%;
+					height: 100%;
+					gap: 5px;
+					opacity: 1;
+					z-index: 2;
+				}
+
+				&-active {
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					gap: 5px;
+					opacity: 0;
+					z-index: 4;
+				}
+
+				&-normal,
+				&-active {
+					.jet-cw-icon {
+						display: flex;
+						justify-content: center;
+						align-items: center;
+					}
+				}
+			}
+
+			&.active {
+				.jet-compare-table-action-control__plane,
+				.jet-compare-table-action-control__state {
+					&-normal {
+						opacity: 0;
+					}
+
+					&-active {
+						opacity: 1;
+					}
+				}
+			}
+
+			&.disable {
+				pointer-events: none;
+			}
+		}
+
+		.jet-cw-add-to-cart {
+			.added_to_cart.wc-forward{
+				display: none !important;
+			}
+		}
+	}
+}
+
+[data-elementor-device-mode="mobile"] .jet-compare-table-responsive-mobile,
+[data-elementor-device-mode="tablet"] .jet-compare-table-responsive-tablet,
+[data-elementor-device-mode="desktop"] .jet-compare-table-responsive-desktop {
+	display: block;
+	width: 100%;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	-ms-overflow-style: -ms-autohiding-scrollbar;
+	
+	.jet-compare-table {
+		table-layout: auto;
+	}
+}

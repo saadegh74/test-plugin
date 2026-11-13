@@ -2,61 +2,6 @@
 
 ## Changelog
 
-### 1.5.13
-* Updated: JetDashboard module;
-* Fixed: JetCompareWishlist links lacked discernible names, causing an accessibility issue;
-
-### 1.5.12.3
-* Updated: Added alternative way to store modules data;
-
-### 1.5.12.2
-* Fixed: issue with Wishlist Product Template;
-
-### 1.5.12.1
-* Fixed: Error 403 on JetEngine Lazy Load;
-
-### 1.5.12
-* Fixed: PHPCS compliance - escaped outputs, sanitized SVG/icon/video HTML, validated GET params, and documented safe ignores;
-
-### 1.5.11
-* Fixed: Compare Widget don't work with FSE themes;
-* Fixed: Compare/Wishlist button doesn't work in listing that is used as template for Ajax Search widget;
-* Added: Default text and background colors for Highlight in Compare Widget;
-
-### 1.5.10.1
-* Fixed: Vulnerability to Cross Site Scripting;
-
-### 1.5.10
-* Fixed: Vulnerability to Local File Inclusion;
-
-### 1.5.9
-* Added: Compatibility with Elementor 3.26;
-* Fixed: Error when initializing the Wishlist widget;
-
-### 1.5.8.1
-* Fixed: Wishlist and compare buttons display in JetWooBuilder plugin widgets;
-
-### 1.5.8
-* Updated: JetDashboard module to 2.2.0 version;
-* Updated: Vue UI framework to 1.5.2 version;
-* Updated: Styles refactor and enqueue;
-* Tweak: Scripts structure;
-* Fixed: widgets functionality after JetEngine listing grid lazy loading;
-
-### 1.5.7
-* Added: New Editor widgets icons
-* Updated: Small Compare widget improvements ([#7487](https://github.com/Crocoblock/suggestions/issues/7487));
-* Fixed: Deprecated warnings ([#7488](https://github.com/Crocoblock/suggestions/issues/7488));
-* Fixed: Compare & Wishlist buttons functionality in JetPopups called from JetEngine listings;
-* Fixed: Compare Widget remove icon initial display;
-
-### 1.5.6
-* Added: Hooks for handling actions before adding/removing products in lists;
-* Added: JS triggers on adding/removing products in lists;
-* Updated: Vue UI module to 1.4.10;
-* Updated: JetDashboard to 2.1.7;
-* Tweak: Widgets registration;
-
 ### 1.5.5.2
 * Fixed: Security issue.
 
@@ -204,7 +149,7 @@
 
 ### 1.1.2
 * Fixed: Compare/Wishlist widgets style controls;
-* Fixed: Check JetCompareWishlist widgets availability in quick view popup;
+* Fixed: Check Jet Compere Wishlist widgets availability in quick view popup;
 * Fixed: Wishlist default icon.
 
 ### 1.1.1
@@ -221,7 +166,7 @@
 ### 1.0.2
 * Added: Need helps links to widgets;
 * Added: Changelog;
-* Added: JetPopups compatibility;
+* Added: Jet Popups compatibility;
 * Fixed: Minor bugs.
 
 ### 1.0.1

@@ -5,7 +5,7 @@
 
 $settings = $this->get_settings_for_display();
 
-$preset        = in_array( $settings['preset'], array( 'type-1', 'type-2', 'type-3', 'type-4' ), true ) ? $settings['preset'] : 'type-1';
+$preset        = $settings['preset'];
 $layout        = $settings['layout_type'];
 $columns       = $settings['columns'];
 $columnsTablet = $settings['columns_tablet'];
@@ -28,7 +28,7 @@ if ( 'masonry' == $layout || 'grid' == $layout ) {
 $this->add_render_attribute( 'main-container', 'data-settings', $this->generate_setting_json() );
 ?>
 
-<div <?php echo $this->get_render_attribute_string( 'main-container' ); // phpcs:ignore ?>><?php
+<div <?php echo $this->get_render_attribute_string( 'main-container' ); ?>><?php
 	$this->render_filters();
 
 	if ( isset( $settings['items_order'] ) && 'true' === $settings['items_order'] ) {

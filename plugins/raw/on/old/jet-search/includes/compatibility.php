@@ -38,89 +38,25 @@ if ( ! class_exists( 'Jet_Search_Compatibility' ) ) {
 
 			// Polylang Compatibility
 			if ( class_exists( 'Polylang' ) || class_exists( 'Polylang_Pro' ) ) {
-				add_filter( 'pll_home_url_white_list',                    array( $this, 'modify_pll_home_url_white_list' ) );
-				add_action( 'jet-search/ajax-search/search-query',        array( $this, 'modify_pll_lang_search_query' ), 10, 2 );
+				add_filter( 'pll_home_url_white_list', array( $this, 'modify_pll_home_url_white_list' ) );
+
+				add_action( 'jet-search/ajax-search/search-query', array( $this, 'modify_pll_lang_search_query' ), 10, 2 );
+
 				add_action( 'jet-search/search-suggestions/search-query', array( $this, 'modify_pll_lang_search_query' ), 10, 2 );
-				add_filter( 'jet-search/search-form/home-url',            array( $this, 'modify_search_form_home_url' ) );
 			}
 
 			// WooCommerce Compatibility
 			if ( class_exists( 'WooCommerce' ) ) {
-				add_action( 'jet-search/ajax-search/add-custom-controls', array( $this, 'add_custom_controls' ), 10, 2 );
-				add_filter( 'jet-search/ajax-search/data-settings',       array( $this, 'modify_allowed_settings' ), 10, 2 );
-				add_filter( 'jet-search/ajax-search/query-settings',      array( $this, 'modify_query_settings' ), 10, 2 );
-				add_action( 'jet-search/ajax-search/search-query',        array( $this, 'modify_search_query' ), 10, 2 );
+				add_action( 'jet-search/ajax-search/add-custom-controls', array( $this, 'add_custom_controls' ) );
+
+				add_filter( 'jet-search/ajax-search/data-settings', array( $this, 'modify_allowed_settings' ), 10, 2 );
+
+				add_filter( 'jet-search/ajax-search/query-settings', array( $this, 'modify_query_settings' ), 10, 2 );
+
+				add_action( 'jet-search/ajax-search/search-query', array( $this, 'modify_search_query' ), 10, 2 );
+
 				add_action( 'jet-search/search-suggestions/search-query', array( $this, 'modify_search_query' ), 10, 2 );
 			}
-
-			// Weglot Compatibility
-			if ( defined( 'WEGLOT_VERSION' ) || function_exists( 'weglot_init' ) || function_exists( 'weglot_get_current_language' ) ) {
-				add_filter( 'jet-search/search-form/home-url', array( $this, 'modify_weglot_home_url' ), 10, 1 );
-				add_filter( 'redirect_canonical',              array( $this, 'modify_prevent_canonical' ), 10, 2 );
-			}
-
-			add_action( 'jet-search/ajax-search/add-custom-controls',        array( $this, 'add_custom_controls' ), 10, 2 );
-			add_action( 'jet-search/ajax-search-bricks/add-custom-controls', array( $this, 'add_bricks_custom_controls' ), 10, 2 );
-
-			// JetEngine compatibility
-			if ( function_exists( 'jet_engine' ) ) {
-				require_once jet_search()->plugin_path( 'includes/compatibility/jet-engine/manager.php' );
-
-				new Jet_Search_Compatibility_JE();
-			}
-		}
-
-		/**
-		 * Modify the search form home URL to respect the current Weglot language
-		 *
-		 * @param  string $url Base URL used by the search form
-		 * @return string      Corrected URL with the current Weglot language slug
-		 */
-		public function modify_weglot_home_url( $url ) {
-			$home    = trailingslashit( home_url() );
-			$current = function_exists( 'weglot_get_current_language' ) ? (string) weglot_get_current_language() : '';
-			$default = function_exists( 'weglot_get_original_language' ) ? (string) weglot_get_original_language() : '';
-
-			$request_uri = '';
-
-			if ( ! empty( $_SERVER['REQUEST_URI'] ) ) {
-				$request_uri = sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) );
-			}
-
-			if ( ( ! $current || $current === $default ) && $request_uri ) {
-				$path = strtok( $request_uri, '?' );
-
-				if ( preg_match( '#^/([a-z]{2}(?:-[A-Z]{2})?)(/|$)#', $path, $m ) ) {
-					$current = $m[1];
-				}
-
-			}
-
-			if ( $current && $default && $current !== $default ) {
-				return rtrim( $home, '/' ) . '/' . $current . '/';
-			}
-
-			return $home;
-		}
-
-		/**
-		 * Modify the canonical redirect behavior
-		 *
-		 * @param  string $redirect_url   The canonical URL WordPress wants to redirect to
-		 * @param  string $requested_url  The original requested URL
-		 * @return string|false           Redirect URL or false to disable redirect
-		 */
-		public function modify_prevent_canonical( $redirect_url, $requested_url ) {
-
-			if ( is_admin() ) {
-				return $redirect_url;
-			}
-
-			if ( isset( $_GET['jet_ajax_search_settings'] ) || isset( $_GET['jsearch'] ) ) { // phpcs:ignore
-				return false;
-			}
-
-			return $redirect_url;
 		}
 
 		/**
@@ -206,66 +142,17 @@ if ( ! class_exists( 'Jet_Search_Compatibility' ) ) {
 
 		}
 
-		public function modify_search_form_home_url( $url ) {
+		public function add_custom_controls( $instance ) {
 
-			if ( function_exists( 'pll_current_language' ) ) {
-
-				$current_lang_slug = pll_current_language( 'slug' );
-				$default_lang      = pll_default_language( 'slug' );
-
-				if ( $current_lang_slug !== $default_lang ) {
-					return trailingslashit( home_url() ) . $current_lang_slug;
-				}
-			}
-
-			return $url;
-		}
-
-		public function get_current_lang() {
-			$lang = '';
-
-			if ( class_exists( 'Polylang' ) || class_exists( 'Polylang_Pro' ) || defined( 'WPML_ST_VERSION' ) ) {
-				$lang = get_locale();
-
-				if ( defined( 'WPML_ST_VERSION' ) ) {
-					$lang = wpml_get_current_language();
-				}
-
-				if ( strlen( $lang ) > 0 ) {
-					$lang = explode( '_', $lang )[0];
-				}
-			}
-			return $lang;
-		}
-
-		public function add_custom_controls( $instance, $default_query_settings ) {
-
-			if ( class_exists( 'WooCommerce' ) ) {
-				$instance->add_control(
-					'catalog_visibility',
-					array(
-						'label'      => esc_html__( 'Use Product Catalog Visibility Settings', 'jet-search' ),
-						'type'       => \Elementor\Controls_Manager::SWITCHER,
-						'default'    => $default_query_settings['catalog_visibility'],
-						'separator'  => 'before',
-					)
-				);
-			}
-		}
-
-		public function add_bricks_custom_controls( $instance, $default_query_settings ) {
-
-			if ( class_exists( 'WooCommerce' ) ) {
-				$instance->register_jet_control(
-					'catalog_visibility',
-					[
-						'tab'      => 'content',
-						'label'    => esc_html__( 'Use Product Catalog Visibility Settings', 'jet-search' ),
-						'type'     => 'checkbox',
-						'default'  => $default_query_settings['catalog_visibility'],
-					]
-				);
-			}
+			$instance->add_control(
+				'catalog_visibility',
+				array(
+					'label'      => esc_html__( 'Use Product Catalog Visibility Settings', 'jet-search' ),
+					'type'       => \Elementor\Controls_Manager::SWITCHER,
+					'default'    => '',
+					'separator'  => 'before',
+				)
+			);
 		}
 
 		public function modify_allowed_settings( $allowed = array(), $settings = array() ) {
@@ -287,7 +174,7 @@ if ( ! class_exists( 'Jet_Search_Compatibility' ) ) {
 
 		public function modify_search_query( $instance, $args ) {
 
-			if ( isset( $args['catalog_visibility'] ) && filter_var( $args['catalog_visibility'], FILTER_VALIDATE_BOOLEAN ) ) {
+			if ( ! empty( $args['catalog_visibility'] ) ) {
 				array_push(
 					$instance->search_query['tax_query'],
 					array(
@@ -300,19 +187,24 @@ if ( ! class_exists( 'Jet_Search_Compatibility' ) ) {
 			}
 
 			if ( 'yes' === get_option( 'woocommerce_hide_out_of_stock_items' ) ) {
-				$product_visibility_term_ids  = function_exists( 'wc_get_product_visibility_term_ids' )
-					? wc_get_product_visibility_term_ids()
-					: array();
+				$instance->search_query['meta_query'] = array( 'relation'  => 'OR' );
 
-				if ( isset( $product_visibility_term_ids['outofstock'] ) ) {
-					$instance->search_query['tax_query'][] = array(
-						'taxonomy' => 'product_visibility',
-						'field'    => 'term_taxonomy_id',
-						'terms'    => array( (int) $product_visibility_term_ids['outofstock'] ),
-						'operator' => 'NOT IN',
-					);
-				}
+				array_push(
+					$instance->search_query['meta_query'],
+					array(
+						'key'     => '_stock_status',
+						'value'   => 'outofstock',
+						'compare' => 'NOT LIKE'
+					)
+				);
 
+				array_push(
+					$instance->search_query['meta_query'],
+					array(
+						'key'     => '_stock_status',
+						'compare' => 'NOT EXISTS'
+					)
+				);
 			}
 
 			return $instance;

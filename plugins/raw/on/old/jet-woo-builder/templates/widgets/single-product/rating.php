@@ -44,12 +44,12 @@ $counter = apply_filters( 'jet-woo-builder/jet-single-rating/rating-counter-labe
 $url     = $settings['single_rating_reviews_link_url'] ?? '#reviews';
 ?>
 
-<div class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
-	<?php echo wp_kses_post( $rating ); ?>
+<div class="<?php echo implode( ' ', $classes ); ?>">
+	<?php echo $rating; ?>
 
 	<?php if ( comments_open() ) : ?>
 		<a href="<?php echo esc_url( $url ) ?>" class="woocommerce-review-link" rel="nofollow">
-			<?php echo wp_kses_post( $counter ); ?>
+			<?php echo $counter; ?>
 		</a>
 	<?php endif; ?>
 </div>

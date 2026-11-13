@@ -41,14 +41,6 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
-	protected function is_dynamic_content(): bool {
-		return false;
-	}
-
-	public function get_style_depends() { 
-		return array( 'jet-team-member', 'jet-team-member-skin' ); 
-	}
-
 	protected function register_controls() {
 		$css_scheme = apply_filters(
 			'jet-elements/team-member/css-scheme',
@@ -140,7 +132,7 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 			)
 		);
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$this->_add_advanced_icon_control(
 			'social_icon',
@@ -1864,12 +1856,12 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 		}
 
 		if ( ! empty( $first_name ) ) {
-			$first_name_html = sprintf( '<span class="jet-team-member__name-first">%s</span>', wp_kses_post( $first_name ) );
+			$first_name_html = sprintf( '<span class="jet-team-member__name-first">%s</span>', $first_name );
 		}
 
 		if ( ! empty( $last_name ) ) {
 
-			$last_name_html = sprintf( '<span class="jet-team-member__name-last"> %s</span>', wp_kses_post( $last_name ) );
+			$last_name_html = sprintf( '<span class="jet-team-member__name-last"> %s</span>', $last_name );
 		}
 
 		$name_tag = $this->get_settings_for_display( 'member_name_html_tag' );
@@ -1895,7 +1887,7 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 
 		$format = apply_filters( 'jet-elements/team-member/position-format', '<div class="jet-team-member__position"><span>%1$s</span></div>' );
 
-		return sprintf( $format, wp_kses_post( $position ) );
+		return sprintf( $format, $position );
 	}
 
 	public function _generate_description( $cover_location = false ) {
@@ -1912,7 +1904,7 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 
 		$format = apply_filters( 'jet-elements/team-member/description-format', '<p class="jet-team-member__desc">%s</p>' );
 
-		return sprintf( $format, wp_kses_post( $desc ) );
+		return sprintf( $format, $desc );
 	}
 
 	public function _generate_action_button( $cover_location = false ) {
@@ -1940,9 +1932,9 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 
 		if ( is_array( $button_url ) ) {
 			if ( method_exists( $this, 'add_link_attributes' ) ) {
-				$this->add_link_attributes( 'url', $this->sanitize_link_control( $button_url ) );
+				$this->add_link_attributes( 'url', $button_url );
 			} else {
-				$this->add_render_attribute( 'url', 'href', esc_url( $button_url['url'] ) );
+				$this->add_render_attribute( 'url', 'href', $button_url['url'] );
 
 				if ( $button_url['is_external'] ) {
 					$this->add_render_attribute( 'url', 'target', '_blank' );
@@ -1953,12 +1945,12 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 				}
 			}
 		} else {
-			$this->add_render_attribute( 'url', 'href', esc_url( $button_url ) );
+			$this->add_render_attribute( 'url', 'href', $button_url );
 		}
 
 		$format = apply_filters( 'jet-elements/team-member/description-format', '<div class="jet-team-member__button-container"><a %1$s>%2$s</a></div>' );
 
-		return sprintf( $format, $this->get_render_attribute_string( 'url' ), wp_kses_post( $button_text ) );
+		return sprintf( $format, $this->get_render_attribute_string( 'url' ), $button_text );
 	}
 
 	public function _generate_social_icon_list( $cover_location = false ) {
@@ -1984,7 +1976,7 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 			if ( ! empty( $icon_data[ 'social_link' ] ) ) {
 
 				$this->add_render_attribute( 'social-link-' . $icon_data['_id'], 'href', esc_url( $icon_data[ 'social_link' ] ) );
-				$this->add_render_attribute( 'social-link-' . $icon_data['_id'], 'aria-label', wp_strip_all_tags( wp_kses_post( $icon_data[ 'social_label' ] ) ) );
+				$this->add_render_attribute( 'social-link-' . $icon_data['_id'], 'aria-label', $icon_data[ 'social_label' ] );
 
 				if ( ! empty( $icon_data[ 'social_link_target' ] ) ) {
 					$this->add_render_attribute( 'social-link-' . $icon_data['_id'], 'target', '_blank' );
@@ -1997,7 +1989,7 @@ class Jet_Elements_Team_Member extends Jet_Elements_Base {
 				$icon = $this->_get_icon( 'social_icon', '<div class="jet-team-member__socials-icon"><div class="inner"><span class="jet-elements-icon">%s</span></div></div>' );
 
 				if ( filter_var( $icon_data['label_visible'], FILTER_VALIDATE_BOOLEAN ) ) {
-					$label = sprintf( '<span class="jet-team-member__socials-label">%s</span>', wp_kses_post( $icon_data[ 'social_label' ] ) );
+					$label = sprintf( '<span class="jet-team-member__socials-label">%s</span>', $icon_data[ 'social_label' ] );
 				}
 
 				$icon_list .= sprintf(

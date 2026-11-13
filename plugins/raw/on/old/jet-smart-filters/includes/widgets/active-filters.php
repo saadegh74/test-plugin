@@ -108,17 +108,6 @@ class Jet_Smart_Filters_Active_Filters_Widget extends Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'query_id_wc_shortcode_notice',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => __( '<b>Query ID</b> for <b>WooCommerce Shortcode</b> must be specified as attribute class: [products class="query_id"]', 'jet-smart-filters' ),
-				'condition' => array(
-					'content_provider' => array( 'woocommerce-shortcode' ),
-				),
-			)
-		);
-
 		// Include Additional Providers Settings
 		include jet_smart_filters()->plugin_path( 'includes/widgets/common-controls/additional-providers.php' );
 
@@ -881,12 +870,12 @@ class Jet_Smart_Filters_Active_Filters_Widget extends Widget_Base {
 
 		printf(
 			'<div class="%1$s jet-active-filters jet-filter" data-label="%6$s" data-content-provider="%2$s" data-additional-providers="%3$s" data-apply-type="%4$s" data-query-id="%5$s">',
-			esc_attr( $base_class ),
-			esc_attr( $provider ),
-			esc_attr( $additional_providers ),
-			esc_attr( $settings['apply_type'] ),
-			esc_attr( $query_id ),
-			esc_attr( wp_kses_post( $settings['filters_label'] ) )
+			$base_class,
+			$provider,
+			$additional_providers,
+			$settings['apply_type'],
+			$query_id,
+			$settings['filters_label']
 		);
 
 		if ( Plugin::instance()->editor->is_edit_mode() ) {

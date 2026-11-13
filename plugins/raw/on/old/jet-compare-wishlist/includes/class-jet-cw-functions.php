@@ -455,17 +455,14 @@ if ( ! class_exists( 'Jet_CW_Functions' ) ) {
 		 * Print add to wishlist button inside Compare Table widget.
 		 *
 		 * @since  1.5.2
-		 * @since  1.5.8 Added style enqueue.
 		 * @access public
 		 *
 		 * @param object $product  WooCommerce product instance.
 		 * @param array  $settings Widget settings list.
-		 *
-		 * @return void
 		 */
 		public function get_wishlist_button( $product, $settings ) {
 
-			$widget_settings = [
+			$widget_settings = array(
 				'button_icon_position' => $settings['compare_table_wishlist_button_icon_position'],
 				'use_button_icon'      => $settings['compare_table_wishlist_use_button_icon'],
 				'button_icon_normal'   => $settings['selected_compare_table_wishlist_button_icon_normal'],
@@ -474,11 +471,9 @@ if ( ! class_exists( 'Jet_CW_Functions' ) ) {
 				'button_icon_added'    => $settings['selected_compare_table_wishlist_button_icon_added'],
 				'button_label_added'   => $settings['compare_table_wishlist_button_label_added'],
 				'_widget_id'           => 'jet-compare',
-			];
+			);
 
 			jet_cw()->wishlist_render->render_wishlist_button( $widget_settings );
-
-			wp_enqueue_style( 'jet-cw-widget-cw-button' );
 
 		}
 

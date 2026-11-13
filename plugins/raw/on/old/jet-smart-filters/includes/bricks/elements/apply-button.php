@@ -110,36 +110,6 @@ class Jet_Smart_Filters_Bricks_Apply_Button extends \Jet_Engine\Bricks_Views\Ele
 		);
 
 		$this->register_jet_control(
-			'active_state',
-			[
-				'tab'     => 'content',
-				'label'   => esc_html__( 'Active button state', 'jet-smart-filters' ),
-				'type'    => 'select',
-				'options' => [
-					'always' => esc_html__( 'Always', 'jet-smart-filters' ),
-					'any'    => esc_html__( 'Any filter selected', 'jet-smart-filters' ),
-					'all'    => esc_html__( 'All filters selected', 'jet-smart-filters' )
-				],
-				'default' => 'always'
-			]
-		);
-
-		$this->register_jet_control(
-			'if_inactive',
-			[
-				'tab'      => 'content',
-				'label'    => esc_html__( 'If button inactive', 'jet-smart-filters' ),
-				'type'     => 'select',
-				'options'  => [
-					'disable' => esc_html__( 'Disable', 'jet-smart-filters' ),
-					'hide'    => esc_html__( 'Hide', 'jet-smart-filters' )
-				],
-				'default'  => 'disable',
-				'required' => [ 'active_state', '!=', 'always' ]
-			]
-		);
-
-		$this->register_jet_control(
 			'apply_redirect',
 			[
 				'tab'     => 'content',
@@ -235,8 +205,6 @@ class Jet_Smart_Filters_Bricks_Apply_Button extends \Jet_Engine\Bricks_Views\Ele
 		$redirect               = ! empty( $settings['apply_redirect'] ) ? $settings['apply_redirect'] : false;
 		$redirectPath           = ! empty( $settings['redirect_path'] ) ? $settings['redirect_path'] : false;
 		$redirect_in_new_window = ! empty( $settings['redirect_in_new_window'] ) ? $settings['redirect_in_new_window'] : false;
-		$redirectPath           = apply_filters( 'jet-smart-filters/widgets/apply-button/redirect-path', $redirectPath, $settings );
-		$redirectPath           = jet_smart_filters()->utils->sanitize_redirect_path( $redirectPath );
 		$additional_providers   = jet_smart_filters()->utils->get_additional_providers( $settings );
 
 		$data_atts = array(
@@ -256,7 +224,7 @@ class Jet_Smart_Filters_Bricks_Apply_Button extends \Jet_Engine\Bricks_Views\Ele
 		}
 
 		foreach ( $data_atts as $key => $value ) {
-			$output .= sprintf( ' %1$s="%2$s"', $key, esc_attr( $value ) );
+			$output .= sprintf( ' %1$s="%2$s"', $key, $value );
 		}
 
 		return $output;
@@ -282,17 +250,14 @@ class Jet_Smart_Filters_Bricks_Apply_Button extends \Jet_Engine\Bricks_Views\Ele
 
 		$data_atts = $this->container_data_atts($settings, $provider);
 		$settings['apply_button'] = 'yes';
-		$settings['apply_on']     = 'submit';
 
 		if ( empty( $settings['apply_button_text'] ) ) {
 			$settings['apply_button_text'] = '';
 		}
 
-		// render_attributes() returns pre-escaped and validated HTML attributes.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo "<div {$this->render_attributes( '_root' )}>";
 
-		echo '<div class="' . esc_attr( $base_class ) . ' jet-filter">';
+		echo '<div class="' . $base_class . ' jet-filter">';
 		include jet_smart_filters()->get_template( 'common/apply-filters.php' );
 		echo '</div>';
 

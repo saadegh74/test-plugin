@@ -10,8 +10,9 @@ namespace Elementor;
 use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
-use Elementor\Group_Control_Css_Filter;
 use Elementor\Group_Control_Typography;
+use Elementor\Core\Schemes\Color;
+use Elementor\Core\Schemes\Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,18 +36,8 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-products-grid-widget-overview/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-
-		$deps[] = 'elementor-icons-fa-solid';
-		$deps[] = 'e-swiper';
-
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
+	public function get_jet_style_depends() {
+		return [ 'jet-woo-builder', 'elementor-icons-fa-solid' ];
 	}
 
 	public function __shortcode() {
@@ -80,21 +71,6 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 					$this->add_responsive_control( $attr, $settings );
 				} else {
 					$this->add_control( $attr, $settings );
-				}
-
-				if ( 'use_current_query' === $attr ) {
-					$this->add_control(
-						'use_current_query_notice',
-						[
-							'type'            => Controls_Manager::RAW_HTML,
-							'raw'             => esc_html__( 'When Use Current Query is enabled, the number of products per page is inherited from the WooCommerce archive query. You can change it in the WooCommerce or active theme settings.', 'jet-woo-builder' ),
-							'content_classes' => 'elementor-descriptor elementor-panel-alert elementor-panel-alert-info',
-							'condition'       => [
-								'use_current_query'    => 'yes',
-								'enable_custom_query!' => 'yes',
-							],
-						]
-					);
 				}
 			}
 
@@ -292,72 +268,56 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 
 		$this->start_controls_tab(
 			'tab_thumb_normal',
-			[
-				'label' => __( 'Normal', 'jet-woo-builder' ),
-			]
+			array(
+				'label' => esc_html__( 'Normal', 'jet-woo-builder' ),
+			)
 		);
 
 		$this->add_control(
 			'thumb_background',
-			[
+			array(
+				'label'     => esc_html__( 'Background Color', 'jet-woo-builder' ),
 				'type'      => Controls_Manager::COLOR,
-				'label'     => __( 'Background Color', 'jet-woo-builder' ),
-				'selectors' => [
+				'selectors' => array(
 					'{{WRAPPER}} ' . $css_scheme['thumb'] => 'background-color: {{VALUE}}',
-				],
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Css_Filter::get_type(),
-			[
-				'name'     => 'thumb_css_filters',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['thumb'] . ' img',
-			]
+				),
+			)
 		);
 
 		$this->add_group_control(
 			Group_Control_Box_Shadow::get_type(),
-			[
+			array(
 				'name'     => 'thumb_box_shadow',
 				'selector' => '{{WRAPPER}} ' . $css_scheme['thumb'],
-			]
+			)
 		);
 
 		$this->end_controls_tab();
 
 		$this->start_controls_tab(
 			'tab_thumb_hover',
-			[
-				'label' => __( 'Hover', 'jet-woo-builder' ),
-			]
+			array(
+				'label' => esc_html__( 'Hover', 'jet-woo-builder' ),
+			)
 		);
 
 		$this->add_control(
 			'thumb_background_hover',
-			[
+			array(
+				'label'     => esc_html__( 'Background Color', 'jet-woo-builder' ),
 				'type'      => Controls_Manager::COLOR,
-				'label'     => __( 'Background Color', 'jet-woo-builder' ),
-				'selectors' => [
+				'selectors' => array(
 					'{{WRAPPER}} ' . $css_scheme['inner-box'] . ':hover .jet-woo-product-thumbnail' => 'background-color: {{VALUE}}',
-				],
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Css_Filter::get_type(),
-			[
-				'name'     => 'thumb_css_filters_hover',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['inner-box'] . ':hover .jet-woo-product-thumbnail img',
-			]
+				),
+			)
 		);
 
 		$this->add_group_control(
 			Group_Control_Box_Shadow::get_type(),
-			[
+			array(
 				'name'     => 'thumb_box_shadow_hover',
 				'selector' => '{{WRAPPER}} ' . $css_scheme['inner-box'] . ':hover .jet-woo-product-thumbnail',
-			]
+			)
 		);
 
 		$this->end_controls_tab();
@@ -1141,25 +1101,6 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 			]
 		);
 
-		$this->add_control(
-			'sale_price_position_block',
-			[
-				'label'     => __( 'Sale Price Position', 'jet-woo-builder' ),
-				'type'      => Controls_Manager::SELECT,
-				'options'   => [
-					'column-reverse' => esc_html__( 'Above', 'jet-woo-builder' ),
-					'column'         => esc_html__( 'Below', 'jet-woo-builder' ),
-				],
-				'default'   => 'column-reverse',
-				'selectors' => [
-					'{{WRAPPER}} ' . $css_scheme['price'] . ' .price'=> 'display: flex; flex-direction: {{VALUE}};',
-				],
-				'condition' => [
-					'price_sale_display_type' => 'block',
-				],
-			]
-		);
-
 		$this->add_responsive_control(
 			'price_space_between',
 			[
@@ -1172,9 +1113,7 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} ' . $css_scheme['price'] . ' del' => ! is_rtl()
-						? 'margin-right: {{SIZE}}{{UNIT}};'
-						: 'margin-left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['price'] . ' del+ins' => ! is_rtl() ? 'margin-left: {{SIZE}}{{UNIT}};' : 'margin-right: {{SIZE}}{{UNIT}};',
 				],
 				'condition' => [
 					'price_sale_display_type' => 'inline-block',
@@ -1194,7 +1133,7 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} ' . $css_scheme['price'] . ' .price'=> 'gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['price'] . ' del+ins' => 'margin-top: {{SIZE}}{{UNIT}};',
 				],
 				'condition' => [
 					'price_sale_display_type' => 'block',
@@ -2423,8 +2362,6 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 
 	protected function render() {
 
-		jet_woo_builder_assets()->add_inline_widget_script( 'jet-woo-products.default' );
-
 		$attributes          = [];
 		$settings            = $this->get_settings_for_display();
 		$shortcode_obj       = $this->__shortcode();
@@ -2459,7 +2396,7 @@ class Jet_Woo_Products extends Jet_Woo_Builder_Base {
 
 		$this->__open_wrap();
 
-		echo jet_woo_builder_tools()->get_carousel_wrapper_atts( $shortcode_obj->do_shortcode( $attributes ), $settings ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo jet_woo_builder_tools()->get_carousel_wrapper_atts( $shortcode_obj->do_shortcode( $attributes ), $settings );
 
 		$this->__close_wrap();
 

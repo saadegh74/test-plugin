@@ -1,167 +1,215 @@
 <?php
 /**
+ * Taxonomy API: WP_Tax_Query class
+ *
+ * @package WordPress
+ * @subpackage Taxonomy
+ * @since 4.4.0
+ */
+
+/**
+ * Core class used to implement taxonomy queries for the Taxonomy API.
+ *
+ * Used for generating SQL clauses that filter a primary query according to object
+ * taxonomy terms.
+ *
+ * WP_Tax_Query is a helper that allows primary query classes, such as WP_Query, to filter
+ * their results by object metadata, by generating `JOIN` and `WHERE` subclauses to be
+ * attached to the primary SQL query string.
+ *
  * @since 3.1.0
  */
-class Jet_Search_Tax_Query {
+class Jet_Search_Tax_Query extends WP_Tax_Query {
 
 	/**
-	 * Ajax action.
+	 * Generate SQL clauses to be appended to a main query.
 	 *
+	 * Called by the public WP_Tax_Query::get_sql(), this method
+	 * is abstracted out to maintain parity with the other Query classes.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @return string[] {
+	 *     Array containing JOIN and WHERE SQL clauses to append to the main query.
+	 *
+	 *     @type string $join  SQL fragment to append to the main JOIN clause.
+	 *     @type string $where SQL fragment to append to the main WHERE clause.
+	 * }
+	 */
+
+	/**
+	 * Standard response when the query should not return any rows.
+	 *
+	 * @since 3.2.0
 	 * @var string
 	 */
-	private $action = 'jet_ajax_search';
+	private static $no_results = array(
+		'join'  => array( '' ),
+		'where' => array( '0 = 1' ),
+	);
 
-	private $search = null;
-
-	public $settings          = null;
-	public $terms_ids         = array();
-	public $include_terms_ids = array();
-	public $exclude_terms_ids = array();
-	public $exclude_posts_ids = array();
-
-	public function __construct() {
-		$this->set_settings();
-		$this->get_search_string();
-	}
-
-	public function set_settings() {
-		// phpcs:disable
-		if ( isset( $_GET['action'] ) && $this->action === $_GET['action']
-			&& ! empty( $_GET['data']['search_in_taxonomy'] )
-			&& ! empty( $_GET['data']['search_in_taxonomy_source'] )
-		) {
-			$raw_data = wp_unslash( $_GET['data'] );
-
-			$this->settings = map_deep( $raw_data, 'sanitize_text_field' );
-		} else {
-			$this->settings = jet_search_ajax_handlers()->get_form_settings();
-		}
-		// phpcs:enable
-	}
-
-	public function get_taxonomies() {
-		$taxonomies = ! empty( $this->settings['search_in_taxonomy'] ) && ! empty( $this->settings['search_in_taxonomy_source'] ) ? $this->settings['search_in_taxonomy_source'] : false;
-
-		return $taxonomies;
-	}
-
-	public function get_search_string() {
-		// phpcs:disable WordPress.Security.NonceVerification
-		$search = null;
-
-		$custom_search_query_param = jet_search_ajax_handlers()->get_custom_search_query_param();
-		$search_query_param        = ! empty( $_REQUEST[$custom_search_query_param] ) ? $_REQUEST[$custom_search_query_param] : false; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-
-		if ( isset( $_GET['action'] ) && $this->action === $_GET['action']
-			&& isset( $_GET['data']['value'] )
-			&& ! empty( $_GET['data']['value'] )
-		) {
-			$search = sanitize_text_field( wp_unslash( $_GET['data']['value'] ) );
-		} else if ( false != $search_query_param ) {
-			$search = sanitize_text_field( wp_unslash ( $search_query_param ) );
-		} else {
-			$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash ( $_GET['s'] ) ) : '';
-		}
-
-		$this->search = $search;
-		// phpcs:enable WordPress.Security.NonceVerification
-	}
-
-	public function get_posts_ids() {
-		$taxonomies = $this->get_taxonomies();
-		$settings   = $this->settings;
-
-		$include_terms_ids = ! empty( $settings['include_terms_ids'] ) ? array_map( 'intval', (array) $settings['include_terms_ids'] ) : array();
-		$exclude_terms_ids = ! empty( $settings['exclude_terms_ids'] ) ? array_map( 'intval', (array) $settings['exclude_terms_ids'] ) : array();
-		$exclude_posts_ids = ! empty( $settings['exclude_posts_ids'] ) ? array_map( 'intval', (array) $settings['exclude_posts_ids'] ) : array();
-
-		if ( $taxonomies ) {
-			global $wpdb;
-
-			$posts_table              = $wpdb->posts;
-			$term_relationships_table = $wpdb->term_relationships;
-			$term_taxonomy_table      = $wpdb->term_taxonomy;
-			$terms_table              = $wpdb->terms;
-
-			$search = $this->search;
-
-			if ( ! empty( $search ) ) {
-
-				$s_query = $wpdb->esc_like( $search );
-				$tax_in  = [];
-
-				foreach ( $taxonomies as $tax ) {
-					$tax_in[] = $wpdb->prepare( 'tt.taxonomy = %s', $tax );
-				}
-
-				$tax_in = implode( ' OR ', $tax_in );
-
-				$sql_args = array( '%' . $s_query . '%' );
-
-				$include_terms_sql = '';
-				if ( ! empty( $include_terms_ids ) ) {
-					$placeholders      = implode( ',', array_fill( 0, count( $include_terms_ids ), '%d' ) );
-					$include_terms_sql = " AND t.term_id IN ($placeholders)";
-					$sql_args          = array_merge( $sql_args, $include_terms_ids );
-				}
-
-				$exclude_terms_sql = '';
-				if ( ! empty( $exclude_terms_ids ) ) {
-					$placeholders      = implode( ',', array_fill( 0, count( $exclude_terms_ids ), '%d' ) );
-					$exclude_terms_sql = " AND t.term_id NOT IN ($placeholders)";
-					$sql_args          = array_merge( $sql_args, $exclude_terms_ids );
-				}
-
-				$db_query = "SELECT DISTINCT p.ID
-							FROM {$posts_table} AS p
-							INNER JOIN {$term_relationships_table} AS tr ON p.ID = tr.object_id
-							INNER JOIN {$term_taxonomy_table} AS tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-							INNER JOIN {$terms_table} AS t ON tt.term_id = t.term_id
-							WHERE ( {$tax_in} )
-							AND t.name LIKE %s 
-							{$include_terms_sql} 
-							{$exclude_terms_sql}";
-
-				$db_query .= ";";
-
-				$posts_ids = $wpdb->get_results( $wpdb->prepare( $db_query, ...$sql_args ) );
-
-				if ( ! empty( $posts_ids ) ) {
-					$ids = array();
-
-					foreach ( $posts_ids as $key => $value ) {
-						$ids[$key] = $value->ID;
-					}
-
-					if ( ! empty( $exclude_posts_ids ) ) {
-						$ids = array_values( array_diff( $ids, $exclude_posts_ids ) );
-					}
-
-					return $ids;
-				}
-			}
-
-		}
-
-		/**
-		 * Enables support for searching by custom product attributes.
-		 *
-		 * This allows external code to hook into 'jet_search/custom_attribute_search_ids'
-		 * and return matching post IDs from wp_postmeta
+	protected function get_sql_clauses() {
+		/*
+		 * $queries are passed by reference to get_sql_for_query() for recursion.
+		 * To keep $this->queries unaltered, pass a copy.
 		 */
-		$custom_ids = apply_filters(
-			'jet_search/custom_attribute_search_ids',
-			[],
-			$this->search,
-			$taxonomies,
-			$this->settings
+		$queries = $this->queries;
+		$sql     = $this->get_sql_for_query( $queries );
+
+		if ( ! empty( $sql['where'] ) ) {
+			$sql['where'] = ' OR (' . $sql['where'] . ' AND (' . $this->primary_table . '.post_status = \'publish\'))';
+		}
+
+		return $sql;
+	}
+
+	/**
+	 * Generate SQL JOIN and WHERE clauses for a "first-order" query clause.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @global wpdb $wpdb The WordPress database abstraction object.
+	 *
+	 * @param array $clause       Query clause (passed by reference).
+	 * @param array $parent_query Parent query array.
+	 * @return string[] {
+	 *     Array containing JOIN and WHERE SQL clauses to append to a first-order query.
+	 *
+	 *     @type string $join  SQL fragment to append to the main JOIN clause.
+	 *     @type string $where SQL fragment to append to the main WHERE clause.
+	 * }
+	 */
+	public function get_sql_for_clause( &$clause, $parent_query ) {
+		global $wpdb;
+
+		$sql = array(
+			'where' => array(),
+			'join'  => array(),
 		);
 
-		if ( ! empty( $custom_ids ) && is_array( $custom_ids ) ) {
-			$ids = isset( $ids ) ? array_merge( $ids, $custom_ids ) : $custom_ids;
+		$join  = '';
+		$where = '';
+
+		$clause['terms'] = array_unique( (array) $clause['terms'] );
+
+		if ( is_taxonomy_hierarchical( $clause['taxonomy'] ) && $clause['include_children'] ) {
+
+			$this->transform_query( $clause, 'term_id' );
+
+			$children = array();
+			
+			foreach ( $clause['terms'] as $term ) {
+				$children   = array_merge( $children, get_term_children( $term, $clause['taxonomy'] ) );
+				$children[] = $term;
+			}
+
+			$clause['terms'] = $children;
+
+		} else {
+			$this->transform_query( $clause, 'term_taxonomy_id' );
 		}
 
-		return ! empty( $ids ) ? array_unique( $ids ) : false;
+		if ( is_wp_error( $clause ) ) {
+			return self::$no_results;
+		}
+
+		$terms    = $clause['terms'];
+		$operator = strtoupper( $clause['operator'] );
+
+		if ( empty( $terms ) ) {
+			return self::$no_results;
+		}
+
+		$terms = array_unique( $terms );
+		$terms = implode( ',', $terms );
+
+		/*
+		 * Before creating another table join, see if this clause has a
+		 * sibling with an existing join that can be shared.
+		 */
+		$alias = 'ajt';
+		//$i     = count( $this->table_aliases );
+		$i     = rand( 0, 999 );
+		$alias = $i ? $alias . $i : $alias;
+
+		// Store the alias as part of a flat array to build future iterators.
+		$this->table_aliases[] = $alias;
+
+		// Store the alias with this clause, so later siblings can use it.
+		$clause['alias'] = $alias;
+
+		$join .= " LEFT JOIN $wpdb->term_relationships";
+		$join .= " AS $alias";
+		$join .= " ON ($this->primary_table.$this->primary_id_column = $alias.object_id)";
+
+		$where = "$alias.term_taxonomy_id $operator ($terms)";
+
+		$sql['join'][]  = $join;
+		$sql['where'][] = $where;
+		return $sql;
 	}
 
+	/**
+	 * Transforms a single query, from one field to another.
+	 *
+	 * Operates on the `$query` object by reference. In the case of error,
+	 * `$query` is converted to a WP_Error object.
+	 *
+	 * @since 3.2.0
+	 *
+	 * @global wpdb $wpdb The WordPress database abstraction object.
+	 *
+	 * @param array  $query           The single query. Passed by reference.
+	 * @param string $resulting_field The resulting field. Accepts 'slug', 'name', 'term_taxonomy_id',
+	 *                                or 'term_id'. Default 'term_id'.
+	 */
+	public function transform_query( &$query, $resulting_field ) {
+		
+		if ( empty( $query['terms'] ) ) {
+			return;
+		}
+
+		if ( $query['field'] == $resulting_field ) {
+			return;
+		}
+
+		$resulting_field = sanitize_key( $resulting_field );
+
+		// Empty 'terms' always results in a null transformation.
+		$terms = array_filter( $query['terms'] );
+		if ( empty( $terms ) ) {
+			$query['terms'] = array();
+			$query['field'] = $resulting_field;
+			return;
+		}
+
+		$args = array(
+			'get'                    => 'all',
+			'number'                 => 0,
+			'taxonomy'               => $query['taxonomy'],
+			'update_term_meta_cache' => false,
+		);
+
+		$args['search'] = is_array( $terms ) ? $terms[0] : $terms;
+
+		if ( ! is_taxonomy_hierarchical( $query['taxonomy'] ) ) {
+			$args['number'] = count( $terms );
+		}
+
+		$term_query = new WP_Term_Query();
+		$term_list  = $term_query->query( $args );
+
+		if ( is_wp_error( $term_list ) ) {
+			$query = $term_list;
+			return;
+		}
+
+		if ( 'AND' === $query['operator'] && count( $term_list ) < count( $query['terms'] ) ) {
+			$query = new WP_Error( 'inexistent_terms', __( 'Inexistent terms.' ) );
+			return;
+		}
+
+		$query['terms'] = wp_list_pluck( $term_list, $resulting_field );
+		$query['field'] = $resulting_field;
+	}
 }

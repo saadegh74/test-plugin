@@ -6,10 +6,6 @@
 add_action( 'jet-smart-filters/providers/woocommerce-archive/before-ajax-content', 'jet_woo_astra_compatibility', 1 );
 add_action( 'wp_enqueue_scripts', 'jet_woo_astra_enqueue_styles' );
 
-if ( class_exists( 'ASTRA_Ext_WooCommerce_Markup' ) ) {
-	remove_filter( 'woocommerce_sale_flash', [ ASTRA_Ext_WooCommerce_Markup::get_instance(), 'sale_flash' ], 10 );
-}
-
 /**
  * Astra theme compatibility
  */
@@ -36,15 +32,6 @@ add_action( 'wp', function () {
 		remove_action( 'woocommerce_checkout_billing', [ WC()->checkout(), 'checkout_form_shipping' ] );
 	}
 } );
-
-/**
- * Handle sale badges issue.
- */
-if ( ! defined( 'ASTRA_EXT_VER' ) || ( defined( 'ASTRA_EXT_VER' ) && ! Astra_Ext_Extension::is_active( 'woocommerce' ) ) ) {
-	add_filter( 'jet-woo-builder/template-functions/product-sale-flash', function ( $html, $product, $settings, $label ) {
-		return sprintf( '<div class="jet-woo-product-badge jet-woo-product-badge__sale">%s</div>', $label );
-	}, 10, 4 );
-}
 
 /**
  * Enqueue Astra integration stylesheets.

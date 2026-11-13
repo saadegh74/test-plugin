@@ -4,7 +4,7 @@
  *
  * This template can be overridden by copying it to yourtheme/jet-woo-builder/woocommerce/checkout/form-checkout.php.
  *
- * @version 9.4.0
+ * @version 3.5.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,11 +21,7 @@ if ( $top_template ) {
 	remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form' );
 	remove_action( 'woocommerce_before_checkout_form', 'woocommerce_checkout_login_form' );
 
-	echo jet_woo_builder_template_functions()->get_woo_builder_content( $top_template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-}
-
-if ( ! isset( WC()->cart ) ) {
-	return;
+	echo jet_woo_builder_template_functions()->get_woo_builder_content( $top_template );
 }
 
 do_action( 'woocommerce_before_checkout_form', $checkout );
@@ -38,8 +34,8 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 ?>
 
 <div class="jet-woo-builder-woocommerce-checkout">
-	<form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__( 'Checkout', 'jet-woo-builder' ); ?>">
-		<?php echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+	<form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
+		<?php echo jet_woo_builder_template_functions()->get_woo_builder_content( $template ); ?>
 	</form>
 </div>
 

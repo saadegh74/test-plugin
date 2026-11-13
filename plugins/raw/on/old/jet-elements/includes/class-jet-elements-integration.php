@@ -235,58 +235,6 @@ if ( ! class_exists( 'Jet_Elements_Integration' ) ) {
 		}
 
 		/**
-		 * Addons with styles.
-		 *
-		 * This method returns the list of all the widgets that have styles.
-		 *
-		 * @since 2.7.1
-		 *
-		 * @return array The names of the widgets that have styles.
-		 */
-		public function addons_with_styles(): array {
-			return [
-				'jet-carousel',
-				'jet-map',
-				'jet-banner',
-				'jet-animated-box',
-				'jet-animated-text',
-				'jet-audio',
-				'jet-charts',
-				'jet-brands',
-				'jet-button',
-				'jet-circle-progress',
-				'jet-countdown-timer',
-				'jet-download-button',
-				'jet-dropbar',
-				'jet-headline',
-				'jet-horizontal-timeline',
-				'jet-image-comparison',
-				'jet-images-layout',
-				'jet-inline-svg',
-				'jet-instagram-gallery',
-				'jet-lottie',
-				'jet-portfolio',
-				'jet-posts',
-				'jet-price-list',
-				'jet-pricing-table',
-				'jet-progress-bar',
-				'jet-scroll-navigation',
-				'jet-services',
-				'jet-slider',
-				'jet-subscribe-form',
-				'jet-table',
-				'jet-team-member',
-				'jet-testimonials',
-				'jet-timeline',
-				'jet-video',
-				'jet-weather',
-				'jet-pie-chart',
-				'jet-bar-chart',
-				'jet-line-chart',
-			];
-		}
-
-		/**
 		 * Rewrite core controls.
 		 *
 		 * @param  object $controls_manager Controls manager instance.

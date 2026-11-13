@@ -106,17 +106,6 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 			)
 		);
 
-		$this->add_control(
-			'query_id_wc_shortcode_notice',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => __( '<b>Query ID</b> for <b>WooCommerce Shortcode</b> must be specified as attribute class: [products class="query_id"]', 'jet-smart-filters' ),
-				'condition' => array(
-					'content_provider' => array( 'woocommerce-shortcode' ),
-				),
-			)
-		);
-
 		$this->end_controls_section();
 
 		$this->start_controls_section(
@@ -143,7 +132,7 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 			'pages_center_offset',
 			array(
 				'label'       => esc_html__( 'Items center offset', 'jet-smart-filters' ),
-				'description' => esc_html__( 'Set number of items to either side of current page, not including current page. Set 0 to show all items.', 'jet-smart-filters' ),
+				'description' => esc_html__( 'Set number of items to either side of current page, not including current page.Set 0 to show all items.', 'jet-smart-filters' ),
 				'type'        => Controls_Manager::NUMBER,
 				'default'     => 0,
 				'min'         => 0,
@@ -204,21 +193,6 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 				'type'      => Controls_Manager::TEXT,
 				'default'   => __( 'Next', 'jet-smart-filters' ),
 				'condition' => array(
-					'enable_prev_next' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'hide_inactive_prev_next',
-			array(
-				'label'        => esc_html__( 'Hide inactive', 'jet-smart-filters' ),
-				'type'         => Controls_Manager::SWITCHER,
-				'label_on'     => esc_html__( 'Yes', 'jet-smart-filters' ),
-				'label_off'    => esc_html__( 'No', 'jet-smart-filters' ),
-				'return_value' => 'yes',
-				'default'      => 'yes',
-				'condition'    => array(
 					'enable_prev_next' => 'yes',
 				),
 			)
@@ -594,7 +568,8 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 					),
 				),
 				'selectors'   => array(
-					'{{WRAPPER}} ' . $css_scheme['pagination'] => 'column-gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['pagination-item'] => 'margin-right: calc({{SIZE}}{{UNIT}}/2); margin-left: calc({{SIZE}}{{UNIT}}/2);',
+					'{{WRAPPER}} ' . $css_scheme['pagination']      => 'margin-right: calc(-{{SIZE}}{{UNIT}}/2); margin-left: calc(-{{SIZE}}{{UNIT}}/2);',
 				),
 			)
 		);
@@ -617,7 +592,8 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 					),
 				),
 				'selectors'   => array(
-					'{{WRAPPER}} ' . $css_scheme['pagination'] => 'row-gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['pagination-item'] => 'margin-top: calc({{SIZE}}{{UNIT}}/2); margin-bottom: calc({{SIZE}}{{UNIT}}/2)',
+					'{{WRAPPER}} ' . $css_scheme['pagination']      => 'margin-top: calc(-{{SIZE}}{{UNIT}}/2); margin-bottom: calc(-{{SIZE}}{{UNIT}}/2)',
 				),
 			)
 		);
@@ -878,19 +854,16 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 		}
 
 		if ( 'yes' === $nav_enabled ) {
-			$controls['nav_enabled']       = true;
-			$controls['prev']              = wp_kses_post( $settings['prev_text'] );
-			$controls['next']              = wp_kses_post( $settings['next_text'] );
-			$controls['hide_inactive_nav'] = isset( $settings['hide_inactive_prev_next'] )
-				? filter_var( $settings['hide_inactive_prev_next'], FILTER_VALIDATE_BOOLEAN )
-				: false;
+			$controls['nav_enabled'] = true;
+			$controls['prev']        = $settings['prev_text'];
+			$controls['next']        = $settings['next_text'];
 		} else {
 			$controls['nav_enabled'] = false;
 		}
 
 		if ( 'yes' === $load_more_enabled ) {
 			$controls['load_more_enabled'] = true;
-			$controls['load_more_text']    = wp_kses_post( $settings['load_more_text'] );
+			$controls['load_more_text']    = $settings['load_more_text'];
 		} else {
 			$controls['load_more_enabled'] = false;
 		}
@@ -898,8 +871,6 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 		if ( $settings['autoscroll'] === 'yes' ) {
 			$controls['provider_top_offset'] = ! empty( $settings['provider_top_offset'] ) ? absint( $settings['provider_top_offset'] ) : 0;
 		}
-
-		jet_smart_filters()->filter_request_validator->register_pagination( $content_provider, $query_id );
 
 		printf(
 			'<div
@@ -910,11 +881,11 @@ class Jet_Smart_Filters_Pagination_Widget extends Widget_Base {
 				data-controls="%4$s"
 				data-apply-type="%5$s"
 			>',
-			esc_attr( $base_class ),
-			esc_attr( $content_provider ),
-			esc_attr( $query_id ),
-			esc_attr( wp_json_encode( $controls ) ),
-			esc_attr( $apply_type )
+			$base_class,
+			$content_provider,
+			$query_id,
+			htmlspecialchars( json_encode( $controls ) ),
+			$apply_type
 		);
 
 		if ( Plugin::instance()->editor->is_edit_mode() ) {

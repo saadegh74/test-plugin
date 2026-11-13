@@ -40,14 +40,6 @@ class Jet_Elements_Dropbar extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
-	public function get_style_depends() { 
-		return array( 'jet-dropbar' ); 
-	}
-
-	public function get_script_depends() {
-		return array( 'jet-dropbar' );
-	}
-
 	protected function register_controls() {
 		$css_scheme = apply_filters(
 			'jet-elements/dropbar/css-scheme',
@@ -371,19 +363,6 @@ class Jet_Elements_Dropbar extends Jet_Elements_Base {
 					'flip-in-x'        => esc_html__( 'Flip In X', 'jet-elements' ),
 					'flip-in-y'        => esc_html__( 'Flip In Y', 'jet-elements' ),
 				),
-			)
-		);
-
-		$this->add_control(
-			'ajax_template',
-			array(
-				'label'        => esc_html__( 'Use Ajax Loading for Template', 'jet-elements' ),
-				'description'  => esc_html__( 'Note: Do not use with query or dynamic data', 'jet-elements' ),
-				'type'         => Controls_Manager::SWITCHER,
-				'label_on'     => esc_html__( 'On', 'jet-elements' ),
-				'label_off'    => esc_html__( 'Off', 'jet-elements' ),
-				'return_value' => 'yes',
-				'default'      => 'false',
 			)
 		);
 
@@ -973,34 +952,6 @@ class Jet_Elements_Dropbar extends Jet_Elements_Base {
 			75
 		);
 
-		$this->_add_control(
-			'dropbar_content_loader_style_heading',
-			array(
-				'label'     => esc_html__( 'Loader Styles', 'jet-elements' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-				'condition' => array(
-					'ajax_template' => 'yes',
-				),
-			),
-			75
-		);
-
-		$this->_add_control(
-			'dropbar_content_loader_color',
-			array(
-				'label' => esc_html__( 'Loader color', 'jet-elements' ),
-				'type'  => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['content_wrapper'] . ' .jet-elements-loader' => 'border-color: {{VALUE}}; border-top-color: white;',
-				),
-				'condition' => array(
-					'ajax_template' => 'yes',
-				),
-			),
-			85
-		);
-
 		$this->_end_controls_section();
 
 	}
@@ -1017,8 +968,6 @@ class Jet_Elements_Dropbar extends Jet_Elements_Base {
 	public function get_dropbar_content() {
 		$settings = $this->get_settings_for_display();
 		$content  = '';
-
-		$ajax_template = filter_var( $this->get_settings( 'ajax_template' ), FILTER_VALIDATE_BOOLEAN );
 
 		$content_type = $settings['content_type'];
 
@@ -1038,21 +987,7 @@ class Jet_Elements_Dropbar extends Jet_Elements_Base {
 
 					// for multi-language plugins
 					$template_id = apply_filters( 'jet-elements/widgets/template_id', $template_id, $this );
-
-					$template_content = jet_elements()->elementor()->frontend->get_builder_content( $template_id );
-
-					if ( ! empty( $template_content ) ) {
-
-						if ( jet_elements()->elementor()->preview->is_preview_mode() ){
-							$content = jet_elements()->elementor()->frontend->get_builder_content_for_display( $template_id );
-						} else {
-							if ( ! $ajax_template ) {
-								$content .= $template_content;
-							} else {
-								$content .= '<div class="jet-elements-loader"></div>';
-							}
-						}
-					}
+					$content     = jet_elements()->elementor()->frontend->get_builder_content( $template_id );
 
 					if ( jet_elements()->elementor()->editor->is_edit_mode() ) {
 						$edit_url = add_query_arg(
@@ -1077,40 +1012,16 @@ class Jet_Elements_Dropbar extends Jet_Elements_Base {
 
 	public function get_dropbar_export_settings() {
 		$settings = $this->get_settings_for_display();
-	
-		$unique_id = get_option( 'jet_elements_unique_id' );
-	
-		if ( empty( $unique_id ) ) {
-			$unique_id = time();
-			update_option( 'jet_elements_unique_id', $unique_id );
-		}
-	
-		$template_id = isset( $settings['template_id'] ) ? $settings['template_id'] : '0';
-		
-		$key = defined( 'NONCE_KEY' ) ? NONCE_KEY : '';
-	
-		$signature = md5( $unique_id . $template_id . $key );
 
 		$allowed = apply_filters( 'jet-elements/dropbar/export-settings', array(
-			'mode'          => 'hover',
-			'hide_delay'    => 500,
-			'ajax_template' => 'yes',
-			'template_id'   => $template_id,
-			'signature'     => $signature
+			'mode',
+			'hide_delay',
 		) );
 
-		if ( ! is_array( $allowed ) ) {
-			$allowed = array();
-		}
-
 		$result = array();
-	
-		foreach ( $allowed as $key => $setting ) {
-			if ( $key === 'signature' ) {
-				$result[ $key ] = $setting;
-			} else {
-				$result[ $key ] = isset( $settings[ $key ] ) ? $settings[ $key ] : false;
-			}
+
+		foreach ( $allowed as $setting ) {
+			$result[ $setting ] = isset( $settings[ $setting ] ) ? $settings[ $setting ] : false;
 		}
 
 		return json_encode( $result );

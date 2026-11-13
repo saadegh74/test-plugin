@@ -81,9 +81,8 @@ class Jet_Smart_Filters_Terms_Walker extends Walker {
 		$template       = $args['item_template'];
 		$extra_classes  = '';
 		$checked        = '';
-		$is_parent      = $this->has_children;
 
-		if ( $is_parent ) {
+		if ( $this->has_children ) {
 			$extra_classes = ' jet-list-tree__parent';
 		}
 
@@ -95,12 +94,6 @@ class Jet_Smart_Filters_Terms_Walker extends Walker {
 			if ( ! is_array( $current ) && $value == $current ) {
 				$checked = 'checked';
 			}
-		}
-
-		if ( jet_smart_filters()->settings->url_taxonomy_term_name === 'slug' && isset( $cat->slug ) ) {
-			$data_attrs = array(
-				'url-value' => $cat->slug
-			);
 		}
 
 		ob_start();

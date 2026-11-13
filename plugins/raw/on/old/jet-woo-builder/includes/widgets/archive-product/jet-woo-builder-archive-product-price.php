@@ -31,19 +31,8 @@ class Jet_Woo_Builder_Archive_Product_Price extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/woocommerce-jetwoobuilder-settings-how-to-create-and-set-a-custom-categories-archive-template/?utm_source=need-help&utm_medium=jet-woo-categories&utm_campaign=jetwoobuilder';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-		
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'archive' );
+		return jet_woo_builder()->documents->is_document_type( 'archive' );
 	}
 
 	protected function register_controls() {
@@ -78,25 +67,6 @@ class Jet_Woo_Builder_Archive_Product_Price extends Jet_Woo_Builder_Base {
 			]
 		);
 
-		$this->add_control(
-			'archive_sale_price_position_block',
-			[
-				'label'     => __( 'Sale Price Position', 'jet-woo-builder' ),
-				'type'      => Controls_Manager::SELECT,
-				'options'   => [
-					'column-reverse' => esc_html__( 'Above', 'jet-woo-builder' ),
-					'column'         => esc_html__( 'Below', 'jet-woo-builder' ),
-				],
-				'default'   => 'column-reverse',
-				'selectors' => [
-					'{{WRAPPER}} ' . $css_scheme['price'] => 'display: flex; flex-direction: {{VALUE}};',
-				],
-				'condition' => [
-					'archive_price_sale_display_type' => 'block',
-				],
-			]
-		);
-
 		$this->add_responsive_control(
 			'archive_price_space_between',
 			[
@@ -109,9 +79,7 @@ class Jet_Woo_Builder_Archive_Product_Price extends Jet_Woo_Builder_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} ' . $css_scheme['price'] . ' del' => ! is_rtl()
-						? 'margin-right: {{SIZE}}{{UNIT}};'
-						: 'margin-left: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['price'] . ' del+ins' => ! is_rtl() ? 'margin-left: {{SIZE}}{{UNIT}};' : 'margin-right: {{SIZE}}{{UNIT}};',
 				],
 				'condition' => [
 					'archive_price_sale_display_type' => 'inline-block',
@@ -131,7 +99,7 @@ class Jet_Woo_Builder_Archive_Product_Price extends Jet_Woo_Builder_Base {
 					],
 				],
 				'selectors' => [
-					'{{WRAPPER}} ' . $css_scheme['price'] => 'gap: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['price'] . ' del+ins' => 'margin-top: {{SIZE}}{{UNIT}};',
 				],
 				'condition' => [
 					'archive_price_sale_display_type' => 'block',
@@ -457,13 +425,13 @@ class Jet_Woo_Builder_Archive_Product_Price extends Jet_Woo_Builder_Base {
 		$pre_get_price = apply_filters( 'jet-woo-builder/widgets/archive/pre-product-price', false );
 
 		if ( $pre_get_price ) {
-			echo wp_kses_post( $pre_get_price );
+			echo $pre_get_price;
 			return;
 		}
 
 		echo '<div class="jet-woo-builder-archive-product-price">';
 		echo '<div class="jet-woo-product-price">';
-		echo wp_kses_post( jet_woo_builder_template_functions()->get_product_price() );
+		echo jet_woo_builder_template_functions()->get_product_price();
 		echo '</div>';
 		echo '</div>';
 
@@ -472,9 +440,9 @@ class Jet_Woo_Builder_Archive_Product_Price extends Jet_Woo_Builder_Base {
 	protected function render() {
 
 		if ( jet_woo_builder_tools()->is_builder_content_save() ) {
-			echo wp_kses_post( jet_woo_builder()->parser->get_macros_string( $this->get_name() ) );
+			echo jet_woo_builder()->parser->get_macros_string( $this->get_name() );
 		} else {
-			echo wp_kses_post( self::render_callback() ?: '' );
+			echo self::render_callback();
 		}
 
 	}

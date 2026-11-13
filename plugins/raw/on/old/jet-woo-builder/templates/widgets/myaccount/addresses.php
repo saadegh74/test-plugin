@@ -53,8 +53,6 @@ $col    = 1;
 		<address>
 			<?php
 			echo $address ? wp_kses_post( $address ) : esc_html_e( 'You have not set up this type of address yet.', 'woocommerce' );
-
-			do_action( 'woocommerce_my_account_after_my_address', $name );
 			?>
 		</address>
 	</div>

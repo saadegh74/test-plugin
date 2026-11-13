@@ -331,7 +331,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Parser' ) ) {
 			$css_meta = $css_file->get_meta();
 
 			if ( 'inline' === $css_meta['status'] ) {
-				printf( '<style id="elementor-post-%1$s">%2$s</style>', esc_attr( $css_file->get_post_id() ), wp_kses_post( $css_meta['css'] ) );
+				printf( '<style id="elementor-post-%1$s">%2$s</style>', $css_file->get_post_id(), $css_meta['css'] ); // XSS ok.
 			} else {
 				$css_file->enqueue();
 			}
@@ -354,7 +354,7 @@ if ( ! class_exists( 'Jet_Woo_Builder_Parser' ) ) {
 			$plugin = Elementor\Plugin::instance();
 
 			if ( $plugin->editor->is_edit_mode() ) {
-				printf( '<link rel="stylesheet" type="text/css" href="%s">', esc_url( $css_file->get_url() ) );
+				printf( '<link rel="stylesheet" type="text/css" href="%s">', $css_file->get_url() );
 			}
 
 		}

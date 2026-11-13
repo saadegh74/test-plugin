@@ -45,10 +45,11 @@ class Plugin_Settings extends Base {
 			] );
 		}
 
-		$settings = jet_elements_settings();
-		$current = array_replace( $settings->sanitize( $current ), $settings->sanitize( $data ) );
-		update_option( $settings->key, $current );
-		$settings->settings = $current;
+		foreach ( $data as $key => $value ) {
+			$current[ $key ] = is_array( $value ) ? $value : esc_attr( $value );
+		}
+
+		update_option( jet_elements_settings()->key, $current );
 
 		return rest_ensure_response( [
 			'status'  => 'success',

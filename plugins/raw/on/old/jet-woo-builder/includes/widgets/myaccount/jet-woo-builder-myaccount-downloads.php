@@ -33,19 +33,8 @@ class Jet_Woo_Builder_MyAccount_Downloads extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-my-account-page-template/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ]; 
-
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'myaccount' );
+		return jet_woo_builder()->documents->is_document_type( 'myaccount' );
 	}
 
 	protected function register_controls() {
@@ -53,44 +42,12 @@ class Jet_Woo_Builder_MyAccount_Downloads extends Jet_Woo_Builder_Base {
 		$css_scheme = apply_filters(
 			'jet-woo-builder/jet-myaccount-downloads/css-scheme',
 			[
-				'table'   => '.woocommerce-table.woocommerce-table--order-downloads.order_details',
-				'heading' => '.woocommerce-table.woocommerce-table--order-downloads thead tr th',
+				'heading' => '.woocommerce-table.woocommerce-table--order-downloads thead th',
 				'cell'    => '.woocommerce-table.woocommerce-table--order-downloads tbody tr td',
 				'button'  => '.woocommerce-table.woocommerce-table--order-downloads .download-file a.woocommerce-MyAccount-downloads-file',
 				'message' => '.woocommerce-info',
 			]
 		);
-
-		$this->start_controls_section(
-			'myaccount_downloads_table_styles',
-			[
-				'label' => __( 'Table', 'jet-woo-builder' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			[
-				'name'     => 'myaccount_downloads_table_border',
-				'label'    => __( 'Border', 'jet-woo-builder' ),
-				'selector' => '{{WRAPPER}} ' . $css_scheme['table'],
-			]
-		);
-
-		$this->add_responsive_control(
-			'myaccount_downloads_table_border_radius',
-			[
-				'type'       => Controls_Manager::DIMENSIONS,
-				'label'      => __( 'Border Radius', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
-				'selectors'  => [
-					'{{WRAPPER}} ' . $css_scheme['table'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				],
-			]
-		);
-
-		$this->end_controls_section();
 
 		$this->start_controls_section(
 			'myaccount_downloads_heading_styles',
@@ -359,10 +316,6 @@ class Jet_Woo_Builder_MyAccount_Downloads extends Jet_Woo_Builder_Base {
 	}
 
 	protected function render() {
-
-		if ( ! isset( WC()->customer ) ) {
-			return;
-		}
 
 		$this->__open_wrap();
 

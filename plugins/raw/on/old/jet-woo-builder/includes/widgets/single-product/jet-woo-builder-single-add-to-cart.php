@@ -11,6 +11,7 @@ use Elementor\Controls_Manager;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
+use Elementor\Core\Schemes\Typography;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -38,19 +39,8 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 		return [ 'wc-add-to-cart', 'wc-add-to-cart-variation', 'wc-single-product' ];
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ]; 
-
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'single' );
+		return jet_woo_builder()->documents->is_document_type( 'single' );
 	}
 
 	protected function register_controls() {
@@ -108,20 +98,16 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			)
 		);
 
-		$this->add_responsive_control(
+		$this->add_control(
 			'qty_display',
 			[
-				'type'                 => Controls_Manager::SELECT,
-				'label'                => __( 'Display Type', 'jet-woo-builder' ),
-				'options'              => jet_woo_builder_tools()->get_available_display_types(),
-				'default'              => 'inline-block',
-				'selectors_dictionary' => [
-					'block'        => 'flex-direction: column;',
-					'inline-block' => 'flex-direction: row;',
-				],
-				'selectors'            => [
-					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart:not(.grouped_form):not(.variations_form)' => '{{VALUE}}',
-					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart .woocommerce-variation-add-to-cart'       => '{{VALUE}}',
+				'type'      => Controls_Manager::SELECT,
+				'label'     => __( 'Display Type', 'jet-woo-builder' ),
+				'options'   => jet_woo_builder_tools()->get_available_flex_directions_types(),
+				'default'   => 'row',
+				'selectors' => [
+					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart:not(.grouped_form):not(.variations_form)' => 'flex-direction: {{VALUE}};',
+					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart .woocommerce-variation-add-to-cart'       => 'flex-direction: {{VALUE}};',
 				],
 			]
 		);
@@ -131,7 +117,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::SLIDER,
 				'label'      => __( 'Width', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', '%' ] ),
 				'range'      => [
 					'%'  => [
 						'min' => 10,
@@ -140,18 +126,6 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 					'px' => [
 						'min' => 50,
 						'max' => 1000,
-					],
-					'em' => [
-						'min' => 0.1,
-						'max' => 10,
-					],
-					'rem' => [
-						'min' => 0.1,
-						'max' => 10,
-					],
-					'vw' => [
-						'min' => 0,
-						'max' => 100,
 					],
 				],
 				'selectors'  => [
@@ -330,7 +304,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Border Radius', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['button'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -350,7 +324,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['button'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -362,7 +336,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['button'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -372,21 +346,35 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 		$this->add_control(
 			'add_to_cart_alignment',
 			[
-				'type'                 => Controls_Manager::CHOOSE,
-				'label'                => __( 'Alignment', 'jet-woo-builder' ),
-				'options'              => jet_woo_builder_tools()->get_available_h_align_types(),
-				'separator'            => 'before',
-				'selectors_dictionary' => [
-					'left'   => 'start',
-					'center' => 'center',
-					'right'  => 'end',
+				'type'      => Controls_Manager::CHOOSE,
+				'label'     => __( 'Alignment', 'jet-woo-builder' ),
+				'options'   => jet_woo_builder_tools()->get_available_flex_h_align_types(),
+				'separator' => 'before',
+				'selectors' => [
+					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart:not(.grouped_form):not(.variations_form)' => 'justify-content: {{VALUE}};',
+					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart .woocommerce-variation-add-to-cart'       => 'justify-content: {{VALUE}};',
 				],
-				'selectors'            => [
-					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart:not(.grouped_form):not(.variations_form)' => 'align-items: {{VALUE}}; justify-content: {{VALUE}};',
-					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart .woocommerce-variation-add-to-cart'       => 'align-items: {{VALUE}}; justify-content: {{VALUE}};',
-					'{{WRAPPER}} form.cart'                                                                        => 'text-align: {{VALUE}};',
+				'condition' => [
+					'qty_display' => 'row',
 				],
-				'classes'              => 'elementor-control-align',
+			]
+		);
+
+		$this->add_control(
+			'add_to_cart_alignment_block',
+			[
+				'type'      => Controls_Manager::CHOOSE,
+				'label'     => __( 'Alignment', 'jet-woo-builder' ),
+				'options'   => jet_woo_builder_tools()->get_available_flex_h_align_types(),
+				'default'   => '{{add_to_cart_alignment.VALUE}}',
+				'separator' => 'before',
+				'selectors' => [
+					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart:not(.grouped_form):not(.variations_form)' => 'align-items: {{VALUE}};',
+					'{{WRAPPER}} .elementor-jet-single-add-to-cart .cart .woocommerce-variation-add-to-cart'       => 'align-items: {{VALUE}};',
+				],
+				'condition' => [
+					'qty_display' => 'column',
+				],
 			]
 		);
 
@@ -427,7 +415,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['view_cart'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -439,7 +427,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['view_cart'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -461,7 +449,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::SLIDER,
 				'label'      => __( 'Width', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', '%' ] ),
 				'range'      => [
 					'%'  => [
 						'min' => 10,
@@ -470,18 +458,6 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 					'px' => [
 						'min' => 50,
 						'max' => 1000,
-					],
-					'em' => [
-						'min' => 0.1,
-						'max' => 100,
-					],
-					'rem' => [
-						'min' => 0.1,
-						'max' => 100,
-					],
-					'vw' => [
-						'min' => 1,
-						'max' => 100,
 					],
 				],
 				'default'    => [
@@ -596,7 +572,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Border Radius', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['qty'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -616,9 +592,9 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
-					'{{WRAPPER}} ' . $css_scheme['qty'] . ':not([type="hidden"])' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['qty'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
 			]
 		);
@@ -628,7 +604,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['qty'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -650,7 +626,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::SLIDER,
 				'label'      => __( 'Width', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', '%' ] ),
 				'range'      => [
 					'%'  => [
 						'min' => 10,
@@ -659,18 +635,6 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 					'px' => [
 						'min' => 50,
 						'max' => 1000,
-					],
-					'em' => [
-						'min' => 0.1,
-						'max' => 100,
-					],
-					'rem' => [
-						'min' => 0.1,
-						'max' => 100,
-					],
-					'vw' => [
-						'min' => 1,
-						'max' => 100,
 					],
 				],
 				'default'    => [
@@ -688,7 +652,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['variations_wrap'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -700,7 +664,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['variations_wrap'] . ' tr > *' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -740,7 +704,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['label'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -752,7 +716,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
 				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['label'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -870,7 +834,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Border Radius', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['select'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -890,7 +854,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['select'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -902,7 +866,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['select'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -1086,7 +1050,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'separator'  => 'before',
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['price']         => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
@@ -1320,7 +1284,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'separator'  => 'before',
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['availability'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
@@ -1375,7 +1339,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['description'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -1507,7 +1471,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Border Radius', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['reset_button'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -1519,7 +1483,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Margin', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['reset_button'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -1531,7 +1495,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 			[
 				'type'       => Controls_Manager::DIMENSIONS,
 				'label'      => __( 'Padding', 'jet-woo-builder' ),
-				'size_units' => $this->set_custom_size_unit( [ 'px', '%', 'em', 'rem', 'vw' ] ),
+				'size_units' => $this->set_custom_size_unit( [ 'px', 'em', '%' ] ),
 				'selectors'  => [
 					'{{WRAPPER}} ' . $css_scheme['reset_button'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				],
@@ -1543,8 +1507,6 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 	}
 
 	protected function render() {
-
-		jet_woo_builder_assets()->add_inline_widget_script( 'jet-single-add-to-cart.default' );
 
 		global $product;
 
@@ -1558,7 +1520,7 @@ class Jet_Woo_Builder_Single_Add_To_Cart extends Jet_Woo_Builder_Base {
 		if ( $this->__set_editor_product() ) {
 			$this->__open_wrap();
 
-			echo sprintf( '<div class="jet-woo-builder-single-ajax-add-to-cart" %s>', esc_attr( $custom_attrs ) );
+			echo sprintf( '<div class="jet-woo-builder-single-ajax-add-to-cart" %s>', $custom_attrs );
 
 			woocommerce_template_single_add_to_cart();
 

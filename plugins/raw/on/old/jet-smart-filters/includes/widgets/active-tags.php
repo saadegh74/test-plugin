@@ -34,7 +34,7 @@ class Jet_Smart_Filters_Active_Tags_Widget extends Widget_Base {
 	public function get_help_url() {
 
 		return jet_smart_filters()->widgets->prepare_help_url(
-			'https://crocoblock.com/knowledge-base/jetsmartfilters/jetsmartfilters-active-tags-widget-overview/',
+			'https://crocoblock.com/knowledge-base/articles/jetsmartfilters-how-to-enable-visitors-to-disable-active-filters/',
 			$this->get_name()
 		);
 	}
@@ -129,17 +129,6 @@ class Jet_Smart_Filters_Active_Tags_Widget extends Widget_Base {
 				'type'        => Controls_Manager::TEXT,
 				'label_block' => true,
 				'description' => __( 'Set unique query ID if you use multiple widgets of same provider on the page. Same ID you need to set for filtered widget.', 'jet-smart-filters' ),
-			)
-		);
-
-		$this->add_control(
-			'query_id_wc_shortcode_notice',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => __( '<b>Query ID</b> for <b>WooCommerce Shortcode</b> must be specified as attribute class: [products class="query_id"]', 'jet-smart-filters' ),
-				'condition' => array(
-					'content_provider' => array( 'woocommerce-shortcode' ),
-				),
 			)
 		);
 
@@ -917,13 +906,13 @@ class Jet_Smart_Filters_Active_Tags_Widget extends Widget_Base {
 
 		printf(
 			'<div class="%1$s jet-active-tags jet-filter" data-label="%6$s" data-clear-item-label="%7$s" data-content-provider="%2$s" data-additional-providers="%3$s" data-apply-type="%4$s" data-query-id="%5$s">',
-			esc_attr( $base_class ),
-			esc_attr( $provider ),
-			esc_attr( $additional_providers ),
-			esc_attr( $settings['apply_type'] ),
-			esc_attr( $query_id ),
-			esc_attr( wp_kses_post( $settings['tags_label'] ) ),
-			esc_attr( $clear_item && $clear_label ? wp_kses_post( $settings['clear_item_label'] ) : false )
+			$base_class,
+			$provider,
+			$additional_providers,
+			$settings['apply_type'],
+			$query_id,
+			$settings['tags_label'],
+			$clear_item && $clear_label ? $settings['clear_item_label'] : false
 		);
 
 		if ( Plugin::instance()->editor->is_edit_mode() ) {

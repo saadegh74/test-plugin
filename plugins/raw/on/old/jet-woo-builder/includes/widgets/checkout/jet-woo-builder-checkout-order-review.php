@@ -33,19 +33,8 @@ class Jet_Woo_Builder_Checkout_Order_Review extends Jet_Woo_Builder_Base {
 		return 'https://crocoblock.com/knowledge-base/articles/jetwoobuilder-how-to-create-a-checkout-page-template/';
 	}
 
-	public function get_style_depends() {
-
-		$deps = [ 'jet-woo-builder' ];
-		
-		if ( $handle = jet_woo_builder_assets()->get_widget_style_handle( $this->get_name() ) ) {
-			$deps[] = $handle;
-		}
-
-		return $deps;
-	}
-
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'checkout' );
+		return jet_woo_builder()->documents->is_document_type( 'checkout' );
 	}
 
 	protected function register_controls() {
@@ -326,10 +315,6 @@ class Jet_Woo_Builder_Checkout_Order_Review extends Jet_Woo_Builder_Base {
 	}
 
 	protected function render() {
-
-		if ( ! isset( WC()->cart ) ) {
-			return;
-		}
 
 		// Remove actions before displaying our Widget.
 		remove_action( 'woocommerce_checkout_order_review', 'woocommerce_checkout_payment', 20 );

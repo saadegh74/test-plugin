@@ -43,11 +43,11 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 	}
 
 	public function get_script_depends() {
-		return array( 'imagesloaded', 'jet-slider-pro', 'jet-slider' );
+		return array( 'imagesloaded', 'jet-slider-pro' );
 	}
 
 	public function get_style_depends() {
-		return array( 'jet-slider-pro-css', 'jet-slider', 'jet-slider-skin' );
+		return array( 'jet-slider-pro-css' );
 	}
 
 	protected function register_controls() {
@@ -85,7 +85,7 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'item_list' );
 
-		$repeater = new \Elementor\Jet_Elements_Repeater();
+		$repeater = new Repeater();
 
 		$repeater->add_control(
 			'item_image',
@@ -690,15 +690,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 		);
 
 		$this->add_control(
-			'slider_id',
-			array(
-				'label'   => esc_html__( 'Slider CSS ID', 'jet-elements' ),
-				'type'    => Controls_Manager::TEXT,
-				'dynamic' => array( 'active' => true ),
-			)
-		);
-
-		$this->add_control(
 			'slider_width',
 			array(
 				'label' => esc_html__( 'Slider Width(%)', 'jet-elements' ),
@@ -746,19 +737,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 			)
 		);
 
-		$this->add_control(
-			'auto_adjust_slide_height',
-			array(
-				'label'        => esc_html__( 'Dynamic Slide Height for Templates', 'jet-elements' ),
-				'type'         => Controls_Manager::SWITCHER,
-				'label_on'     => esc_html__( 'Yes', 'jet-elements' ),
-				'label_off'    => esc_html__( 'No', 'jet-elements' ),
-				'return_value' => 'true',
-				'default'      => 'no',
-				'description'  => esc_html__( 'Enable to automatically adjust slide height based on the content of template slides.', 'jet-elements' )
-			)			
-		);
-
 		$this->add_responsive_control(
 			'slider_container_width',
 			array(
@@ -785,7 +763,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 					'{{WRAPPER}} ' . $css_scheme['instance_slider'] . ' .jet-slider__content-inner' => 'max-width: {{SIZE}}{{UNIT}}',
 					'{{WRAPPER}} ' . $css_scheme['pagination'] => 'max-width: {{SIZE}}{{UNIT}}',
 				),
-				'render_type'        => 'template',
 			)
 		);
 
@@ -835,6 +812,9 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 					),
 				),
 				'selector' => '{{WRAPPER}} ' . $css_scheme['instance_slider'] . ' .jet-slider__item',
+				'condition' => array(
+					'slide_image_scale_mode' => 'contain',
+				),
 			)
 		);
 
@@ -921,42 +901,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 				'label_off'    => esc_html__( 'No', 'jet-elements' ),
 				'return_value' => 'true',
 				'default'      => '',
-			)
-		);
-	
-		$this->add_control(
-			'fractionPrefix',
-			array(
-				'label'       => esc_html__( 'Prefix Text', 'jet-elements' ),
-				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => '',
-				'condition'   => array(
-					'fraction_pagination' => 'true',
-				),
-			)
-		);
-		
-		$this->add_control(
-			'fractionSeparator',
-			array(
-				'label'       => esc_html__( 'Separator', 'jet-elements' ),
-				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => '/',
-				'condition'   => array(
-					'fraction_pagination' => 'true',
-				),
-			)
-		);
-		
-		$this->add_control(
-			'fractionSuffix',
-			array(
-				'label'       => esc_html__( 'Suffix Text', 'jet-elements' ),
-				'type'        => \Elementor\Controls_Manager::TEXT,
-				'default'     => '',
-				'condition'   => array(
-					'fraction_pagination' => 'true',
-				),
 			)
 		);
 
@@ -1153,17 +1097,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 				),
 				'frontend_available' => true,
 				'render_type'        => 'template',
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Image_Size::get_type(),
-			array(
-				'name'    => 'slider_thumbnail', // Usage: `{name}_size` and `{name}_custom_dimension`, in this case `image_size` and `image_custom_dimension`.
-				'default' => 'thumbnail',
-				'condition' => array(
-					'thumbnails' => 'true',
-				),
 			)
 		);
 
@@ -3330,43 +3263,36 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 		$widget_id = $this->get_id();
 
 		$settings = array(
-			'sliderWidth'           => absint( $module_settings['slider_width'] ),
-			'sliderHeight'          => absint( $module_settings['slider_height'] ),
+			'sliderWidth'           => $module_settings['slider_width'],
+			'sliderHeight'          => $module_settings['slider_height'],
 			'sliderNavigation'      => filter_var( $module_settings['slider_navigation'], FILTER_VALIDATE_BOOLEAN ),
-			'sliderNavigationIcon'  => 'jet-slider__arrow-icon-' . sanitize_key( $widget_id ),
+			'sliderNavigationIcon'  => 'jet-slider__arrow-icon-' . $widget_id,
 			'sliderNaviOnHover'     => filter_var( $module_settings['slider_navigation_on_hover'], FILTER_VALIDATE_BOOLEAN ),
 			'sliderPagination'      => filter_var( $module_settings['slider_pagination'], FILTER_VALIDATE_BOOLEAN ),
 			'sliderAutoplay'        => filter_var( $module_settings['slider_autoplay'], FILTER_VALIDATE_BOOLEAN ),
-			'sliderAutoplayDelay'   => absint( $module_settings['slider_autoplay_delay'] ),
-			'sliderAutoplayOnHover' => $this->ensure_allowed_value( $module_settings['slide_autoplay_on_hover'], array( 'pause', 'none', 'stop' ) ),
+			'sliderAutoplayDelay'   => $module_settings['slider_autoplay_delay'],
+			'sliderAutoplayOnHover' => $module_settings['slide_autoplay_on_hover'],
 			'sliderFullScreen'      => filter_var( $module_settings['slider_fullScreen'], FILTER_VALIDATE_BOOLEAN ),
-			'sliderFullscreenIcon'  => 'jet-slider__fullscreen-icon-' . sanitize_key( $widget_id ),
+			'sliderFullscreenIcon'  => 'jet-slider__fullscreen-icon-' . $widget_id,
 			'sliderShuffle'         => filter_var( $module_settings['slider_shuffle'], FILTER_VALIDATE_BOOLEAN ),
 			'sliderLoop'            => filter_var( $module_settings['slider_loop'], FILTER_VALIDATE_BOOLEAN ),
 			'sliderFadeMode'        => filter_var( $module_settings['slider_fade_mode'], FILTER_VALIDATE_BOOLEAN ),
-			'slideDistance'         => absint( $module_settings['slide_distance'] ),
-			'slideDuration'         => absint( $module_settings['slide_duration'] ),
-			'imageScaleMode'        => $this->ensure_allowed_value( $module_settings['slide_image_scale_mode'], array( 'exact', 'contain' ) ),
+			'slideDistance'         => $module_settings['slide_distance'],
+			'slideDuration'         => $module_settings['slide_duration'],
+			'imageScaleMode'        => $module_settings['slide_image_scale_mode'],
 			'thumbnails'            => filter_var( $module_settings['thumbnails'], FILTER_VALIDATE_BOOLEAN ),
-			'thumbnailWidth'        => absint( $module_settings['thumbnail_width'] ),
-			'thumbnailHeight'       => absint( $module_settings['thumbnail_height'] ),
+			'thumbnailWidth'        => $module_settings['thumbnail_width'],
+			'thumbnailHeight'       => $module_settings['thumbnail_height'],
 			'rightToLeft'           => is_rtl(),
 			'touchswipe'            => filter_var( $module_settings['slider_touchswipe'], FILTER_VALIDATE_BOOLEAN ),
 			'fractionPag'           => filter_var( $module_settings['fraction_pagination'], FILTER_VALIDATE_BOOLEAN ),
-			'fractionPrefix'   		=> sanitize_text_field( $module_settings['fractionPrefix'] ),
-			'fractionSeparator'		=> sanitize_text_field( $module_settings['fractionSeparator'] ),
-			'fractionSuffix'   		=> sanitize_text_field( $module_settings['fractionSuffix'] ),
-			'autoSliderHeight'    => filter_var( $module_settings['auto_adjust_slide_height'], FILTER_VALIDATE_BOOLEAN ),
 		);
 
 		$settings = apply_filters( 'jet-elements/slider/slider-options', $settings, $module_settings );
 
-		$settings = wp_json_encode( $settings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT );
+		$settings = json_encode( $settings );
 
-    	// Escape the JSON string for safe use in HTML attributes
-   		$data_settings_attribute = esc_attr( $settings );
-
-		return sprintf( 'data-settings=\'%1$s\'', $data_settings_attribute );
+		return sprintf( 'data-settings=\'%1$s\'', $settings );
 	}
 
 	/**
@@ -3389,121 +3315,10 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 				return false;
 			}
 
-			$params[] = $this->sanitize_render_value( $item[ $value ], $format, count( $params ) + 1 );
+			$params[] = $item[ $value ];
 		}
 
 		return vsprintf( $format, $params );
-	}
-
-	protected function has_slide_image( $item ) {
-
-		if ( empty( $item['item_image'] ) || ! is_array( $item['item_image'] ) ) {
-			return false;
-		}
-
-		$image = $item['item_image'];
-
-		if ( ! empty( $image['id'] ) ) {
-			$image['id'] = apply_filters( 'wpml_object_id', $image['id'], 'attachment', true );
-			$src         = Group_Control_Image_Size::get_attachment_image_src( $image['id'], 'slider_image', $this->get_settings() );
-
-			return ! empty( $src );
-		}
-
-		if ( empty( $image['url'] ) ) {
-			return false;
-		}
-
-		return Utils::get_placeholder_image_src() !== $image['url'];
-	}
-
-	protected function has_default_slide_content( $item ) {
-
-		$text_keys = array(
-			'item_title',
-			'item_subtitle',
-			'item_desc',
-		);
-
-		foreach ( $text_keys as $key ) {
-			if ( ! empty( $item[ $key ] ) && '' !== trim( wp_strip_all_tags( (string) $item[ $key ] ) ) ) {
-				return true;
-			}
-		}
-
-		if ( ! empty( $item['item_icon'] ) ) {
-			return true;
-		}
-
-		if ( ! empty( $item[ $this->_new_icon_prefix . 'item_icon' ]['value'] ) ) {
-			return true;
-		}
-
-		if (
-			! empty( $item['item_button_primary_url'] )
-			&& ! empty( $item['item_button_primary_text'] )
-			&& '' !== trim( wp_strip_all_tags( (string) $item['item_button_primary_text'] ) )
-		) {
-			return true;
-		}
-
-		if (
-			! empty( $item['item_button_secondary_url'] )
-			&& ! empty( $item['item_button_secondary_text'] )
-			&& '' !== trim( wp_strip_all_tags( (string) $item['item_button_secondary_text'] ) )
-		) {
-			return true;
-		}
-
-		if ( ! empty( $item['item_link_url'] ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	protected function is_empty_slide( $item ) {
-
-		$content_type = ! empty( $item['item_content_type'] ) ? $item['item_content_type'] : 'default';
-		$has_image    = $this->has_slide_image( $item );
-
-		if ( 'template' === $content_type ) {
-			return ! $has_image && empty( $item['template_id'] );
-		}
-
-		return ! $has_image && ! $this->has_default_slide_content( $item );
-	}
-
-	protected function prepare_slider_items( $loop ) {
-
-		if ( empty( $loop ) || ! is_array( $loop ) ) {
-			return array();
-		}
-
-		return array_values(
-			array_filter(
-				$loop,
-				function( $item ) {
-					return is_array( $item ) && ! $this->is_empty_slide( $item );
-				}
-			)
-		);
-	}
-
-	public function _get_render_looped_template( $templates = array(), $setting = null, $callback = null ) {
-
-		if ( 'item_list' === $setting ) {
-			$callback = array( $this, 'prepare_slider_items' );
-		}
-
-		parent::_get_render_looped_template( $templates, $setting, $callback );
-	}
-
-	protected function is_jet_engine_query_enabled() {
-
-		return ! empty( $this->get_settings( 'jet_engine_query_item_list' ) )
-			&& ! empty( $this->get_settings( 'jet_engine_query_id_item_list' ) )
-			&& ! empty( $this->get_settings( 'item_list' ) );
 	}
 
 	/**
@@ -3521,11 +3336,11 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 		$format = 'true' === $lazyload ? '<img class="sp-image" src="%1$s" alt="%2$s" loading="lazy">' : '<img class="sp-image" src="%1$s" alt="%2$s">';
 
 		if ( empty( $image['id'] ) && ! empty( $image['url'] ) ) {
-			return sprintf( $format, esc_url( $image['url'] ), '' );
+			return sprintf( $format, $image['url'], '' );
 		} 
 
 		if ( empty( $image['id']) ) {
-			return sprintf( $format, esc_url( Utils::get_placeholder_image_src() ), '' );
+			return sprintf( $format, Utils::get_placeholder_image_src(), '' );
 		}
 
 		$image['id'] = apply_filters( 'wpml_object_id', $image['id'], 'attachment', true );
@@ -3551,16 +3366,16 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 		$format = '<img class="sp-thumbnail" src="%1$s" alt="%2$s" loading="lazy">';
 
 		if ( empty( $image['id'] ) && ! empty( $image['url'] ) ) {
-			return sprintf( $format, esc_url( $image['url'] ), '' );
+			return sprintf( $format, $image['url'], '' );
 		} 
 
 		if ( empty( $image['id']) ) {
-			return sprintf( $format, esc_url( Utils::get_placeholder_image_src() ), '' );
+			return sprintf( $format, Utils::get_placeholder_image_src(), '' );
 		}
 
 		$image['id'] = apply_filters( 'wpml_object_id', $image['id'], 'attachment', true );
 
-		$src = Group_Control_Image_Size::get_attachment_image_src( $image['id'], 'slider_thumbnail', $this->get_settings() );
+		$src = wp_get_attachment_image_url( $image['id'], 'thumbnail' );
 		$alt = Control_Media::get_image_alt( $image );
 
 		if ( empty( $src ) ) {
@@ -3586,7 +3401,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 		// for multi-language plugins
 		$template_id = apply_filters( 'jet-elements/widgets/template_id', $template_id, $this );
 		$content     = jet_elements()->elementor()->frontend->get_builder_content( $template_id );
-		$content     = apply_filters( 'jet-elements/widgets/template_content', $content, $this->_processed_item, $template_id );
 
 		if ( jet_elements()->elementor()->editor->is_edit_mode() ) {
 			$edit_url = add_query_arg(
@@ -3615,13 +3429,6 @@ class Jet_Elements_Slider extends Jet_Elements_Base {
 	protected function render() {
 
 		$this->_context = 'render';
-
-		if (
-			! $this->is_jet_engine_query_enabled()
-			&& empty( $this->prepare_slider_items( $this->get_settings_for_display( 'item_list' ) ) )
-		) {
-			return;
-		}
 
 		$this->_open_wrap();
 		include $this->_get_global_template( 'index' );

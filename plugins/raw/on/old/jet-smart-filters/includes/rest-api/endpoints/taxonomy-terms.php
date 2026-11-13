@@ -18,10 +18,6 @@ class TaxonomyTerms extends Base {
 		return array(
 			'taxonomy' => array(
 				'required' => true,
-			),
-			'lang'     => array(
-				'default'  => '',
-				'required' => false,
 			)
 		);
 	}
@@ -31,19 +27,14 @@ class TaxonomyTerms extends Base {
 		$args = $request->get_params();
 
 		// Taxonomy
-		$tax  = $args['taxonomy'];
-		$lang = $args['lang'];
+		$tax = $args['taxonomy'];
 
 		$args = array(
 			'taxonomy'   => $tax,
-			'hide_empty' => false,
+			'hide_empty' => $hide_empty
 		);
 
-		if ( defined( 'ICL_SITEPRESS_VERSION' ) && $lang ) {
-			do_action( 'wpml_switch_language', $lang );
-		}
-
-		$terms    = get_terms( $args );
+		$terms = get_terms( $args );
 		$response = wp_list_pluck( $terms, 'name', 'term_id' );
 
 		return rest_ensure_response( $response );

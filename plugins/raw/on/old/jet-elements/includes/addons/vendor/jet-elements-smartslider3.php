@@ -91,19 +91,9 @@ class Jet_Elements_Smartslider3 extends Jet_Elements_Base {
 		);
 	}
 
-	/** Only available, positive slider IDs may reach the shortcode or preview. */
-	protected function get_selected_slider() {
-		$slider = $this->get_settings( 'slider' );
-		if ( ! ( is_string( $slider ) || is_int( $slider ) ) || ! preg_match( '/^[1-9][0-9]*$/', (string) $slider ) ) {
-			return 0;
-		}
-		$sliders = $this->get_sliders();
-		return array_key_exists( $slider, $sliders ) ? (int) $slider : 0;
-	}
-
 	protected function render() {
 
-		$slider = $this->get_selected_slider();
+		$slider = $this->get_settings( 'slider' );
 
 		if ( ! jet_elements_integration()->in_elementor() ) {
 
@@ -112,7 +102,7 @@ class Jet_Elements_Smartslider3 extends Jet_Elements_Base {
 			}
 
 			printf(
-				$this->get_slider_format(), // phpcs:ignore
+				$this->get_slider_format(),
 				do_shortcode( '[smartslider3 slider=' . $slider . ']' )
 			);
 
@@ -128,32 +118,33 @@ class Jet_Elements_Smartslider3 extends Jet_Elements_Base {
 		$format       = '<div class="elementor-smartslider">%s</div>';
 
 		if ( ! $slider ) {
-			printf( $format, $placeholder ); // phpcs:ignore
+			printf( $format, $placeholder );
 			return;
 		}
 
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $sliderstable WHERE id=%d", $slider ) );
 
 		if ( null === $row ) {
-			printf( $format, $placeholder ); // phpcs:ignore
+			printf( $format, $placeholder );
 			return;
 		}
 
 		$params = json_decode( $row->params, ARRAY_A );
 
-		$height_value = isset( $params['height'] ) ? $params['height'] : null;
-		if ( isset( $params['responsive-mode'] ) && 'fullwidth' === $params['responsive-mode'] && isset( $params['responsiveSliderHeightMax'] ) ) {
-			$height_value = $params['responsiveSliderHeightMax'];
+		if ( 'fullwidth' === $params['responsive-mode'] ) {
+			$height = isset( $params['responsiveSliderHeightMax'] )
+				? $params['responsiveSliderHeightMax'] . 'px'
+				: ( isset( $params['height'] ) ? $params['height'] . 'px' : 'auto' );
+		} else {
+			$height = isset( $params['height'] ) ? $params['height'] . 'px' : 'auto';
 		}
-		$height = is_scalar( $height_value ) && preg_match( '/^\d+(?:\.\d+)?$/', (string) $height_value ) && is_finite( (float) $height_value )
-			? (float) $height_value . 'px' : 'auto';
 
 		$slide = $wpdb->get_row(
 			$wpdb->prepare( "SELECT * FROM $slidestable WHERE slider = %d AND ordering = 0", $slider )
 		);
 
 		if ( null === $slide ) {
-			printf( $format, $placeholder ); // phpcs:ignore
+			printf( $format, $placeholder );
 			return;
 		}
 
@@ -163,11 +154,11 @@ class Jet_Elements_Smartslider3 extends Jet_Elements_Base {
 			'<div style="overflow:hidden;height:%1$s;display:flex;">
 				<img style="width: 100%%;object-fit: cover;" src="%2$s" alt="">
 			</div>',
-			esc_attr( $height ),
-			esc_url( $this->get_placeholder_image( $slide_params ) )
+			$height,
+			$this->get_placeholder_image( $slide_params )
 		);
 
-		printf( $format, $image ); // phpcs:ignore
+		printf( $format, $image );
 	}
 
 	public function get_placeholder_image( $slide_params ) {
@@ -187,13 +178,9 @@ class Jet_Elements_Smartslider3 extends Jet_Elements_Base {
 	public function render_plain_content() {
 
 		// In plain mode, render without shortcode
-		$slider = $this->get_selected_slider();
+		$slider = $this->get_settings( 'slider' );
 
-		if ( ! $slider ) {
-			return;
-		}
-
-		printf( '[smartslider3 slider="%d"]', $slider ); // phpcs:ignore
+		printf( '[smartslider3 slider="%s"]', $slider );
 
 	}
 

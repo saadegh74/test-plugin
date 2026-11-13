@@ -14,10 +14,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 	 * Define Jet_Smart_Filters_Provider_EPro_Archive_Products class
 	 */
 	class Jet_Smart_Filters_Provider_EPro_Archive_Products extends Jet_Smart_Filters_Provider_Base {
-
-		protected $has_container_wrapper = null;
-		public $default_query = null;
-
 		/**
 		 * Watch for default query
 		 */
@@ -40,13 +36,10 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 				return;
 			}
 
-			$this->default_query = $this->get_default_query( $query );
+			$default_query = $this->get_default_query( $query );
 
-			$jsf_request_val = jet_smart_filters()->data->get_request_var( 'jsf' );
-			$provider_data = jet_smart_filters()->query->decode_provider_data( $jsf_request_val );
-			if ( ! empty( $provider_data['provider'] ) && $provider_data['provider'] === $this->get_id() ) {
-				$query->set( 'jsf', $this->get_id() );
-			}
+			jet_smart_filters()->query->store_provider_default_query( $this->get_id(), $default_query );
+			$query->set( 'jet_smart_filters', $this->get_id() );
 		}
 
 		public function store_search_query( $query ) {
@@ -55,19 +48,17 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 				return;
 			}
 
-			$this->default_query = $this->get_default_query( $query );
+			$default_query = $this->get_default_query( $query );
 
-			$jsf_request_val = jet_smart_filters()->data->get_request_var( 'jsf' );
-			$provider_data = jet_smart_filters()->query->decode_provider_data( $jsf_request_val );
-			if ( ! empty( $provider_data['provider'] ) && $provider_data['provider'] === $this->get_id() ) {
-				$query->set( 'jsf', $this->get_id() );
-			}
+			jet_smart_filters()->query->store_provider_default_query( $this->get_id(), $default_query );
+			$query->set( 'jet_smart_filters', $this->get_id() );
 		}
 
 		public function get_default_query( $query ) {
 
 			$default_query = array(
 				//'post_type'       => $query->get( 'post_type' ),
+				'post_status'       => 'publish',
 				'wc_query'          => $query->get( 'wc_query' ),
 				'orderby'           => $query->get( 'orderby' ),
 				'order'             => $query->get( 'order' ),
@@ -77,11 +68,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 				'jet_smart_filters' => $this->get_id(),
 			);
 
-			if ( $query->get( 'post_status' ) ) {
-				$default_query['post_status'] = $query->get( 'post_status' );
-			}
-
-			if ( ! empty( $query->queried_object ) && $query->queried_object instanceof WP_Term ) {
+			if ( ! empty( $query->queried_object ) ) {
 				$default_query['taxonomy'] = $query->queried_object->taxonomy;
 				$default_query['term']     = $query->queried_object->slug;
 			}
@@ -103,12 +90,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 					break;
 				case 'rating':
 					$default_query['meta_key'] = '_wc_average_rating';
-					$default_query['orderby']  = 'meta_value_num ID';
-					$default_query['order']    = 'DESC';
-					break;
-				case 'popularity':
-					$default_query['meta_key'] = 'total_sales';
-					$default_query['orderby']  = 'meta_value_num ID';
+					$default_query['orderby']  = 'meta_value_num';
 					$default_query['order']    = 'DESC';
 					break;
 			}
@@ -125,14 +107,23 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 				return;
 			}
 
-			$query_id         = $this->helpers->elementor->get_widget_query_id( $widget );
+			$settings         = $widget->get_settings();
 			$store_settings   = $this->settings_to_store();
-			$default_settings = $this->helpers->elementor->get_widget_settings_for_storage( $widget, $store_settings );
+			$default_settings = array();
+
+			if ( ! empty( $settings['_element_id'] ) ) {
+				$query_id = $settings['_element_id'];
+			} else {
+				$query_id = 'default';
+			}
+
+			foreach ( $store_settings as $key ) {
+				$default_settings[ $key ] = isset( $settings[ $key ] ) ? $settings[ $key ] : '';
+			}
 
 			$default_settings['_el_widget_id'] = $widget->get_id();
 
 			jet_smart_filters()->providers->store_provider_settings( $this->get_id(), $default_settings, $query_id );
-			jet_smart_filters()->query->store_provider_default_query( $this->get_id(), $this->default_query, $query_id );
 
 			add_action( 'woocommerce_shortcode_before_products_loop', array( $this, 'store_props' ) );
 			add_action( 'woocommerce_shortcode_before_current_query_loop', array( $this, 'store_props' ) );
@@ -195,7 +186,17 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 		 */
 		public function ensure_settings( $settings ) {
 
-			return $this->helpers->elementor->ensure_settings( $settings, $this->settings_to_store() );
+			foreach ( $this->settings_to_store() as $setting ) {
+				if ( ! isset( $settings[ $setting ] ) ) {
+					if ( false !== strpos( $setting, '_meta_data' ) ) {
+						$settings[ $setting ] = array();
+					} else {
+						$settings[ $setting ] = false;
+					}
+				}
+			}
+
+			return $settings;
 		}
 
 		/**
@@ -203,7 +204,19 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 		 */
 		public function ajax_get_content() {
 
-			$settings = $this->ensure_settings( jet_smart_filters()->query->get_query_settings() );
+			$settings  = jet_smart_filters()->query->get_query_settings();
+			$settings  = $this->ensure_settings( $settings );
+			$widget_id = $settings['_el_widget_id'];
+
+			unset( $settings['_el_widget_id'] );
+
+			$data = array(
+				'id'         => $widget_id,
+				'elType'     => 'widget',
+				'settings'   => $this->sanitize_settings( $settings ),
+				'elements'   => array(),
+				'widgetType' => $this->widget_name(),
+			);
 
 			global $wp_query;
 			$wp_query = new WP_Query( jet_smart_filters()->query->get_query_args() );
@@ -213,10 +226,9 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 			add_action( 'woocommerce_shortcode_before_products_loop', array( $this, 'store_props' ) );
 			add_action( 'woocommerce_shortcode_before_current_query_loop', array( $this, 'store_props' ) );
 
-			$widget = $this->helpers->elementor->create_widget_instance(
-				$this->widget_name(),
-				$this->sanitize_settings( $settings )
-			);
+			$attributes = jet_smart_filters()->query->get_query_settings();
+
+			$widget     = Elementor\Plugin::$instance->elements_manager->create_element_instance( $data );
 
 			if ( ! $widget ) {
 				throw new \Exception( 'Widget not found.' );
@@ -227,27 +239,12 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 			$content = ob_get_clean();
 
 			if ( $content ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				echo $content;
 			} else {
-				$container_class = $this->has_container_wrapper() ? 'elementor-widget-container' : 'elementor-products';
-				echo '<div class="' . esc_attr( $container_class ) . '"></div>';
+				echo '<div class="elementor-widget-container"></div>';
 			}
 
-			add_filter( 'jet-smart-filters/render/ajax/data', array( $this, 'add_result_count_fragment' ), 99999 );
-
 			do_action( 'jet-smart-filters/providers/epro-archive-products/after-ajax-content' );
-		}
-
-		/**
-		 * Append updated WooCommerce result count fragment to AJAX response.
-		 *
-		 * @param array $data AJAX response data.
-		 * @return array
-		 */
-		public function add_result_count_fragment( $data ) {
-
-			return $this->helpers->woocommerce->add_result_count_fragment( $data );
 		}
 
 		/**
@@ -274,23 +271,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 		 */
 		public function get_wrapper_selector() {
 
-			if ( $this->has_container_wrapper() ) {
-				return '.elementor-widget-wc-archive-products .elementor-widget-container';
-			} else {
-				return '.elementor-widget-wc-archive-products';
-			}
-		}
-
-		/**
-		 * Check if provider has .elementor-widget-container wrapper
-		 */
-		public function has_container_wrapper() {
-
-			if ( null === $this->has_container_wrapper ) {
-				$this->has_container_wrapper = ! Elementor\Plugin::$instance->experiments->is_feature_active( 'e_optimized_markup' );
-			}
-
-			return $this->has_container_wrapper;
+			return '.elementor-widget-wc-archive-products .elementor-widget-container';
 		}
 
 		/**
@@ -314,9 +295,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 		 */
 		public function get_wrapper_action() {
 
-			return $this->has_container_wrapper()
-				? 'replace'
-				: 'insert';
+			return 'replace';
 		}
 
 		/**
@@ -346,7 +325,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_EPro_Archive_Products' ) ) {
 		 */
 		public function add_query_args( $query ) {
 
-			if ( $query->get('jsf') !== $this->get_id() || ! $query->get( 'wc_query' ) ) {
+			if ( $query->get('jsf') !== $this->get_id() && ! $query->get( 'wc_query' ) && ! $query->is_search ) {
 				return;
 			}
 

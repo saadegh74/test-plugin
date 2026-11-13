@@ -102,8 +102,7 @@
 						action: 'jet_license_action',
 						data: {
 							license: self.licenseKey,
-							action: actionType,
-							nonce: window.JetDashboardConfig.nonce,
+							action: actionType
 						}
 					},
 					beforeSend: function( jqXHR, ajaxSettings ) {
@@ -285,7 +284,6 @@
 							action: self.actionPlugin,
 							plugin: self.pluginData['slug'],
 							version: self.rollbackVersion,
-							nonce: window.JetDashboardConfig.nonce,
 						}
 					},
 					beforeSend: function( jqXHR, ajaxSettings ) {
@@ -392,7 +390,6 @@
 						data: {
 							action: self.pluginActionType,
 							plugin: self.pluginData['slug'],
-							nonce: window.JetDashboardConfig.nonce,
 						}
 					},
 					beforeSend: function( jqXHR, ajaxSettings ) {
@@ -731,8 +728,7 @@
 					data: {
 						action: 'jet_dashboard_debug_action',
 						data: {
-							action: 'check-plugin-update',
-							nonce: window.JetDashboardConfig.nonce,
+							action: 'check-plugin-update'
 						}
 					},
 					beforeSend: function( jqXHR, ajaxSettings ) {
@@ -785,8 +781,7 @@
 						action: 'jet_license_action',
 						data: {
 							license: self.licenseKey,
-							action: 'activate',
-							nonce: window.JetDashboardConfig.nonce,
+							action: 'activate'
 						}
 					},
 					beforeSend: function( jqXHR, ajaxSettings ) {

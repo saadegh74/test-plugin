@@ -73,7 +73,6 @@ class Jet_Woo_Products_List_Shortcode extends Jet_Woo_Builder_Shortcode_Base {
 				'max'       => 1000,
 				'step'      => 1,
 				'condition' => [
-					'use_current_query!'   => 'yes',
 					'enable_custom_query!' => 'yes',
 				],
 			],

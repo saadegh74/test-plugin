@@ -33,7 +33,7 @@ class Jet_Woo_Builder_Products_Result_Count extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'shop' );
+		return jet_woo_builder()->documents->is_document_type( 'shop' );
 	}
 
 	protected function register_controls() {

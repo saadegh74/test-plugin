@@ -17,4 +17,4 @@ $classes = [
 
 $attributes = apply_filters( 'jet-woo-builder/templates/jet-woo-products-list/widget-attributes', '', $settings, $query, $this );
 
-printf( '<ul class="%s" %s >', esc_attr( implode( ' ', $classes ) ), esc_attr( $attributes ) );
+printf( '<ul class="%s" %s >', implode( ' ', $classes ), $attributes );

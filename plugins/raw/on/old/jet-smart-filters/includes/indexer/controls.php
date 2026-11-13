@@ -87,21 +87,18 @@ if ( ! class_exists( 'Jet_Smart_Filters_Indexer_Controls' ) ) {
 					'type'        => Elementor\Controls_Manager::CHOOSE,
 					'toggle'      => false,
 					'label_block' => false,
-					'default'     => 'initial',
+					'default'     => 'default',
 					'options'     => array(
-						'initial' => array(
+						'default'       => array(
 							'title' => esc_html__( 'Default', 'jet-smart-filters' ),
 							'icon'  => 'eicon-justify-center-h',
 						),
-						'auto'    => array(
+						'space-between' => array(
 							'title' => esc_html__( 'Space Between', 'jet-smart-filters' ),
 							'icon'  => 'eicon-justify-space-between-h',
 						),
 					),
-					'selectors'  => array(
-						'{{WRAPPER}} .jet-filters-counter'      => 'margin-left: {{VALUE}};',
-						'.rtl {{WRAPPER}} .jet-filters-counter' => 'margin-right: {{VALUE}};',
-					),
+					'prefix_class' => 'jet-filters-counter-position-',
 					'condition'    => array(
 						'filters_position' => 'block',
 					),
@@ -312,9 +309,7 @@ if ( ! class_exists( 'Jet_Smart_Filters_Indexer_Controls' ) ) {
 			$counter_html .= '</span>';
 
 			if ( $options['show_counter'] ) {
-				echo wp_kses_post(
-					apply_filters( 'jet-smart-filter/templates/counter/format', $counter_html )
-				);
+				echo apply_filters( 'jet-smart-filter/templates/counter/format', $counter_html );
 			}
 		}
 	}

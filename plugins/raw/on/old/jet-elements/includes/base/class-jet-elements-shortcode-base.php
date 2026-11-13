@@ -2,8 +2,6 @@
 /**
  * Abstract post type registration class
  */
-require_once dirname( __DIR__ ) . '/class-jet-elements-settings-validator.php';
-
 if ( ! class_exists( 'Jet_Elements_Shortcode_Base' ) ) {
 
 	abstract class Jet_Elements_Shortcode_Base {
@@ -21,13 +19,6 @@ if ( ! class_exists( 'Jet_Elements_Shortcode_Base' ) ) {
 		 * @var array
 		 */
 		public $atts = array();
-
-		/**
-		 * CSS Classes
-		 *
-		 * @var array
-		 */
-		public $css_classes = array();
 
 		/**
 		 * Initialize post type
@@ -52,10 +43,6 @@ if ( ! class_exists( 'Jet_Elements_Shortcode_Base' ) ) {
 		 */
 		public function get_atts() {
 			return array();
-		}
-
-		public function get_validation_controls() {
-			return $this->get_atts();
 		}
 
 		/**
@@ -107,7 +94,7 @@ if ( ! class_exists( 'Jet_Elements_Shortcode_Base' ) ) {
 			$result = vsprintf( $format, $args );
 
 			if ( $echo ) {
-				echo $result; // phpcs:ignore
+				echo $result;
 			} else {
 				return $result;
 			}
@@ -144,18 +131,7 @@ if ( ! class_exists( 'Jet_Elements_Shortcode_Base' ) ) {
 				$content = do_shortcode( $content );
 			}
 
-			$controls = $this->get_validation_controls();
-			foreach ( $controls as $name => $control ) {
-				if ( ! empty( $control['multiple'] ) && isset( $atts[ $name ] ) && is_string( $atts[ $name ] ) ) {
-					$atts[ $name ] = array_map( 'trim', explode( ',', $atts[ $name ] ) );
-				}
-			}
-			$this->atts = Jet_Elements_Settings_Validator::normalize( $atts, $controls );
-			foreach ( $controls as $name => $control ) {
-				if ( ! empty( $control['multiple'] ) && isset( $this->atts[ $name ] ) && is_array( $this->atts[ $name ] ) ) {
-					$this->atts[ $name ] = implode( ',', $this->atts[ $name ] );
-				}
-			}
+			$this->atts = $atts;
 
 			return $this->_shortcode( $content );
 		}

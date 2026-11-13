@@ -14,20 +14,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Base' ) ) {
 	 */
 	abstract class Jet_Smart_Filters_Provider_Base {
 		/**
-		 * Provider helpers manager instance.
-		 *
-		 * @var Jet_Smart_Filters_Provider_Helpers_Manager|null
-		 */
-		private $helpers = null;
-
-		/**
-		 * Constructor.
-		 */
-		public function __construct() {
-			$this->init_helpers();
-		}
-
-		/**
 		 * Get provider name
 		 */
 		abstract public function get_name();
@@ -93,39 +79,6 @@ if ( ! class_exists( 'Jet_Smart_Filters_Provider_Base' ) ) {
 		public function is_data() {
 
 			return false;
-		}
-
-		/**
-		 * Initialize provider helpers manager.
-		 *
-		 * @return void
-		 */
-		protected function init_helpers() {
-
-			if ( null !== $this->helpers ) {
-				return;
-			}
-
-			require_once jet_smart_filters()->plugin_path( 'includes/providers/helpers/manager.php' );
-
-			$this->helpers = new Jet_Smart_Filters_Provider_Helpers_Manager();
-		}
-
-		/**
-		 * Lazy helper access for providers that do not call parent constructor.
-		 *
-		 * @param string $name Property name.
-		 * @return mixed
-		 */
-		public function __get( $name ) {
-
-			if ( 'helpers' !== $name ) {
-				return null;
-			}
-
-			$this->init_helpers();
-
-			return $this->helpers;
 		}
 
 		public function merge_query( $query_args, $default_query_args ) {

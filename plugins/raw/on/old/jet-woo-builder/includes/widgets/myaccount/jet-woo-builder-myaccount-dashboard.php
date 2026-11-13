@@ -33,7 +33,7 @@ class Jet_Woo_Builder_MyAccount_Dashboard extends Jet_Woo_Builder_Base {
 	}
 
 	public function show_in_panel() {
-		return $this->is_widget_visible( 'myaccount' );
+		return jet_woo_builder()->documents->is_document_type( 'myaccount' );
 	}
 
 	protected function register_controls() {

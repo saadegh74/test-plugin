@@ -40,7 +40,7 @@ class Control_Select extends Base {
 		return array_merge(
 			[ 'tab' => 'content' ],
 			$args,
-			$placeholder ? [ 'placeholder' => esc_html__( $placeholder, 'jet-smart-filters' ) ] : [],
+			$placeholder ? [ 'placeholder' => esc_html__( $placeholder, 'jet-engine' ) ] : [],
 			$css ? [ 'css' => $css ] : [],
 			$required ? [ 'required' => $required ] : [],
 		);

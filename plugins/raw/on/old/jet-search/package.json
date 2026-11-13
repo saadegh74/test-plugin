@@ -1,21 +1,16 @@
 {
   "name": "jet-search",
   "version": "1.0.0",
-  "scripts": {
-    "css": "gulp css-all",
-    "watch:css": "gulp watch"
-  },
   "devDependencies": {
-    "gulp": "^5.0.1",
-    "gulp-autoprefixer": "^10.0.0",
-    "gulp-notify": "^5.0.0",
-    "gulp-plumber": "^1.2.1",
-    "gulp-rename": "^2.1.0",
-    "gulp-sass": "^6.0.1",
-    "sass": "^1.93.3",
-    "gulp-checktextdomain": "^2.3.0"
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-notify": "^3.2.0",
+    "gulp-plumber": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-checktextdomain": "^2.2.0"
   },
   "dependencies": {
-    "gulp-livereload": "^4.0.2"
+    "gulp-livereload": "^4.0.1"
   }
 }

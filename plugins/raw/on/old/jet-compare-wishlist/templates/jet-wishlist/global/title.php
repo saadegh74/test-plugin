@@ -25,4 +25,4 @@ if ( -1 !== $widget_settings['title_length'] && 'yes' === $widget_settings['titl
 $open_wrap  = '<' . $heading_tag . ' class="jet-cw-product-title"><a href="' . $title_link . '" ' . $title_tooltip . '>';
 $close_wrap = '</a></' . $heading_tag . '>';
 
-echo wp_kses_post( $open_wrap ?? '' ) . esc_html( $title ?? '' ) . wp_kses_post( $close_wrap ?? '' );
+echo $open_wrap . $title . $close_wrap;

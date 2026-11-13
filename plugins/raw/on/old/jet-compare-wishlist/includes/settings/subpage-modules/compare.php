@@ -35,7 +35,7 @@ class Compare extends Page_Module_Base {
 	 * @return string
 	 */
 	public function get_page_name() {
-		return __( 'Compare Settings', 'jet-cw' );
+		return esc_html__( 'Compare Settings', 'jet-cw' );
 	}
 
 	/**
@@ -57,32 +57,29 @@ class Compare extends Page_Module_Base {
 	}
 
 	/**
-	 * Enqueue module-specific assets.
-	 *
-	 * @since 1.2.2
-	 * @since 1.5.8 Renamed style&script.
+	 * Enqueue module-specific assets
 	 *
 	 * @return void
 	 */
 	public function enqueue_module_assets() {
 
 		wp_enqueue_style(
-			'jet-cw-settings-page-css',
-			jet_cw()->plugin_url( 'assets/css/admin/settings-page.css' ),
+			'jet-cw-admin-css',
+			jet_cw()->plugin_url( 'assets/css/jet-cw-admin.css' ),
 			false,
 			jet_cw()->get_version()
 		);
 
 		wp_enqueue_script(
-			'jet-cw-settings-page-js',
-			jet_cw()->plugin_url( 'assets/js/dist/admin/settings-page.js' ),
-			[ 'cx-vue-ui', 'wp-api-fetch' ],
+			'jet-cw-admin-vue-components',
+			jet_cw()->plugin_url( 'assets/js/admin-vue-components.min.js' ),
+			array( 'cx-vue-ui', 'wp-api-fetch' ),
 			jet_cw()->get_version(),
 			true
 		);
 
 		wp_localize_script(
-			'jet-cw-settings-page-js',
+			'jet-cw-admin-vue-components',
 			'jetCWSettingsConfig',
 			apply_filters( 'jet-cw/admin/settings-page/localized-config', jet_cw()->settings->get_localize_data() )
 		);
@@ -98,7 +95,7 @@ class Compare extends Page_Module_Base {
 	 *
 	 * @return array
 	 */
-	public function page_config( $config = [], $page = false, $subpage = false ) {
+	public function page_config( $config = array(), $page = false, $subpage = false ) {
 
 		$config['pageModule'] = $this->get_parent_slug();
 		$config['subPageModule'] = $this->get_page_slug();
@@ -116,7 +113,7 @@ class Compare extends Page_Module_Base {
 	 *
 	 * @return array
 	 */
-	public function page_templates( $templates = [], $page = false, $subpage = false ) {
+	public function page_templates( $templates = array(), $page = false, $subpage = false ) {
 
 		$templates['jet-cw-compare-settings'] = jet_cw()->plugin_path( 'templates/admin-templates/compare-settings.php' );
 

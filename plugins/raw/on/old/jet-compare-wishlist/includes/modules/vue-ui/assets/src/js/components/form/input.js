@@ -9,7 +9,7 @@ const Input = {
 	props: {
 		type: {
 			validator ( value ) {
-				return oneOf(value, ['text', 'textarea', 'password', 'url', 'email', 'date', 'time',  'number', 'range', 'tel', 'search']);
+				return oneOf(value, ['text', 'textarea', 'password', 'url', 'email', 'date', 'number', 'tel']);
 			},
 			default: 'text'
 		},
@@ -48,15 +48,6 @@ const Input = {
 		autofocus: {
 			type: Boolean,
 			default: false
-		},
-		min: {
-			type: Number
-		},
-		max: {
-			type: Number
-		},
-		step: {
-			type: Number
 		},
 		autocomplete: {
 			validator (value) {
@@ -139,20 +130,12 @@ const Input = {
 		},
 		handleBlur ( event ) {
 			this.$emit( 'on-blur', event );
-			this.$emit( 'on-blur-validation', this.currentValue, this.inputBlurValidation );
 		},
 		handleInput ( event ) {
 			let value = event.target.value;
 			this.$emit( 'input', value );
 			this.setCurrentValue( value );
-			this.$emit( 'input-validation', value, this.inputValidation );
 			this.$emit( 'on-change', event );
-		},
-		inputValidation ( value ) {
-			this.setCurrentValue( value );
-		},
-		inputBlurValidation ( value ) {
-			this.setCurrentValue( value );
 		},
 		handleChange ( event ) {
 			this.$emit( 'on-input-change', event );

@@ -23,10 +23,6 @@ class Filter extends Base {
 				'default'  => false,
 				'required' => false,
 			),
-			'duplicate' => array(
-				'default'  => false,
-				'required' => false,
-			),
 		);
 	}
 
@@ -37,12 +33,9 @@ class Filter extends Base {
 		$args     = $request->get_params();
 		$filterID = $args['id'];
 		$new_data = $args['data'];
-		$duplicate = ! empty( $args['duplicate'] );
 		$response = false;
 
-		if ( $duplicate ) {
-			$response = jet_smart_filters()->services->filter->duplicate( $filterID );
-		} elseif ( ! $new_data ) {
+		if ( ! $new_data ) {
 			// Get filter
 			$response = jet_smart_filters()->services->filter->get( $filterID );
 		} else {

@@ -12,9 +12,8 @@ use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\Group_Control_Typography;
 use Elementor\Repeater;
-use Elementor\Core\Kits\Documents\Tabs\Global_Typography as Global_Typography;
+use Elementor\Core\Schemes\Typography as Scheme_Typography;
 use Elementor\Widget_Base;
-use Jet_Search\Search_Sources\Manager;
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -53,7 +52,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 	 * @return string
 	 */
 	public function get_icon() {
-		return 'jet-search-icon-ajax-search';
+		return 'eicon-search';
 	}
 
 	/**
@@ -72,88 +71,43 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		$css_scheme = apply_filters(
 			'jet-search/ajax-search/css-scheme',
 			array(
-				'form'                                => '.jet-ajax-search__form',
-				'form_focus'                          => '.jet-ajax-search__form--focus',
-				'fields_holder'                       => '.jet-ajax-search__fields-holder',
-				'field_wrapper'                       => '.jet-ajax-search__field-wrapper',
-				'field'                               => '.jet-ajax-search__field',
-				'field_icon'                          => '.jet-ajax-search__field-icon',
-				'popup'                               => '.jet-ajax-search__popup',
-				'popup_full_screen'                   => '.jet-ajax-search__popup--full-screen',
-				'popup_content'                       => '.jet-ajax-search__popup-content',
-				'popup_close'                         => '.jet-ajax-search__popup-close',
-				'popup_close_icon'                    => '.jet-ajax-search__popup-close-icon',
-				'popup_trigger_container'             => '.jet-ajax-search__popup-trigger-container',
-				'popup_trigger'                       => '.jet-ajax-search__popup-trigger',
-				'popup_trigger_icon'                  => '.jet-ajax-search__popup-trigger-icon',
-				'categories'                          => '.jet-ajax-search__categories',
-				'categories_select'                   => '.jet-ajax-search__categories-select',
-				'categories_select_icon'              => '.jet-ajax-search__categories-select-icon',
-				'submit'                              => '.jet-ajax-search__submit',
-				'submit_icon'                         => '.jet-ajax-search__submit-icon',
-				'submit_label'                        => '.jet-ajax-search__submit-label',
-				'results_area'                        => '.jet-ajax-search__results-area',
-				'results_header'                      => '.jet-ajax-search__results-header',
-				'results_list'                        => '.jet-ajax-search__results-list',
-				'results_slide'                       => '.jet-ajax-search__results-slide',
-				'results_footer'                      => '.jet-ajax-search__results-footer',
-				'results_item'                        => '.jet-ajax-search__results-item',
-				'results_item_link'                   => '.jet-ajax-search__item-link',
-				'results_item_thumb'                  => '.jet-ajax-search__item-thumbnail',
-				'results_item_thumb_img'              => '.jet-ajax-search__item-thumbnail-img',
-				'results_item_thumb_placeholder'      => '.jet-ajax-search__item-thumbnail-placeholder',
-				'results_item_title'                  => '.jet-ajax-search__item-title',
-				'results_item_content'                => '.jet-ajax-search__item-content',
-				'results_item_price'                  => '.jet-ajax-search__item-price',
-				'results_item_rating'                 => '.jet-ajax-search__item-rating',
-				'results_item_add_to_cart'            => '.jet-ajax-search__item-add-to-cart',
-				'results_item_cart_button'            => '.jet-ajax-search__results-item-cart-button',
-				'results_item_quantity_input'         => '.jet-ajax-search__item-add-to-cart .jet-ajax-search__results-item-quantity-input',
-				'results_rating_star'                 => '.jet-ajax-search__rating-star',
-				'results_counter'                     => '.jet-ajax-search__results-count',
-				'full_results'                        => '.jet-ajax-search__full-results',
-				'bullet_btn'                          => '.jet-ajax-search__bullet-button',
-				'number_btn'                          => '.jet-ajax-search__number-button',
-				'active_nav_btn'                      => '.jet-ajax-search__active-button',
-				'arrow_btn'                           => '.jet-ajax-search__arrow-button',
-				'results_suggestions_area'            => '.jet-ajax-search__results-suggestions-area',
-				'results_suggestions_area_title'      => '.jet-ajax-search__results-suggestions-area-title',
-				'results_suggestions_area_item'       => '.jet-ajax-search__results-suggestions-area-item',
-				'results_suggestions_area_item_title' => '.jet-ajax-search__results-suggestions-area-item-title',
-				'inline_suggestions_area'             => '.jet-ajax-search__suggestions-inline-area',
-				'inline_suggestions_area_title'       => '.jet-ajax-search__suggestions-inline-area-title',
-				'inline_suggestions_area_item'        => '.jet-ajax-search__suggestions-inline-area-item',
-				'inline_suggestions_area_item_title'  => '.jet-ajax-search__suggestions-inline-area-item-title',
-				'message'                             => '.jet-ajax-search__message',
-				'spinner'                             => '.jet-ajax-search__spinner',
-				'source_results_holder'               => '.jet-ajax-search__source-results-holder',
-				'source_results_title'                => '.jet-ajax-search__source-results-holder-title',
-				'source_results_item'                 => '.jet-ajax-search__source-results-item',
-				'source_results_item_link'            => '.jet-ajax-search__source-results-item_link',
-				'source_results_item_icon'            => '.jet-ajax-search__source-results-item_icon',
+				'form'                           => '.jet-ajax-search__form',
+				'form_focus'                     => '.jet-ajax-search__form--focus',
+				'fields_holder'                  => '.jet-ajax-search__fields-holder',
+				'field_wrapper'                  => '.jet-ajax-search__field-wrapper',
+				'field'                          => '.jet-ajax-search__field',
+				'field_icon'                     => '.jet-ajax-search__field-icon',
+				'categories'                     => '.jet-ajax-search__categories',
+				'categories_select'              => '.jet-ajax-search__categories-select',
+				'categories_select_icon'         => '.jet-ajax-search__categories-select-icon',
+				'submit'                         => '.jet-ajax-search__submit',
+				'submit_icon'                    => '.jet-ajax-search__submit-icon',
+				'submit_label'                   => '.jet-ajax-search__submit-label',
+				'results_area'                   => '.jet-ajax-search__results-area',
+				'results_header'                 => '.jet-ajax-search__results-header',
+				'results_list'                   => '.jet-ajax-search__results-list',
+				'results_slide'                  => '.jet-ajax-search__results-slide',
+				'results_footer'                 => '.jet-ajax-search__results-footer',
+				'results_item'                   => '.jet-ajax-search__results-item',
+				'results_item_link'              => '.jet-ajax-search__item-link',
+				'results_item_thumb'             => '.jet-ajax-search__item-thumbnail',
+				'results_item_thumb_img'         => '.jet-ajax-search__item-thumbnail-img',
+				'results_item_thumb_placeholder' => '.jet-ajax-search__item-thumbnail-placeholder',
+				'results_item_title'             => '.jet-ajax-search__item-title',
+				'results_item_content'           => '.jet-ajax-search__item-content',
+				'results_item_price'             => '.jet-ajax-search__item-price',
+				'results_item_rating'            => '.jet-ajax-search__item-rating',
+				'results_rating_star'            => '.jet-ajax-search__rating-star',
+				'results_counter'                => '.jet-ajax-search__results-count',
+				'full_results'                   => '.jet-ajax-search__full-results',
+				'bullet_btn'                     => '.jet-ajax-search__bullet-button',
+				'number_btn'                     => '.jet-ajax-search__number-button',
+				'active_nav_btn'                 => '.jet-ajax-search__active-button',
+				'arrow_btn'                      => '.jet-ajax-search__arrow-button',
+				'message'                        => '.jet-ajax-search__message',
+				'spinner'                        => '.jet-ajax-search__spinner',
 			)
 		);
-
-		$default_query_settings = array(
-			'show_search_category_list' => '',
-			'search_taxonomy'           => 'category',
-			'current_query'             => '',
-			'search_source'             => array(),
-			'include_terms_ids'         => '',
-			'exclude_terms_ids'         => '',
-			'exclude_posts_ids'         => '',
-			'custom_fields_source'      => '',
-			'sentence'                  => '',
-			'search_in_taxonomy'        => '',
-			'search_in_taxonomy_source' => array(),
-			'results_order_by'          => 'relevance',
-			'results_order'             => 'asc',
-			'catalog_visibility'        => ''
-		);
-
-		if ( false != get_option( 'jet_ajax_search_query_settings' ) ) {
-			$default_query_settings = \Jet_Search_Tools::prepared_settings_for_elementor( get_option( 'jet_ajax_search_query_settings' ) );
-		}
 
 		/**
 		 * `Search Form` Section
@@ -236,15 +190,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		);
 
 		$this->add_control(
-			'submit_on_enter',
-			array(
-				'label'     => esc_html__( 'Disable Submit on Enter', 'jet-search' ),
-				'type'      => Controls_Manager::SWITCHER,
-				'default'   => '',
-			)
-		);
-
-		$this->add_control(
 			'show_search_submit',
 			array(
 				'label'     => esc_html__( 'Show Submit Button', 'jet-search' ),
@@ -262,7 +207,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'default'   => '',
 				'condition' => array(
 					'show_search_submit' => 'yes',
-					'show_search_in_popup!' => 'yes',
 				),
 			)
 		);
@@ -286,88 +230,11 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		);
 
 		$this->add_control(
-			'show_search_in_popup',
-			array(
-				'label'     => esc_html__( 'Show Search Form in Popup', 'jet-search' ),
-				'type'      => Controls_Manager::SWITCHER,
-				'default'   => '',
-				'separator' => 'before',
-			)
-		);
-
-		$this->add_control(
-			'full_screen_popup',
-			array(
-				'label'     => esc_html__( 'Full Screen Popup', 'jet-search' ),
-				'type'      => Controls_Manager::SWITCHER,
-				'default'   => '',
-				'condition' => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'selected_search_popup_trigger_icon',
-			array(
-				'label'            => esc_html__( 'Popup Trigger Icon', 'jet-search' ),
-				'label_block'      => false,
-				'type'             => Controls_Manager::ICONS,
-				'skin'             => 'inline',
-				'fa4compatibility' => 'search_popup_trigger_icon',
-				'default'          => array(
-					'value'   => 'fas fa-search',
-					'library' => 'fa-solid',
-				),
-				'condition'        => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'selected_search_close_icon',
-			array(
-				'label'            => esc_html__( 'Popup Close Button Icon', 'jet-search' ),
-				'label_block'      => false,
-				'type'             => Controls_Manager::ICONS,
-				'skin'             => 'inline',
-				'fa4compatibility' => 'search_close_icon',
-				'default'          => array(
-					'value'   => 'fas fa-times',
-					'library' => 'fa-solid',
-				),
-				'condition'        => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_show_effect',
-			array(
-				'label'   => esc_html__( 'Show Effect', 'jet-search' ),
-				'type'    => Controls_Manager::SELECT,
-				'options' => array(
-					'none'      => esc_html__( 'None', 'jet-search' ),
-					'fade'      => esc_html__( 'Fade', 'jet-search' ),
-					'scale'     => esc_html__( 'Scale', 'jet-search' ),
-					'move-up'   => esc_html__( 'Move Up', 'jet-search' ),
-					'move-down' => esc_html__( 'Move Down', 'jet-search' ),
-				),
-				'default'   => 'move-up',
-				'condition' => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
 			'show_search_category_list',
 			array(
 				'label'     => esc_html__( 'Show Categories List', 'jet-search' ),
 				'type'      => Controls_Manager::SWITCHER,
-				'default'   => $default_query_settings['show_search_category_list'],
+				'default'   => '',
 				'separator' => 'before',
 			)
 		);
@@ -377,7 +244,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			array(
 				'label'     => esc_html__( 'Taxonomy', 'jet-search' ),
 				'type'      => Controls_Manager::SELECT,
-				'default'   => $default_query_settings['search_taxonomy'],
+				'default'   => 'category',
 				'options'   => \Jet_Search_Tools::get_taxonomies(),
 				'condition' => array(
 					'show_search_category_list' => 'yes',
@@ -421,100 +288,12 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		);
 
 		$this->add_control(
-			'manage_default_settings',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => sprintf(
-					esc_html__( 'Please note! You can set a global default for these options from %1$s. This will help you shorten the search results URL generated by this widget.', 'jet-search' ),
-					'<a target="_blank" href="' . jet_search_settings()->get_settings_page_link( 'ajax-search' ) . '">' . esc_html__( 'Ajax Search Settings', 'jet-search' ) . '</a>'
-				)
-			)
-		);
-
-		$this->add_control(
 			'current_query',
 			array(
 				'label'       => esc_html__( 'Search by the current query', 'jet-search' ),
 				'description' => esc_html__( 'Use for Archive Templates', 'jet-search' ),
 				'type'        => Controls_Manager::SWITCHER,
-				'default'     => $default_query_settings['current_query'],
-				'separator' => 'before',
-			)
-		);
-
-		$this->add_control(
-			'search_results_url',
-			array(
-				'label'       => esc_html__( 'Custom Search Results URL', 'jet-search' ),
-				'label_block' => true,
-				'type'        => Controls_Manager::TEXTAREA,
-				'default'     => $default_query_settings['search_results_url'],
-				'separator'   => 'before',
-				'description' => esc_html__(
-					'Please note: Search results apply to all widgets with the same post type on the results page.',
-					'jet-search'
-				),
-			)
-		);
-
-		$this->add_control(
-			'search_results_target_widget_id',
-			array(
-				'label'       => esc_html__( 'Target Widget ID ( optional )', 'jet-search' ),
-				'type'        => Controls_Manager::TEXT,
-				'description' => esc_html__( 'Enter the CSS ID of the target Listing Grid. The search will apply only to this widget.', 'jet-search' ),
-				'label_block' => true,
 				'default'     => '',
-				'condition'   => array(
-					'search_results_url!' => '',
-				),
-			)
-		);
-
-		$listing_grid_notice = class_exists( 'Jet_Engine' )
-			? sprintf(
-				__( 'This works only with <a href="%1$s" target="_blank"><strong>JetEngine\'s Listing Grid</strong></a>. Make sure the widget uses the same post type as set in Ajax Search.', 'jet-search' ),
-				esc_url( admin_url( 'edit.php?post_type=jet-engine' ) ),
-			)
-			: sprintf(
-				__( 'This works only with <strong>JetEngine\'s Listing Grid</strong>. The <a href="%1$s" target="_blank">JetEngine plugin</a> must be installed and active.', 'jet-search' ),
-				esc_url( 'https://crocoblock.com/plugins/jetengine/' )
-			);
-
-		$this->add_control(
-			'search_results_target_widget_notice',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => sprintf(
-					'<div style="margin-top: -10px;"><strong>%s</strong><br>%s</div>',
-					esc_html__( 'Important:', 'jet-search' ),
-					wp_kses_post( $listing_grid_notice )
-				),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-warning',
-				'condition' => array(
-					'search_results_url!' => '',
-				),
-			)
-		);
-
-		$search_query_param_notice = sprintf(
-			__( 'If you are using a Custom Search Results URL, make sure to configure a custom Search Query Parameter in <a href="%1$s" target="_blank"><strong>Ajax Search Settings</strong></a>. Avoid using the default <code>s</code> parameter and other reserved query parameter names such as <code>search</code>, <code>_s</code>, <code>jsearch</code>, <code>jet_ajax_search_settings</code>, and <code>jet_search_suggestions_settings</code>, as they may conflict with WordPress or other plugins and cause the custom results page to return a 404 error.', 'jet-search' ),
-			esc_url( jet_search_settings()->get_settings_page_link( 'ajax-search' ) )
-		);
-
-		$this->add_control(
-			'search_results_url_query_parameter_notice',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => sprintf(
-					'<div><strong>%s</strong><br>%s</div>',
-					esc_html__( 'Note:', 'jet-search' ),
-					wp_kses_post( $search_query_param_notice )
-				),
-				'content_classes' => 'elementor-panel-alert elementor-panel-alert-warning',
-				'condition' => array(
-					'search_results_url!' => '',
-				),
 			)
 		);
 
@@ -526,7 +305,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'type'        => Controls_Manager::SELECT2,
 				'label_block' => true,
 				'multiple'    => true,
-				'default'     => $default_query_settings['search_source'],
+				'default'     => array(),
 				'options'     => \Jet_Search_Tools::get_post_types(),
 				'condition'   => array(
 					'current_query' => '',
@@ -540,7 +319,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'condition' => array(
 					'current_query' => '',
 				),
-				'separator' => 'before',
 			)
 		);
 
@@ -560,7 +338,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'multiple'    => true,
 				'action'      => 'jet_search_get_query_control_options',
 				'query_type'  => 'terms',
-				'default'     => $default_query_settings['include_terms_ids'],
 			)
 		);
 
@@ -582,7 +359,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'multiple'    => true,
 				'action'      => 'jet_search_get_query_control_options',
 				'query_type'  => 'terms',
-				'default'     => $default_query_settings['exclude_terms_ids'],
 			)
 		);
 
@@ -595,7 +371,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'multiple'    => true,
 				'action'      => 'jet_search_get_query_control_options',
 				'query_type'  => 'posts',
-				'default'     => $default_query_settings['exclude_posts_ids'],
 			)
 		);
 
@@ -610,7 +385,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'label_block' => true,
 				'description' => esc_html__( 'Set comma separated custom fields keys list (_sku, _price, etc.)', 'jet-search' ),
 				'type'        => Controls_Manager::TEXT,
-				'default'     => $default_query_settings['custom_fields_source'],
 				'separator'   => 'before',
 			)
 		);
@@ -620,7 +394,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			array(
 				'label'     => esc_html__( 'Sentence Search', 'jet-search' ),
 				'type'      => Controls_Manager::SWITCHER,
-				'default'   => $default_query_settings['sentence'],
+				'default'   => '',
 				'separator' => 'before',
 			)
 		);
@@ -631,7 +405,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'label'     => esc_html__( 'Search in taxonomy terms', 'jet-search' ),
 				'description' => esc_html__( 'Include in the search results the posts containing the terms of the selected taxonomies with the search phrase in the term name', 'jet-search' ),
 				'type'      => Controls_Manager::SWITCHER,
-				'default'   => $default_query_settings['search_in_taxonomy'],
+				'default'   => '',
 				'separator' => 'before',
 			)
 		);
@@ -643,8 +417,8 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'type'        => Controls_Manager::SELECT2,
 				'label_block' => true,
 				'multiple'    => true,
-				'default'     => $default_query_settings['search_in_taxonomy_source'],
-				'options'     => \Jet_Search_Tools::get_taxonomies( true, true ),
+				'default'     => array(),
+				'options'     => \Jet_Search_Tools::get_taxonomies( true ),
 				'condition'   => array(
 					'search_in_taxonomy!' => '',
 				),
@@ -656,7 +430,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			array(
 				'label'       => esc_html__( 'Results Order By', 'jet-search' ),
 				'type'        => Controls_Manager::SELECT,
-				'default'     => $default_query_settings['results_order_by'],
+				'default'     => 'relevance',
 				'options' => array(
 					'relevance'     => esc_html__( 'Relevance', 'jet-search' ),
 					'ID'            => esc_html__( 'ID', 'jet-search' ),
@@ -677,7 +451,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			array(
 				'label'   => esc_html__( 'Results Order', 'jet-search' ),
 				'type'    => Controls_Manager::SELECT,
-				'default' => $default_query_settings['results_order'],
+				'default' => 'asc',
 				'options' => array(
 					'asc'  => esc_html__( 'ASC', 'jet-search' ),
 					'desc' => esc_html__( 'DESC', 'jet-search' ),
@@ -685,7 +459,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			)
 		);
 
-		do_action( 'jet-search/ajax-search/add-custom-controls', $this, $default_query_settings ) ;
+		do_action( 'jet-search/ajax-search/add-custom-controls', $this );
 
 		$this->add_responsive_control(
 			'limit_query',
@@ -724,79 +498,26 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			)
 		);
 
-		if ( class_exists( 'Jet_Engine' ) ) {
-			$this->add_control(
-				'listing_id',
-				array(
-					'label'         => __( 'Listing', 'jet-search' ),
-					'description'   => esc_html__( 'Select the listing that will be used as the search results item template.', 'jet-search' ),
-					'type'          => 'jet-query',
-					'query_type'    => 'post',
-					'create_button' => array(
-						'active'  => true,
-						'handler' => 'JetListings',
-					),
-					'query'         => array(
-						'post_type' => jet_engine()->post_type->slug(),
-					),
-					'prevent_looping' => true,
-				)
-			);
-		} else {
-			$this->add_control(
-				'listing_jetengine_notice',
-				[
-					'type'        => Controls_Manager::NOTICE,
-					'notice_type' => 'warning',
-					'dismissible' => false,
-					'content'     => esc_html__( 'After JetEngine installation, you can use listings as templates for search results items.', 'jet-search' ),
-				]
-			);
-		}
-
 		$this->add_control(
 			'results_area_width_by',
 			array(
-				'label'     => esc_html__( 'Results Area Width', 'jet-search' ),
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'form',
-				'options'   => array(
+				'label'   => esc_html__( 'Results Area Width', 'jet-search' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'form',
+				'options' => array(
 					'form'          => esc_html__( 'by Search Form', 'jet-search' ),
 					'fields_holder' => esc_html__( 'by Input Box and Categories List', 'jet-search' ),
 					'custom'        => esc_html__( 'Custom', 'jet-search' ),
 				),
-				'separator' => 'before',
-			)
-		);
-
-		$this->add_responsive_control(
-			'results_area_columns',
-			array(
-				'label'   => __( 'Columns Number', 'jet-search' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => 1,
-				'options' => array(
-					1  => 1,
-					2  => 2,
-					3  => 3,
-					4  => 4,
-					5  => 5,
-					6  => 6,
-					7  => 7,
-					8  => 8,
-					9  => 9,
-					10 => 10,
-				),
-				'frontend_available' => true,
 			)
 		);
 
 		$this->add_control(
 			'highlight_searched_text',
 			array(
-				'label'     => esc_html__( 'Highlight Searched Text', 'jet-search' ),
-				'type'      => Controls_Manager::SWITCHER,
-				'default'   => '',
+				'label'   => esc_html__( 'Highlight Searched Text', 'jet-search' ),
+				'type'    => Controls_Manager::SWITCHER,
+				'default' => '',
 				'separator' => 'before',
 			)
 		);
@@ -952,36 +673,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		);
 
 		$this->add_control(
-			'show_add_to_cart',
-			array(
-				'label'   => esc_html__( 'Show Add to Cart Button', 'jet-search' ),
-				'type'    => Controls_Manager::SWITCHER,
-				'default' => '',
-			)
-		);
-
-		$this->add_control(
-			'show_add_to_cart_quantity',
-			array(
-				'label'     => esc_html__( 'Show Quantity Input', 'jet-search' ),
-				'type'      => Controls_Manager::SWITCHER,
-				'default'   => '',
-				'condition' => array(
-					'show_add_to_cart!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'show_result_new_tab',
-			array(
-				'label'   => esc_html__( 'Open Result Items in New Tab', 'jet-search' ),
-				'type'    => Controls_Manager::SWITCHER,
-				'default' => '',
-			)
-		);
-
-		$this->add_control(
 			'show_results_counter',
 			array(
 				'label'     => esc_html__( 'Show Results Counter', 'jet-search' ),
@@ -1021,6 +712,15 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				'condition' => array(
 					'show_full_results' => 'yes',
 				),
+			)
+		);
+
+		$this->add_control(
+			'show_result_new_tab',
+			array(
+				'label'   => esc_html__( 'Open Results In New Tab', 'jet-search' ),
+				'type'    => Controls_Manager::SWITCHER,
+				'default' => '',
 			)
 		);
 
@@ -1111,154 +811,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		$this->end_controls_section();
 
 		/**
-		 * `Additional Results` Section
-		 */
-		if ( class_exists( 'Jet_Search\Search_Sources\Manager' ) ) {
-			$sources_manager = jet_search()->search_sources;
-			$sources         = $sources_manager->get_sources();
-
-			$this->start_controls_section(
-				'section_additional_results',
-				array(
-					'label' => esc_html__( 'Additional Results', 'jet-search' ),
-				)
-			);
-
-			foreach ( $sources as $key => $source ) {
-
-				$this->add_additional_results_controls(
-					'section_additional_sources',
-					$source,
-					$key
-				);
-			}
-
-			$this->end_controls_section();
-		}
-
-		/**
-		 * `Search suggestions` Section
-		 */
-		$this->start_controls_section(
-			'section_search_suggestions_settings',
-			array(
-				'label' => esc_html__( 'Search Suggestions', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'search_logging',
-			array(
-				'label'     => esc_html__( 'Save User Searches', 'jet-search' ),
-				'type'      => Controls_Manager::SWITCHER,
-				'default'   => '',
-			)
-		);
-
-		$this->add_control(
-			'manage_saved_suggestions',
-			array(
-				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => sprintf(
-					esc_html__( 'Manage Saved Suggestions %1$s', 'jet-search' ),
-					'<a target="_blank" href="' . jet_search_settings()->get_settings_page_link() . '">' . esc_html__( 'here', 'jet-search' ) . '</a>'
-				),
-				'condition'   => array(
-					'search_logging!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'show_search_suggestions',
-			array(
-				'label'       => esc_html__( 'Show Search Suggestions', 'jet-search' ),
-				'type'        => Controls_Manager::SWITCHER,
-				'default'     => '',
-				'render_type' => 'template',
-				'separator'   => 'before',
-			)
-		);
-
-		$this->add_control(
-			'search_suggestions_source',
-			array(
-				'label'       => esc_html__( 'Suggestions Source', 'jet-search' ),
-				'type'        => Controls_Manager::SELECT,
-				'default'     => 'popular',
-				'options'     => array(
-					'popular' => esc_html__( 'Popular searches', 'jet-search' ),
-					'user'    => esc_html__( 'User searches', 'jet-search' ),
-				),
-				'condition'   => array(
-					'show_search_suggestions!' => '',
-				),
-			)
-		);
-
-		$localize_data     = jet_search_assets()->get_localize_data();
-		$suggestions_limit = $localize_data['ajaxSearchSuggestionsLimits'];
-
-		$this->add_control(
-			'search_suggestions_limits',
-			array(
-				'label'       => esc_html__( 'Max Suggestions Number', 'jet-search' ),
-				'type'        => Controls_Manager::NUMBER,
-				'default'     => $suggestions_limit,
-				'max'         => $suggestions_limit,
-				'min'         => 1,
-				'render_type' => 'template',
-				'condition'   => array(
-					'show_search_suggestions!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'search_suggestions_position',
-			array(
-				'label'       => esc_html__( 'Suggestions Position', 'jet-search' ),
-				'type'        => Controls_Manager::SELECT,
-				'default'     => 'under_form',
-				'options'     => array(
-					'under_form'          => esc_html__( 'Under the form', 'jet-search' ),
-					'inside_results_area' => esc_html__( 'Inside search results area', 'jet-search' ),
-				),
-				'condition'   => array(
-					'show_search_suggestions!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'search_suggestions_title',
-			array(
-				'label'     => esc_html__( 'Suggestions title', 'jet-search' ),
-				'type'      => Controls_Manager::TEXT,
-				'default'   => '',
-				'condition' => array(
-					'show_search_suggestions!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'search_suggestions_item_title_length',
-			array(
-				'label'       => esc_html__( 'Maximum Word Length for Suggestion Item Titles', 'jet-search' ),
-				'description' => esc_html__( 'Set 0 to show full length.', 'jet-search' ),
-				'type'        => Controls_Manager::NUMBER,
-				'default'     => 0,
-				'min'         => 0,
-				'condition'   => array(
-					'show_search_suggestions!' => '',
-				),
-			)
-		);
-
-		$this->end_controls_section();
-
-		/**
 		 * `Notifications` Section
 		 */
 		$this->start_controls_section(
@@ -1272,7 +824,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			'negative_search',
 			array(
 				'label'       => esc_html__( 'Negative search results', 'jet-search' ),
-				'description' => esc_html__( 'Allowed tags are: <a> with "href" and "title" attributes, <br>, <em>, <strong>, <p> with "style" attribute.', 'jet-search' ),
 				'label_block' => true,
 				'type'        => Controls_Manager::TEXTAREA,
 				'default'     => esc_html__( 'Sorry, but nothing matched your search terms.', 'jet-search' ),
@@ -1283,7 +834,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			'server_error',
 			array(
 				'label'       => esc_html__( 'Technical error', 'jet-search' ),
-				'description' => esc_html__( 'Allowed tags are: <a> with "href" and "title" attributes, <br>, <em>, <strong>, <p> with "style" attribute.', 'jet-search' ),
 				'label_block' => true,
 				'type'        => Controls_Manager::TEXTAREA,
 				'default'     => esc_html__( 'Sorry, but we cannot handle your search query now. Please, try again later!', 'jet-search' ),
@@ -2555,651 +2105,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		$this->end_controls_section();
 
 		/**
-		 * `Popup Box` Style Section
-		 */
-		$this->start_controls_section(
-			'section_popup_style',
-			array(
-				'label'     => esc_html__( 'Popup Box', 'jet-search' ),
-				'tab'       => Controls_Manager::TAB_STYLE,
-				'condition' => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_width',
-			array(
-				'label'      => esc_html__( 'Popup Content Width', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 100,
-						'max' => 1000,
-					),
-					'%' => array(
-						'min' => 0,
-						'max' => 100,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup'] . ':not(' . $css_scheme['popup_full_screen'] . ') ' . $css_scheme['popup_content'] => 'width: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['popup_full_screen'] . ' ' . $css_scheme['popup_content'] => 'width: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_bg_color',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_content'] => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_padding',
-			array(
-				'label'      => esc_html__( 'Padding', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_content'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_margin',
-			array(
-				'label'      => esc_html__( 'Margin', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_content'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			array(
-				'name'     => 'popup_border',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['popup_content'],
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_border_radius',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_content'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			array(
-				'name'     => 'popup_box_shadow',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['popup_content'],
-			)
-		);
-
-		$this->add_control(
-			'popup_full_screen_vertical_alignment',
-			array(
-				'label'     => esc_html__( 'Vertical Alignment', 'jet-search' ),
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'center',
-				'options'   => array(
-					'flex-start' => esc_html__( 'Top', 'jet-search' ),
-					'center'     => esc_html__( 'Center', 'jet-search' ),
-					'flex-end'   => esc_html__( 'Bottom', 'jet-search' ),
-				),
-				'condition' => array(
-					'full_screen_popup' => 'yes',
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_full_screen'] => 'align-items: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_position',
-			array(
-				'label'     => esc_html__( 'Popup Position', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-				'condition' => array(
-					'full_screen_popup!' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_vert_position',
-			array(
-				'label'     => esc_html__( 'Vertical Position By', 'jet-search' ),
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'top',
-				'options'   => array(
-					'top'    => esc_html__( 'Top', 'jet-search' ),
-					'bottom' => esc_html__( 'Bottom', 'jet-search' ),
-				),
-				'condition' => array(
-					'full_screen_popup!' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_top_position',
-			array(
-				'label'      => esc_html__( 'Top Indent', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'em' ),
-				'range'      => array(
-					'px' => array(
-						'min' => -400,
-						'max' => 400,
-					),
-					'%' => array(
-						'min' => -100,
-						'max' => 100,
-					),
-					'em' => array(
-						'min' => -50,
-						'max' => 50,
-					),
-				),
-				'condition'  => array(
-					'popup_vert_position' => 'top',
-					'full_screen_popup!'  => 'yes',
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup'] => 'top: {{SIZE}}{{UNIT}}; bottom: auto;',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_bottom_position',
-			array(
-				'label'      => esc_html__( 'Bottom Indent', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'em' ),
-				'range'      => array(
-					'px' => array(
-						'min' => -400,
-						'max' => 400,
-					),
-					'%' => array(
-						'min' => -100,
-						'max' => 100,
-					),
-					'em' => array(
-						'min' => -50,
-						'max' => 50,
-					),
-				),
-				'condition'  => array(
-					'popup_vert_position' => 'bottom',
-					'full_screen_popup!'  => 'yes',
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup'] => 'bottom: {{SIZE}}{{UNIT}}; top: auto;',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_hor_position',
-			array(
-				'label'     => esc_html__( 'Horizontal Position By', 'jet-search' ),
-				'type'      => Controls_Manager::SELECT,
-				'default'   => 'left',
-				'options'   => array(
-					'left'  => esc_html__( 'Left', 'jet-search' ),
-					'right' => esc_html__( 'Right', 'jet-search' ),
-				),
-				'condition' => array(
-					'full_screen_popup!' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_left_position',
-			array(
-				'label'      => esc_html__( 'Left Indent', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'em' ),
-				'range'      => array(
-					'px' => array(
-						'min' => -400,
-						'max' => 400,
-					),
-					'%' => array(
-						'min' => -100,
-						'max' => 100,
-					),
-					'em' => array(
-						'min' => -50,
-						'max' => 50,
-					),
-				),
-				'condition'  => array(
-					'popup_hor_position' => 'left',
-					'full_screen_popup!' => 'yes',
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup'] => 'left: {{SIZE}}{{UNIT}}; right: auto;',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_right_position',
-			array(
-				'label'      => esc_html__( 'Right Indent', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%', 'em' ),
-				'range'      => array(
-					'px' => array(
-						'min' => -400,
-						'max' => 400,
-					),
-					'%' => array(
-						'min' => -100,
-						'max' => 100,
-					),
-					'em' => array(
-						'min' => -50,
-						'max' => 50,
-					),
-				),
-				'condition'  => array(
-					'popup_hor_position' => 'right',
-					'full_screen_popup!' => 'yes',
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup'] => 'right: {{SIZE}}{{UNIT}}; left: auto;',
-				),
-			)
-		);
-
-		$this->end_controls_section();
-
-		/**
-		 * `Popup Trigger` Style Section
-		 */
-		$this->start_controls_section(
-			'section_popup_trigger_style',
-			array(
-				'label'     => esc_html__( 'Popup Trigger', 'jet-search' ),
-				'tab'       => Controls_Manager::TAB_STYLE,
-				'condition' => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_trigger_icon_size',
-			array(
-				'label'      => esc_html__( 'Icon Size', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 10,
-						'max' => 100,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger_icon'] => 'font-size: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->start_controls_tabs( 'tabs_popup_trigger_style' );
-
-		$this->start_controls_tab(
-			'tab_popup_trigger_normal',
-			array(
-				'label' => esc_html__( 'Normal', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'popup_trigger_bg_color',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_trigger_color',
-			array(
-				'label'     => esc_html__( 'Text Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->start_controls_tab(
-			'tab_popup_trigger_hover',
-			array(
-				'label' => esc_html__( 'Hover', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'popup_trigger_bg_color_hover',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] . ':hover' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_trigger_color_hover',
-			array(
-				'label'     => esc_html__( 'Text Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] . ':hover' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_trigger_hover_border_color',
-			array(
-				'label'     => esc_html__( 'Border Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'condition' => array(
-					'popup_trigger_border_border!' => '',
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] . ':hover' => 'border-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->end_controls_tabs();
-
-		$this->add_responsive_control(
-			'popup_trigger_alignment',
-			array(
-				'label'     => esc_html__( 'Alignment', 'jet-search' ),
-				'type'      => Controls_Manager::CHOOSE,
-				'options'   => array(
-					'flex-start' => array(
-						'title' => esc_html__( 'Start', 'jet-search' ),
-						'icon'  => ! is_rtl() ? 'eicon-h-align-left' : 'eicon-h-align-right',
-					),
-					'center' => array(
-						'title' => esc_html__( 'Center', 'jet-search' ),
-						'icon'  => 'eicon-h-align-center',
-					),
-					'flex-end' => array(
-						'title' => esc_html__( 'End', 'jet-search' ),
-						'icon'  => ! is_rtl() ? 'eicon-h-align-right' : 'eicon-h-align-left',
-					),
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger_container'] => 'justify-content: {{VALUE}};',
-				),
-				'separator' => 'before',
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_trigger_padding',
-			array(
-				'label'      => esc_html__( 'Padding', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_trigger_margin',
-			array(
-				'label'      => esc_html__( 'Margin', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			array(
-				'name'     => 'popup_trigger_border',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['popup_trigger'],
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_trigger_border_radius',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_trigger'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			array(
-				'name'     => 'popup_trigger_box_shadow',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['popup_trigger'],
-			)
-		);
-
-		$this->end_controls_section();
-
-		/**
-		 * `Popup Close` Style Section
-		 */
-		$this->start_controls_section(
-			'section_popup_close_style',
-			array(
-				'label'     => esc_html__( 'Popup Close', 'jet-search' ),
-				'tab'       => Controls_Manager::TAB_STYLE,
-				'condition' => array(
-					'show_search_in_popup' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_close_icon_size',
-			array(
-				'label'      => esc_html__( 'Icon Size', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 10,
-						'max' => 100,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close_icon'] => 'font-size: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->start_controls_tabs( 'tabs_popup_close_style' );
-
-		$this->start_controls_tab(
-			'tab_popup_close_normal',
-			array(
-				'label' => esc_html__( 'Normal', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'popup_close_bg_color',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_close_color',
-			array(
-				'label'     => esc_html__( 'Text Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->start_controls_tab(
-			'tab_popup_close_hover',
-			array(
-				'label' => esc_html__( 'Hover', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'popup_close_bg_color_hover',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] . ':hover' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_close_color_hover',
-			array(
-				'label'     => esc_html__( 'Text Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] . ':hover' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'popup_close_hover_border_color',
-			array(
-				'label'     => esc_html__( 'Border Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'condition' => array(
-					'popup_close_border_border!' => '',
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] . ':hover' => 'border-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->end_controls_tabs();
-
-		$this->add_responsive_control(
-			'popup_close_padding',
-			array(
-				'label'      => esc_html__( 'Padding', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'separator'  => 'before',
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_close_margin',
-			array(
-				'label'      => esc_html__( 'Margin', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%', 'em' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			array(
-				'name'     => 'popup_close_border',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['popup_close'],
-			)
-		);
-
-		$this->add_responsive_control(
-			'popup_close_border_radius',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['popup_close'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			array(
-				'name'     => 'popup_close_box_shadow',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['popup_close'],
-			)
-		);
-
-		$this->end_controls_section();
-
-		/**
 		 * `Results Area` Style Section
 		 */
 		$this->start_controls_section(
@@ -3329,9 +2234,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 					'{{WRAPPER}} ' . $css_scheme['results_slide'] => 'overflow-y: auto;',
 				),
 				'render_type' => 'template',
-				'condition' => array(
-					'show_search_in_popup!' => 'yes',
-				),
 			)
 		);
 
@@ -3349,7 +2251,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				),
 				'condition' => array(
 					'enable_scroll' => 'yes',
-					'show_search_in_popup!' => 'yes',
 				),
 			)
 		);
@@ -3364,7 +2265,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				),
 				'condition' => array(
 					'enable_scroll' => 'yes',
-					'show_search_in_popup!' => 'yes',
 				),
 			)
 		);
@@ -3725,7 +2625,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 					'results_item_divider' => 'yes',
 				),
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item'] => 'border-top-style: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['results_item'] . ':not(:first-child)' => 'border-top-style: {{VALUE}}',
 				),
 			)
 		);
@@ -3748,7 +2648,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 					'results_item_divider' => 'yes',
 				),
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item'] => 'border-top-width: {{SIZE}}{{UNIT}}',
+					'{{WRAPPER}} ' . $css_scheme['results_item'] . ':not(:first-child)' => 'border-top-width: {{SIZE}}{{UNIT}}',
 				),
 			)
 		);
@@ -3762,7 +2662,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 					'results_item_divider' => 'yes',
 				),
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item'] => 'border-color: {{VALUE}}',
+					'{{WRAPPER}} ' . $css_scheme['results_item'] . ':not(:first-child)' => 'border-color: {{VALUE}}',
 				),
 			)
 		);
@@ -3975,336 +2875,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				),
 				'condition' => array(
 					'show_product_price' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_styles',
-			array(
-				'label'     => esc_html__( 'Add to Cart Button', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-				'condition' => array(
-					'show_add_to_cart!' => '',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'      => 'cart_button_typography',
-				'selector'  => '{{WRAPPER}} ' . $css_scheme['results_item_cart_button'],
-				'condition' => array(
-					'show_add_to_cart!' => '',
-				),
-			)
-		);
-
-		$this->start_controls_tabs(
-			'tabs_cart_button',
-			array(
-				'condition' => array(
-					'show_add_to_cart!' => '',
-				)
-			)
-		);
-
-		$this->start_controls_tab(
-			'tab_cart_button_normal',
-			array(
-				'label' => esc_html__( 'Normal', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_color',
-			array(
-				'label'     => esc_html__( 'Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_bg_color',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->start_controls_tab(
-			'tab_cart_button_hover',
-			array(
-				'label' => esc_html__( 'Hover', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_color_hover',
-			array(
-				'label'     => esc_html__( 'Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] . ':hover' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_bg_color_hover',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] . ':hover' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_border_color_hover',
-			array(
-				'label'     => esc_html__( 'Border Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] . ':hover' => 'border-color: {{VALUE}};',
-				),
-				'condition' => array(
-					'cart_button_border_border!' => '',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->end_controls_tabs();
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			array(
-				'name'     => 'cart_button_border',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['results_item_cart_button'],
-			)
-		);
-
-		$this->add_responsive_control(
-			'cart_button_border_radius',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'cart_button_gap',
-			array(
-				'label' => esc_html__( 'Gap', 'jet-search' ),
-				'type'  => Controls_Manager::SLIDER,
-				'range' => array(
-					'px' => array(
-						'min' => 1,
-						'max' => 50,
-					),
-				),
-				'separator' => 'before',
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] => 'margin-top: {{SIZE}}{{UNIT}};',
-				),
-				'condition' => array(
-					'show_add_to_cart!' => '',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'cart_button_align',
-			array(
-				'label'   => esc_html__( 'Alignment', 'jet-search' ),
-				'type'    => Controls_Manager::CHOOSE,
-				'options' => array(
-					'left' => array(
-						'title' => esc_html__( 'Left', 'jet-search' ),
-						'icon'  => 'fa fa-align-left',
-					),
-					'center' => array(
-						'title' => esc_html__( 'Center', 'jet-search' ),
-						'icon'  => 'fa fa-align-center',
-					),
-					'right' => array(
-						'title' => esc_html__( 'Right', 'jet-search' ),
-						'icon'  => 'fa fa-align-right',
-					),
-					'justify' => array(
-						'title' => esc_html__( 'Justified', 'jet-search' ),
-						'icon'  => 'fa fa-align-justify',
-					),
-				),
-				'selectors_dictionary' => array(
-					'left'    => 'margin-left: 0; margin-right: auto;',
-					'center'  => 'margin-left: auto; margin-right: auto;',
-					'right'   => 'margin-left: auto; margin-right: 0;',
-					'justify' => 'margin-left: 0; margin-right: 0; width: 100%;',
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_cart_button'] => '{{VALUE}};',
-				),
-				'condition' => array(
-					'show_add_to_cart!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'quantity_input_styles',
-			array(
-				'label'     => esc_html__( 'Quantity Input', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'      => 'quantity_input_typography',
-				'selector'  => '{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'],
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'quantity_input_text_color',
-			array(
-				'label'     => esc_html__( 'Text Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'] => 'color: {{VALUE}};',
-				),
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_control(
-			'quantity_input_bg_color',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'] => 'background-color: {{VALUE}};',
-				),
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Border::get_type(),
-			array(
-				'name'      => 'quantity_input_border',
-				'selector'  => '{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'],
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'quantity_input_border_radius',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'quantity_input_width',
-			array(
-				'label'      => esc_html__( 'Width', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px', '%' ),
-				'range'      => array(
-					'px' => array(
-						'min' => 40,
-						'max' => 200,
-					),
-					'%'  => array(
-						'min' => 1,
-						'max' => 100,
-					),
-				),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'] => 'width: {{SIZE}}{{UNIT}};',
-				),
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'quantity_input_padding',
-			array(
-				'label'      => esc_html__( 'Padding', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'quantity_input_margin',
-			array(
-				'label'      => esc_html__( 'Margin', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['results_item_quantity_input'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'condition' => array(
-					'show_add_to_cart'          => 'yes',
-					'show_add_to_cart_quantity' => 'yes',
 				),
 			)
 		);
@@ -5243,593 +3813,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 		$this->end_controls_section();
 
 		/**
-		 * `Additional Results` Style Section
-		 */
-		if ( class_exists( 'Jet_Search\Search_Sources\Manager' ) ) {
-			$this->start_controls_section(
-				'section_additional_results_style',
-				array(
-					'label' => esc_html__( 'Additional Results', 'jet-search' ),
-					'tab'   => Controls_Manager::TAB_STYLE,
-				)
-			);
-
-			$this->add_control(
-				'additional_results_title_heading',
-				array(
-					'label' => esc_html__( 'Title', 'jet-search' ),
-					'type'  => Controls_Manager::HEADING,
-				)
-			);
-
-			$this->add_group_control(
-				Group_Control_Typography::get_type(),
-				array(
-					'name'     => 'additional_results_title_typography',
-					'selector' => '{{WRAPPER}} ' . $css_scheme['source_results_title'],
-				)
-			);
-
-			$this->add_control(
-				'additional_results_title_color',
-				array(
-					'label'     => esc_html__( 'Color', 'jet-search' ),
-					'type'      => Controls_Manager::COLOR,
-					'selectors' => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_title'] => 'color: {{VALUE}};',
-					),
-				)
-			);
-
-			$this->add_responsive_control(
-				'additional_results_title_margin',
-				array(
-					'label'      => esc_html__( 'Margin', 'jet-search' ),
-					'type'       => Controls_Manager::DIMENSIONS,
-					'size_units' => array( 'px', '%' ),
-					'selectors'  => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_title'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					),
-				)
-			);
-
-			$this->add_control(
-				'additional_results_area_heading',
-				array(
-					'label' => esc_html__( 'Area', 'jet-search' ),
-					'type'  => Controls_Manager::HEADING,
-				)
-			);
-
-			$this->add_responsive_control(
-				'additional_results_area_gap',
-				array(
-					'label'      => esc_html__( 'Padding', 'jet-search' ),
-					'type'       => Controls_Manager::DIMENSIONS,
-					'size_units' => array( 'px', '%' ),
-					'selectors'  => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_holder'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					),
-				)
-			);
-
-			$this->add_control(
-				'additional_results_area_item_heading',
-				array(
-					'label'     => esc_html__( 'Item', 'jet-search' ),
-					'type'      => Controls_Manager::HEADING,
-					'separator' => 'before',
-				)
-			);
-
-			$this->add_group_control(
-				Group_Control_Typography::get_type(),
-				array(
-					'name'     => 'additional_results_area_item_link_typography',
-					'selector' => '{{WRAPPER}} ' . $css_scheme['source_results_item_link'],
-				)
-			);
-
-			$this->add_responsive_control(
-				'additional_results_area_item_gap',
-				array(
-					'label'      => esc_html__( 'Gap', 'jet-search' ),
-					'type'       => Controls_Manager::SLIDER,
-					'size_units' => array( 'px' ),
-					'range' => array(
-						'px' => array(
-							'min' => 0,
-							'max' => 100,
-						),
-					),
-					'selectors' => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_item'] . ':not(:first-child)' => 'margin-top: {{SIZE}}{{UNIT}};',
-					),
-				)
-			);
-
-			$this->start_controls_tabs( 'tabs_additional_results_area_item' );
-
-			$this->start_controls_tab(
-				'tab_additional_results_area_item_normal',
-				array(
-					'label' => esc_html__( 'Normal', 'jet-search' ),
-				)
-			);
-
-			$this->add_control(
-				'additional_results_area_item_color',
-				array(
-					'label'     => esc_html__( 'Color', 'jet-search' ),
-					'type'      => Controls_Manager::COLOR,
-					'selectors' => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_link'] => 'color: {{VALUE}};',
-					),
-				)
-			);
-
-			$this->end_controls_tab();
-
-			$this->start_controls_tab(
-				'tab_additional_results_area_item_hover',
-				array(
-					'label' => esc_html__( 'Hover', 'jet-search' ),
-				)
-			);
-
-			$this->add_control(
-				'additional_results_area_item_color_hover',
-				array(
-					'label'     => esc_html__( 'Color', 'jet-search' ),
-					'type'      => Controls_Manager::COLOR,
-					'selectors' => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_link'] . ':hover' => 'color: {{VALUE}};',
-					),
-				)
-			);
-
-			$this->end_controls_tab();
-
-			$this->end_controls_tabs();
-
-			$this->add_control(
-				'additional_results_area_item_icon_heading',
-				array(
-					'label'     => esc_html__( 'Item Icon', 'jet-search' ),
-					'type'      => Controls_Manager::HEADING,
-					'separator' => 'before',
-				)
-			);
-
-			$this->add_control(
-				'additional_results_area_item_icon_color',
-				array(
-					'label'     => esc_html__( 'Color', 'jet-search' ),
-					'type'      => Controls_Manager::COLOR,
-					'selectors' => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_icon'] => 'color: {{VALUE}};',
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_icon'] . ' svg' => 'fill: {{VALUE}};',
-					),
-				)
-			);
-
-			$this->add_responsive_control(
-				'additional_results_area_item_icon_size',
-				array(
-					'label'       => esc_html__( 'Size', 'jet-search' ),
-					'type'        => Controls_Manager::NUMBER,
-					'default'     => 24,
-					'max'         => 100,
-					'min'         => 0,
-					'render_type' => 'template',
-					'selectors'   => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_icon'] . ' svg' => 'width: {{VALUE}}px;',
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_icon'] => 'font-size: {{VALUE}}px;',
-					),
-				)
-			);
-
-			$this->add_responsive_control(
-				'additional_results_area_item_icon_gap',
-				array(
-					'label'      => esc_html__( 'Gap', 'jet-search' ),
-					'type'       => Controls_Manager::SLIDER,
-					'size_units' => array( 'px' ),
-					'range' => array(
-						'px' => array(
-							'min' => 0,
-							'max' => 100,
-						),
-					),
-					'selectors' => array(
-						'{{WRAPPER}} ' . $css_scheme['source_results_item_icon'] => 'margin-right: {{SIZE}}{{UNIT}};',
-					),
-				)
-			);
-
-			$this->end_controls_section();
-		}
-
-		/**
-		 * `Suggestions Area` Style Section
-		 */
-		$this->start_controls_section(
-			'section_suggestions_area_style',
-			array(
-				'label' => esc_html__( 'Suggestions Area', 'jet-search' ),
-				'tab'   => Controls_Manager::TAB_STYLE,
-				'condition'   => array(
-					'show_search_suggestions!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_title_heading',
-			array(
-				'label'     => esc_html__( 'Suggestions Title', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'condition' => array(
-					'search_suggestions_title!' => '',
-				),
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'      => 'suggestions_title_typography',
-				'selector'  => '{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_title'] . ', {{WRAPPER}} ' . $css_scheme['results_suggestions_area_title'],
-				'condition' => array(
-					'search_suggestions_title!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_title_color',
-			array(
-				'label'     => esc_html__( 'Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_title'] => 'color: {{VALUE}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_title'] => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_title_position',
-			array(
-				'label'   => esc_html__( 'Position', 'jet-search' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => '',
-				'options' => array(
-					''       => esc_html__( 'Inline', 'jet-search' ),
-					'block'  => esc_html__( 'Block', 'jet-search' ),
-				),
-				'selectors_dictionary' => array(
-					'block'   => 'flex-basis: 100%;',
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_title'] => '{{VALUE}}',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_title'] => '{{VALUE}}',
-				),
-				'condition' => array(
-					'search_suggestions_title!' => '',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_heading',
-			array(
-				'label'     => esc_html__( 'Area', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'condition' => array(
-					'search_suggestions_position!' => 'inside_results_area'
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_with_results_heading',
-			array(
-				'label'     => esc_html__( 'Area with Search Results', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'condition' => array(
-					'search_suggestions_position' => 'inside_results_area'
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'suggestions_area_with_results_gap',
-			array(
-				'label'      => esc_html__( 'Margin', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] . ':not(.active)' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_divider',
-			array(
-				'label'       => esc_html__( 'Divider', 'jet-search' ),
-				'type'        => Controls_Manager::SWITCHER,
-				'default'     => '',
-				'render_type' => 'ui',
-				'condition'   => array(
-					'search_suggestions_position' => 'inside_results_area'
-				)
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_divider_style',
-			array(
-				'label'   => esc_html__( 'Style', 'jet-search' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'solid',
-				'options' => array(
-					'solid'  => esc_html__( 'Solid', 'jet-search' ),
-					'double' => esc_html__( 'Double', 'jet-search' ),
-					'dotted' => esc_html__( 'Dotted', 'jet-search' ),
-					'dashed' => esc_html__( 'Dashed', 'jet-search' ),
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] . ':not(.active)' => 'border-top-style: {{VALUE}};border-bottom-style: {{VALUE}};',
-				),
-				'condition' => array(
-					'suggestions_area_divider'    => 'yes',
-					'search_suggestions_position' => 'inside_results_area'
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_divider_weight',
-			array(
-				'label'   => esc_html__( 'Weight', 'jet-search' ),
-				'type'    => Controls_Manager::SLIDER,
-				'default' => array(
-					'size' => 1,
-				),
-				'range' => array(
-					'px' => array(
-						'min' => 1,
-						'max' => 20,
-					),
-				),
-				'condition' => array(
-					'suggestions_area_divider' => 'yes',
-					'search_suggestions_position' => 'inside_results_area'
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] . ':not(.active)' => 'border-top-width: {{SIZE}}{{UNIT}};border-bottom-width: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_divider_color',
-			array(
-				'label'     => esc_html__( 'Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'condition' => array(
-					'suggestions_area_divider' => 'yes',
-					'search_suggestions_position' => 'inside_results_area'
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] . ':not(.active)' => 'border-color: {{VALUE}}',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_without_results_heading',
-			array(
-				'label'     => esc_html__( 'Area without Search Results', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'condition' => array(
-					'search_suggestions_position' => 'inside_results_area'
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'suggestions_area_without_results_gap',
-			array(
-				'label'      => esc_html__( 'Margin', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] . '.active' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'condition'  => array(
-					'search_suggestions_position' => 'inside_results_area'
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_heading',
-			array(
-				'label'     => esc_html__( 'Item', 'jet-search' ),
-				'type'      => Controls_Manager::HEADING,
-				'separator' => 'before',
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			array(
-				'name'     => 'suggestions_area_item_title_typography',
-				'selector' => '{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] . ', {{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'],
-			)
-		);
-
-		$this->add_responsive_control(
-			'suggestions_area_item_column_gap',
-			array(
-				'label'      => esc_html__( 'Column Gap', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range' => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 100,
-					),
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area'] => 'column-gap: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] => 'column-gap: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->add_responsive_control(
-			'suggestions_area_item_rows_gap',
-			array(
-				'label'      => esc_html__( 'Rows Gap', 'jet-search' ),
-				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array( 'px' ),
-				'range' => array(
-					'px' => array(
-						'min' => 0,
-						'max' => 100,
-					),
-				),
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area'] => 'row-gap: {{SIZE}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area'] => 'row-gap: {{SIZE}}{{UNIT}};',
-				),
-			)
-		);
-
-		$this->start_controls_tabs( 'tabs_suggestions_area_item' );
-
-		$this->start_controls_tab(
-			'tab_suggestions_area_item_normal',
-			array(
-				'label' => esc_html__( 'Normal', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_bg_color',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] => 'background-color: {{VALUE}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_color',
-			array(
-				'label'     => esc_html__( 'Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] => 'color: {{VALUE}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_border_radius',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'condition' => array(
-					'suggestions_area_item_bg_color!' => '',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->start_controls_tab(
-			'tab_suggestions_area_item_hover',
-			array(
-				'label' => esc_html__( 'Hover', 'jet-search' ),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_bg_color_hover',
-			array(
-				'label'     => esc_html__( 'Background Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] . ':hover' => 'background-color: {{VALUE}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] . ':hover' => 'background-color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_color_hover',
-			array(
-				'label'     => esc_html__( 'Color', 'jet-search' ),
-				'type'      => Controls_Manager::COLOR,
-				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] . ':hover' => 'color: {{VALUE}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] . ':hover' => 'color: {{VALUE}};',
-				),
-			)
-		);
-
-		$this->add_control(
-			'suggestions_area_item_border_radius_hover',
-			array(
-				'label'      => esc_html__( 'Border Radius', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] . ':hover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] . ':hover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'condition' => array(
-					'inline_area_item_bg_color!' => '',
-				),
-			)
-		);
-
-		$this->end_controls_tab();
-
-		$this->end_controls_tabs();
-
-		$this->add_responsive_control(
-			'suggestions_area_item_padding',
-			array(
-				'label'      => esc_html__( 'Padding', 'jet-search' ),
-				'type'       => Controls_Manager::DIMENSIONS,
-				'size_units' => array( 'px', '%' ),
-				'selectors'  => array(
-					'{{WRAPPER}} ' . $css_scheme['inline_suggestions_area_item_title'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					'{{WRAPPER}} ' . $css_scheme['results_suggestions_area_item_title'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				),
-				'separator' => 'before',
-			)
-		);
-
-		$this->end_controls_section();
-
-		/**
 		 * `Notifications` Style Section
 		 */
 		$this->start_controls_section(
@@ -5924,163 +3907,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 				),
 			)
 		);
-
-		if ( class_exists( 'Jet_Engine' ) ) {
-			$this->update_control( 'highlight_searched_text',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'thumbnail_visible',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'thumbnail_size',
-				array(
-					'condition' => array(
-						'thumbnail_visible' => 'yes',
-						'listing_id'        => '',
-					),
-				)
-			);
-
-			$this->update_control( 'thumbnail_placeholder',
-				array(
-					'condition' => array(
-						'thumbnail_visible' => 'yes',
-						'listing_id'        => '',
-					),
-				)
-			);
-
-			$this->update_control( 'post_content_source',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'post_content_custom_field_key',
-				array(
-					'condition' => array(
-						'post_content_source' => 'custom-field',
-						'listing_id'          => '',
-					),
-				)
-			);
-
-			$this->update_control( 'post_content_length',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'show_product_price',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'show_product_rating',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'show_add_to_cart',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-
-			$this->update_control( 'show_add_to_cart_quantity',
-				array(
-					'condition' => array(
-						'show_add_to_cart!' => '',
-						'listing_id'        => '',
-					),
-				)
-			);
-
-			$this->update_control( 'section_results_custom_fields',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				),
-				array(
-					'recursive' => true,
-				)
-			);
-
-			$this->update_control( 'section_results_items_style',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				),
-				array(
-					'recursive' => true,
-				)
-			);
-
-			$this->update_control( 'section_custom_fields_styles',
-				array(
-					'conditions' => array(
-						'relation' => 'and',
-						'terms'    => array(
-							array(
-								'name'     => 'listing_id',
-								'operator' => '===',
-								'value'    => '',
-							),
-							array(
-								'relation' => 'or',
-								'terms'    => array(
-									array(
-										'name'     => 'show_title_related_meta',
-										'operator' => '===',
-										'value'    => 'yes',
-									),
-									array(
-										'name'     => 'show_content_related_meta',
-										'operator' => '===',
-										'value'    => 'yes',
-									),
-								)
-							)
-						),
-					),
-				),
-				array(
-					'recursive' => true,
-				)
-			);
-
-			$this->update_control( 'show_result_new_tab',
-				array(
-					'condition' => array(
-						'listing_id' => '',
-					),
-				)
-			);
-		}
 
 		$this->end_controls_section();
 	}
@@ -6251,9 +4077,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => $position_slug . '_meta_label_typography',
-				'global'   => array(
-					'default' => Global_Typography::TYPOGRAPHY_TEXT,
-				),
+				'scheme'   => Scheme_Typography::TYPOGRAPHY_3,
 				'selector' => '{{WRAPPER}} .' . $base . '__item-label',
 			)
 		);
@@ -6293,9 +4117,7 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			Group_Control_Typography::get_type(),
 			array(
 				'name'     => $position_slug . '_meta_typography',
-				'global'   => array(
-					'default' => Global_Typography::TYPOGRAPHY_TEXT,
-				),
+				'scheme'   => Scheme_Typography::TYPOGRAPHY_3,
 				'selector' => '{{WRAPPER}} .' . $base . '__item-value',
 			)
 		);
@@ -6386,18 +4208,6 @@ class Jet_Search_Ajax_Search_Widget extends Jet_Search_Widget_Base {
 			)
 		);
 
-	}
-
-	public function add_additional_results_controls( $section, $source ) {
-		$settings = $source->editor_general_controls();
-
-		if ( empty( $settings ) || empty( $settings[ $section ] ) ) {
-			return;
-		}
-
-		foreach ( $settings[ $section ] as $key => $control ) {
-			$this->add_control( $key, $control );
-		}
 	}
 
 	/**

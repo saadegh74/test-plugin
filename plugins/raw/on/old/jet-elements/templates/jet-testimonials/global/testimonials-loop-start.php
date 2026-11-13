@@ -18,8 +18,8 @@ $classes = implode( ' ', $class_array );
 
 $dir = is_rtl() ? 'rtl' : 'ltr';
 
-	?><div class="<?php echo esc_attr( $classes ); ?>"<?php echo $data_settings; // phpcs:ignore ?> dir="<?php echo esc_attr( $dir ); ?>"><?php
-	if ( filter_var(  $this->get_settings_for_display( 'arrows' ), FILTER_VALIDATE_BOOLEAN ) ) {
-		echo sprintf( '<div class="jet-testimonial__prev-arrow-%s jet-arrow prev-arrow">%s</div>', esc_attr( $this->get_id() ), $this->_render_icon( 'prev_arrow', '%s', '', false ) ); // phpcs:ignore
-		echo sprintf( '<div class="jet-testimonial__next-arrow-%s jet-arrow next-arrow">%s</div>', esc_attr( $this->get_id() ), $this->_render_icon( 'next_arrow', '%s', '', false ) ); // phpcs:ignore
-	}
+?><div class="<?php echo $classes; ?>" <?php echo $data_settings; ?> dir="<?php echo $dir; ?>"><?php
+if ( filter_var(  $this->get_settings_for_display( 'arrows' ), FILTER_VALIDATE_BOOLEAN ) ) {
+	echo sprintf( '<div class="jet-testimonial__prev-arrow-%s jet-arrow prev-arrow">%s</div>', $this->get_id(), $this->_render_icon( 'prev_arrow', '%s', '', false ) );
+	echo sprintf( '<div class="jet-testimonial__next-arrow-%s jet-arrow next-arrow">%s</div>', $this->get_id(), $this->_render_icon( 'next_arrow', '%s', '', false ) );
+}

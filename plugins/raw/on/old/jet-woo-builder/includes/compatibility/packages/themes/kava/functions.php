@@ -74,42 +74,10 @@ function jet_woo_kava_close_site_main_wrap() {
  * @access public
  */
 function jet_woo_kava_enqueue_styles() {
-	if ( ! jet_woo_kava_is_woo_module_enabled() ) {
-		return;
-	}
-
 	wp_enqueue_style(
 		'jet-woo-builder-kava',
 		jet_woo_builder()->plugin_url( 'includes/compatibility/packages/themes/kava/assets/css/style.css' ),
-		array(),
+		false,
 		jet_woo_builder()->get_version()
 	);
-
-	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
-		wp_enqueue_style( 'dashicons' );
-	}
-
-	if ( function_exists( 'is_checkout' ) && is_checkout() ) {
-		wp_enqueue_style( 'dashicons' );
-	}
-}
-
-function jet_woo_kava_is_woo_module_enabled() {
-
-	if ( ! function_exists( 'kava_settings' ) ) {
-		return false;
-	}
-
-	$modules = kava_settings()->get( 'available_modules' );
-
-	// Kava logic: if 'woo' key not set -> module enabled by default.
-	if ( ! is_array( $modules ) ) {
-		return true;
-	}
-
-	if ( ! isset( $modules['woo'] ) ) {
-		return true;
-	}
-
-	return filter_var( $modules['woo'], FILTER_VALIDATE_BOOLEAN );
 }

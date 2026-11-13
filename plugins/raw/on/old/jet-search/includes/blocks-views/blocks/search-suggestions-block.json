@@ -83,14 +83,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"search_suggestions_list_inline_item_title_length": {
-			"type": "number",
-			"default": 0
-		},
-		"search_suggestions_list_on_focus_item_title_length": {
-			"type": "number",
-			"default": 0
-		},
 		"is_product_search" : {
 			"type": "boolean",
 			"default": false
