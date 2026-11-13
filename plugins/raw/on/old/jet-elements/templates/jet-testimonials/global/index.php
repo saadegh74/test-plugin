@@ -14,7 +14,7 @@ if ( 'true' === $equal_cols ) {
 $classes = implode( ' ', $classes_list );
 ?>
 
-<div class="<?php echo $classes; ?>">
+<div class="<?php echo esc_attr( $classes ); ?>">
 	<?php
 		if ( isset( $settings['shuffle'] ) && 'true' === $settings['shuffle'] ){
 			$this->_get_global_looped_template( 'testimonials', 'item_list', array( $this, '_shuffle_items' ) );

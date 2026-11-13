@@ -29,7 +29,11 @@ if ( 'lightbox' === $link_type ) {
 	$lightbox_title = isset( $settings['lightbox_show_title'] ) ? $settings['lightbox_show_title'] : 'false';
 	$lightbox_desc  = isset( $settings['lightbox_show_desc'] ) ? $settings['lightbox_show_desc'] : 'false';
 
-	$this->add_render_attribute( $link_instance, 'href', $this->_loop_item( array( 'item_image', 'url' ), '%s' ) );
+	$this->add_render_attribute( 
+		$link_instance,
+		'href',
+		esc_url( $this->_loop_item( array( 'item_image', 'url' ), '%s' ) )
+	);
 	$this->add_render_attribute( $link_instance, 'data-elementor-open-lightbox', 'yes' );
 	$this->add_render_attribute( $link_instance, 'data-elementor-lightbox-slideshow', $this->get_id()  );
 
@@ -48,7 +52,11 @@ if ( 'lightbox' === $link_type ) {
 	$rel    = $this->_loop_item( array( 'item_rel' ), '%s' );
 	$rel    = ! empty( $rel ) ? $rel : '';
 
-	$this->add_render_attribute( $link_instance, 'href', $this->_loop_item( array( 'item_url' ), '%s' ) );
+	$this->add_render_attribute(
+		$link_instance,
+		'href',
+		esc_url( $this->_loop_item( array( 'item_url' ), '%s' ) )
+	);
 	$this->add_render_attribute( $link_instance, 'target', $target );
 	$this->add_render_attribute( $link_instance, 'rel', $rel );
 }
@@ -56,22 +64,22 @@ if ( 'lightbox' === $link_type ) {
 $this->item_counter++;
 
 ?>
-<div class="jet-images-layout__item <?php echo $col_class ?>">
+<div class="jet-images-layout__item <?php echo esc_attr( $col_class ) ?>">
 	<div class="jet-images-layout__inner">
 		<div class="jet-images-layout__image-loader"><span></span></div>
-		<<?php echo $tag?> <?php echo $this->get_render_attribute_string( $link_instance ); ?>>
+		<<?php echo $tag?> <?php echo $this->get_render_attribute_string( $link_instance ); // phpcs:ignore ?>>
 			<div class="jet-images-layout__image">
-				<?php echo $this->_loop_image_item(); ?>
+				<?php echo $this->_loop_image_item(); // phpcs:ignore ?>
 			</div>
 			<div class="jet-images-layout__content"><?php
-				echo $this->_render_icon( 'item_icon', '<div class="jet-images-layout__icon"><div class="jet-images-layout-icon-inner">%s</div></div>', '', false );
+				echo $this->_render_icon( 'item_icon', '<div class="jet-images-layout__icon"><div class="jet-images-layout-icon-inner">%s</div></div>', '', false ); // phpcs:ignore
 
 				$title_tag = $this->_get_html( 'title_html_tag', '%s' );
 				$title_tag = jet_elements_tools()->validate_html_tag( $title_tag );
 
-				echo $this->_loop_item( array( 'item_title' ), '<' . $title_tag . ' class="jet-images-layout__title">%s</' . $title_tag . '>' );
-				echo $this->_loop_item( array( 'item_desc' ), '<div class="jet-images-layout__desc">%s</div>' );
+				echo $this->_loop_item( array( 'item_title' ), '<' . $title_tag . ' class="jet-images-layout__title">%s</' . $title_tag . '>' ); // phpcs:ignore
+				echo $this->_loop_item( array( 'item_desc' ), '<div class="jet-images-layout__desc">%s</div>' ); // phpcs:ignore
 			?></div>
-		</<?php echo $tag?>>
+		</<?php echo esc_html( $tag ); ?>>
 	</div>
 </div>

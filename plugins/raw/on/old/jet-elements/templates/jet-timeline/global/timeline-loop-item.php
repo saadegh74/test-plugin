@@ -22,41 +22,43 @@ $item_desc_attr = $this->get_item_inline_editing_attributes( 'item_desc', 'cards
 $classes = implode( ' ', $classes );
 $this->_processed_item_index += 1;
 ?>
-<div class="<?php echo $classes ?>">
+<div class="<?php echo esc_attr( $classes ); ?>">
 	<div class="timeline-item__card">
 		<div class="timeline-item__card-inner">
 				<?php
 					if ( 'yes' === $item_settings['show_item_image'] && 'inside_after' !== $image_position) {
-						echo $this->_get_timeline_image();
+						echo $this->_get_timeline_image(); // phpcs:ignore
 					}
 				?>
 				<div class="timeline-item__card-content">
 					<?php
+						// phpcs:disable
 						echo '<div class="timeline-item__meta">';
 						echo $this->_loop_item( array( 'item_meta' ), '<div ' . $item_meta_attr . '>%s</div>' );
 						echo '</div>';
 						echo $this->_loop_item( array( 'item_title' ) , '<' . $title_tag . ' ' . $item_title_attr . '>%1s</' . $title_tag . '>' );
 						echo $this->_loop_item( array( 'item_desc' ), '<div ' . $item_desc_attr . '>%s</div>' );
 						echo $this->_get_timeline_button();
+						// phpcs:enable
 					?>
 				</div>
 				<?php
 					if ( 'yes' === $item_settings['show_item_image'] && 'inside_after' === $image_position ) {
-						echo $this->_get_timeline_image();
+						echo $this->_get_timeline_image(); // phpcs:ignore
 					}
 				?>
 		</div>
 		<div class="timeline-item__card-arrow"></div>
 	</div>
 	<?php
-		$this->_generate_point_content( $item_settings );
+		$this->_generate_point_content( $item_settings ); // phpcs:ignore
 		echo '<div class="timeline-item__meta">';
 		if ( 'yes' === $item_settings['show_item_image'] && $image_position === 'outside_before' && 'center' === $settings['horizontal_alignment'] ) {
-			echo $this->_get_timeline_image();
+			echo $this->_get_timeline_image(); // phpcs:ignore
 		}
-		echo $this->_loop_item( array( 'item_meta' ), '<div ' . $item_meta_attr . '>%s</div>' );
+		echo $this->_loop_item( array( 'item_meta' ), '<div ' . $item_meta_attr . '>%s</div>' ); // phpcs:ignore
 		if ( 'yes' === $item_settings['show_item_image'] && $image_position === 'outside_after' && 'center' === $settings['horizontal_alignment'] ) {
-			echo $this->_get_timeline_image();
+			echo $this->_get_timeline_image(); // phpcs:ignore
 		}
 		echo '</div>';
 	?>

@@ -15,8 +15,8 @@ $this->add_render_attribute( 'circle-bar', array(
 ) );
 
 ?>
-<div <?php echo $this->get_render_attribute_string( 'circle-wrap' ); ?>>
-	<div <?php echo $this->get_render_attribute_string( 'circle-bar' ); ?>>
+<div <?php echo $this->get_render_attribute_string( 'circle-wrap' ); // phpcs:ignore ?>>
+	<div <?php echo $this->get_render_attribute_string( 'circle-bar' ); // phpcs:ignore ?>>
 	<?php
 		include $this->_get_global_template( 'circle' );
 		if ( 'in-circle' === $perc_position || 'in-circle' === $labels_position ) {

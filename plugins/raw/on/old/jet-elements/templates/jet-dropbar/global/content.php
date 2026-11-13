@@ -5,6 +5,6 @@
 ?>
 <div class="jet-dropbar__content-wrapper">
 	<div class="jet-dropbar__content"><?php
-		echo $this->get_dropbar_content();
+		echo $this->get_dropbar_content(); // phpcs:ignore
 	?></div>
 </div>

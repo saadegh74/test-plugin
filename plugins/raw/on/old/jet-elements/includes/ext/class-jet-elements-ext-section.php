@@ -56,6 +56,8 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 
 			add_action( 'elementor/frontend/container/before_render', array( $this, 'section_before_render' ), 10, 1 );
 
+			add_action( 'elementor/element/after_add_attributes', array( $this, 'sanitize_parallax_attributes' ) );
+
 			add_action( 'elementor/frontend/before_enqueue_scripts', array( $this, 'enqueue_scripts' ), 9 );
 		}
 
@@ -98,7 +100,7 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 				);
 			}
 
-			$repeater = new Elementor\Repeater();
+			$repeater = new Elementor\Jet_Elements_Repeater();
 
 			$repeater->add_responsive_control(
 				'jet_parallax_layout_image',
@@ -159,11 +161,11 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 					'type'    => Elementor\Controls_Manager::SELECT,
 					'default' => '1',
 					'options' => array(
-						'1'  => esc_html__( 'To Right', 'jet-elements' ),
-						'-1' => esc_html__( 'To Left', 'jet-elements' ),
+						'1'  => esc_html__( 'Down / To Right', 'jet-elements' ),
+						'-1' => esc_html__( 'Up / To Left', 'jet-elements' ),
 					),
 					'condition' => array(
-						'jet_parallax_layout_type' => array( 'h-scroll', 'rotate' ),
+						'jet_parallax_layout_type' => array( 'scroll', 'h-scroll', 'rotate' ),
 					),
 				)
 			);
@@ -274,7 +276,7 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 				)
 			);
 
-			$obj->add_control(
+			\Jet_Elements_Settings_Validator::add_extension_control( $obj,
 				'jet_parallax_layout_list',
 				array(
 					'label'              => '<b>' . esc_html__( 'Layouts', 'jet-elements' ) . '</b>',
@@ -288,6 +290,46 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 			);
 
 			$obj->end_controls_section();
+		}
+
+		/**
+		 * Validate parallax data at output time, including previously saved layouts.
+		 *
+		 * @param object $element Elementor element.
+		 */
+		public function sanitize_parallax_attributes( $element ) {
+			if ( ! in_array( $element->get_type(), array( 'section', 'container' ), true ) ) {
+				return;
+			}
+
+			$attributes = $element->get_render_attributes( '_wrapper' );
+			if ( empty( $attributes['data-settings'][0] ) ) {
+				return;
+			}
+
+			$settings = json_decode( $attributes['data-settings'][0], true );
+			if ( ! is_array( $settings ) || ! isset( $settings['jet_parallax_layout_list'] ) ) {
+				return;
+			}
+
+			$layouts = $settings['jet_parallax_layout_list'];
+			$allowed_types = array( 'none', 'scroll', 'h-scroll', 'mouse', 'zoom', 'rotate', 'blur', 'opacity' );
+			$settings['jet_parallax_layout_list'] = array();
+
+			foreach ( is_array( $layouts ) ? $layouts : array() as $layout ) {
+				if ( ! is_array( $layout ) ) {
+					continue;
+				}
+
+				$type = isset( $layout['jet_parallax_layout_type'] ) ? $layout['jet_parallax_layout_type'] : 'none';
+				$z_index = isset( $layout['jet_parallax_layout_z_index'] ) ? $layout['jet_parallax_layout_z_index'] : 0;
+				$layout['jet_parallax_layout_type'] = in_array( $type, $allowed_types, true ) ? $type : 'none';
+				$layout['_id'] = isset( $layout['_id'] ) && is_string( $layout['_id'] ) ? preg_replace( '/[^A-Za-z0-9_-]/', '', $layout['_id'] ) : '';
+				$layout['jet_parallax_layout_z_index'] = is_numeric( $z_index ) ? (int) max( 0, min( 99, (float) $z_index ) ) : 0;
+				$settings['jet_parallax_layout_list'][] = $layout;
+			}
+
+			$element->add_render_attribute( '_wrapper', 'data-settings', wp_json_encode( $settings ), true );
 		}
 
 		/**
@@ -334,6 +376,7 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 		public function enqueue_scripts() {
 
 			$has_mouse_type = false;
+			$is_element_cache_active = \Elementor\Plugin::$instance->experiments->is_feature_active( 'e_element_cache' );
 
 			if ( ! empty( $this->parallax_sections ) ) {
 
@@ -348,10 +391,13 @@ if ( ! class_exists( 'Jet_Elements_Ext_Section' ) ) {
 				//jet_elements_assets()->localize_data['jetParallaxSections'] = $this->parallax_sections;
 			}
 
-			if ( $has_mouse_type || jet_elements()->elementor()->preview->is_preview_mode() ) {
+			//Register and enqueue parallax stylesheets
+			wp_enqueue_style( 'jet-elements' );
+			wp_enqueue_script( 'jet-elements' );
+
+			if ( $has_mouse_type || jet_elements()->elementor()->preview->is_preview_mode() || $is_element_cache_active ) {
 				wp_enqueue_script( 'jet-tween-js' );
 			}
-
 		}
 
 		/**

@@ -42,8 +42,21 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	/**
+	 * Get style dependencies.
+	 *
+	 * Retrieve the list of style dependencies the widget requires.
+	 *
+	 * @since 1.5.8
+	 *
+	 * @return array Widget style dependencies.
+	 */
+	public function get_style_depends(): array {
+		return [ 'jet-carousel', 'jet-carousel-skin', 'jet-banner' ];
+	}
+
 	public function get_script_depends() {
-		return array( 'jet-slick' );
+		return [ 'jet-slick', 'jet-carousel' ];
 	}
 
 	protected function register_controls() {
@@ -57,7 +70,7 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'items_list' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'item_image',
@@ -315,6 +328,18 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 		);
 
 		$this->add_control(
+			'image_lazyload',
+			array(
+				'label'        => esc_html__( 'Lazy Load Images', 'jet-elements' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'jet-elements' ),
+				'label_off'    => esc_html__( 'No', 'jet-elements' ),
+				'return_value' => 'true',
+				'default'      => 'true',
+			)
+		);
+
+		$this->add_control(
 			'link_title',
 			array(
 				'label'     => esc_html__( 'Link Title', 'jet-elements' ),
@@ -337,6 +362,7 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 				'default'      => '',
 			)
 		);
+		
 
 		$this->add_control(
 			'fluid_width',
@@ -379,9 +405,11 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 			'slides_to_show',
 			array(
 				'label'              => esc_html__( 'Slides to Show', 'jet-elements' ),
-				'type'               => Controls_Manager::SELECT,
+				'type'               => Controls_Manager::NUMBER,
 				'default'            => '2',
-				'options'            => jet_elements_tools()->get_select_range( 10 ),
+				'min'                => 1,
+				'max'                => 10,
+				'step'               => 0.1,
 				'frontend_available' => true,
 				'render_type'        => 'template',
 			)
@@ -2200,7 +2228,7 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 			'fractionNav'    => filter_var( $settings['fraction_navigation'], FILTER_VALIDATE_BOOLEAN ),
 		);
 
-		if ( 1 === absint( $settings['slides_to_show'] ) ) {
+		if ( 1.0 === (float) $settings['slides_to_show'] ) {
 			$options['fade'] = ( 'fade' === $settings['effect'] );
 		}
 
@@ -2214,24 +2242,47 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 		$settings = $this->get_settings_for_display();
 		$size     = isset( $settings['img_size'] ) ? $settings['img_size'] : 'full';
 		$image    = isset( $this->_processed_item['item_image'] ) ? $this->_processed_item['item_image'] : '';
+		$image_lazyload   = isset( $settings['image_lazyload'] ) ? $settings['image_lazyload'] : 'true';
+		$url      = '';
+		$alt      = '';
 
 		if ( ! $image ) {
 			return;
 		}
 
-		if ( 'full' !== $size && ! empty( $image['id'] ) ) {
-			$url = wp_get_attachment_image_url( $image['id'], $size );
-		} else {
-			$url = $image['url'];
+		if ( is_array( $image ) ) {
+			if ( 'full' !== $size && ! empty( $image['id'] ) ) {
+				$url = wp_get_attachment_image_url( $image['id'], $size );
+			} elseif ( ! empty( $image['url'] ) ) {
+				$url = $image['url'];
+			}
+
+			$alt = Control_Media::get_image_alt( $image );
+		} elseif ( is_numeric( $image ) ) {
+			$url = wp_get_attachment_image_url( absint( $image ), $size );
+
+			if ( ! $url ) {
+				$url = wp_get_attachment_url( absint( $image ) );
+			}
+		} elseif ( is_string( $image ) ) {
+			$url = $image;
 		}
 
 		if ( empty( $url ) ) {
 			return;
 		}
 
-		$alt = esc_attr( Control_Media::get_image_alt( $image ) );
+		$lazyload = 'true' === $image_lazyload ? 'lazy' : '';
 
-		return sprintf( '<img src="%1$s" class="%2$s" alt="%3$s" loading="lazy">', $url, $class, $alt );
+		$format = '<img src="%1$s" class="%2$s" alt="%3$s" loading="%4$s">';
+
+		return sprintf(
+			$format,
+			$this->sanitize_render_value( $url, $format, 1 ),
+			$this->sanitize_render_value( $class, $format, 2 ),
+			$this->sanitize_render_value( $alt, $format, 3 ),
+			$this->sanitize_render_value( $lazyload, $format, 4 )
+		);
 
 	}
 
@@ -2254,7 +2305,7 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 				return false;
 			}
 
-			$params[] = $item[ $value ];
+			$params[] = $this->sanitize_render_value( $item[ $value ], $format, count( $params ) + 1 );
 		}
 
 		return vsprintf( $format, $params );
@@ -2275,6 +2326,7 @@ class Jet_Elements_Advanced_Carousel extends Jet_Elements_Base {
 		// for multi-language plugins
 		$template_id = apply_filters( 'jet-elements/widgets/template_id', $template_id, $this );
 		$content     = jet_elements()->elementor()->frontend->get_builder_content( $template_id );
+		$content     = apply_filters( 'jet-elements/widgets/template_content', $content, $this->_processed_item, $template_id );
 
 		if ( jet_elements()->elementor()->editor->is_edit_mode() ) {
 			$edit_url = add_query_arg(

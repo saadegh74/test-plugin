@@ -40,7 +40,7 @@ abstract class Base {
 	 *
 	 * @return string|bool
 	 */
-	public function permission_callback() {
+	public function permission_callback( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 

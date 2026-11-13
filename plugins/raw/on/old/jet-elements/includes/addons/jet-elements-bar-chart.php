@@ -58,12 +58,22 @@ class Jet_Elements_Bar_Chart extends Jet_Elements_Base {
 	}
 
 	/**
+	 * Retrieve the list of style the widget depended on.
+	 *
+	 * @return array
+	 */
+
+	public function get_style_depends() { 
+		return array( 'jet-charts' ); 
+	}
+
+	/**
 	 * Retrieve the list of scripts the widget depended on.
 	 *
 	 * @return array
 	 */
 	public function get_script_depends() {
-		return array( 'chart-js' );
+		return array( 'chart-js', 'jet-bar-chart' );
 	}
 
 	/**
@@ -119,6 +129,17 @@ class Jet_Elements_Bar_Chart extends Jet_Elements_Base {
 				'dynamic'     => array( 'active' => true ),
 			)
 		);
+
+		$this->add_control(
+			'labels_length',
+			array(
+				'label'       => esc_html__( 'Labels length ', 'jet-elements' ),
+				'type'        => Controls_Manager::NUMBER,
+				'default'     => 50,
+				'description' => esc_html__( 'Set the length of label if the quantity of symbols exceed borders of visibility', 'jet-elements' ),
+				'dynamic' => array( 'active' => true ),
+			)
+		);
 		
 		$this->add_control(
 			'axis_range',
@@ -155,7 +176,7 @@ class Jet_Elements_Bar_Chart extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'chart_data' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 		
 		$repeater->start_controls_tabs( 'bar_tabs' );
 		
@@ -842,6 +863,7 @@ class Jet_Elements_Bar_Chart extends Jet_Elements_Base {
 		$tooltip_suffix    = isset( $settings['chart_tooltip_suffix'] ) ? $settings['chart_tooltip_suffix'] : '';
 		$tooltip_separator = isset( $settings['chart_tooltip_separator'] ) ? $settings['chart_tooltip_separator'] : '';
 		$axis_separator    = isset( $settings['axis_thousand_separator'] ) ? $settings['axis_thousand_separator'] : '';
+		$labels_length     = isset( $settings['labels_length'] ) ? intval( $settings['labels_length'] ) : 50;
 
 		$this->add_render_attribute( [
 				'container' => array(
@@ -859,6 +881,7 @@ class Jet_Elements_Bar_Chart extends Jet_Elements_Base {
 					'data-tooltip-suffix'    => $tooltip_suffix,
 					'data-tooltip-separator' => $tooltip_separator,
 					'data-axis-separator'    => $axis_separator,
+					'data-labels-length'     => $labels_length,
 				),
 				'canvas' => array(
 					'class' => 'jet-bar-chart',
@@ -867,8 +890,8 @@ class Jet_Elements_Bar_Chart extends Jet_Elements_Base {
 		] );
 		
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'container' ); ?>>
-			<canvas <?php echo $this->get_render_attribute_string( 'canvas' ); ?>></canvas>
+		<div <?php echo $this->get_render_attribute_string( 'container' ); // phpcs:ignore ?>>
+			<canvas <?php echo $this->get_render_attribute_string( 'canvas' ); // phpcs:ignore ?>></canvas>
 		</div>
 		<?php
 		$this->_close_wrap();

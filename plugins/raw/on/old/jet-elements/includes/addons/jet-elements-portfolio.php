@@ -47,8 +47,12 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	public function get_style_depends() { 
+		return array( 'jet-portfolio', 'jet-portfolio-skin' ); 
+	}
+
 	public function get_script_depends() {
-		return array( 'imagesloaded', 'jet-masonry-js', 'jet-anime-js' );
+		return array( 'imagesloaded', 'jet-masonry-js', 'jet-anime-js', 'jet-portfolio' );
 	}
 
 	protected function register_controls() {
@@ -86,7 +90,7 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'image_list' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'item_category',
@@ -2058,11 +2062,14 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 		$module_settings = $this->get_settings();
 
 		$settings = array(
-			'layoutType' => $module_settings['layout_type'],
-			'perPage'    => $module_settings['per_page'],
+			'layoutType' => $this->ensure_allowed_value( $module_settings['layout_type'], array( 'masonry', 'grid', 'justify', 'list' ) ),
+			'perPage'    => absint( $module_settings['per_page'] ),
 		);
 
-		$settings = json_encode( $settings );
+		$settings = wp_json_encode( $settings );
+
+		// Escape the JSON string for safe use in HTML attributes
+		$settings = esc_attr( $settings );
 
 		return $settings;
 	}
@@ -2074,7 +2081,6 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 	 */
 	protected function _loop_image_item() {
 		$item = $this->_processed_item;
-		$params = [];
 
 		if ( ! array_key_exists( 'item_image', $item ) ) {
 			return false;
@@ -2082,27 +2088,92 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 
 		$image_item      = $item['item_image'];
 		$image_item_size = isset( $item['item_image_size'] ) ? $item['item_image_size'] : 'full';
-		$alt             = esc_attr( Control_Media::get_image_alt( $image_item ) );
 
-		if ( ! empty( $image_item['id'] ) ) {
-			$image_data = wp_get_attachment_image_src( $image_item['id'], $image_item_size );
+		$image_data = $this->get_portfolio_image_data( $image_item, $image_item_size );
 
-			$params[] = $image_data[0];
-			$params[] = $image_data[1];
-			$params[] = $image_data[2];
-		} else {
-			$params[] = $image_item['url'];
-			$params[] = 1200;
-			$params[] = 800;
+		if ( ! $image_data ) {
+			return false;
 		}
 
 		$srcset = '';
 
-		if ( ! empty( $item[ 'item_image_2x' ] ) && ! empty( $item[ 'item_image_2x' ][ 'url' ] ) ) {
-			$srcset = 'srcset="' . $item['item_image_2x'][ 'url' ] . ' 2x"';
+		if ( ! empty( $item['item_image_2x'] ) ) {
+			$retina_image_data = $this->get_portfolio_image_data( $item['item_image_2x'], 'full' );
+
+			if ( $retina_image_data ) {
+				$srcset = 'srcset="' . esc_url( $retina_image_data['url'] ) . ' 2x"';
+			}
 		}
 
-		return sprintf( '<img class="jet-portfolio__image-instance" src="%1$s" width="%2$s" height="%3$s" %4$s alt="%5$s" loading="lazy">', $params[0], $params[1], $params[2], $srcset, $alt );
+		return sprintf(
+			'<img class="jet-portfolio__image-instance" src="%1$s" width="%2$s" height="%3$s" %4$s alt="%5$s" loading="lazy">',
+			esc_url( $image_data['url'] ),
+			esc_attr( $image_data['width'] ),
+			esc_attr( $image_data['height'] ),
+			$srcset,
+			esc_attr( $image_data['alt'] )
+		);
+	}
+
+	/**
+	 * Normalize portfolio image control value.
+	 *
+	 * @param array|int|string $image_item      Image control value, attachment ID or image URL.
+	 * @param string           $image_item_size Image size.
+	 *
+	 * @return array|false
+	 */
+	protected function get_portfolio_image_data( $image_item, $image_item_size = 'full' ) {
+		if ( is_array( $image_item ) && ! empty( $image_item['id'] ) ) {
+			$image_data = wp_get_attachment_image_src( $image_item['id'], $image_item_size );
+
+			if ( empty( $image_data ) ) {
+				return false;
+			}
+
+			return array(
+				'url'    => $image_data[0],
+				'width'  => ! empty( $image_data[1] ) ? $image_data[1] : 1200,
+				'height' => ! empty( $image_data[2] ) ? $image_data[2] : 800,
+				'alt'    => Control_Media::get_image_alt( $image_item ),
+			);
+		}
+
+		if ( is_numeric( $image_item ) ) {
+			$image_id   = absint( $image_item );
+			$image_data = wp_get_attachment_image_src( $image_id, $image_item_size );
+
+			if ( empty( $image_data ) ) {
+				return false;
+			}
+
+			return array(
+				'url'    => $image_data[0],
+				'width'  => ! empty( $image_data[1] ) ? $image_data[1] : 1200,
+				'height' => ! empty( $image_data[2] ) ? $image_data[2] : 800,
+				'alt'    => get_post_meta( $image_id, '_wp_attachment_image_alt', true ),
+			);
+		}
+
+		if ( is_array( $image_item ) && ! empty( $image_item['url'] ) ) {
+			return array(
+				'url'    => $image_item['url'],
+				'width'  => 1200,
+				'height' => 800,
+				'alt'    => Control_Media::get_image_alt( $image_item ),
+			);
+		}
+
+		if ( is_string( $image_item ) && filter_var( $image_item, FILTER_VALIDATE_URL ) ) {
+			return array(
+				'url'    => $image_item,
+				'width'  => 1200,
+				'height' => 800,
+				'alt'    => '',
+			);
+		}
+
+		return false;
 	}
 
 	/**
@@ -2119,25 +2190,21 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 		$image_item      = $item['item_image'];
 		$image_item_size = isset( $item['item_image_size'] ) ? $item['item_image_size'] : 'full';
 
-		if ( ! empty( $item[ 'item_image_2x' ] ) && ! empty( $item[ 'item_image_2x' ][ 'url' ] ) ) {
+		if ( ! empty( $item['item_image_2x'] ) && $this->get_portfolio_image_data( $item['item_image_2x'], 'full' ) ) {
 			$image_item      = $item['item_image_2x'];
 			$image_item_size = 'full';
 		}
 
-		$url = $image_item['url'];
-		$width = 1200;
-		$height = 800;
-		$size = 'justify-size-1-4';
+		$image_data = $this->get_portfolio_image_data( $image_item, $image_item_size );
 
-		if ( ! empty( $image_item['id'] ) ) {
-			$image_data = wp_get_attachment_image_src( $image_item['id'], $image_item_size );
-
-			$url = $image_data[0];
-			$width = ! empty( $image_data[1] ) ? $image_data[1] : 1200;
-			$height = ! empty( $image_data[2] ) ? $image_data[2] : 800;
+		if ( ! $image_data ) {
+			return false;
 		}
 
-		$ratio = $width / $height;
+		$width  = ! empty( $image_data['width'] ) ? $image_data['width'] : 1200;
+		$height = ! empty( $image_data['height'] ) ? $image_data['height'] : 800;
+		$size   = 'justify-size-1-4';
+		$ratio  = $width / $height;
 
 		if ( $this->range_check( $ratio, 0, 1 ) ) {
 			$size = 'justify-size-1-4';
@@ -2196,7 +2263,7 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 			$html .= sprintf( '%3$s<div class="jet-portfolio__filter-item" data-slug="%1$s"><span>%2$s</span></div>', $slug, $category_name, $separator_html );
 		}
 
-		echo sprintf( '<div class="jet-portfolio__filter"><div class="jet-portfolio__filter-list">%s</div></div>', $html );
+		echo sprintf( '<div class="jet-portfolio__filter"><div class="jet-portfolio__filter-list">%s</div></div>', wp_kses_post( $html ) );
 	}
 
 	/**
@@ -2271,7 +2338,7 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 
 		$format = apply_filters( 'jet-elements/portfolio/more-button-format', '<div class="jet-portfolio__view-more hidden-status"><div %1$s>%2$s</div></div>' );
 
-		echo sprintf( $format, $this->get_render_attribute_string( 'view_more_button' ), $button_text );
+		echo sprintf( $format, $this->get_render_attribute_string( 'view_more_button' ), wp_kses_post( $button_text ) ); // phpcs:ignore
 	}
 
 	/**
@@ -2312,9 +2379,9 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 		) );
 
 		if ( method_exists( $this, 'add_link_attributes' ) ) {
-			$this->add_link_attributes( $button_instance, $button_url );
+			$this->add_link_attributes( $button_instance, $this->sanitize_link_control( $button_url ) );
 		} else {
-			$this->add_render_attribute( $button_instance, 'href', $button_url['url'] );
+			$this->add_render_attribute( $button_instance, 'href', esc_url( $button_url['url'] ) );
 
 			if ( ! empty( $button_url['is_external'] ) ) {
 				$this->add_render_attribute( $button_instance, 'target', '_blank' );
@@ -2327,7 +2394,7 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 
 		$format = apply_filters( 'jet-elements/portfolio/action-button-format', '<a %1$s><span class="jet-portfolio__button-text">%2$s</span></a>' );
 
-		return sprintf( $format, $this->get_render_attribute_string( $button_instance ), $button_text );
+		return sprintf( $format, $this->get_render_attribute_string( $button_instance ), wp_kses_post( $button_text ) );
 	}
 
 	/**
@@ -2351,7 +2418,7 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 		$category_tag = $this->_get_html( 'category_html_tag', '%s' );
 		$category_tag = jet_elements_tools()->validate_html_tag( $category_tag );
 
-		return sprintf( '<%2$s class="jet-portfolio__category">%1$s</%2$s>', $category_html, $category_tag );
+		return sprintf( '<%2$s class="jet-portfolio__category">%1$s</%2$s>', wp_kses_post( $category_html ), $category_tag );
 	}
 
 
@@ -2361,7 +2428,7 @@ class Jet_Elements_Portfolio extends Jet_Elements_Base {
 	}
 
 	public function trp_edit_mode() {
-		return ! empty( $_GET['trp-edit-translation'] ) ? true : false;
+		return ! empty( $_GET['trp-edit-translation'] ) ? true : false; // phpcs:ignore
 	}
 
 	/**

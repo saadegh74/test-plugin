@@ -31,9 +31,9 @@ gulp.task('css', () => {
 		.pipe(gulp.dest('./assets/css/'))
 		.pipe(notify('Compile Sass Done!'));
 });
-
-gulp.task('css-skin', () => {
-	return gulp.src('./assets/scss/jet-elements-skin.scss')
+//css
+gulp.task('css-addons', () => {
+	return gulp.src( './assets/scss/addons/*.scss' )
 		.pipe(
 			plumber( {
 				errorHandler: function ( error ) {
@@ -49,30 +49,29 @@ gulp.task('css-skin', () => {
 				cascade: false
 		}))
 
-		.pipe(rename('jet-elements-skin.css'))
-		.pipe(gulp.dest('./assets/css/'))
+		.pipe(gulp.dest('./assets/css/addons'))
 		.pipe(notify('Compile Sass Done!'));
 });
 
-gulp.task('css-skin-rtl', () => {
-	return gulp.src('./assets/scss/jet-elements-skin-rtl.scss')
-			.pipe(
-				plumber( {
-					errorHandler: function ( error ) {
-						console.log('=================ERROR=================');
-						console.log(error.message);
-						this.emit( 'end' );
-					}
-				})
-			)
-			.pipe(sass( { outputStyle: 'compressed' } ))
-			.pipe(autoprefixer({
+gulp.task('css-skin', () => {
+	return gulp.src( './assets/scss/skin/*.scss' )
+		.pipe(
+			plumber( {
+				errorHandler: function ( error ) {
+					console.log('=================ERROR=================');
+					console.log(error.message);
+					this.emit( 'end' );
+				}
+			})
+		)
+		.pipe(sass( { outputStyle: 'compressed' } ))
+		.pipe(autoprefixer({
 				browsers: ['last 10 versions'],
 				cascade: false
-			}))
-			.pipe(rename('jet-elements-skin-rtl.css'))
-			.pipe(gulp.dest('./assets/css/'))
-			.pipe(notify('Compile Sass Done!'));
+		}))
+
+		.pipe(gulp.dest('./assets/css/skin'))
+		.pipe(notify('Compile Sass Done!'));
 });
 
 gulp.task('css-admin', () => {
@@ -173,6 +172,17 @@ gulp.task( 'js-minify', function() {
 		.pipe( notify( 'js Minify Done!' ) );
 } );
 
+// Minify JS Addons
+gulp.task('js-minify-addons', function () {
+    return gulp.src([
+        './assets/js/addons/*.js', 
+        '!./assets/js/addons/*.min.js' // исключили min
+    ])
+    .pipe(uglify())
+    .pipe(rename({ extname: '.min.js' }))
+    .pipe(gulp.dest('./assets/js/addons'))
+});
+
 gulp.task( 'js-editor-minify', function() {
 	return gulp.src( './assets/js/jet-elements-editor.js' )
 		.pipe( uglify() )
@@ -183,9 +193,11 @@ gulp.task( 'js-editor-minify', function() {
 
 //watch
 gulp.task('watch', () => {
-	gulp.watch( './assets/scss/**', gulp.series( ...['css', 'css-skin', 'css-admin', 'css-rtl', 'css-skin-rtl', 'css-icons', 'css-editor'] ) );
+	gulp.watch( './assets/scss/**', gulp.series( ...['css', 'css-addons', 'css-skin', 'css-admin', 'css-rtl', 'css-icons', 'css-editor'] ) );
 
 	gulp.watch( './assets/js/jet-elements.js', gulp.series( 'js-minify' ) );
+
+	gulp.watch( [ './assets/js/addons/*.js', '!./assets/js/addons/*.min.js' ], gulp.series('js-minify-addons'));
 	gulp.watch( './assets/js/jet-elements-editor.js', gulp.series( 'js-editor-minify' ) );
 });
 

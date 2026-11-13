@@ -9,7 +9,7 @@
 		$this->_html( 'title', '<span class="jet-progress-bar__title-text">%s</span>' );?></div>
 	<div class="jet-progress-bar__wrapper">
 		<div class="jet-progress-bar__status-bar">
-			<div class="jet-progress-bar__percent"><?php echo $percent_html ?></div>
+			<div class="jet-progress-bar__percent"><?php echo $percent_html // phpcs:ignore ?></div>
 		</div>
 	</div>
 </div>

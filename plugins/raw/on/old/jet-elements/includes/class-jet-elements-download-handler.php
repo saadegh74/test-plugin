@@ -77,7 +77,7 @@ if ( ! class_exists( 'Jet_Elements_Download_Handler' ) ) {
 				return;
 			}
 
-			$nonce = ! empty( $_GET['nonce'] ) ? $_GET['nonce'] : false;
+			$nonce = ! empty( $_GET['nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['nonce'] ) ) : false;
 
 			if ( ! $nonce || ! wp_verify_nonce( $nonce, $this->hook() ) ) {
 				wp_die( 
@@ -197,11 +197,11 @@ if ( ! class_exists( 'Jet_Elements_Download_Handler' ) ) {
 		 */
 		public function process_download() {
 
-			if ( empty( $_GET[ $this->hook() ] ) ) {
+			if ( empty( $_GET[ $this->hook() ] ) ) { // phpcs:ignore
 				return;
 			}
 
-			$encrypted_id = $_GET[ $this->hook() ];
+			$encrypted_id = sanitize_text_field( wp_unslash( $_GET[ $this->hook() ] ) ); // phpcs:ignore
 			$id           = absint( $this->decrypt_id( $encrypted_id ) );
 
 			if ( ! $id ) {
@@ -218,6 +218,11 @@ if ( ! class_exists( 'Jet_Elements_Download_Handler' ) ) {
 
 			if ( ! is_file( $file_path ) ) {
 				return;
+			}
+
+			// Clear all output buffers to prevent file corruption
+			while ( ob_get_level() ) {
+				@ob_end_clean();
 			}
 
 			if ( ini_get( 'zlib.output_compression' ) ) {
@@ -278,8 +283,11 @@ if ( ! class_exists( 'Jet_Elements_Download_Handler' ) ) {
 
 			while ( ! feof( $handle ) ) {
 				$buffer = fread( $handle, $chunksize );
-				echo $buffer;
-				ob_flush();
+				echo $buffer; // phpcs:ignore
+
+				if ( ob_get_level() > 0 ) {
+					ob_flush();
+				}
 				flush();
 				if ( $retbytes ) {
 					$cnt += strlen( $buffer );

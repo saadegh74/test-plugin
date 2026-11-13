@@ -65,7 +65,7 @@ if ( ! class_exists( 'Jet_Elements_Ajax_Handlers' ) ) {
 		 * @return void
 		 */
 		public function jet_subscribe_form_ajax() {
-			$data = ( ! empty( $_POST['data'] ) ) ? $_POST['data'] : false;
+			$data = ( ! empty( $_POST['data'] ) ) ? $_POST['data'] : false; // phpcs:ignore
 
 			if ( ! $data ) {
 				wp_send_json( array( 'type' => 'error', 'message' => $this->sys_messages['server_error'] ) );

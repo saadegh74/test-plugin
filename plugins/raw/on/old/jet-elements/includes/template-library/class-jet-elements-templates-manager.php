@@ -188,7 +188,7 @@ if ( ! class_exists( 'Jet_Elements_Templates_Manager' ) ) {
 
 			$templates = $this->get_templates();
 
-			if ( ! empty( $templates ) ) {
+			if ( ! empty( $templates ) && is_array( $remote_templates ) ) {
 				$remote_templates = array_merge( $remote_templates, $templates );
 			}
 
@@ -246,14 +246,23 @@ if ( ! class_exists( 'Jet_Elements_Templates_Manager' ) ) {
 		 * @param $ajax
 		 */
 		public function register_ajax_actions( $ajax ) {
-			if ( ! isset( $_REQUEST['actions'] ) ) {
+			if ( ! isset( $_REQUEST['actions'] ) ) { // phpcs:ignore
 				return;
 			}
 
-			$actions = json_decode( stripslashes( $_REQUEST['actions'] ), true );
+			$actions = json_decode( stripslashes( wp_unslash( $_REQUEST['actions'] ) ), true ); // phpcs:ignore
 			$data    = false;
 
+			if ( empty( $actions ) || ! is_array( $actions ) ) {
+				return;
+			}
+			
 			foreach ( $actions as $id => $action_data ) {
+
+				if ( ! is_array( $action_data ) ) {
+					continue;
+				}
+			
 				if ( ! isset( $action_data['get_template_data'] ) ) {
 					$data = $action_data;
 				}
@@ -303,11 +312,11 @@ if ( ! class_exists( 'Jet_Elements_Templates_Manager' ) ) {
 		 */
 		public function force_jet_template_source() {
 
-			if ( empty( $_REQUEST['template_id'] ) ) {
+			if ( empty( $_REQUEST['template_id'] ) ) { // phpcs:ignore
 				return;
 			}
 
-			if ( false === strpos( $_REQUEST['template_id'], 'jet_' ) ) {
+			if ( false === strpos( sanitize_text_field( wp_unslash( $_REQUEST['template_id'] ) ), 'jet_' ) ) { // phpcs:ignore
 				return;
 			}
 

@@ -26,9 +26,9 @@ $this->add_render_attribute( 'url', 'class', array(
 if ( is_array( $button_url ) ) {
 
 	if ( method_exists( $this, 'add_link_attributes' ) ) {
-		$this->add_link_attributes( 'url', $button_url );
+		$this->add_link_attributes( 'url', $this->sanitize_link_control( $button_url ) );
 	} else {
-		$this->add_render_attribute( 'url', 'href', $button_url['url'] );
+		$this->add_render_attribute( 'url', 'href', esc_url( $button_url['url'] ) );
 
 		if ( $button_url['is_external'] ) {
 			$this->add_render_attribute( 'url', 'target', '_blank' );
@@ -40,15 +40,14 @@ if ( is_array( $button_url ) ) {
 	}
 
 } else {
-	$this->add_render_attribute( 'url', 'href', $button_url );
+	$this->add_render_attribute( 'url', 'href', esc_url( $button_url ) );
 }
 
 ?>
-<a <?php echo $this->get_render_attribute_string( 'url' ); ?>><?php
-	echo $this->_html( 'back_side_button_text', '<span class="jet-animated-box__button-text">%s</span>' );
+<a <?php echo $this->get_render_attribute_string( 'url' ); // phpcs:ignore ?>><?php
+	echo $this->_html( 'back_side_button_text', '<span class="jet-animated-box__button-text">%s</span>' ); // phpcs:ignore
 
 	if ( filter_var( $use_icon, FILTER_VALIDATE_BOOLEAN ) ) {
-		echo $this->_icon( 'button_icon', '<span class="jet-animated-box__button-icon jet-elements-icon">%s</span>' );
+		echo $this->_icon( 'button_icon', '<span class="jet-animated-box__button-icon jet-elements-icon">%s</span>' ); // phpcs:ignore
 	}
 ?></a>
-

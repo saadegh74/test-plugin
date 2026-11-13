@@ -42,6 +42,18 @@ class Jet_Elements_Countdown_Timer extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() { 
+		return array( 'jet-countdown-timer', 'jet-countdown-timer-skin' ); 
+	}
+
+	public function get_script_depends() {
+		return array( 'jet-countdown-timer' );
+	}
+
 	protected function register_controls() {
 
 		$css_scheme = apply_filters(
@@ -1157,7 +1169,7 @@ class Jet_Elements_Countdown_Timer extends Jet_Elements_Base {
 			'<div class="jet-countdown-timer__separator">%s</div>'
 		);
 
-		return sprintf( $format, $separator );
+		return sprintf( $format, wp_kses_post( $separator ) );
 	}
 
 	protected function render() {

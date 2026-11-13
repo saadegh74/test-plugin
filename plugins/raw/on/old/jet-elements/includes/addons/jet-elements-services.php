@@ -40,6 +40,14 @@ class Jet_Elements_Services extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() { 
+		return array( 'jet-services', 'jet-services-skin' ); 
+	}
+
 	protected function register_controls() {
 		$css_scheme = apply_filters(
 			'jet-elements/services/css-scheme',
@@ -1431,7 +1439,7 @@ class Jet_Elements_Services extends Jet_Elements_Base {
 
 		if ( ! empty( $title ) ) {
 
-			$title_html = sprintf( '<span class="jet-services__title-text">%s</span>', $title );
+			$title_html = sprintf( '<span class="jet-services__title-text">%s</span>', wp_kses_post( $title ) );
 		}
 
 		$title_tag = $this->get_settings_for_display( 'services_title_size' );
@@ -1457,7 +1465,7 @@ class Jet_Elements_Services extends Jet_Elements_Base {
 
 		$format = apply_filters( 'jet-elements/services/description-format', '<p class="jet-services__desc">%s</p>' );
 
-		return sprintf( $format, $desc );
+		return sprintf( $format, wp_kses_post( $desc ) );
 	}
 
 	public function _generate_action_button( $cover_location = false ) {
@@ -1495,9 +1503,9 @@ class Jet_Elements_Services extends Jet_Elements_Base {
 		if ( is_array( $button_url ) ) {
 
 			if ( method_exists( $this, 'add_link_attributes' ) ) {
-				$this->add_link_attributes( 'url', $button_url );
+				$this->add_link_attributes( 'url', $this->sanitize_link_control( $button_url ) );
 			} else {
-				$this->add_render_attribute( 'url', 'href', $button_url['url'] );
+				$this->add_render_attribute( 'url', 'href', esc_url( $button_url['url'] ) );
 
 				if ( $button_url['is_external'] ) {
 					$this->add_render_attribute( 'url', 'target', '_blank' );
@@ -1509,12 +1517,12 @@ class Jet_Elements_Services extends Jet_Elements_Base {
 			}
 
 		} else {
-			$this->add_render_attribute( 'url', 'href', $button_url );
+			$this->add_render_attribute( 'url', 'href', esc_url( $button_url ) );
 		}
 
 		$format = apply_filters( 'jet-elements/services/action-button-format', '<a %1$s><span class="jet-services__button-text">%2$s</span>%3$s</a>' );
 
-		return sprintf( $format, $this->get_render_attribute_string( 'url' ), $button_text, $icon_html );
+		return sprintf( $format, $this->get_render_attribute_string( 'url' ), wp_kses_post( $button_text ), $icon_html );
 	}
 
 }

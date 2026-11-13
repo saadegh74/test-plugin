@@ -33,7 +33,7 @@ class General extends Page_Module_Base {
 	 * @return [type] [description]
 	 */
 	public function get_page_name() {
-		return esc_html__( 'General Settings', 'jet-dashboard' );
+		return esc_html__( 'تنظیمات اصلی', 'jet-dashboard' );
 	}
 
 	/**

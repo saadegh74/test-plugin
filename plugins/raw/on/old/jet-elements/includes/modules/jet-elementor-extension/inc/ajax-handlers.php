@@ -67,14 +67,123 @@ class Ajax_Handlers {
 	}
 
 	/**
+	 * Generate a custom secret key for the cases when NONCE_KEY is not set.
+	 *
+	 * @return string
+	 */
+	public static function custom_sercret_key() {
+
+		$secret_key = get_option( 'jet-elementor-extension-secret-key', '' );
+
+		if ( ! $secret_key ) {
+			$secret_key = wp_generate_password( 64, false );
+			update_option( 'jet-elementor-extension-secret-key', $secret_key );
+		}
+
+		return $secret_key;
+	}
+
+	/**
+	 * Create a signature for the request.
+	 *
+	 * @return void
+	 */
+	public static function create_signature( $query = array() ) {
+
+		if ( ! is_array( $query ) ) {
+			$query = array();
+		}
+
+		$allowed_keys = array(
+			'post__not_in',
+			'meta_query',
+			'post_type',
+			'posts_per_page',
+		);
+
+		foreach ( $allowed_keys as $key ) {
+			if ( isset( $query[ $key ] ) ) {
+				unset( $query[ $key ] );
+			}
+		}
+
+		foreach ( $query as $key => $value ) {
+			if ( ! is_array( $value ) ) {
+				$query[ $key ] = (string) $value;
+			}
+		}
+
+		ksort( $query );
+
+		$secret_key = defined( 'NONCE_KEY' ) ? NONCE_KEY : self::custom_sercret_key();
+		$signature = md5( wp_json_encode( $query ) . $secret_key );
+
+		return $signature;
+	}
+
+	/**
+	 * Sanitize query arguments.
+	 *
+	 * @param array $query_args Query arguments.
+	 *
+	 * @return array
+	 */
+	public function sanitize_query( $query_args ) {
+
+		if ( ! is_array( $query_args ) ) {
+			return array();
+		}
+
+		$allowed_keys = array(
+			'post_type',
+			'post__in',
+			'tax_query',
+			'meta_query',
+			's_title', // Custom key for searching by title.
+		);
+
+		foreach ( $query_args as $key => $value ) {
+			if ( ! in_array( $key, $allowed_keys, true ) ) {
+				unset( $query_args[ $key ] );
+			}
+		}
+
+		return $query_args;
+	}
+
+	/**
+	 * Validate signature from request to ensure it wasn't hijacked
+	 *
+	 * @param array $data
+	 * @return bool
+	 */
+	public function validate_request_signature( $data ) {
+
+		$input_signature = ! empty( $data['signature'] ) ? $data['signature'] : false;
+		$query = ! empty( $data['query'] ) ? $data['query'] : array();
+		$generated_signature = self::create_signature( $query );
+
+		return $input_signature === $generated_signature;
+	}
+
+	/**
 	 * Get Query control options list.
 	 */
 	public function get_query_control_options() {
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error();
+		}
+
 		$data = $_REQUEST;
 
 		if ( ! isset( $data['query_type'] ) ) {
 			wp_send_json_error();
 			return;
+		}
+
+		if ( ! $this->validate_request_signature( $data ) ) {
+			wp_send_json_error();
 		}
 
 		$results = array();
@@ -92,7 +201,7 @@ class Ajax_Handlers {
 					'order'               => 'ASC',
 				);
 
-				$query_args = ! empty( $data['query'] ) ? $data['query'] : array();
+				$query_args = ! empty( $data['query'] ) ? $this->sanitize_query( $data['query'] ) : array();
 				$query_args = wp_parse_args( $query_args, $default_query_args );
 
 				if ( ! empty( $data['q'] ) ) {

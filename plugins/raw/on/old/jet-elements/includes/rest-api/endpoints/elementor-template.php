@@ -41,6 +41,10 @@ class Elementor_Template extends Base {
 				'default'    => 'false',
 				'required'   => false,
 			),
+            'signature' => array(
+                'default'  => '',
+                'required' => true,
+            ),
 		);
 	}
 
@@ -219,4 +223,44 @@ class Elementor_Template extends Base {
 		return false;
 	}
 
+	/**
+     * Generate a unique ID for your website
+    */
+
+	function generate_template_signature( $template_id ) {
+		$unique_id = get_option( 'jet_elements_unique_id' );
+	
+		if ( empty( $unique_id ) ) {
+			$unique_id = time();
+			update_option( 'jet_elements_unique_id', $unique_id );
+		}
+
+		$key = defined( 'NONCE_KEY' ) ? NONCE_KEY : '';
+	
+		return md5( $unique_id . $template_id . $key );
+	}
+
+	/**
+	 * Is public endpoint.
+	 *
+	 * @return bool
+	 */
+
+    public function permission_callback( $request ) {
+        $args = $request->get_params();
+        $template_id = isset( $args['id'] ) ? intval( $args['id'] ) : 0;
+        $received_signature = isset( $args['signature'] ) ? sanitize_text_field( $args['signature'] ) : '';
+
+        if ( ! $template_id || empty( $received_signature ) ) {
+            return new \WP_Error( 'rest_forbidden', __( 'Access denied.', 'jet-elements' ), [ 'status' => 403 ] );
+        }
+
+        $expected_signature = $this->generate_template_signature( $template_id );
+
+        if ( $received_signature !== $expected_signature ) {
+            return new \WP_Error( 'rest_forbidden', __( 'Invalid request signature.', 'jet-elements' ), [ 'status' => 403 ] );
+        }
+
+        return true;
+    }
 }

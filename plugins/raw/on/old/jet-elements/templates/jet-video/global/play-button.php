@@ -22,6 +22,7 @@ if ( ! empty( $settings['play_button_hover_animation'] ) ) {
 	if ( 'icon' === $settings['play_button_type'] ) {
 		$this->_icon( 'play_button_icon', '<span class="jet-elements-icon jet-video__play-button-icon">%s</span>' );
 	} elseif ( 'image' === $settings['play_button_type'] ) {
+		// phpcs:disable
 		echo jet_elements_tools()->get_image_by_url(
 			$settings['play_button_image']['url'],
 			array(
@@ -29,6 +30,7 @@ if ( ! empty( $settings['play_button_hover_animation'] ) ) {
 				'alt'   => esc_html__( 'Play Video', 'jet-elements' ),
 			)
 		);
+		// phpcs:enable
 	} ?>
 	<span class="elementor-screen-only"><?php esc_html_e( 'Play Video', 'jet-elements' ); ?></span>
 </div>

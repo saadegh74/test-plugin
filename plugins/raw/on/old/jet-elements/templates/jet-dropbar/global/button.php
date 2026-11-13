@@ -18,7 +18,7 @@ if ( isset( $settings['button_hover_animation'] ) && $settings['button_hover_ani
 	if ( 'text' === $button_type ) {
 		$this->_html( 'button_text', '<span class="jet-dropbar__button-text">%s</span>' );
 	} else {
-		echo $this->_button_image_item();
+		echo $this->_button_image_item(); // phpcs:ignore
 	}
 	$this->_icon( 'button_after_icon', '<span class="jet-elements-icon jet-dropbar__button-icon jet-dropbar__button-icon--after">%s</span>' );
 ?></button>

@@ -42,8 +42,16 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() { 
+		return array( 'jet-circle-progress', 'jet-circle-progress-skin' ); 
+	}
+
 	public function get_script_depends() {
-		return array( 'jquery-numerator' );
+		return array( 'jquery-numerator', 'jet-circle-progress' );
 	}
 
 	protected function register_controls() {
@@ -319,7 +327,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				),
 				'default'     => 'color',
 				'label_block' => false,
-				'render_type' => 'ui',
+				'render_type' => 'template',
 			)
 		);
 
@@ -335,6 +343,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'condition' => array(
 					'bg_stroke_type' => array( 'color' ),
 				),
+				'render_type' => 'template',
 			)
 		);
 
@@ -350,6 +359,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'condition' => array(
 					'bg_stroke_type' => array( 'gradient' ),
 				),
+				'render_type' => 'template',
 			)
 		);
 
@@ -365,6 +375,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'condition' => array(
 					'bg_stroke_type' => array( 'gradient' ),
 				),
+				'render_type' => 'template',
 			)
 		);
 
@@ -400,7 +411,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				),
 				'default'     => 'color',
 				'label_block' => false,
-				'render_type' => 'ui',
+				'render_type' => 'template',
 			)
 		);
 
@@ -409,13 +420,15 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 			array(
 				'label'     => esc_html__( 'Value Stroke Color', 'jet-elements' ),
 				'type'      => Controls_Manager::COLOR,
-				'default'   => '#6ec1e4',
 				'selectors' => array(
 					'{{WRAPPER}} .circle-progress__value'  => 'stroke: {{VALUE}};',
 				),
 				'condition' => array(
 					'val_stroke_type' => array( 'color' ),
 				),
+				'default'   => '#6ec1e4',
+				'label_block' => false,
+				'render_type' => 'template',
 			)
 		);
 
@@ -431,6 +444,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'condition' => array(
 					'val_stroke_type' => array( 'gradient' ),
 				),
+				'render_type' => 'template',
 			)
 		);
 
@@ -446,6 +460,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'condition' => array(
 					'val_stroke_type' => array( 'gradient' ),
 				),
+				'render_type' => 'template',
 			)
 		);
 
@@ -750,6 +765,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'selectors' => array(
 					'{{WRAPPER}} .circle-counter .circle-counter__title' => 'color: {{VALUE}}',
 				),
+				'render_type' => 'template',
 			),
 			25
 		);
@@ -800,6 +816,7 @@ class Jet_Elements_Circle_Progress extends Jet_Elements_Base {
 				'selectors' => array(
 					'{{WRAPPER}} .circle-counter .circle-counter__subtitle' => 'color: {{VALUE}}',
 				),
+				'render_type' => 'template',
 			),
 			25
 		);

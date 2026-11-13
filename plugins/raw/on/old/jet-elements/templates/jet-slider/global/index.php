@@ -10,6 +10,6 @@ $classes_list[] = 'jet-slider__image-' . $settings['slide_image_scale_mode'];
 $classes = implode( ' ', $classes_list );
 ?>
 
-<div class="<?php echo $classes; ?>" <?php echo $data_settings; ?>>
+<div class="<?php echo esc_attr( $classes ); ?>" <?php echo wp_kses_data( $data_settings ); ?>>
 	<?php $this->_get_global_looped_template( 'slider', 'item_list' ); ?>
 </div>

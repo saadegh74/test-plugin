@@ -25,7 +25,7 @@ if ( $has_tooltips ) {
 }
 
 ?>
-<div class="pricing-table <?php $this->_html( 'featured', 'featured-table' ); ?>"<?php echo $tooltips_attr; ?>>
+<div class="pricing-table <?php $this->_html( 'featured', 'featured-table' ); ?>"<?php echo wp_kses_post( $tooltips_attr ); ?>>
 	<?php if ( 'inside' === $icon_position ) {
 		$this->_glob_inc_if( 'heading', array( $this->_new_icon_prefix . 'icon', 'icon', 'title', 'subtitle' ) );
 	} else {

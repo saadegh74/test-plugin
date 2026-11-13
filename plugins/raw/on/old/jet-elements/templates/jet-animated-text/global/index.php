@@ -20,8 +20,8 @@ if ( ! empty( $settings['animated_text_link']['url'] ) ) {
 }
 ?>
 
-<<?php echo $tag; ?> <?php echo $this->get_render_attribute_string( 'button' );?> <?php echo $data_settings; ?>>
+<<?php echo $tag; ?> <?php echo $this->get_render_attribute_string( 'button' ); ?> <?php echo $data_settings; // phpcs:ignore ?>>
 	<?php $this->_glob_inc_if( 'before-text', array( 'before_text_content' ) ); ?>
 	<?php $this->_get_global_looped_template( 'animated-text', 'animated_text_list' ); ?>
 	<?php $this->_glob_inc_if( 'after-text', array( 'after_text_content' ) ); ?>
-</<?php echo $tag; ?>>
+</<?php echo $tag; // phpcs:ignore ?>>

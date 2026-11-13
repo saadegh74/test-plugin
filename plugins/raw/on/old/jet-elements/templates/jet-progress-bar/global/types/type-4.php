@@ -5,5 +5,5 @@
 	<div class="jet-progress-bar__wrapper">
 		<div class="jet-progress-bar__status-bar"></div>
 	</div>
-	<div class="jet-progress-bar__percent"><?php echo $percent_html ?></div>
+	<div class="jet-progress-bar__percent"><?php echo $percent_html // phpcs:ignore ?></div>
 </div>

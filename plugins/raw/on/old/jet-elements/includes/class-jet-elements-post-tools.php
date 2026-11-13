@@ -56,11 +56,11 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 				$title     = ( 'post' === $type ) ? $object->post_title : $object->name;
 				$title_cut = $title;
 
-				$title     = ( $args['title'] ) ? 'title="' . $args['title'] . '"' : 'title="' . $title . '"';
+				$title     = ( $args['title'] ) ? 'title="' . esc_attr( $args['title'] ) . '"' : 'title="' . esc_attr( $title ) . '"';
 				$title_cut = $this->cut_text( $title_cut, $args['length'], $args['trimmed_type'], $args['ending'] );
 
 				$link       = ( 'post' === $type ) ? $this->get_post_permalink() : $this->get_term_permalink( $object->term_id );
-				$html_class = ( $args['class'] ) ? 'class="' . $args['class'] . '"' : '' ;
+				$html_class = ( $args['class'] ) ? 'class="' . esc_attr( $args['class'] ) . '"' : '' ;
 
 				$html = sprintf( $args['html'], $html_class, $link, $title, $title_cut );
 			}
@@ -113,7 +113,7 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 				$text = $this->cut_text( $text, $args['length'], $args['trimmed_type'], $args['ending'], $is_content );
 
 				if ( $text ) {
-					$html_class = ( $args['class'] ) ? 'class="' . $args['class'] . '"' : '' ;
+					$html_class = ( $args['class'] ) ? 'class="' . esc_attr( $args['class'] ) . '"' : '' ;
 
 					$html = sprintf( $args['html'], $html_class, $text );
 				}
@@ -152,12 +152,12 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 			$html = '' ;
 
 			if ( filter_var( $args['visible'], FILTER_VALIDATE_BOOLEAN ) ) {
-				$html_class = ( $args['class'] ) ? 'class="' . $args['class'] . '"' : '';
-				$title      = ( $args['title'] ) ? 'title="' . $args['title'] . '"' : '';
+				$html_class = ( $args['class'] ) ? 'class="' . esc_attr( $args['class'] ) . '"' : '';
+				$title      = ( $args['title'] ) ? 'title="' . esc_attr( $args['title'] ) . '"' : '';
 				$author     = get_the_author();
 				$link       = get_author_posts_url( $object->post_author );
 
-				$html = sprintf( $args['html'], $args['prefix'], $link, $title, $html_class, $args['icon'], $author );
+				$html = sprintf( $args['html'], wp_kses_post( $args['prefix'] ), esc_url( $link ), $title, $html_class, $args['icon'], wp_kses_post( $author ) );
 			}
 
 			return $this->output_method( $html, $args['echo'] );
@@ -244,11 +244,11 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 					$count = sprintf( $suffix, $object->comment_count );
 				}
 
-				$html_class = ( $args['class'] ) ? 'class="' . $args['class'] . '"' : '';
-				$title = ( $args['title'] ) ? 'title="' . $args['title'] . '"' : '';
+				$html_class = ( $args['class'] ) ? 'class="' . esc_attr( $args['class'] ) . '"' : '';
+				$title = ( $args['title'] ) ? 'title="' . esc_attr( $args['title'] ) . '"' : '';
 				$link = get_comments_link();
 
-				$html = sprintf( $args['html'], $args['prefix'], $link, $title, $html_class, $args['icon'], $count );
+				$html = sprintf( $args['html'], wp_kses_post( $args['prefix'] ), esc_url( $link ), $title, $html_class, $args['icon'], wp_kses_post( $count ) );
 			}
 
 			return $this->output_method( $html, $args['echo'] );
@@ -286,7 +286,7 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 
 				if ( $args['text'] || $args['icon'] ) {
 
-					$html_class = ( $args['class'] ) ? 'class="' . $args['class'] . '"' : '' ;
+					$html_class = ( $args['class'] ) ? 'class="' . esc_attr( $args['class'] ) . '"' : '' ;
 					$text = esc_html( $args['text'] );
 
 					if ( 'term' === $type ) {
@@ -298,7 +298,7 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 						$link = esc_url( get_the_permalink() );
 					}
 
-					$title = ( $args['title'] ) ? 'title="' . $args['title'] . '"' : 'title="' . $title . '"' ;
+					$title = ( $args['title'] ) ? 'title="' . esc_attr( $args['title'] ) . '"' : 'title="' . esc_attr( $title ) . '"' ;
 					$html = sprintf( $args['html'], $link, $title, $html_class, wp_kses( $text, wp_kses_allowed_html( 'post' ) ), $args['icon'] );
 				}
 			}
@@ -497,7 +497,7 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 			if ( ! filter_var( $echo, FILTER_VALIDATE_BOOLEAN ) ) {
 				return $content;
 			} else {
-				echo $content;
+				echo $content; // phpcs:ignore
 			}
 		}
 
@@ -577,11 +577,9 @@ if ( ! class_exists( 'Jet_Elementst_Post_Tools' ) ) {
 				} else {
 					$text = wp_html_excerpt( $text, $length, $after );
 				}
-			} else {
-				$text = wp_kses_post( $text );
 			}
 
-			return $text;
+			return wp_kses_post( $text );
 		}
 
 		/**

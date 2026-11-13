@@ -40,8 +40,16 @@ class Jet_Elements_Scroll_Navigation extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() { 
+		return array( 'jet-scroll-navigation', 'jet-scroll-navigation-skin' ); 
+	}
+
 	public function get_script_depends() {
-		return array( 'jet-resize-sensor' );
+		return array( 'jet-resize-sensor', 'jet-scroll-navigation' );
 	}
 
 	protected function register_controls() {
@@ -64,7 +72,7 @@ class Jet_Elements_Scroll_Navigation extends Jet_Elements_Base {
 			)
 		);
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$this->_add_advanced_icon_control(
 			'item_icon',
@@ -161,14 +169,14 @@ class Jet_Elements_Scroll_Navigation extends Jet_Elements_Base {
 			)
 		);
 
-		$this->add_control(
-			'speed',
-			array(
-				'label'   => esc_html__( 'Scroll Speed', 'jet-elements' ),
-				'type'    => Controls_Manager::NUMBER,
-				'default' => 500,
-			)
-		);
+		// $this->add_control(
+		// 	'speed',
+		// 	array(
+		// 		'label'   => esc_html__( 'Scroll Speed', 'jet-elements' ),
+		// 		'type'    => Controls_Manager::NUMBER,
+		// 		'default' => 500,
+		// 	)
+		// );
 
 		$this->add_control(
 			'offset',
@@ -176,6 +184,16 @@ class Jet_Elements_Scroll_Navigation extends Jet_Elements_Base {
 				'label'   => esc_html__( 'Scroll Offset', 'jet-elements' ),
 				'type'    => Controls_Manager::NUMBER,
 				'default' => 0,
+			)
+		);
+
+		$this->add_control(
+			'scroll_threshold',
+			array(
+				'label'   => esc_html__( 'Scroll Threshold (px)', 'jet-elements' ),
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 5,
+				'min'     => 0,
 			)
 		);
 
@@ -716,17 +734,21 @@ class Jet_Elements_Scroll_Navigation extends Jet_Elements_Base {
 		$settings = $this->get_settings();
 
 		$instance_settings = array(
-			'position'              => $settings['position'],
-			'speed'                 => absint( $settings['speed'] ),
+			'position'              => $this->ensure_allowed_value( $settings['position'], array( 'right', 'left' ) ),
+			//'speed'                 => absint( $settings['speed'] ),
 			'offset'                => absint( $settings['offset'] ),
+			'scroll_threshold'		=> absint( $settings['scroll_threshold'] ),
 			'sectionSwitch'         => filter_var( $settings['full_section_switch'], FILTER_VALIDATE_BOOLEAN ),
 			'sectionSwitchOnMobile' => filter_var( $settings['full_section_switch_on_mobile'], FILTER_VALIDATE_BOOLEAN ),
-			'hintShowType'          => $settings['hint_show_type'],
+			'hintShowType'          => $this->ensure_allowed_value( $settings['hint_show_type'], array( 'show-active-hint', 'show-hint-on-hover' ) ),
 			'sectionIdVisibility'   => filter_var( $settings['section_id_visibility'], FILTER_VALIDATE_BOOLEAN ),
 		);
 
-		$instance_settings = json_encode( $instance_settings );
+		$instance_settings = wp_json_encode( $instance_settings );
 
-		return sprintf( 'data-settings=\'%1$s\'', $instance_settings );
+		// Escape the JSON string for safe use in HTML attributes
+		$data_settings_attribute = esc_attr( $instance_settings );
+
+		return sprintf( 'data-settings=\'%1$s\'', $data_settings_attribute );
 	}
 }

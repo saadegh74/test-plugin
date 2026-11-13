@@ -1,6 +1,6 @@
-# سیستم توزیع و سرور به‌روزرسانی هوشمند وردپرس (برند تست)
+# سیستم توزیع و سرور به‌روزرسانی هوشمند افزونه‌های وردپرس
 
-این مخزن به عنوان مخزن مرکزی و سرور توزیع دوکاناله (**آزمایشی / Staging** و **محصول نهایی / Production**) برای افزونه‌ها و قالب‌های پچ‌شده و شخصی‌سازی‌شده تحت نام تجاری **برند تست** طراحی و ساختاربندی شده است.
+این مخزن به عنوان مخزن مرکزی و سرور توزیع دوکاناله (**آزمایشی / Staging** و **محصول نهایی / Production**) برای افزونه‌ها و قالب‌های پچ‌شده و شخصی‌سازی‌شده طراحی و ساختاربندی شده است.
 
 ---
 
@@ -56,6 +56,9 @@ plugins/raw/
 plugins/updates/
 ├── up-on/                                  <-- کانال‌های توزیع و آپدیت افزونه‌های متصل به آپدیتر
 │   ├── staging/                            <-- محیط آزمایشی (Staging) جهت تست و بررسی اولیه
+│   │   ├── jet-elements/
+│   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
+│   │   │   └── jet-elements-v2.9.2.8.zip   <-- فایل فشرده با نام استاندارد جهت تست
 │   │   ├── jet-blocks/
 │   │   │   ├── info.json                   <-- فایل متادیتای آپدیت محیط تست
 │   │   │   └── jet-blocks-v1.3.12.zip      <-- فایل فشرده با نام استاندارد جهت تست
@@ -63,7 +66,7 @@ plugins/updates/
 │   │       ├── info.json
 │   │       └── all-in-one-wp-migration-unlimited-extension-v2.86.zip
 │   │
-│   └── production/                         <-- محیط محصول پایدار (Production) جهت تحویل نهایی به کاربران
+│   └── production/                         <-- محیط محصول پایدار (Production) جهت تحویل نهایی به کاربران (تنها پس از تست و تأیید در Staging)
 │       ├── jet-blocks/
 │       │   ├── info.json                   <-- فایل متادیتای آپدیت محیط پروداکشن
 │       │   └── jet-blocks-v1.3.12-[کد_محرمانه_عددی].zip <-- فایل فشرده محافظت‌شده با پسوند عددی اختصاصی
@@ -73,6 +76,8 @@ plugins/updates/
 │
 ├── up-old/                                 <-- کانال بسته‌ها و آپدیت‌های آرشیوی / نسخه‌های مرجع
 │   ├── staging/
+│   │   └── jet-elements/
+│   │       └── jet-elements-v2.6.13.1.zip  <-- آرشیو نسخه قبلی جهت بازگشت یا استفاده مجدد
 │   └── production/
 │
 └── up-side/                                <-- کانال بسته‌های قالب‌ها و افزونه‌های جانبی
@@ -86,6 +91,15 @@ plugins/updates/
 ---
 
 ## ۳. لیست افزونه‌های فعال و آدرس‌های اندپوینت (Endpoints)
+
+### افزونه JetElements For Elementor (نسخه 2.9.2.8)
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-elements/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-elements/jet-elements-v2.9.2.8.zip`
+* **کانال پایدار (Production):**
+  * *طبق قانون مخزن، تا زمان تست و تأیید نهایی در کانال آزمایشی، در پروداکشن قرار نمی‌گیرد.*
+* **آرشیو نسخه قبلی (up-old):**
+  * لینک دانلود نسخه 2.6.13.1: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-old/staging/jet-elements/jet-elements-v2.6.13.1.zip`
 
 ### افزونه JetBlocks For Elementor (نسخه 1.3.12)
 * **کانال Staging:**

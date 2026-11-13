@@ -12,7 +12,7 @@ if ( empty( $video_url ) ) {
 $video_html = $this->get_video_html();
 
 if ( empty( $video_html ) ) {
-	echo $video_url;
+	echo esc_url( $video_url );
 
 	return;
 }
@@ -46,7 +46,7 @@ if ( $settings['lightbox'] ) {
 
 <div <?php $this->print_render_attribute_string( 'wrapper' ); ?>><?php
 	if ( ! $settings['lightbox'] ) {
-		echo $video_html;
+		echo $video_html; // phpcs:ignore
 	}
 
 	include $this->_get_global_template( 'overlay' );

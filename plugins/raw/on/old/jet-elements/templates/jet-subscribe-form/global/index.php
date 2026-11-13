@@ -38,14 +38,14 @@ if ( filter_var( $use_icon, FILTER_VALIDATE_BOOLEAN ) ) {
 }
 
 ?>
-<div <?php echo $this->get_render_attribute_string( 'main-container' ); ?>>
+<div <?php echo $this->get_render_attribute_string( 'main-container' ); // phpcs:ignore ?>>
 	<form method="POST" action="#" class="jet-subscribe-form__form">
 		<div class="jet-subscribe-form__input-group">
 			<div class="jet-subscribe-form__fields">
-				<input <?php echo $this->get_render_attribute_string( 'form-input' ); ?>><?php
+				<input <?php echo $this->get_render_attribute_string( 'form-input' ); // phpcs:ignore ?>><?php
 					$this->generate_additional_fields();
 				?></div>
-			<?php echo sprintf( '<a class="jet-subscribe-form__submit elementor-button elementor-size-md" href="#">%s<span class="jet-subscribe-form__submit-text">%s</span></a>', $icon_html, $submit_button_text ); ?>
+			<?php echo sprintf( '<a class="jet-subscribe-form__submit elementor-button elementor-size-md" href="#">%s<span class="jet-subscribe-form__submit-text">%s</span></a>', $icon_html, esc_html( $submit_button_text ) ); // phpcs:ignore ?>
 		</div>
 		<div class="jet-subscribe-form__message"><div class="jet-subscribe-form__message-inner"><span></span></div></div>
 	</form>

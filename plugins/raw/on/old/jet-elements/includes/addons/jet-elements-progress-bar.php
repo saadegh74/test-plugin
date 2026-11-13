@@ -42,8 +42,16 @@ class Jet_Elements_Progress_Bar extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() { 
+		return array( 'jet-progress-bar', 'jet-progress-bar-skin' ); 
+	}
+
 	public function get_script_depends() {
-		return array( 'jet-anime-js' );
+		return array( 'jet-anime-js', 'jet-progress-bar' );
 	}
 
 	protected function register_controls() {
@@ -57,6 +65,7 @@ class Jet_Elements_Progress_Bar extends Jet_Elements_Base {
 				'progress_wrapper' => '.jet-progress-bar__wrapper',
 				'status_bar'       => '.jet-progress-bar__status-bar',
 				'percent'          => '.jet-progress-bar__percent',
+				'completed_bar'    => '.jet-progress-bar--completed .jet-progress-bar__status-bar',
 			)
 		);
 
@@ -355,6 +364,25 @@ class Jet_Elements_Progress_Bar extends Jet_Elements_Base {
 				),
 			),
 			75
+		);
+
+		$this->_add_control(
+			'completed_bar_heading',
+			array(
+				'label' => esc_html__( 'Сompleted Bar', 'jet-elements' ),
+				'type'  => Controls_Manager::HEADING,
+				'separator' => 'before',
+			),
+			25
+		);
+
+		$this->_add_group_control(
+			Group_Control_Background::get_type(),
+			array(
+				'name'     => 'completed_bar_background',
+				'selector' => '{{WRAPPER}} ' . $css_scheme['completed_bar'],
+			),
+			25
 		);
 
 		$this->_end_controls_section();

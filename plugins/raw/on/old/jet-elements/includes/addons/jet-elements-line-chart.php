@@ -57,13 +57,17 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 		return false;
 	}
 
+	public function get_style_depends() { 
+		return array( 'jet-charts' ); 
+	}
+
 	/**
 	 * Retrieve the list of scripts the widget depended on.
 	 *
 	 * @return array
 	 */
 	public function get_script_depends() {
-		return array( 'chart-js' );
+		return array( 'chart-js', 'jet-line-chart' );
 	}
 
 	/**
@@ -116,10 +120,20 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 		$this->add_control(
 			'axis_range',
 			array(
-				'label'       => esc_html__( 'Scale Axis Range', 'jet-elements' ),
+				'label'       => esc_html__( 'Max Scale Axis Range', 'jet-elements' ),
 				'type'        => Controls_Manager::NUMBER,
 				'default'     => 10,
 				'description' => esc_html__( 'User defined maximum number for the scale, overrides maximum value from data.', 'jet-elements' ),
+				'dynamic'     => array( 'active' => true ),
+			)
+		);
+
+		$this->add_control(
+			'axis_range_min',
+			array(
+				'label'       => esc_html__( 'Min Scale Axis Range', 'jet-elements' ),
+				'type'        => Controls_Manager::NUMBER,
+				'description' => esc_html__( 'User defined minimum number for the scale, overrides minimum value from data.', 'jet-elements' ),
 				'dynamic'     => array( 'active' => true ),
 			)
 		);
@@ -138,7 +152,7 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'chart_data' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 		
 		$repeater->start_controls_tabs( 'line_tabs' );
 		
@@ -231,7 +245,7 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 						'point_bg_color'     => '#55acee',
 					),
 				),
-				'title_field' => '{{{ label }}}',
+				'title_field' => '{{ label }}',
 			)
 		);
 
@@ -1019,8 +1033,8 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 		] );
 		
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'container' ); ?>>
-			<canvas <?php echo $this->get_render_attribute_string( 'canvas' ); ?>></canvas>
+		<div <?php echo $this->get_render_attribute_string( 'container' ); // phpcs:ignore ?>>
+			<canvas <?php echo $this->get_render_attribute_string( 'canvas' ); // phpcs:ignore ?>></canvas>
 		</div>
 		<?php
 		$this->_close_wrap();
@@ -1067,7 +1081,43 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 	}
 	
 	/**
-	 * Get prepare chart data.
+	 * Validate a literal CSS color before serializing chart settings.
+	 *
+	 * @param mixed  $color    Color from widget or global settings.
+	 * @param string $fallback Valid default color.
+	 * @return string Valid color or the default for unsupported values.
+	 */
+	private function sanitize_chart_color( $color, $fallback ) {
+		if ( ! is_string( $color ) || strlen( $color ) > 128 ) {
+			return $fallback;
+		}
+
+		$color = trim( $color );
+
+		if ( preg_match( '/\A#(?:[a-f0-9]{3}|[a-f0-9]{4}|[a-f0-9]{6}|[a-f0-9]{8})\z/i', $color ) ) {
+			return $color;
+		}
+
+		// Only numeric color components are allowed, never CSS declarations or URLs.
+		$number = '[+-]?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)';
+		$channel = $number . '%?';
+		$hue = $number . '(?:deg|grad|rad|turn)?';
+		$rgb = $channel . '(?:\s*,\s*' . $channel . '){2}(?:\s*,\s*' . $channel . ')?';
+		$rgb_space = $channel . '\s+' . $channel . '\s+' . $channel . '(?:\s*/\s*' . $channel . ')?';
+		$hsl = $hue . '\s*,\s*' . $number . '%\s*,\s*' . $number . '%(?:\s*,\s*' . $channel . ')?';
+		$hsl_space = $hue . '\s+' . $number . '%\s+' . $number . '%(?:\s*/\s*' . $channel . ')?';
+
+		if ( preg_match( '~\A(?:rgba?\(\s*(?:' . $rgb . '|' . $rgb_space . ')\s*\)|hsla?\(\s*(?:' . $hsl . '|' . $hsl_space . ')\s*\))\z~i', $color ) ) {
+			return $color;
+		}
+
+		$named_colors = 'aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato transparent turquoise violet wheat white whitesmoke yellow yellowgreen';
+
+		return '' !== $color && false !== strpos( ' ' . $named_colors . ' ', ' ' . strtolower( $color ) . ' ' ) && preg_match( '/\A[a-z]+\z/i', $color ) ? $color : $fallback;
+	}
+
+	/**
+	 * Prepare chart data with validated dataset colors, including global colors.
 	 *
 	 * @return array
 	 */
@@ -1082,13 +1132,17 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 
 			$item_data = $this->get_global_colors($item_data);
 
+			foreach ( array( 'bg_color' => 'rgba(206,206,206,0.4)', 'border_color' => '#7a7a7a', 'point_bg_color' => '#7a7a7a' ) as $key => $fallback ) {
+				$item_data[ $key ] = $this->sanitize_chart_color( isset( $item_data[ $key ] ) ? $item_data[ $key ] : '', $fallback );
+			}
+
 			$item_data['label']                = ! empty( $item_data['label'] ) ? $item_data['label'] : '';
 			$item_data['data']                 = ! empty( $item_data['data'] ) ? array_map( 'floatval', explode( ',', $item_data['data'] ) ) : '';
-			$item_data['backgroundColor']      = ! empty( $item_data['bg_color'] ) ? $item_data['bg_color'] : 'rgba(206,206,206,0.4)';
-			$item_data['borderColor']          = ! empty( $item_data['border_color'] ) ? $item_data['border_color'] : '#7a7a7a';
+			$item_data['backgroundColor']      = $item_data['bg_color'];
+			$item_data['borderColor']          = $item_data['border_color'];
 			$item_data['borderWidth']          = ( '' !== $settings['chart_border_width']['size'] ) ? $settings['chart_border_width']['size'] : 1;
-			$item_data['pointBorderColor']     = ! empty( $item_data['point_bg_color'] ) ? $item_data['point_bg_color'] : '#7a7a7a';
-			$item_data['pointBackgroundColor'] = ! empty( $item_data['point_bg_color'] ) ? $item_data['point_bg_color'] : '#7a7a7a';
+			$item_data['pointBorderColor']     = $item_data['point_bg_color'];
+			$item_data['pointBackgroundColor'] = $item_data['point_bg_color'];
 			$item_data['pointRadius']          = ( '' !== $settings['chart_border_width']['size'] ) ? $settings['chart_border_width']['size'] : 1;
 			$item_data['pointHoverRadius']     = ( '' !== $settings['chart_border_width']['size'] ) ? $settings['chart_border_width']['size'] : 1;
 			$item_data['pointBorderWidth']     = 0;
@@ -1161,16 +1215,23 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 			}
 		}
 		
+		$axis_ticks = array(
+			'display'     => $labels_display,
+			'beginAtZero' => true,
+			'stepSize'    => isset($settings['step_size']) ? intval($settings['step_size']) : 1,
+		);
+		if (isset($settings['axis_range']) && $settings['axis_range'] !== '') {
+			$axis_ticks['max'] = intval($settings['axis_range']);
+		}
+		if (isset($settings['axis_range_min']) && $settings['axis_range_min'] !== '') {
+			$axis_ticks['min'] = intval($settings['axis_range_min']);
+		}
+
 		if ( $grid_display ) {
 			$options['scales'] = array(
 				'yAxes' => array( array(
 					'stacked'     => false,
-					'ticks'       => array(
-						'display'     => $labels_display,
-						'beginAtZero' => true,
-						'max'         => isset( $settings['axis_range'] ) ? intval( $settings['axis_range'] ) : 10,
-						'stepSize'    => isset( $settings['step_size'] ) ? intval( $settings['step_size'] ) : 1,
-					),
+					'ticks'       => $axis_ticks,
 					'gridLines'   => array(
 						'drawBorder'    => false,
 						'zeroLineColor' => isset( $settings['chart_grid_color'] ) ? $settings['chart_grid_color'] : 'rgba(0,0,0,0.05)',
@@ -1178,12 +1239,7 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 					)
 				) ),
 				'xAxes' => array( array(
-					'ticks'     => array(
-						'display'     => $labels_display,
-						'beginAtZero' => true,
-						'max'         => isset( $settings['axis_range'] ) ? intval( $settings['axis_range'] ) : 10,
-						'stepSize'    => isset( $settings['step_size'] ) ? intval( $settings['step_size'] ) : 1,
-					),
+					'ticks'     => $axis_ticks,
 					'gridLines' => array(
 						'drawBorder' => false,
 						'color'      => isset( $settings['chart_grid_color'] ) ? $settings['chart_grid_color'] : 'rgba(0,0,0,0.05)',
@@ -1194,23 +1250,13 @@ class Jet_Elements_Line_Chart extends Jet_Elements_Base {
 			$options['scales'] = array(
 				'stacked'     => true,
 				'yAxes' => array( array(
-					'ticks' => array(
-						'display'     => $labels_display,
-						'beginAtZero' => true,
-						'max'         => isset( $settings['axis_range'] ) ? intval( $settings['axis_range'] ) : 10,
-						'stepSize'    => isset( $settings['step_size'] ) ? intval( $settings['step_size'] ) : 1,
-					),
+					'ticks' => $axis_ticks,
 					'gridLines' => array(
 						'display'    => false,
 					)
 				) ),
 				'xAxes' => array( array(
-					'ticks' => array(
-						'display'     => $labels_display,
-						'beginAtZero' => true,
-						'max'         => isset( $settings['axis_range'] ) ? intval( $settings['axis_range'] ) : 10,
-						'stepSize'    => isset( $settings['step_size'] ) ? intval( $settings['step_size'] ) : 1,
-					),
+					'ticks' => $axis_ticks,
 					'gridLines' => array(
 						'display'    => false,
 					)

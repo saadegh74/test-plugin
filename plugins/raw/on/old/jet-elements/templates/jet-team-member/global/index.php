@@ -23,8 +23,9 @@ if ( filter_var( $show_on_hover, FILTER_VALIDATE_BOOLEAN ) ) {
 $classes = implode( ' ', $classes_list );
 
 ?>
-<div class="<?php echo $classes; ?>">
+<div class="<?php echo esc_attr( $classes ); ?>">
 	<div class="jet-team-member__inner">
+	<?php // phpcs:disable ?>
 		<div class="jet-team-member__image">
 			<div class="jet-team-member__cover"><?php
 				echo $this->_generate_name( true );
@@ -41,4 +42,5 @@ $classes = implode( ' ', $classes_list );
 			echo $this->_generate_social_icon_list();
 			echo $this->_generate_action_button(); ?></div>
 	</div>
+	<?php // phpcs:enable ?>
 </div>

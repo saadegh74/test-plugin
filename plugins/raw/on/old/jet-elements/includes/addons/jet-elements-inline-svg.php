@@ -40,6 +40,14 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() {
+		return array( 'jet-inline-svg' );
+	}
+
 	protected function register_controls() {
 		$css_scheme = apply_filters(
 			'jet-elements/jet-inline-svg/css-scheme',
@@ -64,6 +72,7 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 			array(
 				'label'   => esc_html__( 'SVG', 'jet-elements' ),
 				'type'    => Controls_Manager::MEDIA,
+				'media_type' => 'svg',
 				'default' => array(
 					'url' => '',
 				),
@@ -130,9 +139,7 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 			array(
 				'label'      => esc_html__( 'Width', 'jet-elements' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array(
-					'px', 'custom'
-				),
+				'size_units' => array( 'px', '%', 'em', 'rem', 'vw', 'custom' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 10,
@@ -158,9 +165,7 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 			array(
 				'label'      => esc_html__( 'Height', 'jet-elements' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => array(
-					'px', 'custom'
-				),
+				'size_units' => array( 'px', '%', 'em', 'rem', 'vh', 'custom' ),
 				'range'      => array(
 					'px' => array(
 						'min' => 10,
@@ -250,15 +255,15 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 				'options'   => array(
 					'left'   => array(
 						'title' => esc_html__( 'Left', 'jet-elements' ),
-						'icon'  => 'fa fa-align-left',
+						'icon'  => 'eicon-text-align-left',
 					),
 					'center' => array(
 						'title' => esc_html__( 'Center', 'jet-elements' ),
-						'icon'  => 'fa fa-align-center',
+						'icon'  => 'eicon-text-align-center',
 					),
 					'right'  => array(
 						'title' => esc_html__( 'Right', 'jet-elements' ),
-						'icon'  => 'fa fa-align-right',
+						'icon'  => 'eicon-text-align-right',
 					),
 				),
 				'selectors' => array(
@@ -316,10 +321,10 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 			$tag = 'a';
 
 			if ( method_exists( $this, 'add_link_attributes' ) ) {
-				$this->add_link_attributes( 'svg_wrap', $settings['svg_link'] );
+				$this->add_link_attributes( 'svg_wrap', $this->sanitize_link_control( $settings['svg_link'] ) );
 				$this->add_render_attribute( 'svg_wrap', 'aria-label', 'SVG link' );
 			} else {
-				$this->add_render_attribute( 'svg_wrap', 'href', $settings['svg_link']['url'] );
+				$this->add_render_attribute( 'svg_wrap', 'href', esc_url( $settings['svg_link']['url'] ) );
 				$this->add_render_attribute( 'svg_wrap', 'aria-label', 'SVG link' );
 
 				if ( 'on' === $settings['svg_link']['is_external'] ) {
@@ -341,9 +346,9 @@ class Jet_Elements_Inline_Svg extends Jet_Elements_Base {
 		}
 
 		$this->_open_wrap();
-		echo '<div class="jet-inline-svg__wrapper"><' . $tag . ' ' . $this->get_render_attribute_string( 'svg_wrap' ) . '>';
-		echo $svg;
-		echo '</' . $tag . '></div>';
+		echo '<div class="jet-inline-svg__wrapper"><' . $tag . ' ' . $this->get_render_attribute_string( 'svg_wrap' ) . '>'; // phpcs:ignore
+		echo  $svg; // phpcs:ignore
+		echo '</' . $tag . '></div>'; // phpcs:ignore
 		$this->_close_wrap();
 	}
 

@@ -37,9 +37,12 @@ if ( $is_lightbox ) {
 	$is_external = $this->_loop_item( array( 'item_button_url', 'is_external') );
 	$link_target = 'on' === $is_external ? '_blank' : '';
 	$this->add_render_attribute( $link_instance, 'target', $link_target );
+	$is_nofollow = $this->_loop_item( array( 'item_button_url', 'nofollow') );
+	$rel = 'on' === $is_nofollow ? 'nofollow' : '';
+	$this->add_render_attribute( $link_instance, 'rel', $rel );
 }
 
-$this->add_render_attribute( $link_instance, 'href', $link_href );
+$this->add_render_attribute( $link_instance, 'href', esc_url( $link_href ) );
 
 if ( $is_lightbox ) {
 	$this->add_render_attribute( $link_instance, 'data-elementor-open-lightbox', 'yes' );
@@ -54,15 +57,15 @@ if ( $is_lightbox ) {
 }
 
 ?>
-<article <?php echo $this->get_render_attribute_string( $item_instance ); ?>>
+<article <?php echo $this->get_render_attribute_string( $item_instance ); // phpcs:ignore ?>>
 	<div class="jet-portfolio__inner">
-		<a <?php echo $this->get_render_attribute_string( $link_instance ); ?>>
+		<a <?php echo $this->get_render_attribute_string( $link_instance ); // phpcs:ignore ?>>
 			<div class="jet-portfolio__image">
-				<?php echo $this->_loop_image_item(); ?>
+				<?php echo $this->_loop_image_item(); // phpcs:ignore ?>
 				<div class="jet-portfolio__image-loader"><span></span></div>
 
 				<?php if ( ! $this->trp_edit_mode() ) :?>
-					<div class="jet-portfolio__cover"><?php echo $cover_icon; ?></div>
+					<div class="jet-portfolio__cover"><?php echo $cover_icon; // phpcs:ignore ?></div>
 				<?php endif;?>
 			</div>
 		</a>

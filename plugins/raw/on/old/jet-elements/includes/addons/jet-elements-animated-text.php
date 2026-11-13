@@ -41,8 +41,12 @@ class Jet_Elements_Animated_Text extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	public function get_style_depends() { 
+		return array( 'jet-animated-text', 'jet-animated-text-skin' ); 
+	}
+
 	public function get_script_depends() {
-		return array( 'jet-anime-js' );
+		return array( 'jet-anime-js', 'jet-animated-text' );
 	}
 
 	protected function register_controls() {
@@ -77,7 +81,7 @@ class Jet_Elements_Animated_Text extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'animated_text_list' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'item_text',
@@ -237,6 +241,10 @@ class Jet_Elements_Animated_Text extends Jet_Elements_Base {
 					'flex-end' => array(
 						'title' => esc_html__( 'End', 'jet-elements' ),
 						'icon'  => ! is_rtl() ? 'eicon-h-align-right' : 'eicon-h-align-left',
+					),
+					'space-between' => array(
+						'title' => esc_html__( 'Space between', 'jet-elements' ),
+						'icon'  => 'eicon-text-align-justify',
 					),
 				),
 				'selectors'  => array(
@@ -459,56 +467,60 @@ class Jet_Elements_Animated_Text extends Jet_Elements_Base {
 	}
 
 	/**
-	 * Generate spenned html string
+	 * Generate spanned html string
 	 *
-	 * @param  string $str Base text
+	 * @param  string $base_string Base text
+	 * @param  string $split_type  'symbol' or 'word'
 	 * @return string
 	 */
 	public function str_to_spanned_html( $base_string, $split_type = 'symbol' ) {
 
-		$module_settings = $this->get_settings_for_display();
-		$symbols_array = array();
 		$spanned_array = array();
 
-		$base_words = explode( ' ', $base_string );
+		// Sanitize once, up front, so entities/tags stay intact as single tokens
+		// instead of being torn apart when the string is split below.
+		$base_string = wp_kses_post( $base_string );
 
 		if ( 'symbol' === $split_type ) {
-			$glue = '';
-			$symbols_array = $this->_string_split( $base_string );
+			$glue   = '';
+			$tokens = $this->_string_split( $base_string );
 		} else {
-			$glue = '&nbsp;';
-			$symbols_array = $base_words;
+			$glue   = '&nbsp;';
+			$tokens = explode( ' ', $base_string );
 		}
 
-		foreach ( $symbols_array as $symbol ) {
+		foreach ( $tokens as $token ) {
 
-			if ( ' ' === $symbol ) {
-				$symbol = '&nbsp;';
+			if ( ' ' === $token || '' === $token ) {
+				$token = '&nbsp;';
 			}
 
-			$spanned_array[] = sprintf( '<span>%s</span>', $symbol );
+			// Don't wrap HTML tags themselves in a span, only visible text/entities.
+			if ( preg_match( '/^<[^>]+>$/', $token ) ) {
+				$spanned_array[] = $token;
+			} else {
+				$spanned_array[] = sprintf( '<span>%s</span>', $token );
+			}
 		}
 
 		return implode( $glue, $spanned_array );
 	}
 
 	/**
-	 * Split string
+	 * Split string into an array of tokens, treating HTML tags and HTML
+	 * entities as single atomic units so they are never split mid-token.
 	 *
-	 * @param  [type] $string [description]
-	 * @return [type]         [description]
+	 * @param  string $string
+	 * @return array
 	 */
 	public function _string_split( $string ) {
 
-		$strlen = mb_strlen( $string );
 		$result = array();
 
-		while ( $strlen ) {
+		preg_match_all( '/<[^>]+>|&(?:#[xX][0-9a-fA-F]+|#[0-9]+|[a-zA-Z0-9]+);|./us', $string, $matches );
 
-			$result[] = mb_substr( $string, 0, 1, "UTF-8" );
-			$string   = mb_substr( $string, 1, $strlen, "UTF-8" );
-			$strlen   = mb_strlen( $string );
-
+		if ( ! empty( $matches[0] ) ) {
+			$result = $matches[0];
 		}
 
 		return $result;
@@ -523,13 +535,16 @@ class Jet_Elements_Animated_Text extends Jet_Elements_Base {
 		$module_settings = $this->get_settings_for_display();
 
 		$settings = array(
-			'effect' => $module_settings['animation_effect'],
-			'delay'  => $module_settings['animation_delay'],
+			'effect' => $this->ensure_allowed_value( $module_settings['animation_effect'], array( 'fx1', 'fx2', 'fx3', 'fx4', 'fx5', 'fx6', 'fx7', 'fx8', 'fx9', 'fx10', 'fx11', 'fx12' ) ),
+			'delay'  => absint( $module_settings['animation_delay'] ),
 		);
 
-		$settings = json_encode( $settings );
+		$settings = wp_json_encode( $settings );
 
-		return sprintf( 'data-settings=\'%1$s\'', $settings );
+		// Escape the JSON string for safe use in HTML attributes
+		$data_settings_attribute = esc_attr( $settings );
+
+		return sprintf( 'data-settings=\'%1$s\'', $data_settings_attribute );
 	}
 
 	protected function render() {

@@ -1,6 +1,6 @@
 <?php
 /**
- * Features list end template
+ * Brands loop end template
  */
 ?>
 </div>

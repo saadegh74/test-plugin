@@ -39,9 +39,13 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 	public function get_categories() {
 		return array( 'cherry' );
 	}
+	
+	public function get_style_depends() { 
+		return array( 'jet-testimonials', 'jet-testimonials-skin' ); 
+	}
 
 	public function get_script_depends() {
-		return array( 'jet-slick' );
+		return array( 'jet-slick', 'jet-testimonials' );
 	}
 
 	protected function register_controls() {
@@ -76,7 +80,7 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'item_list' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'item_image',
@@ -244,6 +248,18 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 				'label_off'    => esc_html__( 'No', 'jet-elements' ),
 				'return_value' => 'true',
 				'default'      => '',
+			)
+		);
+
+		$this->add_control(
+			'image_lazyload',
+			array(
+				'label'        => esc_html__( 'Lazy Load Images', 'jet-elements' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Yes', 'jet-elements' ),
+				'label_off'    => esc_html__( 'No', 'jet-elements' ),
+				'return_value' => 'true',
+				'default'      => 'true',
 			)
 		);
 
@@ -2606,7 +2622,6 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 				'selectors'  => array(
 					'{{WRAPPER}} ' . $css_scheme['dots'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
-				'separator' => 'after',
 			),
 			50
 		);
@@ -2746,35 +2761,43 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 			'autoplay'       => filter_var( $settings['autoplay'], FILTER_VALIDATE_BOOLEAN ),
 			'infinite'       => filter_var( $settings['infinite'], FILTER_VALIDATE_BOOLEAN ),
 			'centerMode'     => filter_var( $settings['centered'], FILTER_VALIDATE_BOOLEAN ),
-			'centerPadding'  => ! empty( $settings['centered_padding'] ) ? $settings['centered_padding'] . 'px' : '50px',
+			'centerPadding'  => ! empty( $settings['centered_padding'] ) ? absint( $settings['centered_padding'] ) . 'px' : '50px',
 			'adaptiveHeight' => filter_var( $settings['adaptive_height'], FILTER_VALIDATE_BOOLEAN ),
 			'pauseOnHover'   => filter_var( $settings['pause_on_hover'], FILTER_VALIDATE_BOOLEAN ),
 			'speed'          => absint( $settings['speed'] ),
 			'arrows'         => filter_var( $settings['arrows'], FILTER_VALIDATE_BOOLEAN ),
 			'dots'           => filter_var( $settings['dots'], FILTER_VALIDATE_BOOLEAN ),
 			'slidesToScroll' => 1 < absint( $settings['slides_to_show'] ) ? absint( $settings['slides_to_scroll'] ) : 1,
-			'prevArrow'      => '.jet-testimonial__prev-arrow-' . $widget_id,
-			'nextArrow'      => '.jet-testimonial__next-arrow-' . $widget_id,
+			'prevArrow'      => '.jet-testimonial__prev-arrow-' . sanitize_key( $widget_id ),
+			'nextArrow'      => '.jet-testimonial__next-arrow-' . sanitize_key( $widget_id ),
 			'rtl'            => is_rtl(),
 		);
 
-		if ( 'fade' === $settings['effect'] && 1 >= absint( $settings['slides_to_show'] ) ) {
+		$effect = $this->ensure_allowed_value( $settings['effect'], array( 'slide', 'fade' ) );
+		if ( 'fade' === $effect && 1 >= absint( $settings['slides_to_show'] ) ) {
 			$instance_settings['fade'] = true;
 		}
 
 		$instance_settings = apply_filters( 'jet-elements/jet-testimonials/carousel-options', $instance_settings, $settings, $widget_id );
 
-		$instance_settings = json_encode( $instance_settings );
+		$instance_settings = wp_json_encode( $instance_settings );
 
-		return sprintf( 'data-settings=\'%1$s\'', $instance_settings );
+		// Escape the JSON string for safe use in HTML attributes
+		$data_settings_attribute = esc_attr( $instance_settings );
+
+		return sprintf( 'data-settings=\'%1$s\'', $data_settings_attribute );
 	}
 
 	public function _get_testimonials_image() {
-		$image_item = $this->_processed_item['item_image'];
+		$settings        = $this->get_settings_for_display();
+		$image_item      = $this->_processed_item['item_image'];
+		$image_lazyload  = isset( $settings['image_lazyload'] ) ? $settings['image_lazyload'] : 'true';
 
 		if ( empty( $image_item['url'] ) ) {
 			return;
 		}
+
+		$lazyload = 'true' === $image_lazyload ? 'lazy' : '';
 
 		$item_link = isset( $this->_processed_item['item_link'] ) ? $this->_processed_item['item_link'] : false;
 
@@ -2783,7 +2806,7 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 			$_id = $this->_processed_item['_id'];
 
 			if ( method_exists( $this, 'add_link_attributes' ) ) {
-				$this->add_link_attributes( 'img-link-' . $_id, $item_link );
+				$this->add_link_attributes( 'img-link-' . $_id, $this->sanitize_link_control( $item_link ) );
 			} else {
 				$this->add_render_attribute( 'img-link-' . $_id, 'href', esc_url( $item_link['url'] ) );
 
@@ -2796,21 +2819,23 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 				}
 			}
 
-			return sprintf( '<figure class="jet-testimonials__figure"><a %3$s><img class="jet-testimonials__tag-img" src="%1$s" alt="%2$s" loading="lazy"></a></figure>',
-				$image_item['url'],
+			return sprintf( '<figure class="jet-testimonials__figure"><a %3$s><img class="jet-testimonials__tag-img" src="%1$s" alt="%2$s" loading="%4$s"></a></figure>',
+				esc_url( $image_item['url'] ),
 				esc_attr( Control_Media::get_image_alt( $image_item ) ),
-				$this->get_render_attribute_string( 'img-link-' . $_id )
+				$this->get_render_attribute_string( 'img-link-' . $_id ),
+				esc_attr( $lazyload )
 			);
 		}
 
-		return sprintf( '<figure class="jet-testimonials__figure"><img class="jet-testimonials__tag-img" src="%1$s" alt="%2$s" loading="lazy"></figure>',
-			$image_item['url'],
-			esc_attr( Control_Media::get_image_alt( $image_item ) )
+		return sprintf( '<figure class="jet-testimonials__figure"><img class="jet-testimonials__tag-img" src="%1$s" alt="%2$s" loading="%3$s"></figure>',
+			esc_url( $image_item['url'] ),
+			esc_attr( Control_Media::get_image_alt( $image_item ) ),
+			esc_attr( $lazyload )
 		);
 	}
 
 	public function _get_testimonials_name() {
-		$item_name = $this->_processed_item['item_name'];
+		$item_name = wp_kses_post( $this->_processed_item['item_name'] );
 
 		if ( empty( $item_name ) ) {
 			return;
@@ -2823,7 +2848,7 @@ class Jet_Elements_Testimonials extends Jet_Elements_Base {
 			$_id = $this->_processed_item['_id'];
 
 			if ( method_exists( $this, 'add_link_attributes' ) ) {
-				$this->add_link_attributes( 'name-link-' . $_id, $item_link );
+				$this->add_link_attributes( 'name-link-' . $_id, $this->sanitize_link_control( $item_link ) );
 			} else {
 				$this->add_render_attribute( 'name-link-' . $_id, 'href', esc_url( $item_link['url'] ) );
 

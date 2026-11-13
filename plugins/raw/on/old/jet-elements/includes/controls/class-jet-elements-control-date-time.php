@@ -57,9 +57,9 @@ class Jet_Elements_Control_Date_Time extends Elementor\Control_Date_Time {
 		$control_uid = $this->get_control_uid();
 		?>
 		<div class="elementor-control-field">
-			<label for="<?php echo $control_uid; ?>" class="elementor-control-title">{{{ data.label }}}</label>
+			<label for="<?php echo $control_uid; // phpcs:ignore ?>" class="elementor-control-title">{{{ data.label }}}</label>
 			<div class="elementor-control-input-wrapper elementor-control-dynamic-switcher-wrapper">
-				<input id="<?php echo $control_uid; ?>" placeholder="{{ data.placeholder }}" class="elementor-date-time-picker flatpickr elementor-control-tag-area" type="text" data-setting="{{ data.name }}">
+				<input id="<?php echo $control_uid; // phpcs:ignore ?>" placeholder="{{ data.placeholder }}" class="elementor-date-time-picker flatpickr elementor-control-tag-area" type="text" data-setting="{{ data.name }}">
 			</div>
 		</div>
 		<# if ( data.description ) { #>

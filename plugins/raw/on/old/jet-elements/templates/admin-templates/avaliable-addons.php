@@ -2,7 +2,7 @@
 	class="jet-elements-settings-page jet-elements-settings-page__avaliable-addons"
 >
 	<div class="jet-elements-settings-page__avaliable-controls">
-		<div class="cx-vui-title"><?php _e( 'Available Widgets', 'jet-elements' ); ?></div>
+		<div class="cx-vui-title"><?php esc_html_e( 'Available Widgets', 'jet-elements' ); ?></div>
 		<div
 			class="jet-elements-settings-page__avaliable-control"
 			v-for="(option, index) in pageOptions.avaliable_widgets.options"
@@ -21,7 +21,7 @@
 	</div>
 
 	<div class="jet-elements-settings-page__avaliable-controls">
-		<div class="cx-vui-title"><?php _e( 'Available Extensions', 'jet-elements' ); ?></div>
+		<div class="cx-vui-title"><?php esc_html_e( 'Available Extensions', 'jet-elements' ); ?></div>
 		<div
 			class="jet-elements-settings-page__avaliable-control"
 			v-for="(option, index) in pageOptions.avaliable_extensions.options">

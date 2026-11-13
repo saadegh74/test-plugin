@@ -17,9 +17,9 @@ $direction = $this->_loop_item( array( 'item_text_direction' ) );
 $split_type = ( 'fx12' === $settings['animation_effect'] ) ? 'symbol' : $settings['split_type'];
 
 ?>
-<div class="<?php echo implode( ' ', $classes ); ?>" dir="<?php echo esc_attr( $direction ); ?>">
+<div class="<?php echo implode( ' ', $classes ); // phpcs:ignore ?>" dir="<?php echo esc_attr( $direction ); ?>">
 	<?php
-		echo $this->str_to_spanned_html( $item_text, $split_type );
+		echo $this->str_to_spanned_html( $item_text, $split_type ); // phpcs:ignore
 		$classes = array();
 
 		if ( ! empty( $settings['after_text_content'] ) ) {

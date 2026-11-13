@@ -32,8 +32,9 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 	private $api_count = '3.0';
 
 	private $current_weather_api_url = 'https://api.weatherbit.io/v2.0/current';
-
 	private $forecast_weather_api_url = 'https://api.weatherbit.io/v2.0/forecast/daily';
+	private $owm_current_url  = 'https://api.openweathermap.org/data/2.5/weather';
+	private $owm_forecast_url = 'https://api.openweathermap.org/data/2.5/forecast';
 
 	public function get_name() {
 		return 'jet-weather';
@@ -53,6 +54,14 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 
 	public function get_categories() {
 		return array( 'cherry' );
+	}
+
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
+	public function get_style_depends() { 
+		return array( 'jet-weather' ); 
 	}
 
 	protected function register_controls() {
@@ -83,8 +92,23 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 		);
 
 		$api_key = jet_elements_settings()->get( 'weather_api_key' );
+		$openweathermap_api_key = jet_elements_settings()->get( 'openweathermap_api_key' );
+
+		$this->add_control(
+			'weather_api_provider',
+			array(
+				'label'   => esc_html__( 'Weather API Provider', 'jet-elements' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'weatherbit',
+				'options' => array(
+					'weatherbit'     => esc_html__( 'Weatherbit (default)', 'jet-elements' ),
+					'openweathermap' => esc_html__( 'OpenWeatherMap (free)', 'jet-elements' ),
+				),
+			)
+		);
 
 		if ( ! $api_key ) {
+
 			$this->add_control(
 				'set_api_key',
 				array(
@@ -93,7 +117,26 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 						esc_html__( 'Please set Weather API key before using this widget. You can create own API key  %1$s. Paste created key on %2$s', 'jet-elements' ),
 						'<a target="_blank" href="https://www.weatherbit.io/">' . esc_html__( 'here', 'jet-elements' ) . '</a>',
 						'<a target="_blank" href="' . jet_elements_settings()->get_settings_page_link( 'integrations' ) . '">' . esc_html__( 'settings page', 'jet-elements' ) . '</a>'
-					)
+					),
+					'condition' => array(
+						'weather_api_provider' => 'weatherbit',
+					),
+				)
+			);
+		}
+		if ( ! $openweathermap_api_key ) {
+			$this->add_control(
+				'set_api_key_owm',
+				array(
+					'type' => Controls_Manager::RAW_HTML,
+					'raw'  => sprintf(
+						esc_html__( 'Please set OpenWeatherMap API key before using this widget. You can create your API key %1$s. Paste created key on %2$s', 'jet-elements' ),
+						'<a target="_blank" href="https://openweathermap.org/appid">' . esc_html__( 'here', 'jet-elements' ) . '</a>',
+						'<a target="_blank" href="' . jet_elements_settings()->get_settings_page_link( 'integrations' ) . '">' . esc_html__( 'settings page', 'jet-elements' ) . '</a>'
+					),
+					'condition' => array(
+						'weather_api_provider' => 'openweathermap',
+					),
 				)
 			);
 		}
@@ -145,6 +188,9 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 					'<a target="_blank" href="https://www.weatherbit.io/terms">' . esc_html__( 'Terms and Conditions of Weatherbit', 'jet-elements' ) . '</a>'
 				),
 		        'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition' => array(
+					'weather_api_provider' => 'weatherbit',
+				),
 		   )
 		);
 
@@ -238,11 +284,24 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 		$this->add_control(
 			'show_current_weather_details',
 			array(
-				'label'        => esc_html__( 'Show current weather details', 'jet-elements' ),
+				'label'        => esc_html__( 'Show current weather details (UTC+0)', 'jet-elements' ),
 				'type'         => Controls_Manager::SWITCHER,
 				'return_value' => 'true',
 				'condition'    => array(
 					'show_current_weather' => 'true',
+				),
+			)
+		);
+
+		$this->add_control(
+			'show_current_weather_utc',
+			array(
+				'label'        => esc_html__( 'Show current weather details in your timezone.', 'jet-elements' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'return_value' => 'true',
+				'default'      => 'true',
+				'condition'    => array(
+					'show_current_weather_details' => 'true',
 				),
 			)
 		);
@@ -273,6 +332,86 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 				),
 				'condition' => array(
 					'show_forecast_weather' => 'true',
+				),
+			)
+		);
+
+		$this->add_control(
+			'set_api_key',
+			array(
+				'type' => Controls_Manager::RAW_HTML,
+				'raw'  => esc_html__( 
+					'OpenWeatherMap has a limitation — the daily forecast is available only for a limited number of days depending on your plan.',
+					'jet-elements'
+				),
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition' => array(
+					'weather_api_provider' => 'openweathermap',
+				),
+			)
+		);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'section_background_media',
+			array(
+				'label' => esc_html__( 'Background Media', 'jet-elements' ),
+			)
+		);
+
+		$this->add_control(
+			'weatherbit_background_media_preview_code',
+			array(
+				'label'       => esc_html__( 'Preview Weather Code', 'jet-elements' ),
+				'description' => esc_html__( 'Works in the editor only. Select a weather code to preview the matching background preset.', 'jet-elements' ),
+				'type'        => Controls_Manager::SELECT2,
+				'options'     => $this->get_weatherbit_condition_options(),
+				'label_block' => true,
+				'condition'   => array(
+					'weather_api_provider' => 'weatherbit',
+				),
+			)
+		);
+
+		$this->add_control(
+			'openweathermap_background_media_preview_code',
+			array(
+				'label'       => esc_html__( 'Preview Weather Code', 'jet-elements' ),
+				'description' => esc_html__( 'Works in the editor only. Select a weather code to preview the matching background preset.', 'jet-elements' ),
+				'type'        => Controls_Manager::SELECT2,
+				'options'     => $this->get_openweathermap_condition_options(),
+				'label_block' => true,
+				'condition'   => array(
+					'weather_api_provider' => 'openweathermap',
+				),
+			)
+		);
+
+		$this->add_control(
+			'weatherbit_background_media_items',
+			array(
+				'label'         => esc_html__( 'Background Presets', 'jet-elements' ),
+				'type'          => Controls_Manager::REPEATER,
+				'fields'        => $this->get_background_media_repeater_controls( 'weatherbit' ),
+				'title_field'   => '{{{ item_label }}}',
+				'prevent_empty' => false,
+				'condition'     => array(
+					'weather_api_provider' => 'weatherbit',
+				),
+			)
+		);
+
+		$this->add_control(
+			'openweathermap_background_media_items',
+			array(
+				'label'         => esc_html__( 'Background Presets', 'jet-elements' ),
+				'type'          => Controls_Manager::REPEATER,
+				'fields'        => $this->get_background_media_repeater_controls( 'openweathermap' ),
+				'title_field'   => '{{{ item_label }}}',
+				'prevent_empty' => false,
+				'condition'     => array(
+					'weather_api_provider' => 'openweathermap',
 				),
 			)
 		);
@@ -959,6 +1098,75 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 		);
 
 		$this->_end_controls_section();
+
+		$this->_start_controls_section(
+			'section_background_media_style',
+			array(
+				'label' => esc_html__( 'Background Media', 'jet-elements' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->_add_responsive_control(
+			'background_media_min_height',
+			array(
+				'label'      => esc_html__( 'Min Height', 'jet-elements' ),
+				'type'       => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'vh', 'custom' ),
+				'range'      => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 1000,
+					),
+					'vh' => array(
+						'min' => 0,
+						'max' => 100,
+					),
+				),
+				'selectors'  => array(
+					'{{WRAPPER}} .jet-weather' => 'min-height: {{SIZE}}{{UNIT}};',
+				),
+			),
+			25
+		);
+
+		$this->_add_responsive_control(
+			'background_media_content_padding',
+			array(
+				'label'      => esc_html__( 'Padding', 'jet-elements' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'custom' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .jet-weather__container' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
+			),
+			50
+		);
+
+		$this->_add_group_control(
+			Group_Control_Border::get_type(),
+			array(
+				'name'     => 'background_media_border',
+				'selector' => '{{WRAPPER}} .jet-weather',
+			),
+			75
+		);
+
+		$this->_add_responsive_control(
+			'background_media_border_radius',
+			array(
+				'label'      => esc_html__( 'Border Radius', 'jet-elements' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', '%', 'custom' ),
+				'selectors'  => array(
+					'{{WRAPPER}} .jet-weather' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .jet-weather__media' => 'border-radius: inherit;',
+				),
+			),
+			100
+		);
+
+		$this->_end_controls_section();
 	}
 
 	protected function render() {
@@ -982,87 +1190,128 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 	 */
 	public function get_weather_data() {
 
-		$api_key = jet_elements_settings()->get( 'weather_api_key' );
-
+		$settings      = $this->get_settings_for_display();
+		$location_type = isset( $settings['location_type'] ) ? $settings['location_type'] : 'city';
+		$provider      = isset( $settings['weather_api_provider'] ) ? $settings['weather_api_provider'] : 'weatherbit';
+	
+		// API KEYS
+		$weatherbit_api_key = jet_elements_settings()->get( 'weather_api_key' );
+		$owm_api_key        = jet_elements_settings()->get( 'openweathermap_api_key' );
+	
+		$api_key = ( 'openweathermap' === $provider ) ? $owm_api_key : $weatherbit_api_key;
+	
 		// Do nothing if api key not provided
 		if ( ! $api_key ) {
 			$message = esc_html__( 'Please set Weather API key before using this widget.', 'jet-elements' );
-
 			echo $this->get_weather_notice( $message );
 			return false;
 		}
-
-		$settings = $this->get_settings_for_display();
-		$location = trim( $settings['location'] );
-
-		if ( empty( $location ) ) {
+	
+		$location_identifier = $this->get_location_identifier( $settings, $location_type );
+	
+		if ( empty( $location_identifier ) ) {
 			return false;
 		}
-
+	
 		$units = $this->get_units_param( $settings['units'] );
-
-		$transient_key = sprintf( 'jet-weather-data-%1$s-%2$s', $this->api_count, md5( $location . $units ) );
-
+	
+		$transient_key = sprintf(
+			'jet-weather-data-%1$s-%2$s',
+			$provider,
+			md5( $location_identifier . $units )
+		);
+	
 		$data = get_transient( $transient_key );
+	
+		if ( $data ) {
+			return $data;
+		}
 
-		if ( ! $data ) {
-			// Prepare request data
-			$location = esc_attr( $location );
-			$api_key  = esc_attr( $api_key );
-
+		$api_key = esc_attr( $api_key );
+		$units   = esc_attr( $units );
+	
+		if ( 'weatherbit' === $provider ) {
+	
 			$request_args = array(
 				'key'   => urlencode( $api_key ),
 				'units' => urlencode( $units ),
-				'city'  => urlencode( $location ),
 			);
+	
+			$request_args = $this->add_location_params( $request_args, $settings, $location_type );
 
-			$current_request_url = add_query_arg(
-				$request_args,
-				$this->current_weather_api_url
-			);
-
+			$current_request_url = add_query_arg( $request_args, $this->current_weather_api_url );
 			$current_request_data = $this->_get_request_data( $current_request_url );
-
+	
 			if ( ! $current_request_data ) {
-				$message = esc_html__( 'Weather data of this location not found.', 'jet-elements' );
-
-				echo $this->get_weather_notice( $message );
-
+				echo $this->get_weather_notice( esc_html__( 'Weather data of this location not found.', 'jet-elements' ) );
 				return false;
 			}
-
+	
 			if ( isset( $current_request_data['error'] ) ) {
-
 				echo $this->get_weather_notice( $current_request_data['error'] );
-
 				return false;
 			}
 
 			$request_args['days'] = 8;
-
-			$forecast_request_url = add_query_arg(
-				$request_args,
-				$this->forecast_weather_api_url
+			$forecast_request_url = add_query_arg( $request_args, $this->forecast_weather_api_url );
+			$forecast_request_data = $this->_get_request_data( $forecast_request_url );
+	
+			if ( isset( $forecast_request_data['error'] ) ) {
+				echo $this->get_weather_notice( $forecast_request_data['error'] );
+				return false;
+			}
+	
+			$data = $this->prepare_weather_data( $current_request_data, $forecast_request_data );
+		}
+	
+		else {
+	
+			$request_args = array(
+				'appid' => urlencode( $api_key ),
+				'units' => ( 'M' === $units ? 'metric' : 'imperial' ),
 			);
 
+			$request_args = $this->add_location_params( $request_args, $settings, $location_type );
+	
+			if ( isset( $request_args['city'] ) ) {
+				$request_args['q'] = $request_args['city'];
+				unset( $request_args['city'] );
+			}
+
+			$current_request_url = add_query_arg( $request_args, $this->owm_current_url );
+			$current_request_data = $this->_get_request_data( $current_request_url );
+	
+			if ( ! $current_request_data || ( isset( $current_request_data['cod'] ) && (int) $current_request_data['cod'] !== 200 ) ) {
+	
+				$message = isset( $current_request_data['message'] )
+					? $current_request_data['message']
+					: esc_html__( 'Weather data of this location not found.', 'jet-elements' );
+	
+				echo $this->get_weather_notice( $message );
+				return false;
+			}
+
+			$forecast_request_url = add_query_arg( $request_args, $this->owm_forecast_url );
 			$forecast_request_data = $this->_get_request_data( $forecast_request_url );
-
-			if ( isset( $forecast_request_data['error'] ) ) {
-
-				echo $this->get_weather_notice( $forecast_request_data['error'] );
-
+	
+			if ( isset( $forecast_request_data['cod'] ) && (int) $forecast_request_data['cod'] !== 200 ) {
+				echo $this->get_weather_notice( $forecast_request_data['message'] );
 				return false;
 			}
-
-			$data = $this->prepare_weather_data( $current_request_data, $forecast_request_data );
-
-			if ( empty( $data ) ) {
-				return false;
-			}
-
-			set_transient( $transient_key, $data, apply_filters( 'jet-elements/weather/cached-time', HOUR_IN_SECONDS ) );
+	
+			$data = $this->normalize_owm_data( $current_request_data, $forecast_request_data );
 		}
-
+	
+		if ( empty( $data ) ) {
+			return false;
+		}
+	
+		set_transient(
+			$transient_key,
+			$data,
+			apply_filters( 'jet-elements/weather/cached-time', HOUR_IN_SECONDS )
+		);
+	
 		return $data;
 	}
 
@@ -1080,6 +1329,114 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 		}
 
 		return 'M';
+	}
+
+	/**
+	 * Get location identifier for caching and validation.
+	 *
+	 * @param array  $settings      Widget settings.
+	 * @param string $location_type Location type.
+	 *
+	 * @return string
+	 */
+	public function get_location_identifier( $settings, $location_type ) {
+		$identifier = '';
+
+		switch ( $location_type ) {
+			case 'coordinates':
+				$coordinates = isset( $settings['coordinates'] ) ? trim( $settings['coordinates'] ) : '';
+				
+				if ( ! empty( $coordinates ) ) {
+					$parsed = $this->parse_coordinates( $coordinates );
+					
+					if ( $parsed && ! empty( $parsed['lat'] ) && ! empty( $parsed['lon'] ) ) {
+						$identifier = sprintf( 'lat:%s|lon:%s', $parsed['lat'], $parsed['lon'] );
+					}
+				}
+				break;
+
+			case 'city':
+			default:
+				$identifier = isset( $settings['location'] ) ? trim( $settings['location'] ) : '';
+				break;
+		}
+
+		return $identifier;
+	}
+
+	/**
+	 * Add location parameters to request args based on location type.
+	 *
+	 * @param array  $request_args  Request arguments.
+	 * @param array  $settings      Widget settings.
+	 * @param string $location_type Location type.
+	 *
+	 * @return array
+	 */
+	public function add_location_params( $request_args, $settings, $location_type ) {
+
+		switch ( $location_type ) {
+			case 'coordinates':
+				$coordinates = isset( $settings['coordinates'] ) ? trim( $settings['coordinates'] ) : '';
+				
+				if ( ! empty( $coordinates ) ) {
+					$parsed = $this->parse_coordinates( $coordinates );
+					
+					if ( $parsed && ! empty( $parsed['lat'] ) && ! empty( $parsed['lon'] ) ) {
+						$request_args['lat'] = urlencode( esc_attr( $parsed['lat'] ) );
+						$request_args['lon'] = urlencode( esc_attr( $parsed['lon'] ) );
+					}
+				}
+				break;
+
+			case 'city':
+			default:
+				$location = isset( $settings['location'] ) ? trim( $settings['location'] ) : '';
+				
+				if ( ! empty( $location ) ) {
+					$request_args['city'] = urlencode( esc_attr( $location ) );
+				}
+				break;
+		}
+
+		return $request_args;
+	}
+
+	/**
+	 * Parse coordinates from string.
+	 * Supports formats: "lat;lon", "lat,lon"
+	 *
+	 * @param string $coordinates Coordinates string.
+	 *
+	 * @return array|bool Array with 'lat' and 'lon' keys or false on failure.
+	 */
+	public function parse_coordinates( $coordinates ) {
+		
+		if ( empty( $coordinates ) ) {
+			return false;
+		}
+
+		// Split by ; or ,
+		$parts = preg_split( '/[;,]/', $coordinates );
+		if ( count( $parts ) === 2 ) {
+			$lat = floatval( str_replace( ',', '.', trim( $parts[0] ) ) );
+			$lon = floatval( str_replace( ',', '.', trim( $parts[1] ) ) );
+		} else {
+			$lat = null;
+			$lon = null;
+		}
+
+		// Validate ranges
+		if ( $lat === null || $lon === null || $lat < -90 || $lat > 90 || $lon < -180 || $lon > 180 ) {
+			$message = esc_html__( 'Invalid coordinates format or values outside valid range', 'jet-elements' );
+			echo $this->get_weather_notice( $message ); // phpcs:ignore
+			return false;
+		}
+
+		return array(
+			'lat' => $lat,
+			'lon' => $lon,
+		);
 	}
 
 	/**
@@ -1139,7 +1496,7 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 				'wind_speed' => $current_data['data'][0]['wind_spd'],
 				'wind_deg'   => $current_data['data'][0]['wind_dir'],
 				'wind_dir'   => $current_data['data'][0]['wind_cdir'],
-				'humidity'   => $current_data['data'][0]['rh'] . '%',
+				'humidity'   => (float) $current_data['data'][0]['rh'] . '%',
 				'pressure'   => $current_data['data'][0]['pres'],
 				'sunrise'    => $current_data['data'][0]['sunrise'],
 				'sunset'     => $current_data['data'][0]['sunset'],
@@ -1149,7 +1506,11 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 			'forecast' => array(),
 		);
 
-		for ( $i = 0; $i < 8; $i ++ ) {
+		$forecast_items_count = ! empty( $forecast_data['data'] ) && is_array( $forecast_data['data'] )
+			? min( 8, count( $forecast_data['data'] ) )
+			: 0;
+
+		for ( $i = 0; $i < $forecast_items_count; $i ++ ) {
 			$data['forecast'][] = array(
 				'code'     => $forecast_data['data'][ $i ]['weather']['code'],
 				'date'     => $forecast_data['data'][ $i ]['valid_date'],
@@ -1159,6 +1520,336 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 		}
 
 		return $data;
+	}
+
+	public function get_background_media_repeater_controls( $provider ) {
+		$repeater = new \Elementor\Jet_Elements_Repeater();
+
+		$repeater->add_control(
+			'item_label',
+			array(
+				'label'       => esc_html__( 'Preset Name', 'jet-elements' ),
+				'type'        => Controls_Manager::TEXT,
+				'default'     => '',
+				'placeholder' => esc_html__( 'Rain', 'jet-elements' ),
+			)
+		);
+
+		$repeater->add_control(
+			'weather_codes',
+			array(
+				'label'       => 'openweathermap' === $provider ? esc_html__( 'OpenWeatherMap condition codes', 'jet-elements' ) : esc_html__( 'Weatherbit condition codes', 'jet-elements' ),
+				'type'        => Controls_Manager::SELECT2,
+				'multiple'    => true,
+				'label_block' => true,
+				'options'     => 'openweathermap' === $provider ? $this->get_openweathermap_condition_options() : $this->get_weatherbit_condition_options(),
+			)
+		);
+
+		$repeater->add_control(
+			'weather_codes_help',
+			array(
+				'type'            => Controls_Manager::RAW_HTML,
+				'raw'             => sprintf(
+					__( 'See all condition codes: <a href="%s" target="_blank">here</a>', 'jet-elements' ),
+					esc_url( 'openweathermap' === $provider ? 'https://openweathermap.org/api/weather-conditions#Weather-Condition-Codes-2' : 'https://www.weatherbit.io/api/codes' )
+				),
+				'content_classes' => 'elementor-descriptor',
+			)
+		);
+
+		$repeater->add_control(
+			'media_type',
+			array(
+				'label'   => esc_html__( 'Media type', 'jet-elements' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'image',
+				'options' => array(
+					'image' => esc_html__( 'Image', 'jet-elements' ),
+					'video' => esc_html__( 'Video', 'jet-elements' ),
+				),
+			)
+		);
+
+		$repeater->add_control(
+			'background_image',
+			array(
+				'label' => esc_html__( 'Background image', 'jet-elements' ),
+				'type'  => Controls_Manager::MEDIA,
+				'dynamic' => array( 'active' => true ),
+				'condition' => array(
+					'media_type' => 'image',
+				),
+			)
+		);
+
+		$repeater->add_control(
+			'background_video',
+			array(
+				'label'      => esc_html__( 'Background video', 'jet-elements' ),
+				'type'       => Controls_Manager::MEDIA,
+				'media_type' => 'video',
+				'dynamic' => array( 'active' => true ),
+				'condition'  => array(
+					'media_type' => 'video',
+				),
+			)
+		);
+
+		return $repeater->get_controls();
+	}
+
+	public function get_weatherbit_condition_options() {
+		$options    = array();
+		$conditions = $this->get_weatherbit_conditions();
+
+		foreach ( $conditions as $code => $desc ) {
+			$options[ $code ] = sprintf( '%1$s (%2$s)', $desc, $code );
+		}
+
+		return $options;
+	}
+
+	public function get_weatherbit_conditions() {
+		return array(
+			'200' => esc_html_x( 'Thunderstorm with light rain', 'Weather description', 'jet-elements' ),
+			'201' => esc_html_x( 'Thunderstorm with rain', 'Weather description', 'jet-elements' ),
+			'202' => esc_html_x( 'Thunderstorm with heavy rain', 'Weather description', 'jet-elements' ),
+			'230' => esc_html_x( 'Thunderstorm with light drizzle', 'Weather description', 'jet-elements' ),
+			'231' => esc_html_x( 'Thunderstorm with drizzle', 'Weather description', 'jet-elements' ),
+			'232' => esc_html_x( 'Thunderstorm with heavy drizzle', 'Weather description', 'jet-elements' ),
+			'233' => esc_html_x( 'Thunderstorm with Hail', 'Weather description', 'jet-elements' ),
+			'300' => esc_html_x( 'Light Drizzle', 'Weather description', 'jet-elements' ),
+			'301' => esc_html_x( 'Drizzle', 'Weather description', 'jet-elements' ),
+			'302' => esc_html_x( 'Heavy Drizzle', 'Weather description', 'jet-elements' ),
+			'500' => esc_html_x( 'Light Rain', 'Weather description', 'jet-elements' ),
+			'501' => esc_html_x( 'Moderate Rain', 'Weather description', 'jet-elements' ),
+			'502' => esc_html_x( 'Heavy Rain', 'Weather description', 'jet-elements' ),
+			'511' => esc_html_x( 'Freezing rain', 'Weather description', 'jet-elements' ),
+			'520' => esc_html_x( 'Light shower rain', 'Weather description', 'jet-elements' ),
+			'521' => esc_html_x( 'Shower rain', 'Weather description', 'jet-elements' ),
+			'522' => esc_html_x( 'Heavy shower rain', 'Weather description', 'jet-elements' ),
+			'600' => esc_html_x( 'Light snow', 'Weather description', 'jet-elements' ),
+			'601' => esc_html_x( 'Snow', 'Weather description', 'jet-elements' ),
+			'602' => esc_html_x( 'Heavy Snow', 'Weather description', 'jet-elements' ),
+			'610' => esc_html_x( 'Mix snow/rain', 'Weather description', 'jet-elements' ),
+			'611' => esc_html_x( 'Sleet', 'Weather description', 'jet-elements' ),
+			'612' => esc_html_x( 'Heavy sleet', 'Weather description', 'jet-elements' ),
+			'621' => esc_html_x( 'Snow shower', 'Weather description', 'jet-elements' ),
+			'622' => esc_html_x( 'Heavy snow shower', 'Weather description', 'jet-elements' ),
+			'623' => esc_html_x( 'Flurries', 'Weather description', 'jet-elements' ),
+			'700' => esc_html_x( 'Mist', 'Weather description', 'jet-elements' ),
+			'711' => esc_html_x( 'Smoke', 'Weather description', 'jet-elements' ),
+			'721' => esc_html_x( 'Haze', 'Weather description', 'jet-elements' ),
+			'731' => esc_html_x( 'Sand/dust', 'Weather description', 'jet-elements' ),
+			'741' => esc_html_x( 'Fog', 'Weather description', 'jet-elements' ),
+			'751' => esc_html_x( 'Freezing Fog', 'Weather description', 'jet-elements' ),
+			'800' => esc_html_x( 'Clear sky', 'Weather description', 'jet-elements' ),
+			'801' => esc_html_x( 'Few clouds', 'Weather description', 'jet-elements' ),
+			'802' => esc_html_x( 'Scattered clouds', 'Weather description', 'jet-elements' ),
+			'803' => esc_html_x( 'Broken clouds', 'Weather description', 'jet-elements' ),
+			'804' => esc_html_x( 'Overcast clouds', 'Weather description', 'jet-elements' ),
+			'900' => esc_html_x( 'Unknown Precipitation', 'Weather description', 'jet-elements' ),
+		);
+	}
+
+	public function get_openweathermap_condition_options() {
+		$conditions = array(
+			'200' => esc_html_x( 'Thunderstorm with light rain', 'Weather description', 'jet-elements' ),
+			'201' => esc_html_x( 'Thunderstorm with rain', 'Weather description', 'jet-elements' ),
+			'202' => esc_html_x( 'Thunderstorm with heavy rain', 'Weather description', 'jet-elements' ),
+			'210' => esc_html_x( 'Light thunderstorm', 'Weather description', 'jet-elements' ),
+			'211' => esc_html_x( 'Thunderstorm', 'Weather description', 'jet-elements' ),
+			'212' => esc_html_x( 'Heavy thunderstorm', 'Weather description', 'jet-elements' ),
+			'221' => esc_html_x( 'Ragged thunderstorm', 'Weather description', 'jet-elements' ),
+			'230' => esc_html_x( 'Thunderstorm with light drizzle', 'Weather description', 'jet-elements' ),
+			'231' => esc_html_x( 'Thunderstorm with drizzle', 'Weather description', 'jet-elements' ),
+			'232' => esc_html_x( 'Thunderstorm with heavy drizzle', 'Weather description', 'jet-elements' ),
+			'300' => esc_html_x( 'Light intensity drizzle', 'Weather description', 'jet-elements' ),
+			'301' => esc_html_x( 'Drizzle', 'Weather description', 'jet-elements' ),
+			'302' => esc_html_x( 'Heavy intensity drizzle', 'Weather description', 'jet-elements' ),
+			'310' => esc_html_x( 'Light intensity drizzle rain', 'Weather description', 'jet-elements' ),
+			'311' => esc_html_x( 'Drizzle rain', 'Weather description', 'jet-elements' ),
+			'312' => esc_html_x( 'Heavy intensity drizzle rain', 'Weather description', 'jet-elements' ),
+			'313' => esc_html_x( 'Shower rain and drizzle', 'Weather description', 'jet-elements' ),
+			'314' => esc_html_x( 'Heavy shower rain and drizzle', 'Weather description', 'jet-elements' ),
+			'321' => esc_html_x( 'Shower drizzle', 'Weather description', 'jet-elements' ),
+			'500' => esc_html_x( 'Light rain', 'Weather description', 'jet-elements' ),
+			'501' => esc_html_x( 'Moderate rain', 'Weather description', 'jet-elements' ),
+			'502' => esc_html_x( 'Heavy intensity rain', 'Weather description', 'jet-elements' ),
+			'503' => esc_html_x( 'Very heavy rain', 'Weather description', 'jet-elements' ),
+			'504' => esc_html_x( 'Extreme rain', 'Weather description', 'jet-elements' ),
+			'511' => esc_html_x( 'Freezing rain', 'Weather description', 'jet-elements' ),
+			'520' => esc_html_x( 'Light intensity shower rain', 'Weather description', 'jet-elements' ),
+			'521' => esc_html_x( 'Shower rain', 'Weather description', 'jet-elements' ),
+			'522' => esc_html_x( 'Heavy intensity shower rain', 'Weather description', 'jet-elements' ),
+			'531' => esc_html_x( 'Ragged shower rain', 'Weather description', 'jet-elements' ),
+			'600' => esc_html_x( 'Light snow', 'Weather description', 'jet-elements' ),
+			'601' => esc_html_x( 'Snow', 'Weather description', 'jet-elements' ),
+			'602' => esc_html_x( 'Heavy snow', 'Weather description', 'jet-elements' ),
+			'611' => esc_html_x( 'Sleet', 'Weather description', 'jet-elements' ),
+			'612' => esc_html_x( 'Light shower sleet', 'Weather description', 'jet-elements' ),
+			'613' => esc_html_x( 'Shower sleet', 'Weather description', 'jet-elements' ),
+			'615' => esc_html_x( 'Light rain and snow', 'Weather description', 'jet-elements' ),
+			'616' => esc_html_x( 'Rain and snow', 'Weather description', 'jet-elements' ),
+			'620' => esc_html_x( 'Light shower snow', 'Weather description', 'jet-elements' ),
+			'621' => esc_html_x( 'Shower snow', 'Weather description', 'jet-elements' ),
+			'622' => esc_html_x( 'Heavy shower snow', 'Weather description', 'jet-elements' ),
+			'701' => esc_html_x( 'Mist', 'Weather description', 'jet-elements' ),
+			'711' => esc_html_x( 'Smoke', 'Weather description', 'jet-elements' ),
+			'721' => esc_html_x( 'Haze', 'Weather description', 'jet-elements' ),
+			'731' => esc_html_x( 'Sand dust whirls', 'Weather description', 'jet-elements' ),
+			'741' => esc_html_x( 'Fog', 'Weather description', 'jet-elements' ),
+			'751' => esc_html_x( 'Sand', 'Weather description', 'jet-elements' ),
+			'761' => esc_html_x( 'Dust', 'Weather description', 'jet-elements' ),
+			'762' => esc_html_x( 'Volcanic ash', 'Weather description', 'jet-elements' ),
+			'771' => esc_html_x( 'Squalls', 'Weather description', 'jet-elements' ),
+			'781' => esc_html_x( 'Tornado', 'Weather description', 'jet-elements' ),
+			'800' => esc_html_x( 'Clear sky', 'Weather description', 'jet-elements' ),
+			'801' => esc_html_x( 'Few clouds', 'Weather description', 'jet-elements' ),
+			'802' => esc_html_x( 'Scattered clouds', 'Weather description', 'jet-elements' ),
+			'803' => esc_html_x( 'Broken clouds', 'Weather description', 'jet-elements' ),
+			'804' => esc_html_x( 'Overcast clouds', 'Weather description', 'jet-elements' ),
+		);
+
+		$options = array();
+
+		foreach ( $conditions as $code => $desc ) {
+			$options[ $code ] = sprintf( '%1$s (%2$s)', $desc, $code );
+		}
+
+		return $options;
+	}
+
+	public function get_weather_background_media_markup() {
+		$settings = $this->get_settings_for_display();
+		$provider = isset( $settings['weather_api_provider'] ) ? $settings['weather_api_provider'] : 'weatherbit';
+		$items_key = 'openweathermap' === $provider ? 'openweathermap_background_media_items' : 'weatherbit_background_media_items';
+
+		if (
+			empty( $settings[ $items_key ] )
+		) {
+			return '';
+		}
+
+		$current_code = $this->get_background_media_preview_code( $provider );
+
+		if ( '' === $current_code && ! empty( $this->weather_data['current']['code'] ) ) {
+			$current_code = (string) $this->weather_data['current']['code'];
+		}
+
+		if ( '' === $current_code ) {
+			return '';
+		}
+
+		foreach ( $settings[ $items_key ] as $item ) {
+			$item_codes = isset( $item['weather_codes'] ) ? (array) $item['weather_codes'] : array();
+			$item_codes = array_map( 'strval', $item_codes );
+
+			if ( empty( $item_codes ) || ! in_array( $current_code, $item_codes, true ) ) {
+				continue;
+			}
+
+			return $this->get_background_media_item_markup( $item );
+		}
+
+		return '';
+	}
+
+	public function get_background_media_preview_code( $provider ) {
+		if ( ! Plugin::$instance->editor->is_edit_mode() ) {
+			return '';
+		}
+		$settings    = $this->get_settings_for_display();
+		$setting_key = 'openweathermap' === $provider ? 'openweathermap_background_media_preview_code' : 'weatherbit_background_media_preview_code';
+
+		if ( empty( $settings[ $setting_key ] ) ) {
+			return '';
+		}
+
+		return (string) $settings[ $setting_key ];
+	}
+
+	public function get_background_media_item_markup( $item ) {
+		$media_type = isset( $item['media_type'] ) ? $item['media_type'] : 'image';
+		$video      = isset( $item['background_video'] ) ? $item['background_video'] : array();
+
+		if ( 'video' === $media_type && ! empty( $video['url'] ) ) {
+			return sprintf(
+				'<div class="jet-weather__media" aria-hidden="true"><video class="jet-weather__media-video" autoplay muted loop playsinline preload="metadata"><source src="%1$s" /></video></div>',
+				esc_url( $video['url'] )
+			);
+		}
+
+		$image = isset( $item['background_image'] ) ? $item['background_image'] : array();
+
+		if ( 'image' !== $media_type || empty( $image['url'] ) ) {
+			return '';
+		}
+
+		return sprintf(
+			'<div class="jet-weather__media" aria-hidden="true"><img class="jet-weather__media-image" src="%1$s" alt="" /></div>',
+			esc_url( $image['url'] )
+		);
+	}
+
+	public function normalize_owm_data( $current_data = [], $forecast_data = [] ) {
+		$current_timezone  = isset( $current_data['timezone'] ) ? (int) $current_data['timezone'] : 0;
+		$forecast_timezone = isset( $forecast_data['city']['timezone'] ) ? (int) $forecast_data['city']['timezone'] : $current_timezone;
+		$current_hour      = (int) gmdate( 'H', $current_data['dt'] + $current_timezone );
+
+		$current = [
+			'code'       => $current_data['weather'][0]['id'],
+			'is_day'     => $current_hour >= 6 && $current_hour < 18,
+			'temp'       => $current_data['main']['temp'],
+			'temp_min'   => null,
+			'temp_max'   => null,
+			'wind_speed' => $current_data['wind']['speed'],
+			'wind_deg'   => $current_data['wind']['deg'],
+			'wind_dir'   => $this->deg_to_compass( $current_data['wind']['deg'] ),
+			'humidity'   => (float) $current_data['main']['humidity'] . '%',
+			'pressure'   => $current_data['main']['pressure'],
+			'sunrise'    => gmdate( 'H:i', $current_data['sys']['sunrise'] + $current_timezone ),
+			'sunset'     => gmdate( 'H:i', $current_data['sys']['sunset'] + $current_timezone ),
+		];
+	
+		$location = [
+			'city'    => $current_data['name'],
+			'country' => $current_data['sys']['country'],
+		];
+	
+		$forecast = [];
+		if ( !empty( $forecast_data['list'] ) && is_array( $forecast_data['list'] )) {
+			$days = [];
+			foreach ( $forecast_data['list'] as $entry ) {
+				$date = gmdate( 'Y-m-d', $entry['dt'] + $forecast_timezone );
+				if ( !isset( $days[$date] )) {
+					$days[$date] = [
+						'temp_min' => $entry['main']['temp_min'],
+						'temp_max' => $entry['main']['temp_max'],
+						'code'     => $entry['weather'][0]['id'],
+					];
+				} else {
+					$days[$date]['temp_min'] = min( $days[$date]['temp_min'], $entry['main']['temp_min'] );
+					$days[$date]['temp_max'] = max( $days[$date]['temp_max'], $entry['main']['temp_max'] );
+				}
+			}
+	
+			foreach ( $days as $date => $data ) {
+				$forecast[] = array_merge( ['date' => $date], $data );
+			}
+	
+			$current['temp_min'] = $forecast[0]['temp_min'];
+			$current['temp_max'] = $forecast[0]['temp_max'];
+		}
+	
+		return compact( 'location', 'current', 'forecast' );
+	}
+	
+	private function deg_to_compass( $deg ) {
+		$val = floor((( $deg / 22.5) + 0.5 ));
+		$directions = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+		return $directions[ $val % 16 ];
 	}
 
 	/**
@@ -1184,6 +1875,22 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 			),
 			'202' => array(
 				'desc' => esc_html_x( 'Thunderstorm with heavy rain', 'Weather description', 'jet-elements' ),
+				'icon' => 1,
+			),
+			'210' => array(
+				'desc' => esc_html_x( 'Light thunderstorm', 'Weather description', 'jet-elements' ),
+				'icon' => 1,
+			),
+			'211' => array(
+				'desc' => esc_html_x( 'Thunderstorm', 'Weather description', 'jet-elements' ),
+				'icon' => 1,
+			),
+			'212' => array(
+				'desc' => esc_html_x( 'Heavy thunderstorm', 'Weather description', 'jet-elements' ),
+				'icon' => 1,
+			),
+			'221' => array(
+				'desc' => esc_html_x( 'Ragged thunderstorm', 'Weather description', 'jet-elements' ),
 				'icon' => 1,
 			),
 			'230' => array(
@@ -1216,6 +1923,30 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 				'desc' => esc_html_x( 'Heavy Drizzle', 'Weather description', 'jet-elements' ),
 				'icon' => 3,
 			),
+			'310' => array(
+				'desc' => esc_html_x( 'Light intensity drizzle rain', 'Weather description', 'jet-elements' ),
+				'icon' => 3,
+			),
+			'311' => array(
+				'desc' => esc_html_x( 'Drizzle rain', 'Weather description', 'jet-elements' ),
+				'icon' => 3,
+			),
+			'312' => array(
+				'desc' => esc_html_x( 'Heavy intensity drizzle rain', 'Weather description', 'jet-elements' ),
+				'icon' => 3,
+			),
+			'313' => array(
+				'desc' => esc_html_x( 'Shower rain and drizzle', 'Weather description', 'jet-elements' ),
+				'icon' => 3,
+			),
+			'314' => array(
+				'desc' => esc_html_x( 'Heavy shower rain and drizzle', 'Weather description', 'jet-elements' ),
+				'icon' => 4,
+			),
+			'321' => array(
+				'desc' => esc_html_x( 'Shower drizzle', 'Weather description', 'jet-elements' ),
+				'icon' => 3,
+			),
 
 			// Rain
 			'500' => array(
@@ -1230,9 +1961,17 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 				'desc' => esc_html_x( 'Heavy Rain', 'Weather description', 'jet-elements' ),
 				'icon' => 4,
 			),
+			'503' => array(
+				'desc' => esc_html_x( 'Very heavy rain', 'Weather description', 'jet-elements' ),
+				'icon' => 4,
+			),
+			'504' => array(
+				'desc' => esc_html_x( 'Extreme rain', 'Weather description', 'jet-elements' ),
+				'icon' => 5,
+			),
 			'511' => array(
 				'desc' => esc_html_x( 'Freezing rain', 'Weather description', 'jet-elements' ),
-				'icon' => 3,
+				'icon' => 9,
 			),
 			'520' => array(
 				'desc' => esc_html_x( 'Light shower rain', 'Weather description', 'jet-elements' ),
@@ -1245,6 +1984,10 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 			'522' => array(
 				'desc' => esc_html_x( 'Heavy shower rain', 'Weather description', 'jet-elements' ),
 				'icon' => 5,
+			),
+			'531' => array(
+				'desc' => esc_html_x( 'Ragged shower rain', 'Weather description', 'jet-elements' ),
+				'icon' => 4,
 			),
 
 			// Snow
@@ -1272,6 +2015,22 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 				'desc' => esc_html_x( 'Heavy sleet', 'Weather description', 'jet-elements' ),
 				'icon' => 10,
 			),
+			'613' => array(
+				'desc' => esc_html_x( 'Shower sleet', 'Weather description', 'jet-elements' ),
+				'icon' => 10,
+			),
+			'615' => array(
+				'desc' => esc_html_x( 'Light rain and snow', 'Weather description', 'jet-elements' ),
+				'icon' => 9,
+			),
+			'616' => array(
+				'desc' => esc_html_x( 'Rain and snow', 'Weather description', 'jet-elements' ),
+				'icon' => 9,
+			),
+			'620' => array(
+				'desc' => esc_html_x( 'Light shower snow', 'Weather description', 'jet-elements' ),
+				'icon' => 7,
+			),
 			'621' => array(
 				'desc' => esc_html_x( 'Snow shower', 'Weather description', 'jet-elements' ),
 				'icon' => 7,
@@ -1286,6 +2045,10 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 			),
 
 			// Special
+			'701' => array(
+				'desc' => esc_html_x( 'Mist', 'Weather description', 'jet-elements' ),
+				'icon' => 12,
+			),
 			'700' => array(
 				'desc' => esc_html_x( 'Mist', 'Weather description', 'jet-elements' ),
 				'icon' => 12,
@@ -1309,6 +2072,22 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 			'751' => array(
 				'desc' => esc_html_x( 'Freezing Fog', 'Weather description', 'jet-elements' ),
 				'icon' => 15,
+			),
+			'761' => array(
+				'desc' => esc_html_x( 'Dust', 'Weather description', 'jet-elements' ),
+				'icon' => 14,
+			),
+			'762' => array(
+				'desc' => esc_html_x( 'Volcanic ash', 'Weather description', 'jet-elements' ),
+				'icon' => 14,
+			),
+			'771' => array(
+				'desc' => esc_html_x( 'Squalls', 'Weather description', 'jet-elements' ),
+				'icon' => 14,
+			),
+			'781' => array(
+				'desc' => esc_html_x( 'Tornado', 'Weather description', 'jet-elements' ),
+				'icon' => 14,
 			),
 
 			// Clouds
@@ -1407,11 +2186,17 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 
 		switch ( $type ) {
 			case 'location':
-				$title = esc_html( $settings['location'] );
+				$location_type = isset( $settings['location_type'] ) ? $settings['location_type'] : 'city';
+				
+				if ( 'coordinates' === $location_type ) {					
+					$title = wp_kses_post( $settings['coordinates'] );
+				} else {					
+					$title = wp_kses_post( $settings['location'] );
+				}
 				break;
 
 			case 'custom':
-				$title = esc_html( $settings['custom_title'] );
+				$title = wp_kses_post( $settings['custom_title'] );
 				break;
 
 			default:
@@ -1424,7 +2209,7 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 			$title = sprintf( '%1$s, %2$s', $title, $country );
 		}
 
-		return sprintf( '<%1$s class="jet-weather__title">%2$s</%1$s>', $tag, $title );
+		return sprintf( '<%1$s class="jet-weather__title">%2$s</%1$s>', $tag, wp_kses_post( $title ) );
 	}
 
 	/**
@@ -1437,14 +2222,15 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 	public function get_weather_temp( $temp ) {
 		$units     = $this->get_settings_for_display( 'units' );
 		$temp_unit = ( 'metric' === $units ) ? '&#176;C' : '&#176;F';
-
+	
 		// For 2.0 API Count
 		if ( is_array( $temp ) ) {
 			$temp = ( 'metric' === $units ) ? $temp['c'] : $temp['f'];
 		}
 
+		$temp = floatval( $temp );
 		$format = apply_filters( 'jet-elements/weather/temperature-format', '%1$s%2$s' );
-
+	
 		return sprintf( $format, round( $temp ), $temp_unit );
 	}
 
@@ -1507,7 +2293,7 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 
 		$format = apply_filters( 'jet-elements/weather/wind-format', '%1$s %2$s %3$s' );
 
-		return sprintf( $format, $direction, round( $speed ), $speed_unit );
+		return sprintf( $format, wp_kses_post( $direction ), round( (float) $speed ), $speed_unit );
 	}
 
 	/**
@@ -1536,11 +2322,21 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 	 * @param  string $time
 	 * @return string
 	 */
+
 	public function get_weather_astro_time( $time ) {
-		$format = $this->get_settings_for_display( 'time_format' );
+		$format         = $this->get_settings_for_display( 'time_format' );
+		$current_offset = $this->get_settings_for_display( 'show_current_weather_utc' );
+		$gmt_offset     = get_option('gmt_offset', 0);
+		$current_time   = strtotime( $time);
+
+		if ( $current_offset ) {
+			$current_time   = strtotime( $time . "+{$gmt_offset}hours");
+		}
+
+		$time = date('H:i', $current_time);
 
 		if ( '12' === $format ) {
-			$time = date( 'h:i A', strtotime( $time ) );
+			$time = date( 'h:i A', $current_time);
 		}
 
 		return $time;
@@ -1554,7 +2350,7 @@ class Jet_Elements_Weather extends Jet_Elements_Base {
 	 * @return string
 	 */
 	public function get_weather_notice( $message ) {
-		return sprintf( '<div class="jet-weather-notice">%s</div>', $message );
+		return sprintf( '<div class="jet-weather-notice">%s</div>', wp_kses_post( $message ) );
 	}
 
 	/**

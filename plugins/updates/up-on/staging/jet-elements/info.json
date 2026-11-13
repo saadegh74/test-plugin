@@ -1,0 +1,20 @@
+{
+  "name": "JetElements For Elementor [کانال آزمایشی - Staging]",
+  "slug": "jet-elements",
+  "version": "2.9.2.8",
+  "tested": "6.8",
+  "requires": "5.6",
+  "requires_php": "7.4",
+  "last_updated": "2026-11-10 01:00:00",
+  "author": "Crocoblock",
+  "author_homepage": "https://crocoblock.com/",
+  "sections": {
+    "description": "مجموعه جامع و حرفه‌ای المان‌ها و ابزارک‌های کاربردی برای صفحه‌ساز المنتور جهت طراحی محتوای مدرن، گالری، اسلایدر، جداول قیمت‌گذاری و جلوه‌های بصری پیشرفته.",
+    "changelog": "<h4>2.9.2.8</h4><ul><li>بهبود امنیت و رفع آسیب‌پذیری‌های XSS در انیمیشن‌های Lottie و سایر ویجت‌ها</li><li>حفظ تنظیمات کوئری تکرارشونده (Repeater Query) جت‌انجین در آکاردئون جت‌تبز</li><li>حفظ استایل‌های پیشرفته پس‌زمینه و حاشیه (Background & Border) در تمام ابزارک‌ها</li><li>حذف کامل تبلیغات، لینک‌ها و نام‌های سایت واسطه از کدها و پنل مدیریت</li><li>حذف فایل‌های زائد توسعه‌دهنده جهت پیشگیری از خطای فایروال سرور</li><li>اتصال به سرور اختصاصی به‌روزرسانی خودکار و مستقیم (PUC)</li></ul>"
+  },
+  "rating": 100,
+  "num_ratings": 480,
+  "downloaded": 2100,
+  "active_installs": 2100,
+  "download_url": "https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-elements/jet-elements-v2.9.2.8.zip"
+}

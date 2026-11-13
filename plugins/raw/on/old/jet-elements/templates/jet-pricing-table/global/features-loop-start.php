@@ -27,4 +27,4 @@ if ( ! $fold_enabled ) {
 
 ?>
 <div class="pricing-table__features">
-	<div class="<?php echo join( ' ', $fold_classes ); ?>"<?php echo $fold_attr; ?>>
+<div class="<?php echo esc_attr( join( ' ', $fold_classes ) ); ?>" <?php echo wp_kses_post( $fold_attr ); ?>>

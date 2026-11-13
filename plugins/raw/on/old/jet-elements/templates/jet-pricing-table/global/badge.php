@@ -3,4 +3,4 @@
  * Featured badge template
  */
 
-echo $this->_get_badge_image();
+echo $this->_get_badge_image(); // phpcs:ignore

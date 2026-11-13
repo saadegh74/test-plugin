@@ -14,6 +14,6 @@ if ( ! empty( $settings['shuffle_image_list'] ) && filter_var( $settings['shuffl
 }
 ?>
 
-<div class="jet-images-layout <?php echo $classes; ?>" <?php echo $data_settings; ?>>
+<div class="jet-images-layout <?php echo esc_attr( $classes ); ?>" <?php echo wp_kses_data( $data_settings ); ?>>
 	<?php $this->_get_global_looped_template( 'images-layout', 'image_list', $callback ); ?>
 </div>

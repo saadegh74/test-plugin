@@ -42,6 +42,14 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	public function get_style_depends() { 
+		return array( 'jet-horizontal-timeline' ); 
+	}
+
+	public function get_script_depends() {
+		return array( 'jet-horizontal-timeline' );
+	}
+
 	protected function register_controls() {
 		$css_scheme = apply_filters(
 			'jet-elements/horizontal-timeline/css-scheme',
@@ -76,7 +84,7 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'cards_list' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'is_item_active',
@@ -144,7 +152,7 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 			'item_desc',
 			array(
 				'label'   => esc_html__( 'Description', 'jet-elements' ),
-				'type'    => Controls_Manager::TEXTAREA,
+				'type'    => Controls_Manager::WYSIWYG,
 				'dynamic' => array( 'active' => true ),
 			)
 		);
@@ -2189,16 +2197,32 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 
 	public function _render_image( $item_settings ) {
 		$show_image = filter_var( $item_settings['show_item_image'], FILTER_VALIDATE_BOOLEAN );
-
-		if ( ! $show_image || empty( $item_settings['item_image']['url'] ) ) {
+	
+		if ( ! $show_image || empty( $item_settings['item_image']['id'] ) ) {
 			return;
 		}
-
+	
+		$translated_id = apply_filters( 'jet-elements/widgets/translate_image_id', $item_settings['item_image']['id'] );
+	
+		if ( ! $translated_id ) {
+			return;
+		}
+	
+		$item_settings['item_image']['id'] = $translated_id;
+	
+		$image_src = wp_get_attachment_image_src( $translated_id, 'full' );
+		if ( $image_src ) {
+			$item_settings['item_image']['url'] = $image_src[0];
+		}
+	
 		$img_html = Group_Control_Image_Size::get_attachment_image_html( $item_settings, 'item_image' );
-
-		$image_format = apply_filters( 'jet-elements/horizontal-timeline/image-format', '<div class="jet-hor-timeline-item__card-img">%s</div>' );
-
-		printf( $image_format, $img_html );
+	
+		$image_format = apply_filters(
+			'jet-elements/horizontal-timeline/image-format',
+			'<div class="jet-hor-timeline-item__card-img">%s</div>'
+		);
+	
+		printf( $image_format, $img_html ); // phpcs:ignore
 	}
 
 	public function _render_button( $item_settings ) {
@@ -2220,7 +2244,7 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 		);
 
 		if ( method_exists( $this, 'add_link_attributes' ) ) {
-			$this->add_link_attributes( 'button_' . $item_settings['_id'], $item_settings['item_btn_url'] );
+			$this->add_link_attributes( 'button_' . $item_settings['_id'], $this->sanitize_link_control( $item_settings['item_btn_url'] ) );
 		} else {
 			$this->add_render_attribute( 'button_' . $item_settings['_id'], 'href', esc_url( $item_settings['item_btn_url']['url'] ) );
 
@@ -2236,9 +2260,9 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 		$format = apply_filters( 'jet-elements/horizontal-timeline/button-format', '<div class="jet-hor-timeline-item__card-btn-wrap"><a %2$s>%1$s</a></div>' );
 
 		printf(
-			$format,
-			$item_settings['item_btn_text'],
-			$this->get_render_attribute_string( 'button_' . $item_settings['_id'] )
+			$format, // phpcs:ignore
+			wp_kses_post( $item_settings['item_btn_text'] ),
+			$this->get_render_attribute_string( 'button_' . $item_settings['_id'] ) // phpcs:ignore
 		);
 	}
 
@@ -2250,7 +2274,7 @@ class Jet_Elements_Horizontal_Timeline extends Jet_Elements_Base {
 				$this->_icon( 'item_point_icon', '<span class="jet-elements-icon">%s</span>' );
 				break;
 			case 'text':
-				echo $this->_loop_item( array( 'item_point_text' ), '%s' );
+				echo $this->_loop_item( array( 'item_point_text' ), '%s' ); // phpcs:ignore
 				break;
 		}
 		echo '</div>';

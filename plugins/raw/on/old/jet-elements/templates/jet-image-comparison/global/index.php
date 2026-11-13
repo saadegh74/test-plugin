@@ -6,6 +6,6 @@
 $classes_list[] = 'jet-image-comparison';
 $classes = implode( ' ', $classes_list );
 
-?><div class="<?php echo $classes; ?>">
+?><div class="<?php echo esc_attr( $classes ); ?>">
 	<?php $this->_get_global_looped_template( 'image-comparison', 'item_list' ); ?>
 </div>

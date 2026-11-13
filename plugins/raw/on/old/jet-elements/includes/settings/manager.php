@@ -69,7 +69,7 @@ class Settings {
 	public function register_settings_category() {
 
 		\Jet_Dashboard\Dashboard::get_instance()->module_manager->register_module_category( array(
-			'name'     => esc_html__( 'JetElements', 'jet-elements' ),
+			'name'     => esc_html__( 'جت المنت', 'jet-elements' ),
 			'slug'     => 'jet-elements-settings',
 			'priority' => 1
 		) );

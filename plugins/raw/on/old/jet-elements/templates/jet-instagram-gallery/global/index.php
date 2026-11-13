@@ -22,13 +22,12 @@ if ( 'masonry' === $settings['layout_type'] ) {
 	$this->add_script_depends( 'jet-salvattore' );
 }
 
-$columns        = $settings['columns'];
-$columns_tablet = $settings['columns_tablet'];
-$columns_mobile = $settings['columns_mobile'];
-
-$columns        = empty( $columns ) ? 3 : $columns;
-$columns_tablet = empty( $columns_tablet ) ? 2 : $columns_tablet;
-$columns_mobile = empty( $columns_mobile ) ? 1 : $columns_mobile;
+$column_settings = $this->get_column_settings();
+$columns         = $column_settings['columns'];
+$columns_tablet  = $column_settings['columns_tablet'];
+$columns_mobile  = $column_settings['columns_mobile'];
+$initial_posts   = $this->get_initial_posts_counts( $settings );
+$total_posts     = $this->get_total_posts_count( $settings );
 
 $class_array[] =  'column-desktop-' . $columns;
 $class_array[] =  'column-tablet-' . $columns_tablet;
@@ -38,6 +37,14 @@ $classes = implode( ' ', $class_array );
 $attrs = implode( ' ', $attr_array );
 ?>
 
-<div class="<?php echo $classes; ?>" <?php echo $attrs; ?> <?php echo $data_settings; ?>><?php
+<div class="<?php echo esc_attr( $classes ); ?>" <?php echo $attrs; // phpcs:ignore ?> <?php echo $data_settings; // phpcs:ignore ?>><?php
 	$this->render_gallery();
 ?></div>
+
+<?php if ( ! empty( $settings['enable_load_more'] ) && 'yes' === $settings['enable_load_more'] && $total_posts > max( $initial_posts ) ) : ?>
+	<div class="jet-instagram-gallery__load-more-wrap">
+		<button class="jet-instagram-gallery__load-more elementor-button elementor-size-md" type="button">
+			<?php echo esc_html( ! empty( $settings['load_more_text'] ) ? $settings['load_more_text'] : esc_html__( 'Load More', 'jet-elements' ) ); ?>
+		</button>
+	</div>
+<?php endif; ?>

@@ -38,30 +38,34 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	public function get_script_depends() {
 
-		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) {
-			return array( 'jquery-tablesorter' );
+		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) { // phpcs:ignore
+			return array( 'jquery-tablesorter', 'jet-table');
 		}
 
 		if ( 'yes' === $this->get_settings( 'sorting_table' ) ) {
-			return array( 'jquery-tablesorter' );
+			return array( 'jquery-tablesorter', 'jet-table' );
 		}
 
-		return array();
+		return array( 'jet-table' );
 	}
 
 	public function get_style_depends() {
 
-		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) {
-			return array( 'elementor-icons-fa-solid' );
+		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) { // phpcs:ignore
+			return array( 'elementor-icons-fa-solid', 'jet-table' );
 		}
 
 		if ( 'yes' === $this->get_settings( 'sorting_table' ) ) {
-			return array( 'elementor-icons-fa-solid' );
+			return array( 'elementor-icons-fa-solid', 'jet-table');
 		}
 
-		return array();
+		return array( 'jet-table' );
 	}
 
 	protected function register_controls() {
@@ -106,6 +110,11 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'table_body_img_before'   => '.jet-table__body-cell .jet-table__cell-img--before',
 				'table_body_img_after'    => '.jet-table__body-cell .jet-table__cell-img--after',
 				'table_body_cell_link'    => '.jet-table__cell-link',
+				'table_rating'            => '.jet-table__cell-rating',
+				'table_rating_star'       => '.jet-table__cell-rating-star',
+				'table_rating_star_filled'=> '.jet-table__cell-rating-star--filled',
+				'table_rating_star_empty' => '.jet-table__cell-rating-star--empty',
+				'table_rating_content'    => '.jet-table__cell-content--rating',
 			)
 		);
 
@@ -137,7 +146,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 			)
 		);
 
-		$table_header_repeater = new Repeater();
+		$table_header_repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$table_header_repeater->start_controls_tabs( 'header_tabs' );
 
@@ -149,11 +158,54 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 		);
 
 		$table_header_repeater->add_control(
+			'cell_content_type',
+			array(
+				'label'   => esc_html__( 'Content Type', 'jet-elements' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'text',
+				'options' => array(
+					'text'   => esc_html__( 'Text', 'jet-elements' ),
+					'rating' => esc_html__( 'Star Rating', 'jet-elements' ),
+				),
+			)
+		);
+
+		$table_header_repeater->add_control(
 			'cell_text',
 			array(
 				'label'   => esc_html__( 'Text', 'jet-elements' ),
 				'type'    => Controls_Manager::TEXT,
 				'dynamic' => array( 'active' => true ),
+				'condition' => array(
+					'cell_content_type' => 'text',
+				),
+			)
+		);
+
+		$table_header_repeater->add_control(
+			'rating_value',
+			array(
+				'label'   => esc_html__( 'Rating Value', 'jet-elements' ),
+				'type'    => Controls_Manager::TEXT,
+				'dynamic' => array( 'active' => true ),
+				'default' => '5',
+				'condition' => array(
+					'cell_content_type' => 'rating',
+				),
+			)
+		);
+
+		$table_header_repeater->add_control(
+			'rating_max',
+			array(
+				'label'   => esc_html__( 'Maximum Rating', 'jet-elements' ),
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 5,
+				'min'     => 1,
+				'step'    => 1,
+				'condition' => array(
+					'cell_content_type' => 'rating',
+				),
 			)
 		);
 
@@ -168,6 +220,9 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 					'icon'  => esc_html__( 'Icon', 'jet-elements' ),
 					'image' => esc_html__( 'Image', 'jet-elements' ),
 				),
+				'condition' => array(
+					'cell_content_type' => 'text',
+				),
 			)
 		);
 
@@ -178,6 +233,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'label_block' => true,
 				'type'        => Controls_Manager::ICON,
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'icon',
 				),
 			),
@@ -191,6 +247,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'type'      => Controls_Manager::MEDIA,
 				'dynamic'   => array( 'active' => true ),
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'image',
 				),
 			)
@@ -202,6 +259,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'name' => 'cell_image_size',
 				'default' => 'thumbnail',
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'image',
 				),
 			)
@@ -218,6 +276,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 					'after'  => esc_html__( 'After', 'jet-elements' ),
 				),
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image!' => '',
 				),
 			)
@@ -255,7 +314,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 					),
 				),
 				'selectors' => array(
-					'{{WRAPPER}} {{CURRENT_ITEM}}' . $css_scheme['table_head_cell']  => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} {{CURRENT_ITEM}}' . $css_scheme['table_head_cell']  => 'width: {{SIZE}}{{UNIT}}; min-width: {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -327,7 +386,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 			)
 		);
 
-		$table_body_repeater = new Repeater();
+		$table_body_repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$table_body_repeater->add_control(
 			'action',
@@ -396,6 +455,22 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 		);
 
 		$table_body_repeater->add_control(
+			'cell_content_type',
+			array(
+				'label'   => esc_html__( 'Content Type', 'jet-elements' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'text',
+				'options' => array(
+					'text'   => esc_html__( 'Text', 'jet-elements' ),
+					'rating' => esc_html__( 'Star Rating', 'jet-elements' ),
+				),
+				'condition' => array(
+					'action' => 'cell',
+				),
+			)
+		);
+
+		$table_body_repeater->add_control(
 			'cell_text',
 			array(
 				'label'     => esc_html__( 'Text', 'jet-elements' ),
@@ -403,6 +478,36 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'dynamic'   => array( 'active' => true ),
 				'condition' => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
+				),
+			)
+		);
+
+		$table_body_repeater->add_control(
+			'rating_value',
+			array(
+				'label'   => esc_html__( 'Rating Value', 'jet-elements' ),
+				'type'    => Controls_Manager::TEXT,
+				'dynamic' => array( 'active' => true ),
+				'default' => '5',
+				'condition' => array(
+					'action' => 'cell',
+					'cell_content_type' => 'rating',
+				),
+			)
+		);
+
+		$table_body_repeater->add_control(
+			'rating_max',
+			array(
+				'label'   => esc_html__( 'Maximum Rating', 'jet-elements' ),
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 5,
+				'min'     => 1,
+				'step'    => 1,
+				'condition' => array(
+					'action' => 'cell',
+					'cell_content_type' => 'rating',
 				),
 			)
 		);
@@ -416,6 +521,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'placeholder' => esc_html__( 'https://your-link.com', 'jet-elements' ),
 				'condition'   => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
 				),
 			)
 		);
@@ -433,6 +539,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				),
 				'condition' => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
 				),
 			)
 		);
@@ -445,6 +552,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'type'        => Controls_Manager::ICON,
 				'condition' => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'icon',
 				),
 			),
@@ -459,6 +567,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'dynamic'   => array( 'active' => true ),
 				'condition' => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'image',
 				),
 			)
@@ -471,6 +580,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'default' => 'thumbnail',
 				'condition' => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'image',
 				),
 			)
@@ -488,6 +598,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				),
 				'condition' => array(
 					'action' => 'cell',
+					'cell_content_type' => 'text',
 					'add_icon_or_image!' => '',
 				),
 			)
@@ -637,7 +748,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 			)
 		);
 
-		$table_footer_repeater = new Repeater();
+		$table_footer_repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$table_footer_repeater->start_controls_tabs( 'footer_tabs' );
 
@@ -649,11 +760,54 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 		);
 
 		$table_footer_repeater->add_control(
+			'cell_content_type',
+			array(
+				'label'   => esc_html__( 'Content Type', 'jet-elements' ),
+				'type'    => Controls_Manager::SELECT,
+				'default' => 'text',
+				'options' => array(
+					'text'   => esc_html__( 'Text', 'jet-elements' ),
+					'rating' => esc_html__( 'Star Rating', 'jet-elements' ),
+				),
+			)
+		);
+
+		$table_footer_repeater->add_control(
 			'cell_text',
 			array(
 				'label'   => esc_html__( 'Text', 'jet-elements' ),
 				'type'    => Controls_Manager::TEXT,
 				'dynamic' => array( 'active' => true ),
+				'condition' => array(
+					'cell_content_type' => 'text',
+				),
+			)
+		);
+
+		$table_footer_repeater->add_control(
+			'rating_value',
+			array(
+				'label'   => esc_html__( 'Rating Value', 'jet-elements' ),
+				'type'    => Controls_Manager::TEXT,
+				'dynamic' => array( 'active' => true ),
+				'default' => '5',
+				'condition' => array(
+					'cell_content_type' => 'rating',
+				),
+			)
+		);
+
+		$table_footer_repeater->add_control(
+			'rating_max',
+			array(
+				'label'   => esc_html__( 'Maximum Rating', 'jet-elements' ),
+				'type'    => Controls_Manager::NUMBER,
+				'default' => 5,
+				'min'     => 1,
+				'step'    => 1,
+				'condition' => array(
+					'cell_content_type' => 'rating',
+				),
 			)
 		);
 
@@ -668,6 +822,9 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 					'icon'  => esc_html__( 'Icon', 'jet-elements' ),
 					'image' => esc_html__( 'Image', 'jet-elements' ),
 				),
+				'condition' => array(
+					'cell_content_type' => 'text',
+				),
 			)
 		);
 
@@ -678,6 +835,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'label_block' => true,
 				'type'        => Controls_Manager::ICON,
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'icon',
 				),
 			),
@@ -691,6 +849,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'type'      => Controls_Manager::MEDIA,
 				'dynamic'   => array( 'active' => true ),
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'image',
 				),
 			)
@@ -702,6 +861,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				'name' => 'cell_image_size',
 				'default' => 'thumbnail',
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image' => 'image',
 				),
 			)
@@ -718,6 +878,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 					'after'  => esc_html__( 'After', 'jet-elements' ),
 				),
 				'condition' => array(
+					'cell_content_type' => 'text',
 					'add_icon_or_image!' => '',
 				),
 			)
@@ -755,7 +916,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 					),
 				),
 				'selectors' => array(
-					'{{WRAPPER}} {{CURRENT_ITEM}}' . $css_scheme['table_foot_cell']  => 'width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} {{CURRENT_ITEM}}' . $css_scheme['table_foot_cell']  => 'width: {{SIZE}}{{UNIT}}; min-width: {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}};',
 				),
 			)
 		);
@@ -2146,6 +2307,137 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 		$this->_end_popover();
 
 		$this->_end_controls_section();
+
+		$this->_start_controls_section(
+			'section_table_rating_style',
+			array(
+				'label' => esc_html__( 'Star Rating', 'jet-elements' ),
+				'tab'   => Controls_Manager::TAB_STYLE,
+			)
+		);
+
+		$this->_add_responsive_control(
+			'table_rating_size',
+			array(
+				'label' => esc_html__( 'Star Size', 'jet-elements' ),
+				'type'  => Controls_Manager::SLIDER,
+				'size_units' => array( 'px', 'em', 'rem', 'custom' ),
+				'range' => array(
+					'px' => array(
+						'min' => 1,
+						'max' => 100,
+					),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['table_rating'] => 'font-size: {{SIZE}}{{UNIT}};',
+				),
+			),
+			20
+		);
+
+		$this->_add_control(
+			'table_rating_filled_color',
+			array(
+				'label' => esc_html__( 'Filled Star Color', 'jet-elements' ),
+				'type'  => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['table_rating_star_filled'] => 'color: {{VALUE}};',
+				),
+			),
+			20
+		);
+
+		$this->_add_control(
+			'table_rating_empty_color',
+			array(
+				'label' => esc_html__( 'Empty Star Color', 'jet-elements' ),
+				'type'  => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['table_rating_star_empty'] => 'color: {{VALUE}};',
+				),
+			),
+			20
+		);
+
+		$this->_add_responsive_control(
+			'table_rating_gap',
+			array(
+				'label' => esc_html__( 'Gap Between Stars', 'jet-elements' ),
+				'type'  => Controls_Manager::SLIDER,
+				'range' => array(
+					'px' => array(
+						'min' => 0,
+						'max' => 40,
+					),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['table_rating'] => 'gap: {{SIZE}}{{UNIT}};',
+				),
+			),
+			20
+		);
+
+		$this->_add_responsive_control(
+			'table_rating_alignment',
+			array(
+				'label' => esc_html__( 'Alignment', 'jet-elements' ),
+				'type'  => Controls_Manager::CHOOSE,
+				'options' => array(
+					'flex-start' => array(
+						'title' => esc_html__( 'Left', 'jet-elements' ),
+						'icon'  => 'eicon-h-align-left',
+					),
+					'center' => array(
+						'title' => esc_html__( 'Center', 'jet-elements' ),
+						'icon'  => 'eicon-h-align-center',
+					),
+					'flex-end' => array(
+						'title' => esc_html__( 'Right', 'jet-elements' ),
+						'icon'  => 'eicon-h-align-right',
+					),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_scheme['table_rating_content'] => 'justify-content: {{VALUE}};',
+				),
+			),
+			20
+		);
+
+		$this->_end_controls_section();
+	}
+
+	protected function get_rating_data( $item = array() ) {
+		$max_rating = ! empty( $item['rating_max'] ) ? absint( $item['rating_max'] ) : 5;
+		$max_rating = max( 1, $max_rating );
+
+		$rating_raw = isset( $item['rating_value'] ) ? $item['rating_value'] : 0;
+		$rating     = absint( wp_unslash( $rating_raw ) );
+		$rating     = min( $rating, $max_rating );
+
+		return array(
+			'value' => $rating,
+			'max'   => $max_rating,
+		);
+	}
+
+	protected function get_rating_html( $item = array() ) {
+		$rating_data = $this->get_rating_data( $item );
+		$stars       = '';
+
+		for ( $i = 1; $i <= $rating_data['max']; $i++ ) {
+			$is_filled = $i <= $rating_data['value'];
+			$stars    .= sprintf(
+				'<span class="jet-table__cell-rating-star jet-table__cell-rating-star--%1$s" aria-hidden="true">%2$s</span>',
+				$is_filled ? 'filled' : 'empty',
+				$is_filled ? '&#9733;' : '&#9734;'
+			);
+		}
+
+		return sprintf(
+			'<div class="jet-table__cell-rating" aria-label="%1$s">%2$s</div>',
+			esc_attr( sprintf( __( '%1$s out of %2$s', 'jet-elements' ), $rating_data['value'], $rating_data['max'] ) ),
+			$stars
+		);
 	}
 
 	protected function render() {
@@ -2179,13 +2471,13 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 		}
 		?>
 
-		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
-			<table <?php echo $this->get_render_attribute_string( 'table' ); ?>>
-				<thead class="jet-table__head"><?php echo $this->get_table_cells( $table_head, 'head' ); ?></thead>
+		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); // phpcs:ignore ?>>
+			<table <?php echo $this->get_render_attribute_string( 'table' ); // phpcs:ignore ?>>
+				<thead class="jet-table__head"><?php echo $this->get_table_cells( $table_head, 'head' ); // phpcs:ignore ?></thead>
 				<?php if ( ! empty( $table_footer ) ): ?>
-				<tfoot class="jet-table__foot"><?php echo $this->get_table_cells( $table_footer, 'foot' ); ?></tfoot>
+				<tfoot class="jet-table__foot"><?php echo $this->get_table_cells( $table_footer, 'foot' ); // phpcs:ignore ?></tfoot>
 				<?php endif; ?>
-				<tbody class="jet-table__body<?php if ( ! empty( $table_footer ) ): ?> jet-table__body_no-border-radius<?php endif; ?>"><?php echo $this->get_table_cells( $table_body, 'body' ); ?></tbody>
+				<tbody class="jet-table__body<?php if ( ! empty( $table_footer ) ): ?> jet-table__body_no-border-radius<?php endif; ?>"><?php echo $this->get_table_cells( $table_body, 'body' ); // phpcs:ignore ?></tbody>
 			</table>
 		</div>
 
@@ -2233,24 +2525,43 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 				$additional_content = '';
 				$additional_element = isset( $item['add_icon_or_image'] ) ? $item['add_icon_or_image'] : '';
 				$position = isset( $item['additional_elem_position'] ) ? $item['additional_elem_position'] : 'before';
+				$content_type = isset( $item['cell_content_type'] ) ? $item['cell_content_type'] : 'text';
 
-				if ( 'icon' === $additional_element ) {
+				if ( 'text' === $content_type && 'icon' === $additional_element ) {
 					$icon_format        = '<span class="jet-elements-icon jet-table__cell-icon jet-table__cell-icon--' . esc_attr( $position ) . '">%s</span>';
 					$additional_content = $this->_get_icon( 'cell_icon', $icon_format );
 				}
 
-				if ( 'image' === $additional_element && ! empty ( $item['cell_image']['url'] ) ) {
+				if ( 'text' === $content_type && 'image' === $additional_element && ! empty ( $item['cell_image']['url'] ) ) {
 					$image_html = Group_Control_Image_Size::get_attachment_image_html( $item, 'cell_image_size', 'cell_image' );
 
 					$additional_content = sprintf( '<div class="jet-table__cell-img jet-table__cell-img--%2$s">%1$s</div>', $image_html, esc_attr( $position ) );
 				}
 
-				$cell_text = ( ! empty( $item['cell_text'] ) || '0' === $item['cell_text'] ) ? sprintf( '<div class="jet-table__cell-text">%s</div>', $this->parse_text_editor( $item['cell_text'] ) ) : '';
+				$cell_text = '';
 
-				$cell_content = sprintf( '<div class="jet-table__cell-content">%1$s%2$s</div>', $additional_content, $cell_text );
+				if ( 'rating' === $content_type ) {
+					$cell_text = $this->get_rating_html( $item );
+				} elseif ( ! empty( $item['cell_text'] ) || '0' === $item['cell_text'] ) {
+					// Filter user HTML before parsing; registered shortcodes/embeds render trusted plugin markup.
+					$cell_text = sprintf( '<div class="jet-table__cell-text">%s</div>', $this->parse_text_editor( wp_kses_post( $item['cell_text'] ) ) );
+				}
+
+				$cell_content_class = 'jet-table__cell-content';
+
+				if ( 'rating' === $content_type ) {
+					$cell_content_class .= ' jet-table__cell-content--rating';
+				}
+
+				$cell_content = sprintf( '<div class="%3$s">%1$s%2$s</div>', $additional_content, $cell_text, esc_attr( $cell_content_class ) );
 
 				$this->add_render_attribute( 'cell-' . $item['_id'], 'class', 'jet-table__cell' );
 				$this->add_render_attribute( 'cell-' . $item['_id'], 'class', sprintf( 'elementor-repeater-item-%s', esc_attr( $item['_id'] ) ) );
+
+				if ( 'rating' === $content_type ) {
+					$rating_data = $this->get_rating_data( $item );
+					$this->add_render_attribute( 'cell-' . $item['_id'], 'data-sort-value', $rating_data['value'] );
+				}
 
 				if ( ! empty( $item['col_span'] ) ) {
 					$this->add_render_attribute( 'cell-' . $item['_id'], 'colspan', esc_attr( $item['col_span'] ) );
@@ -2293,7 +2604,7 @@ class Jet_Elements_Table extends Jet_Elements_Base {
 						$this->add_render_attribute( 'cell-inner-' . $item['_id'], 'class', 'jet-table__cell-link' );
 
 						if ( method_exists( $this, 'add_link_attributes' ) ) {
-							$this->add_link_attributes( 'cell-inner-' . $item['_id'], $item['cell_link'] );
+							$this->add_link_attributes( 'cell-inner-' . $item['_id'], $this->sanitize_link_control( $item['cell_link'] ) );
 						} else {
 							$this->add_render_attribute( 'cell-inner-' . $item['_id'], 'href', esc_url( $item['cell_link']['url'] ) );
 

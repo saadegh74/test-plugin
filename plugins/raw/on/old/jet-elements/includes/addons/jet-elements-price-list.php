@@ -46,6 +46,10 @@ class Jet_Elements_Price_List extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	public function get_style_depends() { 
+		return array( 'jet-price-list', 'jet-price-list-skin' ); 
+	}
+
 	protected function register_controls() {
 		$css_scheme = apply_filters(
 			'jet-elements/price-list/css-scheme',
@@ -72,7 +76,7 @@ class Jet_Elements_Price_List extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'price_list' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'item_title',
@@ -896,9 +900,9 @@ class Jet_Elements_Price_List extends Jet_Elements_Base {
 		$id = $this->_processed_item['_id'];
 
 		if ( method_exists( $this, 'add_link_attributes' ) ) {
-			$this->add_link_attributes( 'link-' . $id, $item[ $url_key ] );
+				$this->add_link_attributes( 'link-' . $id, $this->sanitize_link_control( $item[ $url_key ] ) );
 		} else {
-			$this->add_render_attribute( 'link-' . $id, 'href', $item[ $url_key ]['url'] );
+				$this->add_render_attribute( 'link-' . $id, 'href', esc_url( $item[ $url_key ]['url'] ) );
 
 			if ( ! empty( $item[ $url_key ]['is_external'] ) ) {
 				$this->add_render_attribute( 'link-' . $id, 'target', '_blank' );
@@ -911,19 +915,21 @@ class Jet_Elements_Price_List extends Jet_Elements_Base {
 
 		printf(
 			'<a %s>',
-			$this->get_render_attribute_string( 'link-' . $id )
-		);
+			$this->get_render_attribute_string( 'link-' . $id ) // phpcs:ignore
+	);
 
 	}
 
 	public function _open_price_item_link_edit( $url_key ) {
 
-		echo '<# if ( item.' . $url_key . '.url ) { #>';
+		$format = '<a href="%1$s" class="price-list__item-link"%2$s%3$s>';
+
+		echo '<# if ( item.' . $url_key . '.url ) { #>'; // phpcs:ignore
 		printf(
-			'<a href="%1$s" class="price-list__item-link"%2$s%3$s>',
-			'{{{ item.' . $url_key . '.url }}}',
-			'<# if ( item.' . $url_key . '.is_external ) { #> target="_blank"<# } #>',
-			'<# if ( item.' . $url_key . '.nofollow ) { #> rel="nofollow"<# } #>'
+			$format,
+			$this->get_template_render_value( 'item.' . $url_key . '.url', $format, 1 ), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'<# if ( item.' . $url_key . '.is_external ) { #> target="_blank"<# } #>', // phpcs:ignore
+			'<# if ( item.' . $url_key . '.nofollow ) { #> rel="nofollow"<# } #>' // phpcs:ignore
 		);
 		echo '<# } #>';
 
@@ -947,7 +953,7 @@ class Jet_Elements_Price_List extends Jet_Elements_Base {
 
 	public function _close_price_item_link_edit( $url_key ) {
 
-		echo '<# if ( item.' . $url_key . '.url ) { #>';
+		echo '<# if ( item.' . $url_key . '.url ) { #>'; // phpcs:ignore
 		echo '</a>';
 		echo '<# } #>';
 
@@ -969,7 +975,7 @@ class Jet_Elements_Price_List extends Jet_Elements_Base {
 		}
 		
 		return sprintf( '<div class="price-list__item-img-wrap"><img src="%1$s" alt="%2$s" class="price-list__item-img" loading="lazy"></div>',
-			$image_item['url'],
+			esc_url( $image_item['url'] ),
 			esc_attr( Control_Media::get_image_alt( $image_item ) )
 		);
 	}

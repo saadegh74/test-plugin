@@ -41,23 +41,27 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	public function get_script_depends() {
-		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) {
-			return array( 'mediaelement', 'mejs-speed' );
+		if ( isset( $_GET['elementor-preview'] ) && 'wp_enqueue_scripts' === current_filter() ) { // phpcs:ignore
+			return array( 'mediaelement', 'mejs-speed', 'jet-audio' );
 		} else if ( 'yes' === $this->get_settings( 'speed' ) ){
-			return array( 'mediaelement', 'mejs-speed' );
+			return array( 'mediaelement', 'mejs-speed', 'jet-audio' );
 		} else {
-			return array( 'mediaelement' );
+			return array( 'mediaelement', 'jet-audio' );
 		}
 	}
 
 	public function get_style_depends() {
-		if ( isset( $_GET['elementor-preview'] ) ) {
-			return array( 'mediaelement', 'mejs-speed-css', 'elementor-icons-fa-solid' );
+		if ( isset( $_GET['elementor-preview'] ) ) { // phpcs:ignore
+			return array( 'mediaelement', 'mejs-speed-css', 'elementor-icons-fa-solid', 'jet-audio' );
 		} else if ( 'yes' === $this->get_settings( 'speed' ) ){
-			return array( 'mediaelement', 'mejs-speed-css', 'elementor-icons-fa-solid' );
+			return array( 'mediaelement', 'mejs-speed-css', 'elementor-icons-fa-solid', 'jet-audio' );
 		} else {
-			return array( 'mediaelement', 'elementor-icons-fa-solid' );
+			return array( 'mediaelement', 'elementor-icons-fa-solid', 'jet-audio' );
 		}
 	}
 
@@ -157,7 +161,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 			'audio_support_desc',
 			array(
 				'type' => Controls_Manager::RAW_HTML,
-				'raw'  => esc_html__( 'Audio Player support MP3 audio format', 'jet-elements' ),
+				'raw'  => esc_html__( 'Audio Player supports MP3, Google Drive, SoundCloud, Spotify, and YouTube audio formats', 'jet-elements' ),
 				'content_classes' => 'elementor-descriptor',
 			)
 		);
@@ -337,7 +341,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 					),
 				),
 				'selectors' => array(
-					'{{WRAPPER}} .elementor-widget-container' => 'max-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .elementor-jet-audio' => 'max-width: {{SIZE}}{{UNIT}};',
 				),
 			),
 			25
@@ -410,7 +414,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 					),
 				),
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['play_pause_btn'] => 'font-size: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['play_pause_btn'] . ':before' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
 				),
 			),
 			50
@@ -431,7 +435,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 				'label' => esc_html__( 'Color', 'jet-elements' ),
 				'type'  => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['play_pause_btn'] => 'color: {{VALUE}};',
+					'{{WRAPPER}} ' . $css_scheme['play_pause_btn'] . ':before' => 'background-color: {{VALUE}};',
 				),
 			),
 			25
@@ -464,7 +468,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 				'label' => esc_html__( 'Color', 'jet-elements' ),
 				'type'  => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['play_pause_btn'] . ':hover' => 'color: {{VALUE}};',
+					'{{WRAPPER}} ' . $css_scheme['play_pause_btn'] . ':hover:before' => 'background-color: {{VALUE}};',
 				),
 			),
 			25
@@ -800,7 +804,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 					),
 				),
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['volume_btn'] => 'font-size: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} ' . $css_scheme['volume_btn'] . ':before' => 'width: {{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
 				),
 				'condition' => array(
 					'volume' => 'yes',
@@ -827,7 +831,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 				'label' => esc_html__( 'Color', 'jet-elements' ),
 				'type'  => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['volume_btn'] => 'color: {{VALUE}};',
+					'{{WRAPPER}} ' . $css_scheme['volume_btn'] . ':before'=> 'background-color: {{VALUE}};',
 				),
 				'condition' => array(
 					'volume' => 'yes',
@@ -869,7 +873,7 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 				'label' => esc_html__( 'Color', 'jet-elements' ),
 				'type'  => Controls_Manager::COLOR,
 				'selectors' => array(
-					'{{WRAPPER}} ' . $css_scheme['volume_btn'] . ':hover' => 'color: {{VALUE}};',
+					'{{WRAPPER}} ' . $css_scheme['volume_btn'] . ':hover:before' => 'background-color: {{VALUE}};',
 				),
 				'condition' => array(
 					'volume' => 'yes',
@@ -1512,10 +1516,40 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 
 		if ( is_numeric( $audio_url ) ) {
 			$audio_url = wp_get_attachment_url( $audio_url );
+		} else if ( strpos( $audio_url, ',' ) !== false ) {
+			$parts = array_map( 'trim', explode( ',', $audio_url ) );
+			$url = wp_get_attachment_url( $parts[0] );
+			$audio_url = $url ? $url : ( $parts[1] ?? '' );
 		}
 
 		if ( empty( $audio_url ) ) {
 			return;
+		}
+
+		$is_embed  = false;
+		$embed_src = '';
+
+		// YouTube Music to YouTube for MediaElement compatibility
+		if ( preg_match( '#music\.youtube\.com/watch\?v=([A-Za-z0-9_-]+)#i', $audio_url, $m ) ) {
+			$audio_url = sprintf( 'https://www.youtube.com/watch?v=%s', $m[1] );
+		}
+		// Google Drive
+		if ( preg_match( '#drive\.google\.com\/file\/d\/([^\/]+)/?#', $audio_url, $m ) ) {
+			$is_embed  = true;
+			$embed_src = sprintf( 'https://drive.google.com/file/d/%s/preview', esc_attr( $m[1] ) );
+		}
+		// SoundCloud
+		elseif ( preg_match( '#soundcloud\.com#i', $audio_url ) ) {
+			$is_embed  = true;
+			$embed_src = sprintf(
+				'https://w.soundcloud.com/player/?url=%s',
+				rawurlencode( $audio_url )
+			);
+		}
+		// Spotify
+		elseif ( preg_match( '#open\.spotify\.com/track/([A-Za-z0-9]+)#', $audio_url, $m ) ) {
+			$is_embed  = true;
+			$embed_src = sprintf( 'https://open.spotify.com/embed/track/%s', esc_attr( $m[1] ) );
 		}
 
 		$controls = array( 'playpause' );
@@ -1583,7 +1617,19 @@ class Jet_Elements_Audio extends Jet_Elements_Base {
 		?>
 
 		<div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
-			<audio <?php $this->print_render_attribute_string( 'player' ); ?>></audio>
+			<?php if ( ! $is_embed ) : ?>
+				<audio <?php $this->print_render_attribute_string( 'player' ); ?>></audio>
+			<?php else : ?>
+				<iframe
+					class="jet-audio-iframe"
+					src="<?php echo esc_url( $embed_src ); ?>"
+					width="100%"
+					height="200"
+					frameborder="0"
+					allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+					allowfullscreen>
+				</iframe>
+			<?php endif; ?>
 		</div>
 
 		<?php

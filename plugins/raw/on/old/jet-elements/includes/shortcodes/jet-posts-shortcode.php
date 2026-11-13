@@ -15,6 +15,17 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 	 *
 	 * @return string
 	 */
+	/** Shortcode-only schema; the widget registers these repeaters separately. */
+	public function get_validation_controls() {
+		$controls = $this->get_atts();
+		foreach ( array( 'title_related', 'content_related' ) as $position ) {
+			$controls[ 'show_' . $position . '_meta' ] = array( 'type' => 'switcher', 'return_value' => 'yes', 'default' => false );
+			$controls[ 'meta_' . $position . '_position' ] = array( 'type' => 'select', 'default' => '', 'options' => array( 'before' => 'Before', 'after' => 'After' ) );
+			$controls[ $position . '_meta' ] = array( 'type' => 'repeater', 'fields' => array( 'meta_callback' => array( 'type' => 'select', 'options' => jet_elements_tools()->allowed_meta_callbacks(), 'default' => '' ) ) );
+		}
+		return $controls;
+	}
+
 	public function get_tag() {
 		return 'jet-posts';
 	}
@@ -215,6 +226,14 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 				'default'      => 'yes',
 				'separator'    => 'before',
 			),
+			'show_post_links' => array(
+				'type'         => 'switcher',
+				'label'        => esc_html__( 'Link Title and Image', 'jet-elements' ),
+				'label_on'     => esc_html__( 'Yes', 'jet-elements' ),
+				'label_off'    => esc_html__( 'No', 'jet-elements' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+			),
 
 			'title_html_tag' => array(
 				'type'       => 'select',
@@ -333,6 +352,43 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 				'condition' => array(
 					'show_image'    => array( 'yes' ),
 					'show_image_as' => array( 'image' ),
+				),
+			),
+			'thumb_ratio' => array(
+				'type'       => 'slider',
+				'label'      => esc_html__( 'Image Ratio', 'jet-elements' ),
+				'range' => [
+					'px' => [
+						'min'        => 0.1,
+						'max'        => 3,
+						'step'       => 0.1,
+					],
+				],
+				'responsive' => true,
+				'condition' => array(
+					'show_image'    => array( 'yes' ),
+					'show_image_as' => array( 'image' ),
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .post-thumbnail__img' => 'aspect-ratio: {{SIZE}};',
+				),
+			),
+			'thumb_fit' => array(
+				'type'       => 'select',
+				'label'      => esc_html__( 'Image Fit', 'jet-elements' ),
+				'default'    => '',
+				'options'    => array(
+					''  => 'Default',
+					'contain'  => esc_html__( 'Contain', 'jet-elements' ),
+					'cover'    => esc_html__( 'Cover', 'jet-elements' ),
+				),
+				'condition' => array(
+					'show_image'    => array( 'yes' ),
+					'show_image_as' => array( 'image' ),
+					'thumb_ratio[size]!' => '',
+				),
+				'selectors' => array(
+					'{{WRAPPER}} .post-thumbnail__img' => 'object-fit: {{VALUE}};',
 				),
 			),
 			'show_excerpt' => array(
@@ -736,15 +792,37 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 			return;
 		}
 
-		$thumb_id   = get_post_thumbnail_id();
-		$thumb_size = $this->get_attr( 'bg_thumb_size' );
-		$thumb_url  = wp_get_attachment_image_url( $thumb_id, $thumb_size );
+		$thumb_id    = get_post_thumbnail_id();
+		$thumb_size  = $this->get_attr( 'bg_thumb_size' );
+		$thumb_url   = wp_get_attachment_image_url( $thumb_id, $thumb_size );
+		$bg_size     = $this->get_attr( 'bg_size' );
+		$bg_position = $this->get_attr( 'bg_position' );
+
+		if ( ! in_array( $bg_size, array( 'cover', 'contain' ), true ) ) {
+			$bg_size = 'cover';
+		}
+
+		$allowed_positions = array(
+			'center center',
+			'center left',
+			'center right',
+			'top center',
+			'top left',
+			'top right',
+			'bottom center',
+			'bottom left',
+			'bottom right',
+		);
+
+		if ( ! in_array( $bg_position, $allowed_positions, true ) ) {
+			$bg_position = 'center center';
+		}
 
 		printf(
 			' style="background-image: url(\'%1$s\'); background-repeat: no-repeat; background-size: %2$s; background-position: %3$s;"',
-			$thumb_url,
-			$this->get_attr( 'bg_size' ),
-			$this->get_attr( 'bg_position' )
+			esc_url( $thumb_url ),
+			esc_attr( $bg_size ),
+			esc_attr( $bg_position )
 		);
 
 	}
@@ -774,7 +852,7 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 			return;
 		}
 
-		if ( empty( $meta_config ) ) {
+		if ( empty( $meta_config ) || ! is_array( $meta_config ) ) {
 			return;
 		}
 
@@ -782,12 +860,17 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 
 		foreach ( $meta_config as $meta ) {
 
-			if ( empty( $meta['meta_key'] ) ) {
+			if ( ! is_array( $meta ) || empty( $meta['meta_key'] ) || ! is_string( $meta['meta_key'] ) ) {
 				continue;
 			}
 
 			$key      = $meta['meta_key'];
-			$callback = ! empty( $meta['meta_callback'] ) ? $meta['meta_callback'] : false;
+			$callback = ! empty( $meta['meta_callback'] ) && is_string( $meta['meta_callback'] ) ? $meta['meta_callback'] : false;
+			$meta_callbacks = jet_elements_tools()->allowed_meta_callbacks();
+			unset( $meta_callbacks[''] );
+			if ( ! in_array( $callback, array_keys( $meta_callbacks ), true ) || ! is_callable( $callback ) ) {
+				$callback = false;
+			}
 			$value    = get_post_meta( get_the_ID(), $key, false );
 
 			if ( ! $value ) {
@@ -809,41 +892,43 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 					case 'date':
 					case 'date_i18n':
 
-						$timestamp       = $value[0];
+						$timestamp       = is_scalar( $value[0] ) ? $value[0] : '';
 						$valid_timestamp = jet_elements_tools()->is_valid_timestamp( $timestamp );
 
 						if ( ! $valid_timestamp ) {
 							$timestamp = strtotime( $timestamp );
 						}
 
-						$format        = ! empty( $meta['date_format'] ) ? $meta['date_format'] : 'F j, Y';
+						$format        = ! empty( $meta['date_format'] ) && is_string( $meta['date_format'] ) ? $meta['date_format'] : 'F j, Y';
 						$callback_args = array( $format, $timestamp );
 
 						break;
 				}
 			}
 
-			$meta_callbacks = jet_elements_tools()->allowed_meta_callbacks();
-
-			unset( $meta_callbacks[''] );
-
-			$allowed_functions = array_keys( $meta_callbacks );
-
-			if ( in_array( $callback, $allowed_functions ) && ! empty( $callback ) && is_callable( $callback ) ) {
+			if ( $callback ) {
 				$meta_val = call_user_func_array( $callback, $callback_args );
 			} else {
 				$meta_val = $value[0];
 			}
 
-			$meta_val = sprintf( $meta['meta_format'], $meta_val );
+			// Only one string placeholder (and escaped percent signs) is supported.
+			$meta_format = isset( $meta['meta_format'] ) && is_string( $meta['meta_format'] ) ? $meta['meta_format'] : '%s';
+			$placeholders = str_replace( '%%', '', $meta_format );
+			if ( 1 !== substr_count( $placeholders, '%s' ) || false !== strpos( str_replace( '%s', '', $placeholders ), '%' ) ) {
+				$meta_format = '%s';
+			}
 
-			$label = ! empty( $meta['meta_label'] )
-				? sprintf( '<div class="%1$s__item-label">%2$s</div>', $base, $meta['meta_label'] )
+			// Sanitize after interpolation: the format may put the value in a URL or attribute.
+			$meta_val = wp_kses_post( sprintf( $meta_format, is_scalar( $meta_val ) ? $meta_val : '' ) );
+
+			$label = ! empty( $meta['meta_label'] ) && is_string( $meta['meta_label'] )
+				? sprintf( '<div class="%1$s__item-label">%2$s</div>', esc_attr( $base ), wp_kses_post( $meta['meta_label'] ) )
 				: '';
 
 			$result .= sprintf(
 				'<div class="%1$s__item %1$s__item-%4$s">%2$s<div class="%1$s__item-value">%3$s</div></div>',
-				$base, $label, $meta_val, esc_attr( $key )
+				esc_attr( $base ), $label, $meta_val, esc_attr( $key )
 			);
 
 		}
@@ -852,7 +937,7 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 			return;
 		}
 
-		printf( '<div class="%1$s">%2$s</div>', $base, $result );
+		printf( '<div class="%1$s">%2$s</div>', esc_attr( $base ), $result ); // phpcs:ignore
 
 	}
 
@@ -891,10 +976,12 @@ class Jet_Posts_Shortcode extends Jet_Elements_Shortcode_Base {
 		$result = '';
 
 		foreach ( $terms as $term ) {
-			$result .= sprintf( $format, $term->name, get_term_link( (int) $term->term_id, $tax ) );
+			$link = get_term_link( (int) $term->term_id, $tax );
+			if ( is_wp_error( $link ) ) { continue; }
+			$result .= wp_kses_post( sprintf( $format, wp_kses_post( $term->name ), esc_url( $link ) ) );
 		}
 
-		printf( '<div class="jet-posts__terms">%s</div>', $result );
+		printf( '<div class="jet-posts__terms">%s</div>', $result ); // phpcs:ignore
 
 	}
 

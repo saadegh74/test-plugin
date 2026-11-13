@@ -44,15 +44,38 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 		return array( 'cherry' );
 	}
 
+	public function get_style_depends() {
+
+		$styles = array( 'jet-map' );
+	
+		if ( ! function_exists( 'jet_elements_advanced_map_providers' ) ) {
+			return $styles;
+		}
+	
+		$provider = jet_elements_advanced_map_providers()->get_provider( $this->get_active_provider() );
+	
+		if ( $provider ) {
+			$styles = array_merge( $styles, $provider->get_style_depends() );
+		}
+	
+		return array_unique( $styles );
+	}
+
 	public function get_script_depends() {
 
-		$api_disabled = jet_elements_settings()->get( 'disable_api_js', [ 'disable' => 'false' ] );
-
-		if ( empty( $api_disabled ) || 'true' !== $api_disabled['disable'] ) {
-			return array( 'google-maps-api' );
-		} else {
-			return array();
+		$scripts = array( 'jet-map' );
+	
+		if ( ! function_exists( 'jet_elements_advanced_map_providers' ) ) {
+			return $scripts;
 		}
+	
+		$provider = jet_elements_advanced_map_providers()->get_provider( $this->get_active_provider() );
+	
+		if ( $provider ) {
+			$scripts = array_merge( $scripts, $provider->get_script_depends() );
+		}
+	
+		return array_unique( $scripts );
 	}
 
 	protected function register_controls() {
@@ -64,7 +87,8 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			)
 		);
 
-		$key = jet_elements_settings()->get( 'api_key' );
+		$key             = \jet_elements_settings()->get( 'api_key' );
+		$active_provider = $this->get_active_provider();
 
 		if ( ! $key ) {
 
@@ -75,8 +99,8 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 					'raw'  => sprintf(
 						esc_html__( 'Please set Google maps API key before using this widget. You can create own API key  %1$s. Paste created key on %2$s', 'jet-elements' ),
 						'<a target="_blank" href="https://developers.google.com/maps/documentation/javascript/get-api-key">' . esc_html__( 'here', 'jet-elements' ) . '</a>',
-						'<a target="_blank" href="' . jet_elements_settings()->get_settings_page_link( 'integrations' ) . '">' . esc_html__( 'settings page', 'jet-elements' ) . '</a>'
-					)
+						'<a target="_blank" href="' . \jet_elements_settings()->get_settings_page_link( 'integrations' ) . '">' . esc_html__( 'settings page', 'jet-elements' ) . '</a>'
+					),
 				)
 			);
 		}
@@ -199,44 +223,46 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			)
 		);
 
-		$this->add_control(
-			'fullscreen_control',
-			array(
-				'label'   => esc_html__( 'Fullscreen Control', 'jet-elements' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'true',
-				'options' => array(
-					'true'  => esc_html__( 'Show', 'jet-elements' ),
-					'false' => esc_html__( 'Hide', 'jet-elements' ),
-				),
-			)
-		);
+		if ( 'google' === $active_provider ) {
+			$this->add_control(
+				'fullscreen_control',
+				array(
+					'label'   => esc_html__( 'Fullscreen Control', 'jet-elements' ),
+					'type'    => Controls_Manager::SELECT,
+					'default' => 'true',
+					'options' => array(
+						'true'  => esc_html__( 'Show', 'jet-elements' ),
+						'false' => esc_html__( 'Hide', 'jet-elements' ),
+					),
+				)
+			);
 
-		$this->add_control(
-			'street_view',
-			array(
-				'label'   => esc_html__( 'Street View Controls', 'jet-elements' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'true',
-				'options' => array(
-					'true'  => esc_html__( 'Show', 'jet-elements' ),
-					'false' => esc_html__( 'Hide', 'jet-elements' ),
-				),
-			)
-		);
+			$this->add_control(
+				'street_view',
+				array(
+					'label'   => esc_html__( 'Street View Controls', 'jet-elements' ),
+					'type'    => Controls_Manager::SELECT,
+					'default' => 'true',
+					'options' => array(
+						'true'  => esc_html__( 'Show', 'jet-elements' ),
+						'false' => esc_html__( 'Hide', 'jet-elements' ),
+					),
+				)
+			);
 
-		$this->add_control(
-			'map_type',
-			array(
-				'label'   => esc_html__( 'Map Type Controls (Map/Satellite)', 'jet-elements' ),
-				'type'    => Controls_Manager::SELECT,
-				'default' => 'true',
-				'options' => array(
-					'true'  => esc_html__( 'Show', 'jet-elements' ),
-					'false' => esc_html__( 'Hide', 'jet-elements' ),
-				),
-			)
-		);
+			$this->add_control(
+				'map_type',
+				array(
+					'label'   => esc_html__( 'Map Type Controls (Map/Satellite)', 'jet-elements' ),
+					'type'    => Controls_Manager::SELECT,
+					'default' => 'true',
+					'options' => array(
+						'true'  => esc_html__( 'Show', 'jet-elements' ),
+						'false' => esc_html__( 'Hide', 'jet-elements' ),
+					),
+				)
+			);
+		}
 
 		$this->add_control(
 			'drggable',
@@ -274,29 +300,44 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			)
 		);
 
-		$this->add_control(
-			'map_style',
-			array(
-				'label'       => esc_html__( 'Map Style', 'jet-elements' ),
-				'type'        => Controls_Manager::SELECT,
-				'default'     => 'default',
-				'options'     => $this->_get_available_map_styles(),
-				'label_block' => true,
-				'description' => esc_html__( 'You can add own map styles within your theme. Add file with styles array in .json format into jet-elements/google-map-styles/ folder in your theme. File must be minified', 'jet-elements' )
-			)
-		);
+		if ( 'google' === $active_provider ) {
+			$this->add_control(
+				'map_style',
+				array(
+					'label'       => esc_html__( 'Map Style', 'jet-elements' ),
+					'type'        => Controls_Manager::SELECT,
+					'default'     => 'default',
+					'options'     => $this->_get_available_map_styles(),
+					'label_block' => true,
+					'description' => esc_html__( 'You can add own map styles within your theme. Add file with styles array in .json format into jet-elements/google-map-styles/ folder in your theme. File must be minified', 'jet-elements' ),
+				)
+			);
 
-		$this->add_control(
-			'custom_map_style_json',
-			array(
-				'label'     => esc_html__( 'Custom Style JSON', 'jet-elements' ),
-				'type'      => Controls_Manager::TEXTAREA,
-				'rows'      => 10,
-				'condition' => array(
-					'map_style' => 'custom',
-				),
-			)
-		);
+			$this->add_control(
+				'custom_map_style_json',
+				array(
+					'label'     => esc_html__( 'Custom Style JSON', 'jet-elements' ),
+					'type'      => Controls_Manager::TEXTAREA,
+					'rows'      => 10,
+					'condition' => array(
+						'map_style' => 'custom',
+					),
+				)
+			);
+		}
+
+		if ( 'mapbox' === $active_provider ) {
+			$this->add_control(
+				'mapbox_style',
+				array(
+					'label'       => esc_html__( 'Mapbox Style URL', 'jet-elements' ),
+					'type'        => Controls_Manager::TEXT,
+					'default'     => $this->get_default_mapbox_style(),
+					'label_block' => true,
+					'description' => esc_html__( 'You can get in your Mapbox account', 'jet-elements' ),
+				)
+			);
+		}
 
 		$this->end_controls_section();
 
@@ -309,7 +350,7 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 
 		do_action( 'jet-engine-query-gateway/control', $this, 'pins' );
 
-		$repeater = new Repeater();
+		$repeater = new \Elementor\Jet_Elements_Repeater();
 
 		$repeater->add_control(
 			'pin_address_type',
@@ -559,6 +600,8 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 				),
 				'selectors' => array(
 					'{{WRAPPER}} .gm-style .gm-style-iw-c' => 'width: {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .leaflet-popup-content'   => 'width: {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}};',
+					'{{WRAPPER}} .mapboxgl-popup-content'  => 'width: {{SIZE}}{{UNIT}}; max-width: {{SIZE}}{{UNIT}};',
 				),
 				'dynamic'   => array( 'active' => true ),
 			)
@@ -740,28 +783,30 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 	 */
 	public function _get_map_style( $style ) {
 
-		$full_path    = untrailingslashit( ABSPATH ) . $style;
-		$include_path = null;
+		$available_styles = $this->_get_available_map_styles();
 
-		ob_start();
-
-		if ( file_exists( $full_path ) ) {
-			$include_path = $full_path;
-		} elseif ( file_exists( $style ) ) {
-			$include_path = $style;
-		} elseif ( file_exists( str_replace( '\\', '/', $full_path ) ) ) {
-			$include_path = str_replace( '\\', '/', $full_path );
-		}
-
-		ob_get_clean();
-
-		if ( ! $include_path ) {
+		// Map styles are registered option keys, never arbitrary file paths.
+		if ( ! is_string( $style ) || in_array( $style, array( 'default', 'custom' ), true ) || ! in_array( $style, array_keys( $available_styles ), true ) ) {
 			return '';
 		}
 
-		ob_start();
-		include $include_path;
-		return preg_replace( '/\/\/?\s*\*[\s\S]*?\*\s*\/\/?/m', '', ob_get_clean() );
+		$style_path = untrailingslashit( ABSPATH ) . $style;
+
+		if ( ! is_file( $style_path ) ) {
+			$style_path = $style;
+		}
+
+		if ( 'json' !== strtolower( pathinfo( $style_path, PATHINFO_EXTENSION ) ) || ! is_file( $style_path ) || ! is_readable( $style_path ) ) {
+			return '';
+		}
+
+		$style_json = file_get_contents( $style_path );
+
+		if ( false === $style_json ) {
+			return '';
+		}
+
+		return preg_replace( '/\/\/?\s*\*[\s\S]*?\*\s*\/\/?/m', '', $style_json );
 	}
 
 	/**
@@ -771,79 +816,50 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 	 */
 	public function get_location_coord( $location ) {
 
-		$api_key           = jet_elements_settings()->get( 'api_key' );
-		$use_geocoding_key = jet_elements_settings()->get( 'use_geocoding_key' );
-		$geocoding_key     = jet_elements_settings()->get( 'geocoding_key' );
-
-		if ( 'true' === $use_geocoding_key && empty( $geocoding_key ) ) {
-			$message = esc_html__( 'Please set Geocoding API key before using this widget.', 'jet-elements' );
-
-			echo $this->get_map_message( $message );
-
-			return;
+		if ( ! $location ) {
+			return false;
 		}
 
-		if ( ! $api_key ) {
-			$message = esc_html__( 'Please set Google maps API key before using this widget.', 'jet-elements' );
+		$provider = \jet_elements_advanced_map_geocode_providers()->get_active_provider();
 
-			echo $this->get_map_message( $message );
-
-			return;
+		if ( ! $provider ) {
+			return false;
 		}
 
-		$key = md5( $location );
+		$cache_key = 'jet-elements-geocode-' . md5( $provider->get_id() . $location );
 
-		$coord = get_transient( $key );
+		$coord = get_transient( $cache_key );
 
 		if ( ! empty( $coord ) ) {
 			return $coord;
 		}
 
-		// Prepare request data
-		$location = esc_attr( $location );
+		$result = $provider->get_location_data( $location );
 
-		if ( 'true' === $use_geocoding_key ) {
-			$api_key = esc_attr( $geocoding_key );
-		} else {
-			$api_key  = esc_attr( $api_key );
+		if ( is_wp_error( $result ) ) {
+			echo $this->get_map_message( $result->get_error_message() ); // phpcs:ignore
+			return;
 		}
 
-		$reques_url = esc_url( add_query_arg(
-			array(
-				'address' => urlencode( $location ),
-				'key'     => urlencode( $api_key )
-			),
-			$this->geo_api_url
-		) );
-
-		// Fixed '&' encoding bug
-		$reques_url = str_replace( '&#038;', '&', $reques_url );
-
-		$response = wp_remote_get( $reques_url );
-		$json     = wp_remote_retrieve_body( $response );
-		$data     = json_decode( $json, true );
-
-		$coord = isset( $data['results'][0]['geometry']['location'] )
-			? $data['results'][0]['geometry']['location']
-			: false;
-
-		if ( ! $coord ) {
-
+		if ( empty( $result['lat'] ) || empty( $result['lng'] ) ) {
 			$message = esc_html__( 'Coordinates of this location not found', 'jet-elements' );
 
-			echo $this->get_map_message( $message );
+			echo $this->get_map_message( $message ); // phpcs:ignore
 
 			return;
 		}
 
-		set_transient( $key, $coord, WEEK_IN_SECONDS );
+		set_transient( $cache_key, $result, WEEK_IN_SECONDS );
 
-		return $coord;
+		return $result;
 	}
 
 	protected function render() {
 
 		$settings = $this->get_settings_for_display();
+		$provider_id = $this->get_active_provider();
+
+		$this->enqueue_provider_assets( $provider_id );
 
 		$map_center_type = isset( $settings['map_center_type'] ) ? $settings['map_center_type'] : '1';
 
@@ -863,7 +879,7 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			if ( empty( $settings['map_center_lat_lng'] ) ) {
 				$message = esc_html__( 'Location not found', 'jet-elements' );
 
-				echo $this->get_map_message( $message );
+				echo $this->get_map_message( $message ); // phpcs:ignore
 				return;
 			}
 
@@ -894,14 +910,14 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 				if ( $lat > 90 || $lat < -90 ) {
 					$message = esc_html__( 'Map Center latitude value outside range from -90 to 90', 'jet-elements' );
 
-					echo $this->get_map_message( $message );
+					echo $this->get_map_message( $message ); // phpcs:ignore
 					return;
 				}
 
 				if ( $lng > 180 || $lng < -180 ) {
 					$message = esc_html__( 'Map Center longitude value outside range from -180 to 180', 'jet-elements' );
 
-					echo $this->get_map_message( $message );
+					echo $this->get_map_message( $message ); // phpcs:ignore
 					return;
 				}
 
@@ -909,7 +925,7 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			} else {
 				$message = esc_html__( 'Location not found', 'jet-elements' );
 
-				echo $this->get_map_message( $message );
+				echo $this->get_map_message( $message ); // phpcs:ignore
 				return;
 			}
 		} else {
@@ -917,7 +933,7 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			if ( empty( $settings['map_center_dms'] ) ) {
 				$message = esc_html__( 'Location not found', 'jet-elements' );
 
-				echo $this->get_map_message( $message );
+				echo $this->get_map_message( $message ); // phpcs:ignore
 				return;
 			}
 
@@ -936,40 +952,63 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 			} else {
 				$message = esc_html__( 'Location not found', 'jet-elements' );
 
-				echo $this->get_map_message( $message );
+				echo $this->get_map_message( $message ); // phpcs:ignore
 				return;
 			}
 		}
 
 		$scroll_ctrl     = isset( $settings['scrollwheel'] ) ? $settings['scrollwheel'] : '';
 		$zoom_ctrl       = isset( $settings['zoom_controls'] ) ? $settings['zoom_controls'] : '';
-		$fullscreen_ctrl = isset( $settings['fullscreen_control'] ) ? $settings['fullscreen_control'] : '';
-		$streetview_ctrl = isset( $settings['street_view'] ) ? $settings['street_view'] : '';
+		$draggable_ctrl  = isset( $settings['drggable'] ) ? $settings['drggable'] : 'true';
+		$map_style       = isset( $settings['map_style'] ) ? $settings['map_style'] : 'default';
 
-		$init = apply_filters( 'jet-elements/addons/advanced-map/data-args', array(
+		$init = array(
 			'center'            => $coordinates,
 			'zoom'              => isset( $settings['zoom']['size'] ) ? intval( $settings['zoom']['size'] ) : 11,
 			'scrollwheel'       => filter_var( $scroll_ctrl, FILTER_VALIDATE_BOOLEAN ),
 			'zoomControl'       => filter_var( $zoom_ctrl, FILTER_VALIDATE_BOOLEAN ),
-			'fullscreenControl' => filter_var( $fullscreen_ctrl, FILTER_VALIDATE_BOOLEAN ),
-			'streetViewControl' => filter_var( $streetview_ctrl, FILTER_VALIDATE_BOOLEAN ),
-			'mapTypeControl'    => filter_var( $settings['map_type'], FILTER_VALIDATE_BOOLEAN ),
 			'pinsAutoClose'     => filter_var( $settings['pins_auto_close'], FILTER_VALIDATE_BOOLEAN ),
-		) );
+			'draggable'         => filter_var( $draggable_ctrl, FILTER_VALIDATE_BOOLEAN ),
+			'provider'          => $provider_id,
+		);
 
-		if ( 'false' === $settings['drggable'] ) {
+		if ( 'google' === $provider_id ) {
+			$fullscreen_ctrl = isset( $settings['fullscreen_control'] ) ? $settings['fullscreen_control'] : 'true';
+			$streetview_ctrl = isset( $settings['street_view'] ) ? $settings['street_view'] : 'true';
+			$map_type_ctrl   = isset( $settings['map_type'] ) ? $settings['map_type'] : 'true';
+
+			$init['fullscreenControl'] = filter_var( $fullscreen_ctrl, FILTER_VALIDATE_BOOLEAN );
+			$init['streetViewControl'] = filter_var( $streetview_ctrl, FILTER_VALIDATE_BOOLEAN );
+			$init['mapTypeControl']    = filter_var( $map_type_ctrl, FILTER_VALIDATE_BOOLEAN );
+
+			if ( ! in_array( $map_style, array( 'default', 'custom' ), true ) ) {
+				$style_json = $this->_get_map_style( $map_style );
+
+				if ( '' !== $style_json ) {
+					$styles = json_decode( $style_json );
+
+					if ( JSON_ERROR_NONE === json_last_error() ) {
+						$init['styles'] = $styles;
+					}
+				}
+			}
+
+			if ( 'custom' === $map_style && ! empty( $settings['custom_map_style_json'] ) ) {
+				$init['styles'] = json_decode( $settings['custom_map_style_json'] );
+			}
+		} elseif ( 'mapbox' === $provider_id ) {
+			$mapbox_style           = ! empty( $settings['mapbox_style'] ) ? $settings['mapbox_style'] : $this->get_default_mapbox_style();
+			$init['mapboxStyle'] = $mapbox_style;
+		}
+
+		if ( 'false' === $draggable_ctrl ) {
 			$init['gestureHandling'] = 'none';
 		}
 
-		if ( ! in_array( $settings['map_style'], array( 'default', 'custom' ) ) ) {
-			$init['styles'] = json_decode( $this->_get_map_style( $settings['map_style'] ) );
-		}
+		$init = apply_filters( 'jet-elements/addons/advanced-map/data-args', $init );
 
-		if ( 'custom' === $settings['map_style'] && ! empty( $settings['custom_map_style_json'] ) ) {
-			$init['styles'] = json_decode( $settings['custom_map_style_json'] );
-		}
-
-		$this->add_render_attribute( 'map-data', 'data-init', json_encode( $init ) );
+		$this->add_render_attribute( 'map-data', 'data-provider', esc_attr( $provider_id ) );
+		$this->add_render_attribute( 'map-data', 'data-init', wp_json_encode( $init ) );
 
 		$pins = array();
 
@@ -1024,20 +1063,20 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 						if ( $pos_lat > 90 || $pos_lat < -90 ) {
 							$message = esc_html__( 'Pin address latitude value outside range from -90 to 90', 'jet-elements' );
 
-							echo $this->get_map_message( $message );
+							echo $this->get_map_message( $message ); // phpcs:ignore
 							return;
 						}
 
 						if ( $pos_lng > 180 || $pos_lng < -180 ) {
 							$message = esc_html__( 'Pin address longitude value outside range from -180 to 180', 'jet-elements' );
 
-							echo $this->get_map_message( $message );
+							echo $this->get_map_message( $message ); // phpcs:ignore
 							return;
 						}
 					} else {
 						$message = esc_html__( 'Pin location not found', 'jet-elements' );
 
-						echo $this->get_map_message( $message );
+						echo $this->get_map_message( $message ); // phpcs:ignore
 						return;
 					}
 
@@ -1055,7 +1094,7 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 						$position     = array( 'lat' => $pos_dms_lat, 'lng' => $pos_dms_lng );
 					} else {
 						$message = esc_html__( 'Pin location not found', 'jet-elements' );
-						echo $this->get_map_message( $message );
+						echo $this->get_map_message( $message ); // phpcs:ignore
 						return;
 					}
 				}
@@ -1063,7 +1102,7 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 				$current = array(
 					'address'  => $pin['pin_address'],
 					'position' => $position,
-					'desc'     => $pin['pin_desc'],
+					'desc'     => wp_kses_post( $pin['pin_desc'] ),
 					'state'    => $pin['pin_state'],
 				);
 
@@ -1078,8 +1117,26 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 				}
 
 				if ( ! empty ( $pin['pin_link_title'] ) && ! empty( $pin['pin_link'] ) ) {
-					$current['link_title'] = $pin['pin_link_title'];
+					$current['link_title'] = sanitize_text_field( $pin['pin_link_title'] );
 					$current['link']       = $pin['pin_link'];
+					$current['link']['url'] = esc_url_raw( isset( $pin['pin_link']['url'] ) ? $pin['pin_link']['url'] : '', array( 'http', 'https', 'mailto', 'tel' ) );
+
+					$custom_attributes = array();
+
+					if ( ! empty( $pin['pin_link']['custom_attributes'] ) && is_string( $pin['pin_link']['custom_attributes'] ) ) {
+						foreach ( explode( ',', $pin['pin_link']['custom_attributes'] ) as $attribute ) {
+							$parts = explode( '|', $attribute, 2 );
+							$key   = strtolower( trim( $parts[0] ) );
+
+							if ( ! preg_match( '/^[-_a-z0-9]+$/D', $key ) || 'href' === $key || 0 === strpos( $key, 'on' ) ) {
+								continue;
+							}
+
+							$custom_attributes[] = $key . '|' . ( isset( $parts[1] ) ? sanitize_text_field( $parts[1] ) : '' );
+						}
+					}
+
+					$current['link']['custom_attributes'] = implode( ',', $custom_attributes );
 				}
 
 				$pins[] = $current;
@@ -1087,12 +1144,13 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 
 		}
 
-		$this->add_render_attribute( 'map-pins', 'data-pins', json_encode( $pins ) );
+		// Preserve HTML entities through attribute escaping and browser JSON parsing.
+		$this->add_render_attribute( 'map-pins', 'data-pins', wp_json_encode( $pins, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) );
 
 		printf(
 			'<div class="jet-map" %1$s %2$s></div>',
-			$this->get_render_attribute_string( 'map-data' ),
-			$this->get_render_attribute_string( 'map-pins' )
+			$this->get_render_attribute_string( 'map-data' ), // phpcs:ignore
+			$this->get_render_attribute_string( 'map-pins' ) // phpcs:ignore
 		);
 	}
 
@@ -1128,7 +1186,70 @@ class Jet_Elements_Advanced_Map extends Jet_Elements_Base {
 	 * @return [type]          [description]
 	 */
 	public function get_map_message( $message ) {
-		return sprintf( '<div class="jet-map-message"><div class="jet-map-message__dammy-map"></div><span class="jet-map-message__text">%s</span></div>', $message );
+		return sprintf( '<div class="jet-map-message"><div class="jet-map-message__dammy-map"></div><span class="jet-map-message__text">%s</span></div>', wp_kses_post( $message ) );
+	}
+
+	/**
+	 * Returns active provider slug.
+	 *
+	 * @return string
+	 */
+
+	 protected function get_active_provider() {
+
+		$default = 'google';
+	
+		if ( function_exists( 'jet_elements_advanced_map_providers' ) ) {
+
+			$providers = jet_elements_advanced_map_providers();
+
+			if ( $providers ) {
+				$default = $providers->get_default_provider();
+			}
+		}
+	
+		return jet_elements_settings()->get( 'map_provider', $default );
+	}
+
+	/**
+	 * Default Mapbox style URL.
+	 *
+	 * @return string
+	 */
+	protected function get_default_mapbox_style() {
+		return 'mapbox://styles/mapbox/streets-v11';
+	}
+
+	/**
+	 * Ensures provider-specific assets enqueued.
+	 *
+	 * @param string $provider_id Provider slug.
+	 */
+	protected function enqueue_provider_assets( $provider_id ) {
+
+		if ( ! function_exists( 'jet_elements_advanced_map_providers' ) ) {
+			return;
+		}
+	
+		$providers = jet_elements_advanced_map_providers();
+	
+		if ( ! $providers ) {
+			return;
+		}
+	
+		$provider = $providers->get_provider( $provider_id );
+	
+		if ( ! $provider ) {
+			return;
+		}
+	
+		foreach ( $provider->get_style_depends() as $style ) {
+			wp_enqueue_style( $style );
+		}
+	
+		foreach ( $provider->get_script_depends() as $script ) {
+			wp_enqueue_script( $script );
+		}
 	}
 
 }

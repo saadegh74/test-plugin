@@ -89,14 +89,7 @@ class Jet_Elements_Woo_Recent_Products extends Jet_Elements_Base {
 
 		$this->_open_wrap();
 
-		$attributes = '';
-
-		foreach ( $this->_atts() as $attr => $data ) {
-
-			$attr_val    = $settings[ $attr ];
-			$attr_val    = ! is_array( $attr_val ) ? $attr_val : implode( ',', $attr_val );
-			$attributes .= sprintf( ' %1$s="%2$s"', $attr, $attr_val );
-		}
+		$attributes = $this->get_vendor_shortcode_attributes( $settings );
 
 		$shortcode = sprintf( '[%s %s]', $this->_tag(), $attributes );
 		echo do_shortcode( $shortcode );
