@@ -21,6 +21,7 @@ plugins/raw/
 │   ├── jet-tabs/                           <-- نسخه old پاک‌سازی‌شده (2.3.5) متصل به سرور ما
 │   ├── jet-woo-builder/                    <-- نسخه old پاک‌سازی‌شده (2.1.7.3) متصل به سرور ما
 │   ├── powerpack-elements/                 <-- نسخه old پاک‌سازی‌شده (2.9.19) متصل به سرور ما
+│   ├── revslider/                          <-- نسخه old پاک‌سازی‌شده (7.2.10) متصل به سرور ما
 │   ├── wp-rocket/                          <-- نسخه old پاک‌سازی‌شده (3.23.5.1) متصل به سرور ما
 │   └── old/                                <-- فایل‌های اصلی و دست‌نخورده سرور بیرونی (منبع استخراج لینک دانلود آپدیت‌ها)
 │       ├── advanced-custom-fields-pro/
@@ -33,6 +34,7 @@ plugins/raw/
 │       ├── jet-tabs/
 │       ├── jet-woo-builder/
 │       ├── powerpack-elements/
+│       ├── revslider/
 │       └── wp-rocket/
 │
 ├── off/                                    <-- افزونه‌های فاقد سیستم یا لینک آپدیتر سرور
@@ -95,6 +97,9 @@ plugins/updates/
 │   │   ├── advanced-custom-fields-pro/
 │   │   │   ├── info.json
 │   │   │   └── advanced-custom-fields-pro-v6.8.11.zip
+│   │   ├── revslider/
+│   │   │   ├── info.json
+│   │   │   └── revslider-v7.2.11.zip
 │   │   └── wp-rocket/
 │   │       ├── info.json
 │   │       └── wp-rocket-v3.23.5.1.zip
@@ -230,6 +235,15 @@ plugins/updates/
 * **سورس‌های `raw`:**
   * نسخه old با سرور ما: `plugins/raw/on/jet-elements/` (نسخه `2.6.13.1`)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-elements/` (نسخه `2.6.13.1`)
+
+#### افزونه Slider Revolution (نسخه 7.2.11)
+* **کانال آزمایشی (Staging):**
+  * اطلاعات آپدیت: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/revslider/info.json`
+  * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/revslider/revslider-v7.2.11.zip`
+* **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
+* **سورس‌های `raw`:**
+  * نسخه old با سرور ما: `plugins/raw/on/revslider/` (نسخه `7.2.10`)
+  * فایل اصلی دست‌نخورده: `plugins/raw/on/old/revslider/` (نسخه `7.2.10`)
 
 ---
 

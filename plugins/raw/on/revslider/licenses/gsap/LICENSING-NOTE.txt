@@ -1,0 +1,77 @@
+GSAP IN SLIDER REVOLUTION: WHAT IS SHIPPED, UNDER WHICH LICENCE, AND WHY THE VERSION IS FROZEN
+================================================================================================
+Written 2026-09-04. Read this before touching any GSAP file.
+
+1. WHAT IS SHIPPED
+------------------
+Every GreenSock file in this plugin is version 3.12.7, released by GreenSock in early 2025 and added to this
+repository on 2025-03-31 (git a63c0ad59). Nothing newer exists anywhere in the core or in any add-on.
+
+  public/js/libs/tpgsap.js                  GSAP core 3.12.7 plus CustomEase, CustomBounce, CustomWiggle,
+                                            Draggable, InertiaPlugin, MotionPathPlugin, DrawSVGPlugin, SplitText
+                                            sha256 2a310e2e88e830e328108443b06b726b860a9a3ce2c0ffa9bb643f737c1c8fc4
+  admin/assets/js/tools/motionpathhelper.js MotionPathHelper 3.12.7 (editor only, never on a published page)
+                                            sha256 ec3cab78771012db571cfcba80c2922f23bd92394eaaedf7ef7cfa89d8abbba2
+
+The release build concatenates tpgsap.js into public/js/libs/tptools.js and deletes the single file, so a
+customer install carries GSAP inside tptools.js only. GSAP is exposed under ThemePunch's own namespace
+(window._tpt / window.tpGS), never as window.gsap.
+
+2. WHICH LICENCE APPLIES
+------------------------
+Two GreenSock texts are kept beside this note. Only one of them covers Slider Revolution.
+
+  GSAP-Club-Software-License-Agreement-2015.txt   THE LICENCE THIS PLUGIN SHIPS GSAP UNDER.
+      The Club GreenSock / Club GSAP membership agreement ThemePunch's "Business" membership was granted under.
+      It permits distributing the compiled code inside a Developed Work and licensing that Developed Work to
+      end users and to third parties who license it on ("you may license those Developed Works to end users
+      and to third parties, who may also further license such Developed Works to end users"). That is the
+      plugin sold directly and the plugin bundled with themes. The Club-only plugins listed above (SplitText,
+      CustomEase, CustomBounce, CustomWiggle, InertiaPlugin, DrawSVGPlugin, MotionPathHelper) were only ever
+      obtainable through this membership.
+
+  GSAP-Standard-No-Charge-License-2023.txt        REFERENCE ONLY. DOES NOT COVER THIS PLUGIN.
+      The public licence the file header of tpgsap.js points at. Section III limits it to Developed Works
+      whose end users pay nothing; Slider Revolution is sold, so it explicitly sends such a product to the
+      Club "Business" agreement above. It is kept here because the file header references it, and because
+      it shows what the 3.12.7 header terms said before GreenSock's site replaced them.
+
+3. WHY VERSION 3.12.7 IS FROZEN, AND WHY IT MAY KEEP BEING USED
+---------------------------------------------------------------
+On 2025-04-30 Webflow, GSAP's owner since autumn 2024, replaced the GSAP licence. The new "GSAP Standard
+License" is free for everyone but adds a Prohibited Use: GSAP in tools that let people build animations
+visually in a way that competes with Webflow's animation builder ("Competitive Products"). Slider Revolution
+is a visual animation builder, so those terms are not ones this plugin wants to be under.
+
+The 3.12.7 files were obtained before that date. The new licence itself, section VI Amendments, states:
+"you may continue using previous versions of GSAP Products under the applicable terms licensed to you prior to
+the effective date of the revised GSAP License" (effective date 2025-04-30). The applicable terms are the Club
+agreement above, which "may be modified only with the mutual written approval of authorized representatives
+of the parties", so they cannot be changed from GreenSock's side alone.
+
+The position therefore rests on three facts, and the rules below exist to keep all three true:
+  a) every GreenSock file is 3.12.7, obtained 2025-03-31, before the licence change;
+  b) it ships only inside ThemePunch's Developed Work, namespaced, not as a standalone library;
+  c) the Club agreement is the licence it was obtained under.
+
+4. RULES (BINDING FOR EVERY PERSON AND EVERY AGENT)
+---------------------------------------------------
+  - NEVER update any GreenSock file beyond 3.12.7. Not the core, not a plugin, not MotionPathHelper, not in an
+    add-on. A 3.13+ file is licensed under the 2025 terms and would put the whole product under them.
+  - NEVER add a "gsap" npm dependency or import anywhere in the core, an add-on, or a tool that ships.
+    All animation code goes through _tpt.gsap. Direct window.gsap must not exist.
+  - NEVER ship tpgsap.js as a standalone downloadable library on any ThemePunch CDN or hosted product. It is
+    always folded into the player bundle.
+  - Do not remove or alter the GreenSock copyright headers inside the files.
+  - Before a release, compare the two sha256 sums above against the files. A different hash means somebody
+    changed a GreenSock file; find out why before shipping.
+
+5. WHAT STILL HAS TO BE KEPT ON FILE OUTSIDE THIS REPOSITORY
+------------------------------------------------------------
+  - The Club GSAP membership records: tier, number of developer seats, and the invoices covering 2025-03-31.
+    They are the proof that the agreement above was in force when 3.12.7 was obtained.
+  - Written confirmation from Webflow/GSAP (requested via the licence FAQ contact) that 3.12.7 remains
+    licensed under the Club agreement after Club GSAP was discontinued. Until it arrives, section 3 is
+    ThemePunch's reading of the published text, not a confirmed position.
+
+This note is a record of the facts and the decision, not legal advice.

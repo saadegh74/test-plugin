@@ -1,0 +1,271 @@
+{
+  "version": 2,
+  "note": "Canonical alias -> role/weight lexicon in the LOCKED tagging vocabulary. Ships in SR7 core (revslider/admin/includes/alias-lexicon.json, admin-only, handed to the Quick Editor only when caps.slots); sr-connect readers point at that path once core has it. A rule outputs a role and, where the old vocab implied it, a weight. It is a low-confidence SUGGESTION only — the human confirms in Meta Editing.",
+  "roles": [
+    "headline",
+    "subheadline",
+    "body",
+    "cta",
+    "background",
+    "product",
+    "logo",
+    "decoration"
+  ],
+  "weights": [
+    "primary",
+    "secondary",
+    "decorative"
+  ],
+  "actions": [
+    "text",
+    "style",
+    "media",
+    "link",
+    "hide",
+    "addon",
+    "preset"
+  ],
+  "statuses": [
+    "todo",
+    "checked",
+    "metas",
+    "bug",
+    "ignore",
+    "derived"
+  ],
+  "delivered": ["checked", "metas"],
+  "normalize": "lowercase; strip digits and '#'; '-' and '_' -> space; collapse whitespace",
+  "match": "first matching rule wins; a single-word pattern must match a WHOLE word; a multi-word pattern matches as a substring; a matched rule may also carry a weight suggestion",
+  "gaps": "The old vocab's eyebrow and badge have no role in the locked 8: eyebrow-ish aliases (kicker/category/label/tag/overline) are mapped to subheadline, badge-ish (price/date/rating) to body. Change here if a label role is added.",
+  "rules": [
+    {
+      "role": "decoration",
+      "weight": "decorative",
+      "patterns": [
+        "next slide",
+        "prev slide",
+        "slide number",
+        "slide index",
+        "slide counter",
+        "slide count",
+        "current slide",
+        "total slides",
+        "slide link",
+        "pagination",
+        "bullet",
+        "arrow",
+        "chevron",
+        "scroll",
+        "progress",
+        "thumbnail",
+        "thumb",
+        "divider",
+        "separator",
+        "overlay",
+        "placeholder",
+        "spacer",
+        "copy cal",
+        "copy day"
+      ]
+    },
+    {
+      "role": "logo",
+      "patterns": [
+        "logo",
+        "wordmark",
+        "brand"
+      ]
+    },
+    {
+      "role": "decoration",
+      "weight": "decorative",
+      "patterns": [
+        "prev",
+        "previous",
+        "next",
+        "close",
+        "menu",
+        "nav",
+        "icon",
+        "counter",
+        "slide",
+        "cal",
+        "calendar",
+        "check",
+        "facebook",
+        "instagram",
+        "twitter",
+        "linkedin",
+        "youtube",
+        "tiktok",
+        "social"
+      ]
+    },
+    {
+      "role": "cta",
+      "weight": "secondary",
+      "patterns": [
+        "secondary button",
+        "ghost button",
+        "secondary cta",
+        "watch",
+        "learn more",
+        "read more",
+        "link"
+      ]
+    },
+    {
+      "role": "cta",
+      "weight": "primary",
+      "patterns": [
+        "cta button",
+        "call to action",
+        "add to cart",
+        "buy",
+        "shop now",
+        "get started",
+        "sign up",
+        "signup",
+        "subscribe",
+        "choice btn",
+        "copy button",
+        "cta",
+        "button"
+      ]
+    },
+    {
+      "role": "subheadline",
+      "patterns": [
+        "eyebrow",
+        "kicker",
+        "overline",
+        "category",
+        "top text",
+        "pre title",
+        "pretitle",
+        "label",
+        "tag"
+      ]
+    },
+    {
+      "role": "body",
+      "patterns": [
+        "price",
+        "discount",
+        "sale",
+        "percent",
+        "rating",
+        "stars",
+        "review",
+        "high low",
+        "date",
+        "day",
+        "time",
+        "size",
+        "new",
+        "badge"
+      ]
+    },
+    {
+      "role": "subheadline",
+      "patterns": [
+        "sub headline",
+        "subheadline",
+        "sub head",
+        "subheading",
+        "subtitle",
+        "sub title",
+        "sub line",
+        "subline",
+        "tagline",
+        "slogan",
+        "lead"
+      ]
+    },
+    {
+      "role": "headline",
+      "patterns": [
+        "big headline",
+        "small headline",
+        "copy headline",
+        "copy title",
+        "project title",
+        "main title",
+        "page title",
+        "headline",
+        "heading",
+        "title"
+      ]
+    },
+    {
+      "role": "body",
+      "patterns": [
+        "description",
+        "paragraph",
+        "copy text",
+        "copy sub",
+        "copy description",
+        "about",
+        "content",
+        "caption",
+        "testimonial",
+        "quote",
+        "summary",
+        "excerpt",
+        "bio",
+        "info",
+        "address",
+        "contact",
+        "location",
+        "name",
+        "feature",
+        "list item",
+        "text",
+        "author",
+        "email",
+        "phone",
+        "reviews",
+        "attribute",
+        "services",
+        "work"
+      ]
+    }
+  ],
+  "ordinal": {
+    "note": "Tier-3 fallback when no alias rule matches: role (+weight) by kind + per-slide ordinal (index; last entry repeats).",
+    "slidebg": [
+      {
+        "role": "background"
+      }
+    ],
+    "image": [
+      {
+        "role": "product"
+      },
+      {
+        "role": "product",
+        "weight": "secondary"
+      }
+    ],
+    "video": [
+      {
+        "role": "product"
+      },
+      {
+        "role": "product",
+        "weight": "secondary"
+      }
+    ],
+    "text": [
+      {
+        "role": "headline"
+      },
+      {
+        "role": "subheadline"
+      },
+      {
+        "role": "body"
+      }
+    ]
+  }
+}

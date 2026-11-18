@@ -1,0 +1,7 @@
+/**
+ * @preserve
+ * @author    ThemePunch <info@themepunch.com>
+ * @link      http://www.themepunch.com/
+ * @copyright 2026 ThemePunch
+ */
+!function(){"use strict";window.SR7??={},SR7.PE??={},SR7.PE.runtimes??={},SR7.PE._mounted??={},SR7.PE.devices??=SR7.D&&Array.isArray(SR7.D.devices)?SR7.D.devices:["wdesktop","desktop","notebook","tablet","mobile"],SR7.PE.deviceWidths??=[1600,1240,1024,778,480],SR7.PE.levelForWidth=t=>{const e=SR7.PE.deviceWidths;for(let o=e.length-1;o>=0;o--)if(t<=e[o])return o;return 0},SR7.PE.lev=(t,e)=>{if(!Array.isArray(t))return t;let o=t[e];if(null!=o&&"#a"!==o&&""!==o)return o;for(let r=e-1;r>=0;r--)if(o=t[r],null!=o&&"#a"!==o&&""!==o)return o;for(let r=e+1;r<5;r++)if(o=t[r],null!=o&&"#a"!==o&&""!==o)return o;return 0},SR7.PE.registerRuntime=(t,e)=>{SR7.PE.runtimes[t]=e,SR7.PE.boot()},SR7.PE.boot=()=>{if(SR7.E&&SR7.E.backend)return;const t=SR7.E&&SR7.E.pageEffects;if(t)for(const e in t){if(!Object.prototype.hasOwnProperty.call(t,e))continue;const o=t[e],r=o&&SR7.PE.runtimes[o.type];if(!o||!r||SR7.PE._mounted[e])continue;const n="string"==typeof o.root?document.querySelector(o.root):o.root;try{SR7.PE._mounted[e]=r.mount(o.data,e,n?{root:n}:void 0)||!0}catch(t){}}},"loading"===document.readyState?document.addEventListener("DOMContentLoaded",SR7.PE.boot):SR7.PE.boot()}();

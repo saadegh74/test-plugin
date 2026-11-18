@@ -1,0 +1,89 @@
+sr7-prl.prlt20 {
+	width: 40px;
+	height: 40px;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%)
+}
+
+sr7-prl.prlt20 .sr7-prl-inner {
+	width: 100%;
+	height: 100%;
+	-webkit-animation: rs-revealer-20 1.1s linear infinite;
+	animation: rs-revealer-20 1.1s linear infinite
+}
+
+sr7-prl.prlt20 .sr7-prl-inner span {
+	display: block;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 12px;
+	height: 12px;
+	margin: -6px 0 0 -6px;
+	border-radius: 50%
+}
+
+/* the two travel opposite each other and breathe against each other, so the pair reads as motion even in the
+   instant the rotation itself is hard to see */
+sr7-prl.prlt20 .sr7-prl-inner span:nth-child(1) {
+	-webkit-animation: rs-revealer-20a 1.1s ease-in-out infinite alternate;
+	animation: rs-revealer-20a 1.1s ease-in-out infinite alternate
+}
+
+sr7-prl.prlt20 .sr7-prl-inner span:nth-child(2) {
+	opacity: .5;
+	-webkit-animation: rs-revealer-20b 1.1s ease-in-out infinite alternate;
+	animation: rs-revealer-20b 1.1s ease-in-out infinite alternate
+}
+
+@keyframes rs-revealer-20 {
+	to {
+		transform: rotate(360deg)
+	}
+}
+
+@keyframes rs-revealer-20a {
+	from {
+		transform: translateY(-12px) scale(.7)
+	}
+
+	to {
+		transform: translateY(-12px) scale(1.15)
+	}
+}
+
+@keyframes rs-revealer-20b {
+	from {
+		transform: translateY(12px) scale(1.15)
+	}
+
+	to {
+		transform: translateY(12px) scale(.7)
+	}
+}
+
+@-webkit-keyframes rs-revealer-20 {
+	to {
+		-webkit-transform: rotate(360deg)
+	}
+}
+
+@-webkit-keyframes rs-revealer-20a {
+	from {
+		-webkit-transform: translateY(-12px) scale(.7)
+	}
+
+	to {
+		-webkit-transform: translateY(-12px) scale(1.15)
+	}
+}
+
+@-webkit-keyframes rs-revealer-20b {
+	from {
+		-webkit-transform: translateY(12px) scale(1.15)
+	}
+
+	to {
+		-webkit-transform: translateY(12px) scale(.7)
+	}
+}

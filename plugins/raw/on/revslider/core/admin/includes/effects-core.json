@@ -1,0 +1,22 @@
+{
+	"slug": "core",
+	"version": "7.2.0",
+	"effects": [
+		{
+			"key": "counter",
+			"title": "Counter",
+			"group": "text",
+			"kind": "content",
+			"target": "layer",
+			"still": "core-counter.webp",
+			"video": "core-counter.mp4",
+			"w": 640,
+			"h": 360,
+			"featured": true,
+			"popularity": 0,
+			"insertOnly": true,
+			"aparam": "counter",
+			"leaf": "s012"
+		}
+	]
+}

@@ -1,0 +1,59 @@
+sr7-prl.prlt24 {
+	width: 44px;
+	height: 20px;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%)
+}
+
+sr7-prl.prlt24 .sr7-prl-inner {
+	width: 100%;
+	height: 100%
+}
+
+sr7-prl.prlt24 .sr7-prl-inner span {
+	display: block;
+	position: absolute;
+	top: 50%;
+	width: 10px;
+	height: 10px;
+	margin-top: -5px;
+	border-radius: 50%;
+	-webkit-animation: rs-revealer-24 .9s cubic-bezier(.4, 0, .6, 1) infinite;
+	animation: rs-revealer-24 .9s cubic-bezier(.4, 0, .6, 1) infinite
+}
+
+sr7-prl.prlt24 .sr7-prl-inner span:nth-child(1) {
+	left: 0
+}
+
+sr7-prl.prlt24 .sr7-prl-inner span:nth-child(2) {
+	left: 17px;
+	animation-delay: -.75s;
+	-webkit-animation-delay: -.75s
+}
+
+sr7-prl.prlt24 .sr7-prl-inner span:nth-child(3) {
+	left: 34px;
+	animation-delay: -.6s;
+	-webkit-animation-delay: -.6s
+}
+
+@keyframes rs-revealer-24 {
+	0%, 60%, 100% {
+		transform: translateY(0) scale(.85)
+	}
+
+	30% {
+		transform: translateY(-9px) scale(1)
+	}
+}
+
+@-webkit-keyframes rs-revealer-24 {
+	0%, 60%, 100% {
+		-webkit-transform: translateY(0) scale(.85)
+	}
+
+	30% {
+		-webkit-transform: translateY(-9px) scale(1)
+	}
+}

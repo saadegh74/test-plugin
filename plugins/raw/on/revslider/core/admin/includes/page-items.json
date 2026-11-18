@@ -1,0 +1,53 @@
+{
+	"schema": "esg.records/2",
+	"records": [
+		{
+			"key": "sample:item:1",
+			"title": "Alpine Lake Cabin",
+			"excerpt": "<p>Wake up to still water, cedar walls and a view that needs no filter.</p>",
+			"link": "https://example.com/alpine-lake-cabin/",
+			"date": "2026-10-28T09:00:00Z",
+			"media": { "src": "admin/assets/images/presets/samples/alpine-lake.webp", "width": 1280, "height": 720, "alt": "", "type": "image" },
+			"thumb": { "src": "admin/assets/images/presets/samples/alpine-lake.webp", "width": 1280, "height": 720 },
+			"meta": { "author_name": "Mara Lind", "price": "129", "compare_price": "159", "currency": "EUR", "rating": "4.8", "review_count": "36" },
+			"terms": [ { "id": 1, "slug": "travel", "name": "Travel" } ],
+			"sort": {}
+		},
+		{
+			"key": "sample:item:2",
+			"title": "The Concrete House",
+			"excerpt": "<p>Raw walls, warm light and a floor plan that gets out of the way.</p>",
+			"link": "https://example.com/the-concrete-house/",
+			"date": "2026-10-21T09:00:00Z",
+			"media": { "src": "admin/assets/images/presets/samples/concrete-house.webp", "width": 1280, "height": 720, "alt": "", "type": "image" },
+			"thumb": { "src": "admin/assets/images/presets/samples/concrete-house.webp", "width": 1280, "height": 720 },
+			"meta": { "author_name": "Jonas Weber", "price": "89", "compare_price": "", "currency": "EUR", "rating": "4.5", "review_count": "18" },
+			"terms": [ { "id": 2, "slug": "architecture", "name": "Architecture" } ],
+			"sort": {}
+		},
+		{
+			"key": "sample:item:3",
+			"title": "Still Life Studio",
+			"excerpt": "<p>Five objects, one window and an afternoon of patient light.</p>",
+			"link": "https://example.com/still-life-studio/",
+			"date": "2026-10-14T09:00:00Z",
+			"media": { "src": "admin/assets/images/presets/samples/still-life.webp", "width": 1280, "height": 720, "alt": "", "type": "image" },
+			"thumb": { "src": "admin/assets/images/presets/samples/still-life.webp", "width": 1280, "height": 720 },
+			"meta": { "author_name": "Ines Duarte", "price": "45", "compare_price": "59", "currency": "EUR", "rating": "4.9", "review_count": "52" },
+			"terms": [ { "id": 3, "slug": "design", "name": "Design" } ],
+			"sort": {}
+		},
+		{
+			"key": "sample:item:4",
+			"title": "Rainy Street Prints",
+			"excerpt": "<p>City lights on wet stone, printed on matte paper in three sizes.</p>",
+			"link": "https://example.com/rainy-street-prints/",
+			"date": "2026-10-07T09:00:00Z",
+			"media": { "src": "admin/assets/images/presets/samples/rainy-street.webp", "width": 1280, "height": 720, "alt": "", "type": "image" },
+			"thumb": { "src": "admin/assets/images/presets/samples/rainy-street.webp", "width": 1280, "height": 720 },
+			"meta": { "author_name": "Theo Marsh", "price": "29", "compare_price": "", "currency": "EUR", "rating": "4.6", "review_count": "11" },
+			"terms": [ { "id": 4, "slug": "photography", "name": "Photography" } ],
+			"sort": {}
+		}
+	]
+}

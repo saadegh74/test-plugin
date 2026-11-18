@@ -1,0 +1,51 @@
+sr7-prl.prlt19 {
+	width: 38px;
+	height: 38px;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%)
+}
+
+sr7-prl.prlt19 .sr7-prl-inner {
+	width: 100%;
+	height: 100%;
+	-webkit-animation: rs-revealer-19 .9s linear infinite;
+	animation: rs-revealer-19 .9s linear infinite
+}
+
+/* 🔴 The ring is the COLOUR with two masks over it, not a border: a border colour cannot be set from the
+   module's own colour field, which only ever writes a background. Donut AND wedge leaves the arc */
+sr7-prl.prlt19 .sr7-prl-inner span {
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px)), conic-gradient(#000 72%, transparent 0);
+	mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px)), conic-gradient(#000 72%, transparent 0);
+	-webkit-mask-composite: source-in;
+	mask-composite: intersect
+}
+
+/* 🔴 Without mask-composite the two masks ADD instead of meeting, which draws a filled pie. A browser that
+   old keeps the plain ring: still a spinner, just without the gap */
+@supports not ((mask-composite: intersect) or (-webkit-mask-composite: source-in)) {
+	sr7-prl.prlt19 .sr7-prl-inner span {
+		-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+		mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+		opacity: .55
+	}
+}
+
+@keyframes rs-revealer-19 {
+	to {
+		transform: rotate(360deg)
+	}
+}
+
+@-webkit-keyframes rs-revealer-19 {
+	to {
+		-webkit-transform: rotate(360deg)
+	}
+}

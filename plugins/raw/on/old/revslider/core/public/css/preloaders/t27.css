@@ -1,0 +1,108 @@
+sr7-prl.prlt27 {
+	width: 36px;
+	height: 36px;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%)
+}
+
+sr7-prl.prlt27 .sr7-prl-inner {
+	width: 100%;
+	height: 100%
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span {
+	display: block;
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+	-webkit-animation: rs-revealer-27 1.3s ease-in-out infinite;
+	animation: rs-revealer-27 1.3s ease-in-out infinite
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(1) {
+	left: 0px;
+	top: 0px;
+	animation-delay: -1.30s;
+	-webkit-animation-delay: -1.30s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(2) {
+	left: 13px;
+	top: 0px;
+	animation-delay: -1.19s;
+	-webkit-animation-delay: -1.19s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(3) {
+	left: 26px;
+	top: 0px;
+	animation-delay: -1.08s;
+	-webkit-animation-delay: -1.08s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(4) {
+	left: 0px;
+	top: 13px;
+	animation-delay: -1.19s;
+	-webkit-animation-delay: -1.19s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(5) {
+	left: 13px;
+	top: 13px;
+	animation-delay: -1.08s;
+	-webkit-animation-delay: -1.08s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(6) {
+	left: 26px;
+	top: 13px;
+	animation-delay: -0.97s;
+	-webkit-animation-delay: -0.97s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(7) {
+	left: 0px;
+	top: 26px;
+	animation-delay: -1.08s;
+	-webkit-animation-delay: -1.08s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(8) {
+	left: 13px;
+	top: 26px;
+	animation-delay: -0.97s;
+	-webkit-animation-delay: -0.97s
+}
+
+sr7-prl.prlt27 .sr7-prl-inner span:nth-child(9) {
+	left: 26px;
+	top: 26px;
+	animation-delay: -0.86s;
+	-webkit-animation-delay: -0.86s
+}
+
+@keyframes rs-revealer-27 {
+	0%, 70%, 100% {
+		transform: scale(.45);
+		opacity: .35
+	}
+
+	35% {
+		transform: scale(1);
+		opacity: 1
+	}
+}
+
+@-webkit-keyframes rs-revealer-27 {
+	0%, 70%, 100% {
+		-webkit-transform: scale(.45);
+		opacity: .35
+	}
+
+	35% {
+		-webkit-transform: scale(1);
+		opacity: 1
+	}
+}

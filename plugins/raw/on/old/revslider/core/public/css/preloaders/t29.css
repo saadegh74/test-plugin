@@ -1,0 +1,63 @@
+sr7-prl.prlt29 {
+	width: 34px;
+	height: 34px;
+	-webkit-transform: translate(-50%, -50%);
+	transform: translate(-50%, -50%)
+}
+
+sr7-prl.prlt29 .sr7-prl-inner {
+	width: 100%;
+	height: 100%
+}
+
+sr7-prl.prlt29 .sr7-prl-inner span {
+	display: block;
+	position: absolute
+}
+
+sr7-prl.prlt29 .sr7-prl-inner span:nth-child(1) {
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	opacity: .35;
+	-webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+	mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))
+}
+
+sr7-prl.prlt29 .sr7-prl-inner span:nth-child(2) {
+	left: 50%;
+	top: 50%;
+	width: 2px;
+	height: 9px;
+	margin: -9px 0 0 -1px;
+	border-radius: 2px;
+	transform-origin: 50% 100%;
+	-webkit-animation: rs-revealer-29 8s linear infinite;
+	animation: rs-revealer-29 8s linear infinite
+}
+
+sr7-prl.prlt29 .sr7-prl-inner span:nth-child(3) {
+	left: 50%;
+	top: 50%;
+	width: 2px;
+	height: 13px;
+	margin: -13px 0 0 -1px;
+	border-radius: 2px;
+	transform-origin: 50% 100%;
+	-webkit-animation: rs-revealer-29 1.3s linear infinite;
+	animation: rs-revealer-29 1.3s linear infinite
+}
+
+@keyframes rs-revealer-29 {
+	to {
+		transform: rotate(360deg)
+	}
+}
+
+@-webkit-keyframes rs-revealer-29 {
+	to {
+		-webkit-transform: rotate(360deg)
+	}
+}

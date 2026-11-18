@@ -1,0 +1,1351 @@
+
+<div class="slider-revolution-update-list">
+	<h3 class="version-number">Version 7.2.10 (9th November 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>A popup opened by a link to its #alias, on a page with more than two modules, ignored clicks on its own buttons, such as Close or No thanks. Fixed</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.9 (9th November 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Items from the page (Content Source): a module takes up to 24 posts or products that the page hands in beside it, from a developer's code or the SR Anywhere connector. The editor and the preview show sample items</li>
+		<li>Dashboard: modules can be selected several at a time in the list view too, to delete, export, group or move them together</li>
+		<li>Add Layer: Effects now stands out at the top of the list, the way into the Effects Library with its ready-made effects and presets</li>
+		<li>Pricing Presets in the Effects Library: plan cards in eight looks, from Classic to Neon and Holographic, and tables of three or five plans. Cards tilt toward the pointer, lift on hover and count their price up, all editable in Quick Edit</li>
+		<li>Hotspot Presets in the Effects Library: dots on a picture that open a bubble on hover or tap, in nine looks from Light to Glass and Neon, with a product card and a three point tour. Each bubble opens in its own scene, to edit in the timeline</li>
+		<li>Accordion Presets in the Effects Library: questions that open on a click, in seven looks from Clean to Glass and an FAQ section with a headline. The Accordion settings of the group choose one open at a time or several, and what is open at start</li>
+		<li>Form fields: a text layer can be a field to type into, Submit Form sends what was typed as the event sr7:submit and to the dataLayer, and the new Sent trigger runs what follows, like a thank-you scene</li>
+		<li>Submit Form can also send the fields to a URL of yours, such as Zapier, Make or Brevo. Your WordPress sends them, the page never shows the URL</li>
+		<li>New Popup in the New Module dialog and on the Slider Revolution block in the block editor, Elementor, WPBakery, Avada and Divi: twenty-four popups in one click, placed on your page with their trigger already set</li>
+		<li>Modal settings: with Play Layer Exits on Close, a popup plays its layers' exit animations before it fades, so a designed close is seen whole</li>
+		<li>TikTok videos: a video layer or a slide background now plays a TikTok film beside HTML5, YouTube and Vimeo. Paste the TikTok link or its ID in the new TikTok tab, or use Add Layer, Video, TikTok</li>
+		<li>Map & Places: Quick Edit takes the map's Google API key and moves each place to a name or address you search, so an imported template runs on your key and shows your places</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>With a persistent object cache such as Redis or Memcached, a saved module could keep showing old slides, and with usage tracking on every update check emptied the whole object cache. Both fixed</li>
+		<li>Before/After: with a Compare Area, layers beside it could not be clicked or dragged, such as a map, buttons or links on the slide. They respond again, with nothing to re-save</li>
+		<li>Before/After: resizing the browser cut a slide in half when that slide had the comparison switched off. It stays whole now</li>
+		<li>A link that opens a popup (data-sr7-modal) showed only the dark backdrop on a page without a module, and one naming a popup that does not exist asked the server again and again. Both fixed</li>
+		<li>A popup wider than the browser window was cut off at the side, on a small tablet for example. It shrinks to fit the window now</li>
+		<li>Editor: a module narrower than the phone breakpoint, such as a small popup, showed its phone layout on the desktop stage, beside an empty strip. It shows the desktop layout now</li>
+		<li>A layer with Pan & Zoom on its image that is hidden on one device stopped the whole slide there: its other layers and an interactive map stayed hidden. They show now</li>
+		<li>With Essential Grid, a grid of custom items wrote a PHP warning ("Trying to access array offset on false") for every item, and an item could open the slider chosen for the page around the grid. Fixed</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.8 (4th November 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Alternative 1st Slide can be set to Random Slide: the module opens on a different slide on every visit and plays on in order from there. A link to a slide still opens that slide</li>
+		<li>Highlight Menu Link in View (Module Settings, Advanced): while a module is in view, the menu links to its Module ID get the current-menu-item class, so a one-page menu shows where the visitor is</li>
+		<li>Button Presets: 39 looks for a button, from solid, outline, fill and gradient to glass, neon, light and playful motion like jelly, tilt or magnetic, each with its own hover. Pick one in the button's Style tab or the Effects Library</li>
+		<li>Star ratings: {{stars:4.5}} in any text draws stars filled to that value, also out of ten or in your own colour (Add Layer, Text, Content, Rating). WooCommerce ratings use the same stars and show even without WooCommerce's star font</li>
+		<li>Ratings: hearts, dots, thumbs or flames instead of stars ({{stars:4.5:heart}}), empty ones as an outline, a fill that runs in as the layer arrives, and eight Rating Presets in the Effects Library</li>
+		<li>Replace SVG: an SVG layer takes a new file from its Element tab, the layer toolbar or the right-click menu, and keeps its colours, size and animation. In Quick Edit an SVG logo can be swapped, uploaded or picked from the SR library</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Security: through Quick Edit, a user with Contributor rights could store script in any module, and it ran for visitors and admins. Fixed. Authors and Contributors now Quick Edit only modules imported for their own post. Reported via Patchstack</li>
+		<li>Alternative 1st Slide set to Last Slide opened the first slide. It opens the last one now, with nothing to re-save</li>
+		<li>Editor: a hover background with a gradient did not show in the stage's hover preview, the page showed it. It shows in the editor now too</li>
+		<li>Editor: on an SVG layer the toolbar's WordPress and SR buttons did nothing, and Undo after picking another SVG kept showing the new file. Both work now</li>
+		<li>With themes that still call the old admin bar function of Slider Revolution 6, such as Impreza, every page stopped with a critical error before the footer and lost its layout. These pages load in full again</li>
+		<li>A Facebook stream set to Album showed no slides, the album picked in the editor never reached Facebook. It shows the album's photos again, and several picked albums are combined</li>
+		<li>Video Effects: on a YouTube or Vimeo film, Glow and Looks could be switched on and did nothing. They show locked there now, and the (i) says why: they need an MP4 or WebM film</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.7 (29th October 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Layer animations: your own presets. My Presets at the top of the animation browser saves a layer's In, Out or Loop animation, and applies, renames, overwrites or deletes it on any layer</li>
+		<li>Crystal Glass, a new add-on: a diamond, crystal, sphere or your own icon in glass turns in front of your layers and bends them, in eight materials, with a light that follows the pointer</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>On some Apache hosts, modules and slides loaded with Smart Loading stayed empty with an HTTP 411 error. They load again, with nothing to re-save</li>
+		<li>Touch swipe did not change slides when the finger started on a layer with a click action, such as one that opens a modal. Swiping works over these layers now, a tap still runs the action</li>
+		<li>Link actions: a relative link such as /contact/ opened a wrong address like https://contact/. It stays on your own site now, with nothing to re-save</li>
+		<li>A module whose wrapper class held several class names, separated by spaces, stayed black and did not load. Each class is added now</li>
+		<li>Facebook and Instagram streams: a long token ran under the Connect Here link in the token field. It stops above the link now</li>
+		<li>Quick Edit: an Undo or Redo after saving was never saved, so the module kept what you had undone. It is saved with the next save now</li>
+		<li>Quick Edit: a text the AI assist wrote kept its AI mark in the module after you rewrote it. Your own edit removes the mark now</li>
+		<li>Quick Edit: a link set on a button that already had a click action, such as Scroll Below Module, came beside it, so one click did both. The link replaces it now</li>
+		<li>Quick Edit: after Replace Video the page showed the old poster until the new film played. The poster drawn from the new film is saved with it now</li>
+		<li>Quick Edit: one colour pick could make two Undo steps, and the second changed nothing. One pick is one step now</li>
+		<li>Quick Edit: a duplicated slide came at the end instead of right after its slide, and Duplicate could not be undone. The copy comes right after it now, and Undo takes it away</li>
+		<li>Video posters made in the editor or in Quick Edit added a new Media Library entry on every save, and a poster could show another picture of the same name. Each picture is stored once now, under its own name</li>
+		<li>Exploding Layers: turning the effect on opened the preset browser on its last page. It opens on page one now, with Classic Burst first</li>
+		<li>Lottie: a file picked from the library or chosen on the Lottie tab played up to ten times too fast, at a fixed 917 ms. It plays at its own pace now. Layers built before keep their Duration, change it on the Lottie tab</li>
+		<li>Hover Morph and Filmstrip: without a valid licence their blocks in a page vanished. They show their pictures now, and the effect starts once the site is registered</li>
+		<li>A module removed through its API or an AJAX page transition could keep throwing console errors: while it was still starting, and in Safari and Firefox also once it ran. It stops cleanly now</li>
+		<li>Image optimization: on servers with Imagick, slide pictures could show as empty, because their optimized copies came out fully transparent. Re-save the module once and the copies are made again correctly</li>
+		<li>Layer animations: Effects (WebGL) added as an animation target stayed hidden among the targets until it was added a second time. It shows right away now</li>
+		<li>Layer animations: the Backdrop Filter Cont. field of the Filter target went back to 0 and was not kept. It sets the backdrop contrast now, in percent like the other filters</li>
+		<li>Counter: with three or more decimals Rolling Digits showed a wrong number beside an empty space, and a layer text like 3.1415 lost its decimal point. Decimals added to 12.500 now give 12.500,00 instead of 12.500.00</li>
+		<li>Counter: Rolling Digits showed zeros for a Compact number with a suffix, such as 12.5k+, and a wrong number for one written as 500k. Both roll to their number now</li>
+		<li>Editor: Save and Leave in the prompt for unsaved changes closed it without saving, and the page stayed. It saves the module and leaves once the save is done now</li>
+		<li>Layer animations: Respect Margin Offsets in the X and Y position popup switched itself off again, and the Wrapper target forgot Self, Parent or Stage. Both are kept now</li>
+		<li>Slide transitions: an arrow clicked during a transition longer than a second, as many Transition Pack ones are, started the next slide on top of it and left it half drawn. The click now waits for the transition to end</li>
+		<li>Slide settings: HTML Data, DeepLink ID and Attribute were never written onto the slide on the page. They are now, as name="value" pairs, without event handlers</li>
+		<li>Liquid Glass: a Scene lens at the edge of the slide bent the page's colour into the glass. It bends the slide's own colour there now</li>
+		<li>Video Effects: on a YouTube or Vimeo film, Glow and Looks could be switched on and did nothing. They show locked there now, and the (i) says they need an MP4 or WebM film</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.6 (26th October 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Respect Reduced Motion, a new switch in Global Settings under Breakpoints. Visitors whose system asks for less motion get slides that do not advance on their own, cuts instead of transitions and layers that arrive in place. Off by default</li>
+		<li>Navigation: Scale with Module Width, a new option under Controls. Arrows, bullets, tabs and thumbs size themselves by the module's width instead of the window's. Off by default</li>
+		<li>Video Effects: Dither, Dot Matrix and Glitch looks on pictures and films, one Look for the whole module including its navigation thumbnails, and a Glow that fills its layer or runs as a band</li>
+		<li>Carousel X: Dust, a new Card Deform effect. The cards beside the middle one turn to dust from their far edge and gather again as they come back</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Delete Unmigrated Modules says now that Slider Revolution 6 can no longer be reinstalled with your old modules afterwards</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>After the update from SR6 with a lifetime or CodeCanyon key, modules built from premium templates vanished from the site. They keep showing now, changing them needs an SR7 licence</li>
+		<li>After the update from SR6, a lifetime or CodeCanyon key unlocked premium for up to two days and then stopped. The key is checked on the first load now</li>
+		<li>AJAX page transitions (revslider_ajax_reinit): the modules of the page left behind kept their slideshow, transitions and videos running and filled the console with errors. They stop now</li>
+		<li>Hover Morph: on a site without a valid licence, an active Hover Morph stopped every front page with a PHP error. It stays out of the way now until the site is registered</li>
+		<li>A module a page adds after it has loaded, such as one in a grid or a popup built later, came without its arrows and bullets, and removing a module through its API could leave parts of it running. Both work in full now</li>
+		<li>SunBeam: Rays Only drew its light faint and patchy since 7.1.7. It is as bright as the full mode now, and modules saved with Rays Only get the brighter light</li>
+		<li>Carousel X: while the carousel moved, Card Deform drew its cards one frame behind their slides. They sit exactly where their slides are now</li>
+		<li>Navigation presets: Overwrite on a saved preset of another skin made a same-named copy on the module's skin. It is offered only on the module's own skin now, and saving from another skin creates a new preset</li>
+		<li>Commerce and WooCommerce: the price fields, {{wc_price}} and {{wc_price_no_cur}} included, follow the shop's Display prices setting, with or without tax, as WooCommerce's own price does. Commerce's Sale Price shows only while a sale runs</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.5 (26th October 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Chromatic grain: the grain of a background colour can be in colour, and Chromatic Grain is a new pattern, also for the module overlay above everything</li>
+		<li>Highlights for text layers: words you mark (the new Mark button beside the content) draw in as a box behind them, a colour sweep or an underline once the layer arrives, one after the other. Six looks wait as tiles in the panel and the Effects Library</li>
+		<li>Scroll Video: Pointer Range, a layer takes its Selected look while the pointer turns the video through a part of its range, for heroes where a filmed face looks at the words</li>
+		<li>Open Lightbox: a new click action for image and video layers. It shows the picture or film large over the page, with the module's other lightbox layers one arrow, key or swipe away. On a button it opens every picture of the module</li>
+		<li>Filmstrip: a new 3D Band layout. Your pictures fill a wall of rows that rolls away over a 3D drum at the bottom, the top or both, on its own or with the page scroll, in even rows or mixed tile sizes</li>
+		<li>AI Translate: with WPML, slide texts sent to WPML's translation service come back about as long as the original, so a longer language no longer breaks the slide layout</li>
+		<li>ShapeBurst: Inertia for the pointer modes, the particles spring after the pointer, overshoot a little and settle, and a quick move leaves a wake. The new Elastic Pull preset in the Effects Library shows it</li>
+		<li>Carousel X: Card Deform, a new carousel type. The cards beside the middle one crumple, fold, roll, wave, shatter or twist, or climb a staircase across the module, and lie flat with all their layers in the middle</li>
+		<li>Slides Follow the Scroll (Scroll Based Timeline): the module holds while the page scrolls, one screen per slide, and every change plays its own transition, in both directions. Arrows and bullets scroll to their slide</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Once updates are free for your site, a lifetime, CodeCanyon or expired key gets a plain note naming the premium add-ons your modules use, instead of the "License has been Deactivated" popup, and the update button works without a key</li>
+		<li>Editor: a new layer is placed in the middle of the stage instead of the top left corner. Layers added into a group or column keep their place in its flow</li>
+		<li>Quick Edit AI: a text you type word for word, such as "rewrite the headline into 'I Love SR'", is set even when it is shorter than the layer's usual text. Texts the AI writes keep their limits</li>
+		<li>Weather: rain on glass sends less than half as much to the graphics card while it rains, and nothing while it is paused. It looks the same</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Editor: with Prefer Feed Image on, the Feed label covered the AI button in the picture box. It steps aside while the pickers show</li>
+		<li>Editor: a font that came with a new layer or an add-on preset showed in a stand-in font until the module was opened again. It loads at once now</li>
+		<li>Particle Wave: an Image Surface as particles showed the picture upside down and stretched, a filled one darkened toward its edges, and Contain stretched like Stretch or, on an Image Surface, drew like Cover. All three show the picture as it is now</li>
+		<li>Lottie: the picker icons on the tab's preview could not be clicked, Scroll did not follow without Scroll Lerp, and Size Cover, Max DPR and Progressive Load had no effect. All of them work now; Cover fills the layer and crops the edges</li>
+		<li>Effects Library: from the second Lottie added from its tile on, the earlier layer stayed selected, so its panel and changes like Endless Loop went to the wrong layer</li>
+		<li>Navigation: Force Swipe over Effects had no effect, the module dropped the setting when it loaded. It works now; where the editor shows it off, switch it on again</li>
+		<li>Glow: in Aura mode a light that follows the mouse ran ahead of it toward the edges of the layer. It stays under the pointer now</li>
+		<li>Pages with many WebGL effects: at the page's WebGL limit a running background transition or a HoverMorph Page FX block could vanish to make room for a new effect. The new one is skipped now and the running ones stay</li>
+		<li>Quick Edit: picking a layer shown on every slide turned the stage black. The slide you were on stays behind it now, its own layers dimmed</li>
+		<li>Distortion: the pointer effects were stretched into an ellipse on wide or tall layers, and on a screen scaled to 125 or 150 % every window resize could lay a flat copy of the picture over the effect. Both are fixed</li>
+		<li>Security: unsaved editor changes to a module could be read by visitors who are not logged in. Only users who may edit see them now, everyone else gets the saved module</li>
+		<li>Security: a manipulated module zip could make the import copy other files of the site into the uploads folder. The import takes only the media inside the zip now</li>
+		<li>Security: any visitor could make the plugin ask the ThemePunch servers for updates and templates on every request and so slow the site down. Only administrators can force that now</li>
+		<li>Security: a module whose data pointed at other files of the site could make the zip or HTML export pack them. Both exports take only media files from the site's content folder now</li>
+		<li>Switching an add-on on or off left pages in a page cache (WP Rocket, LiteSpeed Cache and others) as they were, so Insights did not count until the cache was emptied by hand. The cache is emptied now</li>
+		<li>Editor and Quick Edit: clicking or hovering a layer with a CallBack action ran its script while you were editing. It runs on the page only now</li>
+		<li>Simulate User Click did nothing in modules built in Slider Revolution 7. It runs the target layer's own click actions now, a link included</li>
+		<li>Actions: an action added with nothing or the slide background selected never fired, and it stopped the actions of every other layer on that slide. It now fires on a click on the slide background</li>
+		<li>Navigation: a saved preset picked under Skins & Presets showed only in the panel, stage and page kept the skin's defaults. It shows at once now, pick it again where it happened. Presets of another skin can be renamed and deleted too</li>
+		<li>Layer Depth: after a reload the editor could make a photo's depth map again instead of using the saved one, in browsers that guard against fingerprinting or when the module was last edited in another browser</li>
+		<li>Charts, Lottie, Mousetrap, Panorama, Slicey, The Cluster and TypeWriter: after an Undo or Redo the stage kept showing the change you had undone. It follows Undo and Redo now</li>
+		<li>Charts: a chart could leave one of its fonts unloaded, it asked Google Fonts for a weight that does not exist</li>
+		<li>Editor: Add Video from Vimeo inserted a sample Vimeo has since removed. It inserts one that plays</li>
+		<li>Editor: once the media library was closed without a pick, the side panel no longer closed on a click beside it</li>
+		<li>Editor: Custom Scripts, a layer's action settings and other tall panels opened at a different height each time, sometimes far from the entry you clicked. They open in the same place now</li>
+		<li>Polyfold: in the editor the folds showed only after switching them off and on, lower than set or without the bottom fold, and a new colour or height did not show. They now follow every change at once, the page still folds with the scroll</li>
+		<li>Editor: audio offered Slider Revolution Elements, which holds no audio, and its button there opened the videos. Both are gone</li>
+		<li>Add-Ons list: screens up to 1340 px wide show two columns again wherever two fit</li>
+		<li>Typewriter and Mousetrap: some fields and switches in the editor showed an error in the browser console and did not refresh the preview. They update at once now</li>
+		<li>Typewriter: opening the Slide Settings of another slide while a Typewriter layer was selected showed an error in the browser console. It opens cleanly now</li>
+		<li>Sites with Essential Grid: Slider Revolution no longer prints an unused script on every page and admin screen, and the slider picked for a grid item is written into the page safely</li>
+		<li>Editor: add-on effects such as Distortion and Particle Wave sometimes did not draw on the first slide until you switched slides. They show at once now</li>
+		<li>Editor: on a slow server, clicking a list such as the slide of an Open Modal action twice while it loaded left a copy of the list on screen that could not be closed. It opens once now</li>
+		<li>Editor: the settings of a layer action opened at the top of the window, partly cut off, the first time it was clicked. They open next to the action now</li>
+		<li>Export and import: custom SVGs from the SVG library were left out of the zip and showed as broken images after the import. They travel with the module now, export it again</li>
+		<li>HTML export: a module with a background pattern, a counter, a glow or a surface material came out without the file that draws it, and SVG icons from Slider Revolution's own library showed as broken images</li>
+		<li>Modules made with Slider Revolution 6: a Loop layer with Curved on could leave the whole module empty after the update or an import. It comes over complete now, import it again</li>
+		<li>Theme demo imports: a slider made with Slider Revolution 6 for a theme's pre-built website stopped the import or came in empty. It comes in now and is finished once an administrator opens any page of the site, import the demo again where it happened</li>
+		<li>Updating from Slider Revolution 6 on a site that had Slider Revolution 7 installed before could leave a slider empty, missing or showing another slider's content. Each one migrates in full now</li>
+		<li>Sliders made with Slider Revolution 6 lost the layers of their static slide on import, and their pictures could take the alt text of other pictures in your media library. Both come over right now, import the slider again</li>
+		<li>Modules with the tablet or phone size switched off: on those screens, layers that take their size or position from a larger device were drawn too small and out of place. They follow the larger device now</li>
+		<li>Without a registered licence, sliders that use add-ons were left out when updating from Slider Revolution 6 and refused on import. They come in now with their settings, the add-on effects play once the site is registered</li>
+		<li>Sites without a registered licence still could not create, import or save a fourth module after 7.2.4, the server kept the old limit. They can now</li>
+		<li>WP Rocket with Lazy Render: a module moved up over the one above it with a negative offset was cut off at the top. It shows in full now</li>
+		<li>Dashboard: the "License has been Deactivated" popup came back on every visit after you closed it, and showed when you deregistered the licence yourself. Closing it once is enough, and your own deregistration gets a short confirmation</li>
+		<li>Premium Features popup: Buy a License opened the system requirements page instead of the pricing page</li>
+		<li>Usage data, on sites that share it, missed every page that shows a module with the [sr7] shortcode</li>
+		<li>Link actions: the editor took the http:// or https:// out of a module's links, and saving stored them without it. They keep it now, and Protocol Keep opens an http:// link as http://, not https://. Links saved without one open as before</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.4 (13th October 2026)</h3>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Sites without a registered licence can create and import as many modules as they like. The limit of three free modules is gone</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Import and export run by WP-CLI or a REST route left add-on files behind: Spatial Scenes and Filmstrip pictures, Lottie files, Scroll Video frames, Whiteboard hands and DepthForge models. They travel with the module now, import it again</li>
+		<li>The Cluster and DepthForge: a custom particle image (The Cluster) and an Emissive map (DepthForge) were left out of an exported module, so the import still loaded them from the old site. Both travel with the module now</li>
+		<li>DepthForge: an imported module kept loading its 3D library model from the site it was built on, and opening it in the editor did not change that. The model is downloaded to your site now, import the module again or open it and save</li>
+		<li>Scroll Video: after an import, a slide's own background, shown again when the video is switched off, still came from the old site, and a module on the sample clip had no frames. Both come along now, import such a module again</li>
+		<li>Actions: Toggle Class had no field for the class to toggle. It has one now, and takes several classes separated by spaces</li>
+		<li>Import Slide: hover and click actions that play a scene still played it on the slide they were imported from, so nothing seemed to happen. Slides imported before need the scene picked again in their actions</li>
+		<li>Interaction: after picking a Cursor Motion on one layer, the next selected layer showed that tile as applied although it had none. Each layer shows its own now</li>
+		<li>Effects Library: a Reveal, Typewriter or other add-on tile clicked right after the library opened could stop withCould not add the effect. It adds the effect now</li>
+		<li>Modules made with Slider Revolution 6: layers that leave before their slide ends were invisible in the editor, in Quick Edit and in the Cloud Thumbnail. They show where they come to rest now</li>
+		<li>Content Source, WooCommerce: picked categories ran over the Woo Products label. They wrap before it now</li>
+		<li>Content Source, Posts and WooCommerce: a picked category could not be removed once its post type was unselected. It stays in the list until you untick it</li>
+		<li>Editor: the layer toolbar of a row placed outside the Top, Middle and Bottom rows showed "undefined". That button is left out there now</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.3 (12th October 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Carousel X: Classic carousels can select a side card with a click, Click to Focus in the Classic settings</li>
+		<li>Cloud Thumbnails: on a registered site, the module overview shows each module as it really looks, a picture of its first slide made by the ThemePunch Cloud after each save. Switch it on in Global Settings, a thumbnail you picked yourself stays</li>
+		<li>Custom CSS: a layer carries data-sr7-entered once it has arrived and loses it as it leaves, so your own CSS can start something inside a text, like a highlight, at that moment</li>
+		<li>Custom JS: a click on a layer that starts an action fires sr.layer.click, and sr.slide.changeRequest says what changed the slide (arrows, bullets, swipe, autoplay and more), for your own tracking code</li>
+		<li>Dark Mode, a new add-on: a module gets a light and a dark look, switched by a button, the visitor's system or the site, with the dark colors worked out for you</li>
+		<li>Hover: Children Hover Along on a group, row or column plays its children's own hover with its own, so a card's words change while the pointer is anywhere on the card, not only over a word</li>
+		<li>Insights, a new add-on: how often each module is really seen and which buttons get clicked, per slide, device and page, without cookies or an outside service</li>
+		<li>Liquid Glass: Edge Shade sets how dark the rim of a Scene lens is, 0 gives a clear lens</li>
+		<li>Spatial Scenes: gallery cards can be portrait, square or any shape from 16:9 to 9:16, with Corner Radius, Card Padding and a Black & White or Sepia filter that gives the colour back on hover or when a picture opens</li>
+		<li>Video Effects, a new add-on: a film redraws live in characters (LED, Halftone, Data, Terminal or your own), glows in its own colors around it, or both, on a video layer or a slide background</li>
+		<li>Weather: Droplet Density, Tint Color and Bolt Color, with defaults that look as before</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>ShapeBurst: new layers let the page scroll on phones, Block Scroll on Touch stays on only in presets you play with your finger. Layers already built keep their setting</li>
+		<li>Saving a module empties the page cache of the pages that show it, in WP Rocket, LiteSpeed Cache, W3 Total Cache, WP Super Cache, SiteGround, Cache Enabler, NitroPack and WP Fastest Cache</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Module Configuration: Min/Max Limitations and Layer Scaling Between Devices switched themselves off after saving and reopening the module. They stay on now, switch them on again and save where it happened</li>
+		<li>Content Source: with Filmstrip or Spatial Scenes active, picking a source stored [object Promise] instead of it. Pick the source again and save where it happened</li>
+		<li>Elements Library: SVG icons, images and videos could stay grey placeholders instead of showing their pictures, most often on the first opening. They load right away now</li>
+		<li>Commerce: a variable product whose attributes were typed on the product itself, not set up under Attributes, showed no colour or size choices</li>
+		<li>Commerce: Variation Choices on a product page showed the layer's own text instead of the colour and size buttons until an option was picked in the shop's form. The buttons show from the start now</li>
+		<li>Commerce: a module loaded on demand and set to the page's product ignored its Show When rules and left its Variation Choices empty on a product page. Both work now</li>
+		<li>Lottie: the Lottie category was missing from the Elements Library when the library had been opened before the add-on was switched on for the module, or after switching it off and on again</li>
+		<li>Lottie: Insert Lottie in the Elements Library opened from Add Layer closed the library without adding the layer. The Lottie layer goes in now</li>
+		<li>Lottie, Video and Audio: a file picked while its source field was being edited could be stored as the bare file name, so the layer stayed empty. The full path is kept now, pick the file again where it happened</li>
+		<li>Lottie: the small preview in the layer's Lottie panel showed some files, such as Figma exports, as a red box while the stage drew them right. It shows the animation now</li>
+		<li>Duplicate Slide: on the copy, hover and click actions that play a scene played the original slide's scene, so nothing seemed to happen. Copies made before need the scene picked again in their actions</li>
+		<li>Effects Library: My Favorites counted every favourite but showed only those on the overview, not the ones picked inside an add-on's collection. It lists them all now</li>
+		<li>Effects Library: Browse Add-ons did nothing until Module Settings had been opened once, a first Reveal, Polyfold or Typewriter tile could stop with Could not add the effect, and Quick Add showed eight add-ons by their code name</li>
+		<li>A module less than about 100 px tall, like a slim banner, could stay still and never start. It starts as soon as it is in view now</li>
+		<li>Editor: an add-on's tab could stop the editor with an error while a module opened or when nothing was selected, as Liquid Glass did. Add-on tabs open cleanly now</li>
+		<li>Liquid Glass: a glass scaling in from nothing, or a layer behind it scaled to nothing, threw an error on every frame. It draws once it has a size</li>
+		<li>Liquid Glass: text on a glass panel always showed in Georgia, whatever font was picked. The font shows and stays now, pick it again where it happened</li>
+		<li>Carousel: on a full width carousel with Space Above or Below, global layers placed in that space were cut off on the page since 7.2.2. They show again</li>
+		<li>Carousel X: in a Cascade with four to six slides, the slide going round to the other end jumped across in view. It goes round out of sight now</li>
+		<li>Weather: the glass cropped the picture around its middle and ignored the background image's focus. It follows that focus now</li>
+		<li>ShapeBurst: a framed picture lost its rounded corners on the page, and a focus like 30% was rounded to the nearest edge or the middle. Both are kept now</li>
+		<li>Particles: Field Lines streams vanished at the edge of the module while their tail was still in view. They leave the picture whole now</li>
+		<li>Kinetic Text: a change could show the first text stretched, or the old line broken onto a cut off second line, and then jump to the new text. It turns into the new text now</li>
+		<li>Static layers: a text colour a scene had set, like the active side of a switch, went back to the layer's own colour on some slide changes. It stays now</li>
+		<li>Layer States: a Selected look like the layer's Hover look vanished as soon as the pointer left the clicked layer. It stays selected now</li>
+		<li>AI Translate: with WPML as the Translation Engine, the editor showed the original text in every language. It shows the WPML translations as soon as the module opens</li>
+		<li>AI Translate: with WPML as the Translation Engine, the layer panel also listed languages WPML does not run, left over from the module's own language list. It lists only the WPML languages now</li>
+		<li>AI Translate: with WPML active, a link action using {{link}} in a post based module opened http://link instead of the post. It opens the post now</li>
+		<li>AI Translate: a single translation that was refused, for example without a registered licence, saved the original text as that language's translation and reported it finished. It shows the error now and keeps the translation you had</li>
+		<li>Before/After: inserted while Global Layers was open, the pair landed there and covered every slide without a split. It goes on the first slide now</li>
+		<li>Particle Wave: the Faces Fill Color was missing from the module's colour lists in the colour picker, the Bulk Style Editor and Quick Edit. It is listed and can be replaced there now</li>
+		<li>ShapeBurst: pictures were drawn with jagged edges. They are drawn smoothly now</li>
+		<li>A module added to the page after it loaded, for example by a consent tool or a lazy loader, stayed empty. It starts now</li>
+		<li>Autoptimize: with JavaScript optimization on, modules stayed empty for visitors, because Autoptimize took every Slider Revolution script off the page. They start now</li>
+		<li>Quick Edit: some modules threw an error about 'canvas' or 'getElementsByClassName' in the console as Quick Edit opened or after a resize. They open without it now</li>
+		<li>Quick Edit: a picture replaced under a layer effect like Film kept showing the old picture on the stage, after an undo or redo too. The new picture shows now</li>
+		<li>Quick Edit: every click on a layer made the whole slide jump back to its animation start for a moment. Picking a layer leaves the slide still now</li>
+		<li>Quick Edit: hiding a slide in the slide list could not be undone, and showing it again still counted as a change to save. Both work now</li>
+		<li>Quick Edit: a click on a word an effect draws across the whole slide, like Hover Morph's, picked the slide background instead. A new look of that effect keeps its words now, and Back to the Template also undoes a look</li>
+		<li>Quick Edit: images filled from product or post data, like a WooCommerce gallery picture, sent failed requests and console errors in the layer list. They show a placeholder there now</li>
+		<li>LiteSpeed Cache, SiteGround Optimizer and other optimizers could hold back the scripts a module needs, so it started late or only after a mouse move, and the page jumped. They leave them alone now</li>
+		<li>A module drawn lower than 100px, like a slim bar scaled down on a phone, never started and stayed an empty strip. It starts as soon as it is in view now</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.2 (6th October 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Popups: Pop Up on Exit Intent opens one when the visitor heads for the top of the browser (desktop), and the scroll offset takes a share of the page too, like 50%</li>
+		<li>Popups: any element of your page opens one with data-sr7-modal="your-alias", data-sr7-slide="2" picks the slide, and in scripts revapi.modal() opens and closes it</li>
+		<li>Commerce: product lists get filter bars by category or by an attribute like Color or Size, Load More, the visitor's cart as a live list with quantity buttons, and the shop page's own results</li>
+		<li>Commerce: the Show this Product action opens a card's product in a quick view or a Shop the Look panel, with its details, gallery and options</li>
+		<li>Commerce: a gallery thumbnail can become the product's main picture, and a colour chosen in WooCommerce's form before a size already shows on the module's swatches</li>
+		<li>Particles: Field Lines draw the particles as flowing streams or as iron filings that turn along the field, with eight new presets like Comet Rain and Magnet Cursor</li>
+		<li>Liquid Glass: the glass refracts your own text, image, shape and video layers behind it, animations included, and brings five new presets like Liquid Drop and Glass Ribbon</li>
+		<li>Quick Edit: duplicate, delete or hide a slide right in the slide list, so a carousel gets longer or shorter without opening the editor</li>
+		<li>Quick Edit: the new AI assist applies your brand colours and fonts, swaps a colour, resizes the headlines or replaces pictures across the module, each as one step you can undo</li>
+		<li>Quick Edit: the word of a Hover Morph, ShapeBurst or Spectrum Lines effect and the rotating texts of Kinetic Text can be changed in Quick Edit and by the AI assist</li>
+		<li>Featured Slider: the box of a post has a Modules button that opens the module browser, to search, open your folders and pick a module by its picture</li>
+		<li>Custom Shape: Freeform shapes with your own corner points. Drag, add or remove them on the stage, round each corner, pin one to its corner so a notch keeps its size, and the layer's background image fills the shape</li>
+		<li>Surface Material: Thermal turns a text, SVG or image into a living heat map that melts or sweeps through it and warms under the mouse, in Thermal, Thermal Violet and Thermal Camera colours, with four new presets</li>
+		<li>Quick Edit: Resting view and a newly opened slide stop where the animations end. The preview track marks and names that moment, so dragging back shows the movement at once</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Preview from the module list could show the module as it was before your last save, on hosts that cache the site's REST answers for a short time. It always shows the saved module now</li>
+		<li>With some themes, like Central by Qode Interactive, a module with On Scroll turned on stayed empty in the preview and on the page. It shows and plays on scroll now</li>
+		<li>Several modules built from the same template on one page: from the second module on, the static layers with your own HTML IDs, like arrows and buttons, did not show. Every module shows them now</li>
+		<li>Slide and module background: a colour picked by hand never showed while a mesh like Reef was selected, the mesh stayed on top. Picking a colour switches the mesh off now, as a gradient tile does</li>
+		<li>WooCommerce: an Add to Cart Button placed in a link layer showed twice, once in the layer and once in the top left corner of the slide. It shows once, in the layer</li>
+		<li>Module pickers, like Commerce Product Pages or Featured Post in Global Settings, the Featured Slider box of a post, or an action's target module, listed your module folders as if they were modules. They now list modules only</li>
+		<li>Featured Slider: the box of a post never showed the picture of the chosen module. It shows it now</li>
+		<li>Split text animations on a right to left page, like Arabic or Hebrew sites, showed Latin words letter by letter backwards. Split text now follows the direction of its own words</li>
+		<li>Editor: a layer placed absolute inside a column could show its selection box lower than the layer itself, when the column's first layer had a negative top margin. The box sits on the layer now</li>
+		<li>A long Image URL of a background or an image layer ran under the field's title whenever the meta picker icon showed in the field</li>
+		<li>Screen readers skipped image layers: their alt text only reached a hidden list on the page. They now read it, whether it comes from the Media Library, the file name or a custom text</li>
+		<li>AI Translate: a duplicated module, or one made with the Quick Start Generator, only appeared in WPML > Translations after it was saved once in the editor. It now appears right away</li>
+		<li>Add-Ons: Social Sharing offered a Configure Settings button that opened Global Settings without any of its options. It has none, so the button is gone</li>
+		<li>Block editor: the Select Module and Edit Module menus of a Slider Revolution block stayed in place when the page was scrolled. They move with their button now</li>
+		<li>Filmstrip Card Stack: a shorter pull or a quick flick switches the card, a drag that leaves the stack's area no longer snaps back, and the next card can be grabbed right after a throw</li>
+		<li>Modal settings: the popup position picker had no effect, a picked position put the popup at the bottom centre. Popups saved with it now open centred on the side you picked, pick again for top or bottom</li>
+		<li>Modal settings: Toggled Body Class never reached the page. It now sits on the body while the popup is open</li>
+		<li>A popup that is not embedded on the page, opened by a layer action, showed its underlay although Underlay was off</li>
+		<li>Pop Up at Scroll Position, Container Based only took an #id, and did nothing on a page carrying only popups. Any CSS selector works now</li>
+		<li>A popup opened by an event with a slide number started on its first slide the first time it opened</li>
+		<li>While a page loaded, a module with its tabs or thumbnails inside reserved extra room for them, and the content below jumped up once the module started</li>
+		<li>Counter: ad blockers such as uBlock Origin blocked its script, so the number never counted for their users. It loads under a new name now</li>
+		<li>Counter: with rolling digits, a count up to 100 or 1000 briefly showed 00 before the new digit appeared. The new digit rolls in with the others now</li>
+		<li>Commerce: Cart Total and Items in Cart stayed empty on a layer with Surface until a resize, and product fields stayed empty on products a filter or Load More brought in</li>
+		<li>Commerce: Instead of Gallery and Summary showed nothing on a block theme like Twenty Twenty-Five, and the product page lost its gallery and add to cart form</li>
+		<li>Commerce: a module with Variation Choices showed the product's own picture and price for a moment before its default variation. It opens on the variation now</li>
+		<li>Selected State: the stage preview in the editor ignored changes to a shadow's X, Y, Blur or Spread. It follows them as you type now</li>
+		<li>Editor: a meta with a word or character limit, like {{title:words:5}}, showed its example only until the editor was reloaded, then it showed as raw text again. It keeps the example now</li>
+		<li>Slide transitions: on a slide with a blend mode layer, like a Multiply cover, the outgoing layers vanished at once instead of playing their out animation. They animate out now, and covering transitions still slide over them</li>
+		<li>Auto Direction on a layer's X or Y in px was ignored, so the layer moved the same way whether the slides went forward or back. It follows the direction now, and the distance scales with the screen like any other value</li>
+		<li>AI Translate: a text changed in the editor or in Quick Edit could stay hidden on the page behind an older translation, for example on a duplicated slide. The changed text shows now</li>
+		<li>Transition Pack: on a site whose plugin files come from a CDN that sends no CORS headers, a module with a Transition Pack effect never started. It starts now and loads the effect from the site itself</li>
+		<li>Custom Shape: a value typed into a field and confirmed with Enter was saved, but the shape kept its old look on the stage and on the page. It updates now, shapes saved that way update once a field is changed again</li>
+		<li>WooCommerce: a module whose category selection had been cleared could fail to show at all, and with a price range set, a module showed fewer products than you asked for. Both work now</li>
+		<li>Site Editor: the Select Module and Select Template dialogs could fail with "cE is not a function" until the page was reloaded</li>
+		<li>WooCommerce: the {{wc_stock}} meta is listed as Total Stock, the number it always printed, instead of In Stock</li>
+		<li>WooCommerce: a product's {{wc_star_rating}} shows as stars in the editor too, where it read as plain text</li>
+		<li>Quick Edit in the block editor: Ctrl/Cmd+Z in a text field did nothing to the text and could undo a change on the page behind instead. It undoes the typing now</li>
+		<li>Quick Edit: undoing a font change made with Bulk Style could leave the original font out of what the page loads, so after saving the text showed in a fallback font</li>
+		<li>Quick Edit: clicking a static layer could show undefined in its text field instead of the text, and typing there wrote it into the layer. The field shows the layer's text now</li>
+		<li>Quick Edit: a picture replaced on a slide background or image layer that had its own picture per device kept showing the old one on the page after saving. The new picture shows on every device now</li>
+		<li>Security: a post based module loaded on demand could include drafts, pending and scheduled posts for visitors. Visitors now get published posts only, editors still see their drafts</li>
+		<li>Editor in a right to left admin language, like Hebrew or Arabic: the Font field of a text layer showed its title on top of the font name. The title sits on the other side now</li>
+		<li>Video tutorials in the editor and the dashboard: on a smaller screen the video was cut off at the top and its close button sat outside the window. The window now fits the screen</li>
+		<li>On a slow host, a click on an arrow right after the page loaded could take several seconds to change the slide, because the next slide was fetched twice. It is fetched once now, so the slide comes sooner</li>
+		<li>Coming Soon & Maintenance: the countdown showed its placeholders like {{t_days}} instead of the remaining time</li>
+		<li>Full-width carousel placed in a post's text, for example by Related Posts: it was cut down to the width of the text column. It spans the whole window again</li>
+		<li>Mousetrap: in a scroll driven module the follow cursor left a resting pointer while the page scrolled, and a mouse move could put it far off. It stays on the pointer now</li>
+		<li>Chalk Line: a segment drawn upwards, ending above its first point, showed in the editor but never drew on the page. It draws now, as in the editor</li>
+		<li>Spectrum Lines: on a slower site some layers stayed empty in the editor and in Quick Edit until a preset was picked. They draw as soon as the editor opens</li>
+		<li>Kinetic Text: its tab showed on a Counter layer, where it does nothing. It shows on other text layers only now</li>
+		<li>Quick Edit: picking a Kinetic Text, Exploding Layers or Layer Depth preset did not play it on the stage. It plays once after each pick now</li>
+		<li>Backup: restoring a slide from a backup broke Add Slide and left the old layers on the stage until a reload. The restored slide works at once now</li>
+		<li>ShapeBurst: a layer could stay black in the editor after a reload. It draws now</li>
+		<li>Map & Places: the preset browser had no Save Preset tile, and a saved preset could not be renamed or deleted. Both work again</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.1 (27th September 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Counter: a text layer can count down to a date. Type the date into the layer or let an add-on fill it, choose the format ({d}d {hh}h {mm}m {ss}s), rolling digits if you like, and whether the layer hides once the time is up</li>
+		<li>Icons in a text: a text layer with an icon has Icon Size and Icon Gap. A larger icon centres itself on the text, and the gap sits on the side the text is on. For a button with an arrow no CSS is needed any more</li>
+		<li>Add to Cart action: the button dims while the product is added and ignores a second click meanwhile, then shows an Added Text of your choice for a moment. Set it in the action, next to Quantity</li>
+		<li>Before/After: the comparison can run inside a group instead of the whole slide. Pick the group as Compare Area in the slide settings, and its handle moves with the arrow keys too</li>
+		<li>Map & Places: a new add-on. Your locations on an interactive globe or a Google 2D or 3D map, with routes, travel times and a guided tour, and your own layers as its buttons</li>
+		<li>Glow Cards: a new add-on. Your images and videos as glowing 3D cards in seven arrangements that morph per slide, on a click or an action, with edges and glow in each card's colors</li>
+		<li>Commerce: a new add-on. Product heroes, carousels, galleries and buy bars filled from your WooCommerce shop, with Add to Cart, variation swatches, sale countdowns and stock bars. Start one with Shop Solution, or place it on product and shop pages</li>
+		<li>The picture box in a layer's Image Content is marked Feed while Prefer Feed Image is on, so it is clear where the image comes from. The video cover box does the same</li>
+		<li>Selected State, in a layer's Interaction panel: a click selects the layer and gives it its own look, like colours, border, shadow or a move. Several layers can act as a group or as tabs, and one can start selected</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>A stream value of zero now renders as 0. A stock quantity of 0, a rating of 0, a comment count of 0, anything legitimately zero was written into the layer as an empty string, so the visitor read nothing where a number belonged</li>
+		<li>Carousel with Show All Layers: on slides other than the first, hover actions of some layers could stay inactive. Every layer with an action responds to hover now</li>
+		<li>A layer hidden on the device in use could stop the whole module where it stood, which left its reserved height empty on the page</li>
+		<li>Inserting a meta from the Insert Meta dialog now updates the layer on the canvas straight away. The text was saved correctly, but the canvas kept showing the previous content until something else redrew it</li>
+		<li>WooCommerce no longer lists Slider Revolution among the plugins that have not confirmed they work with the new order storage. Slider Revolution reads products and never touches an order, so the warning was never right</li>
+		<li>Counter: on a slide that loads after the first one the number stood still at its end value. The counter's script was only asked for when the first slide used it</li>
+		<li>Layer hover: an opacity of 0 was ignored, so a layer could not be faded out completely on hover</li>
+		<li>A WooCommerce module filtered by a sale or regular price range left out every variable product, since its prices sit on its variations. A variable product with a matching variation is shown now, once</li>
+		<li>A text layer that prints a meta now breaks a word that is wider than the layer instead of letting it run out of it. Layers set to a single line are left alone</li>
+		<li>A meta typed into the Image URL of a layer image or a background is kept as the image source. The field read any text without a slash as a colour, so the meta was never stored</li>
+		<li>In the editor and in Quick Edit a meta with a word or character limit, like {{title:words:2}}, showed as raw text, and a meta used twice in one layer showed its example only the first time. Every use shows its example now, cut the same way</li>
+		<li>A broken HTML tag in the text of one layer, a div that lost the closing bracket for example, could take every slide after it out of the module. Those slides are put back where they belong now, so only the one layer looks wrong</li>
+		<li>With the internal cache on, a module that shows the current post, placed inside a list of posts, showed the first post's content on every entry. Each entry gets its own content now</li>
+		<li>Layer Depth and other layer effects: on a duplicated slide, the effect on the original slide was gone for good once the slider had played the copy, when looping back to the first slide for example. Both slides keep their effect now</li>
+		<li>Kinetic Text: with Mouse Reaction on, a text stopped following the mouse once its entrance had finished. It follows for as long as the slide is shown now</li>
+		<li>In the editor the Advanced transition tiles (Transition Pack) showed no preview on hover, only their still. They play again, on a module with the pack switched on and on one without it</li>
+		<li>A slide background created by a script or an import without its own animation stayed invisible, in the editor and on the page. It gets the standard fade now, the same a freshly added background has</li>
+		<li>Applying an animation preset to a layer whose animation starts right with the slide put the animation 290ms before the slide, and the layer stayed hidden in the editor and on the page. Layers saved that way heal on load</li>
+		<li>Particle Wave: changing a wave layer in the editor before its wave had finished building threw an error out of the editor's redraw, which could leave the stage half drawn</li>
+		<li>Particles, Particle Wave, Cymatic and The Cluster: Add Morph State did nothing when the WordPress admin was opened over http instead of https. It adds the state there too now</li>
+		<li>Particle Wave: a wave with Hexagon connections and a single colour instead of a gradient drew nothing at all. It shows in its colour again, with nothing to re-save</li>
+		<li>Liquid Glass: in the editor the glass could disappear from a layer when the stage redrew it. It stays in place now</li>
+		<li>Sharing: share buttons in post modules broke or cut the share text with Content and its word or character limits, and a custom post type on plain permalinks shared raw placeholders</li>
+		<li>Surface Material: a text stroke was painted over by the material, so its colour never showed. The stroke keeps its own colour now and the material covers the letters</li>
+		<li>Quick Edit: a colour picked for a slide background with a mesh never showed, the mesh stayed on top. Picking a colour switches the mesh off now, as a gradient does in the editor</li>
+		<li>A module showing the Current Post could show another post's title and image on pages served through a cache. Each page now asks for its own post</li>
+		<li>Editor: Undo right after saving jumped to the Static Slide or another slide instead of undoing your last change. Saving no longer adds steps to Undo</li>
+		<li>Editor: a newly added slide could not be moved in the slide list on the first try, it snapped back. It moves on the first drag now</li>
+		<li>Importing a version 6 module that uses an add-on stopped on the dashboard with one issue and never finished, and so did the migration of version 6 modules already on the site. Both finish again</li>
+		<li>Layer Depth: an exported module carried every photo tried while building it, each with its depth map, not only the ones its layers show. Save the module once and export again to leave them out</li>
+		<li>Exporting a module no longer packs images and videos nothing in it shows any more: the files of an add-on effect switched off on a layer, and pictures left over from an earlier version of a slide</li>
+		<li>A module exported from a site that moved from http to https kept pointing its older pictures at the old site after the import, although the files were in the zip. They move with the module now</li>
+		<li>YouTube No-Cookie Mode in the Global Settings had no effect, videos still loaded from youtube.com. They load from youtube-nocookie.com now</li>
+		<li>With Borlabs Cookie chosen as the consent tool, YouTube and Vimeo videos loaded without consent. They wait for the visitor's consent now</li>
+		<li>With the image optimizer on, an animated GIF turned into a still picture. Animated GIFs stay as they are now; save a module once to get its animation back</li>
+		<li>SR Elements: favourites were gone after a reload and the Favourites filter stayed empty. Favourites are kept now, the ones saved earlier included</li>
+		<li>SR Elements: inserting a video could give it the small preview picture as its cover. It gets its full size cover now</li>
+		<li>Global Settings: Force 1xDPR on Mobile had no effect. It works now and stays off until you switch it on, whatever it showed before</li>
+		<li>Chalk Line: a line brought to another page with its Export and Import placed points that sit on a module against the module of the page it came from. They follow the new page's module now</li>
+		<li>Pages on the Blank Template showed only "Forbidden" on hosts guarding against the WordPress page template flaw of September 2026 (IONOS, Strato). The template is stored in a form those guards accept now, existing pages move over on their own</li>
+		<li>Layer Depth, Exploding Layers and Kinetic Text: a duration or other value typed into the effect panel jumped back to the old one while the effect was showing on the stage. Typed values are kept now</li>
+		<li>Template Library: with "All Items" selected, the preview images of templates never opened before stayed blank on many hosts. They load in smaller portions now and show up</li>
+		<li>Carousel: a slide swiped to while the page was still loading its pictures could stop its captions halfway into their entrance. They finish now</li>
+		<li>Advanced slide transitions that move the picture far across the slide, like Motion Blurred, showed standing stripes and then jumped to the new slide. The picture moves in now</li>
+		<li>A slide transition could hide the layers of the outgoing slide at once instead of letting them animate out, when the incoming slide had a layer with a blend mode inside a group</li>
+	</ul>
+	<h3 class="version-number">Version 7.2.0 (21st September 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>DepthForge: GLB animations can follow keyframe Progress from 0 to 100 percent. Timeline playback lets scrolling take a model apart and put it back together without custom JavaScript.</li>
+		<li>DepthForge: Reset on Scroll returns an orbited view to its camera path. Spot lights now have shadow quality, softness and bias controls in the editor.</li>
+		<li>DepthForge: An optional loading hint shows your module preloader and custom text while 3D models load. It disappears when the models are drawn and shows a message if loading fails.</li>
+		<li>PaintBrush: Six new presets: Condensation Wipe, Velvet Reveal, Squeegee, Ink Bloom, Silk Ribbon and Ember Trail. New settings for opacity, speed response and how the surface returns, and the picture behind can follow the pointer</li>
+		<li>The Cluster: Save Resonance states and blend between them through layer actions, clicks or a timer. Form and rotation change smoothly while the same particles keep moving</li>
+		<li>Particle Wave: Nine new presets add ripples, swells, ribbons and rings. Image Surface deforms a full image with waves. Save motion and form states, then blend them through actions, clicks, a timer or a state per slide</li>
+		<li>ShapeBurst: Luminous Burst: images and text become glowing dust. Eight new presets add magnetic emission, wind gusts, following colonies and full rebuild cycles, in source colors or a tint. Earlier waves, tilt and dust looks stay available</li>
+		<li>ShapeBurst: Image Fragments, under Particles, preserves photographic detail and sharp text while pieces move independently. Grains remains available for dust and halftone looks</li>
+		<li>Effects Library: Add Layer opens one grid of ready made effects from every add-on. A click installs and switches on what it needs, then drops the effect on a new layer, the selected one or the slide background</li>
+		<li>Counter, a layer that counts, in Add Layer under Content and in the Effects Library without any add-on. It starts with the animation, on hover, on click or by the new Start Counter and Reset Counter actions, and can roll its digits like an odometer</li>
+		<li>Glow and Surface Material, two new effects in Extra Style. Glow is a soft light on the edge or behind the layer that can follow the mouse. Surface Material turns text, SVG and images into liquid chrome, gold, holographic foil or relief</li>
+		<li>Background looks: ten mesh fields and sixteen gradients as tiles next to a slide or module colour, with Chaos and Grain knobs. The Content Overlay picks from 27 patterns in two colours. Both can drift, sway, pulse or shift hue on their own</li>
+		<li>Extra Style: a plain shape can carry a Content Overlay with the new patterns, and Above Everything lays the module overlay over slides, layers and navigation without catching a click</li>
+		<li>Extra Style is four tabs now: Background, Overlay, Shadow and Preloader, each picked from tiles. Sixteen more preloaders sorted by look, four soft module shadows, and the two GIF preloaders are replaced by drawn ones</li>
+		<li>Brand Kit in Global Settings: name your brand colours and fonts once and pick them in any colour or font picker. Change one later and every field using it follows. The Bulk Style Editor swaps a template's colours and fonts for brand ones in one run</li>
+		<li>Text Block: ten new text presets with matching Outs, staggered per word or letter. Cycle and Fly In Random give every line, word and letter its own turn now, and the group is called Combined Motion, apart from the Kinetic Text add-on</li>
+		<li>Story Telling: a story can open by itself from a Play on load marker, scrolling back up stops there unless Scroll Back Stops at Play on Load says otherwise, and Go To Slide can name where in the slide to land, a time or a share</li>
+		<li>Video Scroll: a sequence is one prepared video now instead of a folder of pictures, about a tenth of the weight, prepared the moment you pick a clip. Modules built on frames keep working</li>
+		<li>Video Scroll: the slide background's Layer tab carries the video, its part of the clip and a row per slide in a story, with Auto Split sharing the clip out. A slide can sit out the sequence. Hold in view and offsets sit in Module Settings</li>
+		<li>Weather add-on rebuilt: eleven scenes with rain, branching lightning and targeted strikes, melting snow, frost and movable sunlight. Live weather picks the scene, fixed conditions need no API key, and three forecast cards sit in the Effects Library</li>
+		<li>Particles: weather, flow fields, emitters, swarms, light trails and depth materials, with nine new cinematic presets. Saved states morph through actions, clicks, a timer or Slide Based assignments; bursts can replay by action</li>
+		<li>Particles: the preset library is grouped by family, Weather first, in the panel and in the Effects Library. The old Snowfall preset has made way for Soft Snow and Heavy Snow; a layer that uses it keeps running</li>
+		<li>Liquid Glass, a new add-on: flowing glass, organic lenses and crystal waves over a layer's own image, video and text. Six presets with idle motion and elastic movement after the mouse</li>
+		<li>Kinetic Text, a new add-on: seven liquid motions for text. A text melts in on reveal and out on hide, or rotates through a list on hover, click, on its own or by action, word by word or line by line</li>
+		<li>Layer Depth, a new add-on: 16 presets for photo lighting with moving lamps, embossed text and depth scans with dots, crosses or contour lines. The editor makes the depth map from the photo itself</li>
+		<li>Spatial Scenes, a new add-on: a layer becomes a scene of floating objects the page travels through on scroll, as a portal, a tunnel, an orbit or a gallery with titles, texts and links. 43 presets, eleven object sets or your own pictures</li>
+		<li>Cymatic, a new add-on: ten living particle sculptures with mouse interaction. Save states and morph between them through layer actions. Pause holds idle motion while mouse reactions and pulses remain active</li>
+		<li>Exploding Layers: eighteen presets assemble or break apart text, images, shapes and HTML5 video with Classic, Impact or Glass fragments, on reveal, on hide or both, in a panel of its own. Video keeps playing inside the fragments</li>
+		<li>Revealer: seventeen presets for the curtain as tiles at the top of its panel. Curtains, wipes, slants and irises, each with colour and timing, set up with one click</li>
+		<li>DepthForge: eight finished 3D scenes to pick from in the Effects Library instead of an empty object, Chromatic Cube and Helix Swarm among them. A tile brings its lights, its environment and its exposure with it</li>
+		<li>Fluid Dynamics: a new layer lands full width and full height, the way a Particle Wave layer does, instead of a small box the fluid could barely show in</li>
+		<li>Spectrum Lines: a Photo Relief style bends the lines over an image, generative lines flow as Wave or Ribbon, the pointer can leave a trail and Edge Fade softens the borders. Two new presets</li>
+		<li>Before/After: the handle can carry a word between its arrows, and the comparison can be switched off on mobile, where dragging a split competes with scrolling</li>
+		<li>Duotone: a Custom filter takes two colours of your own. Slicey: a slice can have round corners. Polyfold: the two edges of a fold can meet in a curve. Charts: bars go below the zero line</li>
+		<li>Mousetrap: a spotlight that follows the pointer, with the layer visible only inside or only outside the light. Lottie: an animation can be the progress bar, playing with the slide's time or the position in the slider</li>
+		<li>Backup add-on: a module keeps versions of its settings, not only of its slides. Module Settings has a Backup tab that puts one of the last eleven saves back</li>
+		<li>Three media actions: Restart Media, Jump to Time and Set Volume, for the same targets the play and mute actions reach, the slide background video included</li>
+		<li>A keyframe and a hover can change the box and text shadow now, with a switch of their own like the colours. A keyframe's X or Y can also put a layer inside the edge it aligns to, not only outside</li>
+		<li>Font size and line height can be set in rem, which holds its size across devices. A background image can be picked per device on a slide background and an image layer, and an SVG layer can carry a drop shadow that follows the shape</li>
+		<li>The module height can be set in viewport units: 70vh in any height field, and lvh, svh or dvh choose how it behaves while a mobile address bar slides in and out</li>
+		<li>Pan and Zoom can pause while the pointer rests on the module, and can be held to one device class: All Devices, Not on Mobile or Mobile Only. The old on/off never reached the front end</li>
+		<li>A carousel arrow can move more than one slide at a time, with Slides per Click in the arrow settings</li>
+		<li>The font picker draws every font in its own typeface and the weights in their real cuts, loading only the rows on screen</li>
+		<li>The animation browser can be walked with the arrow keys, each tile playing its preview, and Enter picks one. Select several layers and one click starts them all at the earliest moment, next to align and distribute</li>
+		<li>Moving a layer on the timeline takes its own rows with it, chars and words included, and moves every selected layer together</li>
+		<li>A scroll based timeline can be kept from running backwards: Keep Progress on Scroll Up holds the animation where the scroll left it</li>
+		<li>A global layer can skip single slides inside its span with Except on Slide, animating out and back in at each</li>
+		<li>A slide and a layer can run on a schedule: from a date, to a date and only on chosen weekdays. The layer's schedule sits in its Visibility panel</li>
+		<li>The browser's back button returns to the slide it left. With Use Deeplink Hash in URL the address follows every slide change, Back and Forward walk them, and a link opens one</li>
+		<li>The shortcode can narrow a post based module: post_ids lists the posts to show, category and taxonomy point it elsewhere. One module, many embeds</li>
+		<li>A deleted module goes to a trash. Open Trash in the module overview to put one back, and Keep Deleted Modules in the global settings says how long it waits</li>
+		<li>Yoast SEO and Rank Math read a module's text: on a post that holds a module, its headings, texts and image alt texts count in the content analysis</li>
+		<li>A module can check itself for accessibility, in Module Settings under Accessibility: hard to read text, pictures without alt text and a slideshow that cannot be stopped, each with a jump to the layer</li>
+		<li>A PageSpeed measurement switch in Global Settings under Optimization draws the first module's opening picture straight from the markup, so a speed test reads it instead of waiting for the engine</li>
+		<li>Internal Caching has a lifetime, from an hour to a month, next to its switch under System</li>
+		<li>The Add-On and Template libraries mark what is new to you with a New badge, and a freshly switched on add-on carries a New tag in the module settings list until its panel is opened</li>
+		<li>The purchase code is no longer readable on screen, and an update that brings more than fixes says so on the plugins screen, with a word about backing up first</li>
+		<li>Quick Edit has Undo and Redo: Cmd+Z and Shift+Cmd+Z, or the two arrows in the bar, for text, pictures, videos, colours, links, visibility, effects and Bulk Style runs. Leaving the page with unsaved edits asks first</li>
+		<li>Quick Edit wears a new panel: labelled device buttons, a Fit button on the stage, Typography and Visible on sections, and the rarer text options folded away under More text options</li>
+		<li>Quick Edit: an add-on with a preset library shows its preset tiles under Effects, Fluid Dynamics, Particles and every other one, and a click applies the preset. A shape carrying an effect counts as content, so its effect can be picked and switched</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>ShapeBurst: the preset library groups Dust Behaviors, Luminous Burst, Text, Image and Classic looks. All earlier presets remain available</li>
+		<li>Hover Morph: a new Effects Library video shows eight looks. The 3D Card and Ripple Water presets use less liquid distortion so their tilt and waves stand out</li>
+		<li>Screen reader support is on out of the box: slides get a name and a role, arrows, bullets and tabs get labels, and only the slide on screen is exposed. A modal closes on Escape. Modules already built get both, with nothing to re-save</li>
+		<li>In the navigation panels the View tab is now called Behavior, on arrows, bullets, tabs, thumbnails and the scrubber alike</li>
+		<li>Global Settings has an Editor tab: the align guide, snap and spacing settings moved there from General</li>
+		<li>Spikes in Extra Style have two new types, Top Corner and Bottom Corner, which give a text bar the classic ribbon end at any size</li>
+		<li>Slider Revolution no longer loads what a wp-admin screen cannot draw. The posts list saves about half a megabyte and the post editor about a third</li>
+		<li>Carousel types, Advanced Transitions and Media Reveals show on every site, whether or not their add-on is installed. Picking one installs and switches it on, or asks for a licence first</li>
+		<li>An add-on switched on for a module that no layer uses any more goes off on save, so the page stops loading it for nothing</li>
+		<li>A module wider than the screen says at once how to pan and zoom out, instead of after a wait</li>
+		<li>Spectrum Lines: pointer effects fade out when the pointer leaves the layer, instead of staying in its middle</li>
+		<li>Quick Edit opens faster, its data travels while the editor scripts load, and a carousel shows the neighbouring slides beside the one being edited instead of blue boxes</li>
+		<li>PaintBrush: a brush with a soft edge is about a third cheaper to draw in Firefox on Retina displays and looks the same</li>
+		<li>Particles: a version 6 module that used the Snow add-on imports with Particles Weather Snow, keeping flake count, size, speed and opacity. The Snow add-on is no longer needed for it</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>A module using Arial on Windows or Helvetica on a Mac waited before it drew and warned in the console that the font did not render. It draws at once now</li>
+		<li>Clicking a button that changes the slide left a "Blocked aria-hidden" warning in the console and kept focus on a hidden slide</li>
+		<li>Distortion: a layer with default animation settings came back as Spiral Large on the next editor open, and saving with a default map could fail. A layer rebuilt on return to its slide no longer renders before its material exists</li>
+		<li>PaintBrush: the sharp picture flashed before the blur while a layer entered, strokes drifted from the pointer on Retina displays, and Curl Trail could vanish on the first touch or run faster on high refresh rate displays</li>
+		<li>Panorama: in the editor, a layer attached to the panorama could only be selected at the spot it was placed, not where it showed as the view turned. Its selection box now travels with it</li>
+		<li>Editor: a module without a Static Slide, as some scripts and tools create them, offered no Global Layers. Opening it in the editor now adds the missing Static Slide</li>
+		<li>The Cluster: effects with depth of field could disappear when returning to a slide, and an exported module left the Filings or Image Form picture behind</li>
+		<li>Dashboard: on a fresh load the module cards could stay invisible or half faded until the page was reloaded. The fade-in was cut short by the page settling its layout</li>
+		<li>Particle Wave: Pointer reactions now align with layers placed away from the page origin, respond to touch and move consistently across display refresh rates</li>
+		<li>In the editor, a module overlay set in Extra Style covered the layers on the stage, so a video or image seemed to sit behind it. The overlay stays behind the layers, as on the live page</li>
+		<li>An image layer's own Content Overlay did not show on the live page. On an image drawn to canvas, the module overlay's pattern showed there instead</li>
+		<li>In the editor, text with a line animation kept the alignment of the first device, so a headline centered on mobile showed left aligned there. It now follows each device</li>
+		<li>ShapeBurst: animation speed depended on the display refresh rate, some particles ignored bursts, and the first touch could do nothing. These now behave consistently, including on Retina displays</li>
+		<li>Hover Morph: hover movement and fading stay consistent across refresh rates. Image distortion settles after the pointer leaves, and transparent edges blend correctly</li>
+		<li>Particles: particles could be offset or clipped on Retina displays and stretched after a height-only resize. Resizing now preserves the field</li>
+		<li>Particles: slow speeds retain their variation, gravity runs consistently across refresh rates, and parallax strength works. Dense connection fields use fewer distance checks</li>
+		<li>Use Internal Caching stored nothing since 7.0 and so never made a page faster. Modules are cached again, a post based one included, and editing a post clears it</li>
+		<li>Exporting a module from a modules page left open for hours saved a 0 KB file. The export fetches a fresh session key by itself now, and a failure shows as an error instead of a file</li>
+		<li>Importing a version 6 module lost its navigation, stopped with an error on modules saved by 6.7.23 or older, and dropped sharp corners. Corners come over as Top and Bottom Corner spikes now. Import the module again</li>
+		<li>Importing a module failed on an add-on that is installed and active but not yet in the add-on catalogue</li>
+		<li>A navigation skin carrying its icon in its own CSS drew the character code as text. A module that stored the broken copy is right again after the skin is picked once more</li>
+		<li>Story Telling: Pan and Zoom could stop after leaving a chapter once. It follows the scroll again when returning to that chapter</li>
+		<li>Story Telling: in a pinned story, effects that follow the pointer drifted further off the longer you scrolled. They read the visible stage now</li>
+		<li>Story Telling: scrolling back up showed a cut instead of the transition, GPU transitions showed as hard cuts, and buttons in groups or on leaving slides took no clicks. Nothing to re-save</li>
+		<li>Effects on a slide background, SunBeam, Distortion, Panorama, Filmstrip and the others, stayed dark in a Story, painted over an Advanced Transition and kept the first frame of a Video Scroll sequence. They follow the background now</li>
+		<li>SunBeam: mouse interaction now works through text, buttons and other layers placed over the effect</li>
+		<li>SunBeam: about half as expensive to draw and it looks the same. On a struggling page it steps down with everything else instead of growing brighter the slower the page got</li>
+		<li>Video Scroll: a sequence built before a domain or https move never arrived, WebP frames exported without a frame, and a duplicated module pointed at the original's folder</li>
+		<li>Video Scroll: a layer could pick up the video's first frame as its background just from being clicked. Modules already built clean themselves up</li>
+		<li>Snow: on a slide background the flakes were hidden behind the background image on the published page, so Min and Max Size seemed to do nothing</li>
+		<li>PaintBrush: every preset gave the same result, they are replaced by nine of their own. The Spray brush revealed nothing once set wide, and a layer showed nothing in the editor until the pointer moved</li>
+		<li>Disable on Mobile did nothing in Particles, Filmstrip and SunBeam. Polyfold: a fold switched on in the editor appeared only after a reload</li>
+		<li>Transition Pack: at a high Ripple Intensity, Portal Waves could not reach one edge of the layer. CarouselX flashed the previous panel for a frame when the focus changed</li>
+		<li>Mousetrap: the ease under Special Rules went back to none on every load, so rotations, scaling and fading snapped. Pick the ease again on a layer that had one</li>
+		<li>Prev/Next Posts: the content limits of 10 words and 10 chars returned the whole text. Insert the meta again on a layer already built</li>
+		<li>AI Translate: after every language was removed from a module, the layer panel showed an extra language titled undefined. It is gone the next time the module opens</li>
+		<li>Page FX Cursor Motion: in the block editor a preset tile showed only its drawing when hovered. The tiles play the real interaction now</li>
+		<li>Every post, page and widget screen kept a Slider Revolution loop running at full frame rate, and page builder screens requested a script the plugin does not ship. Both gone</li>
+		<li>The editor could stop at Loading Editor Resources when one of its scripts did not arrive with the page. It takes that code from the bundle it ships in now</li>
+		<li>With screen reader support on, the arrows announced each other, so Next moved back a slide, and Visible if Focused could stop the module loading</li>
+		<li>On a phone a full screen module could trap the page: swiping past the last slide never handed the scroll back</li>
+		<li>Ignore Mobile Height Changes: a full height module opened with the address bar already hidden stayed taller than the screen until the device was turned. It fits the screen with the bar shown now</li>
+		<li>A layer switched off on a device no longer downloads its image there, and with the Image Optimizer on a slide background is fetched once, the optimized file straight away, instead of twice. An image layer is downloaded once too, not twice</li>
+		<li>An uploaded custom font kept the address it was uploaded on, so a site moved to https or another domain showed the text unstyled. The Load in setting on a custom font did nothing. Both work, with nothing to re-save</li>
+		<li>Picking a font whose name holds a number, like Jacquard 24, left the editor showing the previous font on the layer</li>
+		<li>Typing inherit into a hover or parallax field cleared it instead of keeping the word. Switching a text layer from a letter preset to a line preset played nothing until the editor was reloaded</li>
+		<li>Justify did nothing on a text layer at automatic width. It wraps now, so justify works, and the layer toolbar offers it too</li>
+		<li>WPBakery: a module vanished from the page as soon as its Module Settings were saved, until the page was reloaded</li>
+		<li>Block Offsets in Module Settings landed on the wide desktop whichever device they were set on, and reopening the dialog reset the other rows. Set them again on a module that had them</li>
+		<li>The shortcode's order attribute did nothing in version 7. It lists the slides to show again, by id or DeepLink ID</li>
+		<li>Quick Edit put scroll bars on a module that fitted, showed layers that wait for a click over the slide, and a zoomed out module painted its background colour over only part of itself</li>
+		<li>Quick Edit: global layers set behind the slides covered the slide once they had been opened, and a layer revealed by a colour block stayed hidden after switching slides</li>
+		<li>Ghost outlines in the editor stayed lit after the pointer had left, or on layers not selected or not on that slide. Dragging a keyframe left its dotted outline behind on the timeline</li>
+		<li>An image picked in a panel could land on a different layer when that layer was clicked while the panel was still looking the picture up. A field writes only to the layer, slide or module it was opened on</li>
+		<li>Switching a layer's background image off did not stick on text, buttons, rows and columns until the module was next built up</li>
+		<li>A module overlay changed in Extra Style showed only in the panel preview, the stage kept the old one until a reload</li>
+		<li>Bulk Style Editor: with several layers selected, Colors in Use stayed empty and a colour change went to the selected layers instead of the ones using that colour</li>
+		<li>Clicking a number field on the side where its name is printed did not put the cursor in the box. The whole field takes a click now, the slider bar under it included</li>
+		<li>A link from a layer panel into Module Settings opened only the settings list on its first use</li>
+		<li>A Custom Alt or Custom Title set on an image never reached the page. Save the module once and the custom text is written out</li>
+		<li>In a post based module, a post with no featured image left the navigation thumbnail empty, and a post using a slide template from a module not on the page stopped the module loading</li>
+		<li>A Toggle Mute Media action aimed at a video not on screen yet threw an error. It remembers the wish now, so the video comes up muted or audible as asked</li>
+		<li>The dashboard showed every announcement banner it had ever received, expired ones included, and closing one brought it back on the next visit</li>
+		<li>Dashboard: the fly-out of the WordPress Dashboard menu item opened behind the Slider Revolution bar, so its first entry could not be reached</li>
+		<li>Share Slider Revolution Usage Analytics did nothing since 7.0. It works again, and a switch left off stays off</li>
+		<li>On a server without PHP's ZipArchive, an HTML export packed its CSS and JS into the wrong folders, so the page opened unstyled</li>
+		<li>The JavaScript API's getRSVersion() answered 7.0.0 on every site. It returns the installed version now</li>
+		<li>A slide background saved as a colour stayed empty in the editor when switched to Image, the placeholder picture showed only in the panel</li>
+		<li>A curled module shadow from Extra Style drew two rectangles across the module while it was still loading. The shadow waits for the first slide now</li>
+		<li>Disable Module on Mobile in Module Settings always showed as off when reopened, so it seemed not to save. It shows the saved setting now</li>
+		<li>In a post based module, every post showed the same default avatar instead of its author's picture, on any layer using the Author Avatar meta</li>
+		<li>Quick Edit: a user allowed to edit one post could open and change any module through it. A module is reachable only from a post that carries it now</li>
+		<li>Quick Edit: the first draw was smaller than after a click on Desktop, the text panel named the scaled font size, a failed save stayed on Saving, and closing without saving and reopening left two panels</li>
+		<li>Quick Edit: a Bulk Style run cleaned every text layer of the slide, so an inline SVG in an untouched text vanished. Only what the run changed is cleaned now</li>
+		<li>Quick Edit: the slide list asked the server to shrink every picture on every draw, the eye on a layer row sent the list back to the top, and Ctrl+Z ran the editor's undo against the stage</li>
+		<li>Ctrl+Z on a post editor page with Slider Revolution loaded threw an error in the console</li>
+		<li>Quick Edit: the colour picker of a slide background gradient opened at a wrong colour and opacity. A colour background opens its picker straight from the list and from Prev/Next now</li>
+		<li>Image Editor: opening it a second time without reloading the editor showed "Could not open the image editor", and the dialog could not be closed when the image had failed to load</li>
+		<li>A module with Shuffle Order on Load ignored Alternative 1st Slide and could open on any slide</li>
+		<li>Resizing a text layer's width with Shift held also moved it up or down. It keeps its place now</li>
+		<li>Some switches showed on while their setting was off, such as Force Swipe over Effects and Text Stroke on a layer that is not text. Every switch shows its real state now</li>
+		<li>A video from another domain, such as a CDN, broke the effects drawn over it and filled the console with security errors. It is fetched so its picture can be read now, and where the host forbids that, the effect steps aside and the video plays</li>
+		<li>Quick Edit could not swap the photo of a card built as a text layer over its own background image, like the three cards of Blooming Portfolio. Such a layer offers Replace Image now and is listed under the Media filter</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.8 (31st August 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Seven more Pan and Zoom moves, and each of them changes its mind on the way: Arc Swing, Push and Settle, Pull Back, Glide By, Float, Corner Arc and Tilt Sweep. They are there for a layer, for the slide background and in the Page Effect</li>
+		<li>A template package can now bring whole pages, not only its modules. The page arrives with its blocks in order, its Page Effects already pointing at the modules just installed, and its menus and images</li>
+		<li>A module can now be given a wrapper ID and CSS classes wherever it is placed. The Module Wrapper IDs field in Module Settings finally does something, it had nowhere to be stored before</li>
+		<li>Every page builder now shows the module it holds and offers the same controls: swap it, import one from the library, open the editor, Quick Edit it, and one Module Settings dialog. Elementor, Divi 4 and 5, Avada, WPBakery, BeTheme, block editor</li>
+		<li>Divi 5 gains Block Offsets, Block Depth and a wrapper ID it never had</li>
+		<li>Divi 4 and 5: the Visual Builder now draws the module itself on the canvas instead of a stand in card. A Live Preview Render switch turns it back, and modals, missing modules and unregistered premium ones keep the card</li>
+		<li>Themes and plugins can now list modules, offer the module picker and place a module through a documented API. Until now every integration outside the plugin had to reach into Slider Revolution's internals</li>
+		<li>The slide end can now be dragged on the timeline to set the slide's length, instead of opening Slide Settings for it. It stops where the last animation on the slide ends, and its arrow still leads into the Out animation</li>
+		<li>Story Telling is a new module type. The whole module runs off the page scroll instead of a timer, and Scroll Pace sets how much scrolling a story costs</li>
+		<li>A story now says what it spends its scroll on: the Story Telling panel for the whole track, each slide for its own share, and the timeline ruler switchable from seconds to scroll pixels while the animation is being built</li>
+		<li>Arrows, Bullets, Tabs, Thumbnails and the Scrubber are now picked from a grid of live tiles instead of a dropdown. Each tile is the skin itself, and presets you save get one too, with saving, renaming and deleting on the tile</li>
+		<li>The Progress Bar has presets for the first time: twenty two to pick from, among them coloured and segmented bars, edge bars, rings, a hairline through the middle and a wide tint, and you can save your own</li>
+		<li>The scrubber's track pattern and its idle size can be set at last. The engine drew both all along, but the pattern was nailed to dots and the idle size had no control anywhere</li>
+		<li>Thirty three new navigation skins across all five types: pill, outline and card looks, frosted glass, hard black outlines with an offset shadow, gradient rings, and a set that inverts itself against whatever the slide shows so it reads on any image</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>The layer Tab Index starts at auto instead of 0, and takes -1 to keep a decorative layer out of the keyboard order. An empty field falls back to auto. 0 left the quick list, it never wrote a tab index in Slider Revolution 6 either</li>
+		<li>Progressive Blur is about four times cheaper to draw and looks the same. Modules already built get it, with nothing to re-save</li>
+		<li>Slider Revolution eases effects back on a device that cannot keep up, and restores them once it can. It ignores the first seconds of loading, so a slow start is not mistaken for a slow device</li>
+		<li>Aligning several layers now moves the anchor with them. A centered layer that is aligned left is anchored left afterwards, so its edge stays put when the layer gets wider</li>
+		<li>Distribute now says so when the selected layers overlap on that axis, instead of pulling them apart into a row. Arrange as Row and Arrange as Column still do that, it is what they are for</li>
+		<li>All eight translations are complete again, with the 154 strings that are new this release, the template package installer among them</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed modules from folders being displayed at root level on module selection</li>
+		<li>Fixed a dialog opened over another one dimming the page but leaving what was under it clickable, so a template behind an install dialog could still be started</li>
+		<li>Fixed the block editor keeping an old copy of the Slider Revolution block's stylesheet until WordPress itself was updated. It is now versioned by the file, so a corrected block card shows up on the next reload</li>
+		<li>Fixed a slider imported from Slider Revolution 6 arriving without any of its add-on settings. They were dropped in silence, so the module opened as if the add-ons had never been on. Sliders imported before this update need importing again</li>
+		<li>Fixed the layer Tab Index appending auto to every number, so picking 5 left 5auto in the field. Fields already saved this way repair themselves when the value is next edited</li>
+		<li>Fixed the layer Tab Index and Rel attributes never reaching the page. Both were saved, but nothing wrote them onto the layer. On a layer that is a link, Rel adds to what the link settings produce, so a new tab link keeps its noopener</li>
+		<li>Fixed the layer Rel attribute only ever growing, so a word deleted from the field stayed, and a link switched from nofollow back to follow stayed nofollow until a full page reload</li>
+		<li>Fixed module search to properly filter by titles and aliases containing dashes</li>
+		<li>Fixed a Filmstrip module keeping its old size when the browser window grew past the module content width. Shrinking the window always worked, so it looked random, and only a reload brought the right size back</li>
+		<li>Fixed the media actions Play, Stop, Toggle, Mute, Unmute and Toggle Mute Media doing nothing when they point at Active Video in Slide and that video is the first layer of the slide. Sliders imported from Slider Revolution 6 hit this most</li>
+		<li>Fixed a YouTube layer not starting by itself on phones and tablets, even with Autoplay and Mute on. Both settings reached the player in a form YouTube does not read, so it came up with sound and outside the page, and the browser refused to play it</li>
+		<li>Fixed the alignment toolbar of a multi selection starting above the stage, with only its shadow in view. It stayed there until the pointer left the stage and came back, which rebuilt it in the right place</li>
+		<li>Fixed a module set to open as a modal on a custom event saving no event name at all, so it listened for nothing. The name the settings showed was never the one that was stored</li>
+		<li>Elementor: fixed the modal settings of a saved widget losing their values when the page was reopened. Session length, delay and scroll offset fell back to their defaults while their switches stayed on, and a custom event name was replaced</li>
+		<li>Elementor: fixed the Slider Revolution widget never appearing in the editor on Elementor below 3.5. The check deciding how to register it was reading the PHP version instead of Elementor's</li>
+		<li>WPBakery: fixed Module Settings refusing to open a second time on the same element, and no longer losing the module title and the link to the editor when those settings are saved</li>
+		<li>Fixed a module set to open as a modal playing inside the page builder instead of standing in as a card. One set to open after a delay took over the editing canvas with nothing to dismiss it (Elementor and Avada)</li>
+		<li>Divi 4: fixed the Premium Template and Register License to Unlock labels never appearing on a module in the builder. They were saved under one spelling and looked for under another</li>
+		<li>Fixed a module failing to load its data inside a page builder that draws its canvas in a frame. The request was rewritten to an about:// address, which browsers refuse to send</li>
+		<li>Divi: fixed Module Settings doing nothing on a module placed before this update, and that module's modal, offsets and depth reading back as unset</li>
+		<li>Divi: fixed a Slider Revolution module built in Divi 4 arriving in Divi 5 as an unconvertible block. The file telling Divi how to carry it across was generated but never shipped</li>
+		<li>Divi: fixed a page built with Divi 4 printing the module's shortcode as plain text once the site moved to Divi 5. It now renders whether or not it has been converted</li>
+		<li>Elementor: fixed the Slider Revolution panel coming up empty, with no module card and no buttons, on the first page load after the plugin was activated or on any slow one</li>
+		<li>Fixed the Module Settings dialog losing the space between its controls in every page builder, so every tab's rows ran together into one block</li>
+		<li>Fixed the help tooltip on the Module Wrapper IDs field never opening. Its text was written where nothing could find it</li>
+		<li>Elementor: fixed a module's wrapper ID and CSS classes being forgotten whenever its widget was reopened. They were saved correctly but read back as empty, so the next save dropped them</li>
+		<li>Avada: fixed a module placed without "Override Module Layout" rendering full width to visitors while looking correct to whoever was editing the page</li>
+		<li>Fixed modules vanishing from the page on sites that have Fusion Builder installed alongside another theme or builder. A slider added the way BeTheme, Jupiter, Cornerstone and hand written shortcodes add it rendered as nothing at all</li>
+		<li>Divi: fixed a module set to open as a modal ignoring Pop Up after Time completely, and losing the scroll position it was given. Opening at a scroll offset or inside a container now works as set</li>
+		<li>Fixed the Page FX settings window opening empty on WordPress 7.1, with an alert about the page being cross origin. Chalk Line, Pan and Zoom, Cursor Motion and Scroll Animation can be set up again</li>
+		<li>Fixed the Page FX mark on a small block in the editor covering the picture and hanging out under its bottom edge. It now takes a share of the block it sits on, up to the size it always had</li>
+		<li>Fixed switching an effect on for a gallery or a set of columns looking like nothing happened when a block inside already runs one. Both marks sat in the same corner, so the second one landed under the first</li>
+		<li>Fixed a slide never showing on the front, usually the first one of a module imported from Slider Revolution 6. Modules already built get this, with nothing to re-save</li>
+		<li>Fixed the Gaps switch in the Progress Bar settings turning the whole progress bar off instead of its gaps</li>
+		<li>The scrubber works properly at last. Its handle showed a flat colour, or the last slide's picture, wherever it stood: it now shows the slide it is on, dragging included. Modules already built keep what they saved</li>
+		<li>Fixed the scrubber slide title flipping in flat, and the Thin Bar skin losing the size of its handle arrows and the colour of its track pattern</li>
+		<li>Quick Edit: fixed the poster image standing in as the video's thumbnail too, so picking a poster looked like it changed the video</li>
+		<li>Quick Edit: a module with sound no longer plays it while the module is being edited</li>
+		<li>WPBakery: fixed Module Settings forgetting Layout Override when neither switch is on, and Use as Modal when no trigger is set. Both came back off as soon as the dialog was reopened</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.7 (21st August 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Page FX brings Slider Revolution effects to ordinary WordPress blocks, with no module on the page. Switch an effect on from the block toolbar, or place its own block. Settings open in a workbench that browses presets and tunes them</li>
+		<li>Page FX Pan & Zoom: the Ken Burns move on any image or Cover block. Eight moves, from Zoom In to Tilt Drift, with Direction, Corner, Strength, Easing, Duration and Repeat. It starts when the image scrolls into view and pauses when it leaves</li>
+		<li>Page FX Scroll Animation: a block plays a Slider Revolution layer animation as it scrolls in. Twenty-nine animations, including text animations that split a heading into lines, words or characters. It can follow the scroll and wind back</li>
+		<li>Page FX Cursor Motion: a block answers the pointer, leaning toward it, popping, tilting or shying away</li>
+		<li>Twelve slide background filters now run on the core transitions as well as the Transition Pack ones: Grain, Dither, Vignette, Chromatic, Posterize, Halftone, Pixelate, Glitches, Glitch & Noise, Motion Blur, Film and Bokeh</li>
+		<li>Filters have their own tab in the slide background browser, with a live preview and a Strength control, and a filter stays on when a different transition is picked. Each carries its own timing inside the transition, editable per slide</li>
+		<li>Preset browsers instead of dropdowns, across the editor: SunBeam, Hover Morph, Particles, Particle Wave, Custom Shapes and the layer Interaction panel now show a grid of tiles. Each tile renders that preset and plays it on hover</li>
+		<li>The layer Interaction panel is rebuilt. Cursor Icon is a twelve cell grid where hovering a cell shows the real system pointer, and Cursor Motion is a tile browser whose tiles run the effect itself</li>
+		<li>SunBeam Add-On: thirteen presets instead of three, with the controls to match. Tint and Chroma for coloured beams, Threshold and Softness for what the light picks up, Flare for anamorphic streaks, and an Atmosphere section with Dust, Blinds or Canopy</li>
+		<li>Particles Add-On: nine new presets, bringing six shapes into use that shipped with the add-on but no preset ever picked, and answering the cursor. Six older presets renamed to say what they do</li>
+		<li>DepthForge Add-On: many more ways for a 3D object to arrive and leave, with Punch, Blast, Overshoot, Arc, Vortex and Fold, and ten One Shot moves. The tiles show a render of the move itself</li>
+		<li>Applying an animation preset to a 3D object no longer throws away where you put it. Position, rotation and size are kept and the preset animates towards them, with a switch above the Apply button to turn that off</li>
+		<li>Forty-two Custom Shape presets instead of nine, in six families, on tiles that draw the real shape. New among them: Slant, Ring, Arrow, Speech Bubble, Heart, Arch, Notch, Steps, Skyline, Diamond, Hexagon, Sparkle and Burst</li>
+		<li>New Repeat control draws the same shape again, nested inward: concentric rings from an Oval, nested frames from a Rectangle, a contour map from a Blob. Five more Shape Animations run on any shape, and Morph reshapes fourteen shape types</li>
+		<li>The timeline has an end of slide marker that is also the door into the Out animation</li>
+		<li>The Content Flow Container has a Reset button that puts widths, heights and device switches back to what a new module starts with</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Every Page FX surface carries the same name and mark, from the block inserter to the sticker on the block itself, and one click from that sticker opens the settings, or the list where a block can run more than one effect</li>
+		<li>A block's Page FX menu marks a running effect with a tint and a tick. The purple edge down the left is gone, since on a block with several effects it turned the list into one striped block instead of four separate answers</li>
+		<li>Post Processing left the Transition Pack Filters tab. It is one selector now, in the same place whichever transition engine a slide uses</li>
+		<li>The slide background transition family Filter (Flash, Grayscale, Sepia) is now called Color, since all three are colour treatments and the word belonged to the filter set</li>
+		<li>The Breakpoints panel explains itself, and its fields accept the whole sensible range of 320 to 3840 instead of five narrow windows that blocked real setups. A 1920 monitor could not be put in the Desktop tier</li>
+		<li>Opening a colour picker is no longer treated as an edit. It used to write the value straight back and run every live colour update on the way in, more than thirty times for a single open</li>
+		<li>The Page FX editor takes its colours, type sizes and radii from the Slider Revolution editor, so it follows the light and dark themes with everything else. The breakpoint being edited is named on a strip above the page</li>
+		<li>The Slider Revolution block in the WordPress editor speaks the same language as the Page FX cards beside it. Select Module and Edit Module wear the effect card buttons, and its fields stand at the editor height rather than the taller WordPress boxes</li>
+		<li>Hover Morph Add-On: the Liquid Mask presets share one palette for the colour behind the cell, ink or bone. That colour only shows where no second image is picked, and layers you have already built are untouched</li>
+		<li>The Custom Shape builder moved from the Style tab to the Layer tab, above Position & Size, where every other layer type keeps its content. Only Fill, Stroke and Stroke Size stay in Style, the way an SVG layer splits</li>
+		<li>Shape Animation only shows the settings that reach the chosen animation. Drift never read Amount, and a full Spin has no arc for it to scale</li>
+		<li>All eight translations completed, 280 strings that had never been translated, the whole Page FX interface among them. Removed revslider-en_US.mo, whose every entry translated English into itself</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed custom responsive breakpoints being ignored on live pages. The front end still read them from where Slider Revolution 6 kept them, so Global Settings only moved the editor stage. The revslider_front_breakpoints filter pins the old widths</li>
+		<li>Fixed the Global Settings never opening again once a breakpoint field had been left empty. Emptying a field now puts its default back, and settings already damaged this way repair themselves the next time the Global Settings are opened</li>
+		<li>Fixed the Content Flow alignment doing nothing at all. Arrows, bullets, tabs, thumbnails, the scrubber and the progress bar sat on the full stage whichever option was picked. Narrower content now gets its navigation on the content edge</li>
+		<li>Fixed the Content Flow width and height fields accepting an empty value, which came back as a module at default size on every slider on the page. Modules already saved without a usable size repair themselves the next time they load</li>
+		<li>Fixed WebGL effects and slide background transitions dropping out on pages with several modules. Preloaded slides claimed a graphics context each and never gave it back. An effect that loses its context now rebuilds the next time its slide is shown</li>
+		<li>WebGL effects no longer leave graphics memory behind each time they are rebuilt. Changing a setting or hovering through a preset browser handed back only part of what the effect had claimed, so a long editing session filled the graphics card</li>
+		<li>Fixed The Cluster and Particle Wave effects disappearing after stepping through the slides of a module and coming back, and The Cluster Magnetic presets showing their source image over the grains. The Cluster now runs on the shared render loop</li>
+		<li>Particle Wave Add-On: fixed the presets that pair visible particles with a strong blur, Poison, Cells and Starry Night, rendering in Safari as flickering square tiles instead of an even depth of field</li>
+		<li>Fixed the Bokeh depth of field blurring by the wrong amount after a module or the browser window was resized</li>
+		<li>Fixed the slide background standing still while its timeline kept running. Every rebuild of the scene added another Pan & Zoom chain on the same layer, and once a spent chain rendered last it pinned the image</li>
+		<li>Fixed the timeline sitting at IDLE while an animation was in fact running, and only the Play button ever moving the playhead. Every real run drives the timeline now, and a seek ends it</li>
+		<li>Fixed the Coverage control of the Pan & Zoom presets doing nothing. Half now finishes the move by the middle of the slide and holds it there. Its labels reach the translations too</li>
+		<li>Fixed a gradient colour field changing its own gradient as soon as it was edited, and a gradient swatch turning into a stock blue gradient the moment its picker was opened. The preview was writing its own ramp and palette onto the stored colour</li>
+		<li>Fixed the colour palette opening behind the Bulk Style Editor, out of sight and out of reach</li>
+		<li>Fixed dropdowns coming up empty when they were left on their default value. Saving strips values that match the default, and the dropdown had nothing left to fall back on. It now shows what a newly created layer would show</li>
+		<li>Fixed settings whose range holds fractional values, such as the Bubble Morph Pulse, showing a slider that could not be dragged, and a slider handle staying on the previous layer value after another layer was selected</li>
+		<li>Fixed the animation preset tabs coming up short the first time they were opened. Presets contributed by an add-on only appeared after switching away and back again</li>
+		<li>Fixed the layer animation Smash (Center) leaving the layer permanently tilted, since its closing keyframe never brought the X rotation home</li>
+		<li>Fixed applying an animation preset to a 3D object resizing it, throwing away the framing a camera or light preset should keep, and stopping every other layer on the slide from animating at all, the 3D world the camera lives on among them</li>
+		<li>Fixed the editor panels throwing when the In scene was left with the Slide Background layer selected, and the back to In tab staying on offer for seconds after it had done its job</li>
+		<li>Fixed a selected Slider Revolution block showing the editor selection frame around its preview only, with the block title row and preview painting over the top and the sides of it</li>
+		<li>Fixed the Shape Animation Speed and Amount fields showing red on a custom shape that had no animation yet, and the Custom Shape panel leaving a block of empty space below the colours on shapes that use none of the lower settings</li>
+		<li>Fixed the Drift shape animation sliding out of its layer on the front end and after any editor reload. The spare copy it draws is kept inside the shape drawing now, rather than by clipping the layer. Shapes already built repair themselves</li>
+		<li>Fixed the Custom Shape browser marking the shape that was applied last instead of the one on the selected layer. The marked tile now follows the layer, and a shape tuned past anything the catalogue describes shows no tile marked at all</li>
+		<li>Removed Morph from the Shape Animations offered for shape types that cannot morph</li>
+		<li>Page FX effects that take over the same image now know about each other, instead of leaving one silently doing nothing on the front end. A Filmstrip takes the pictures over and names what it switched off, and one undo puts it back</li>
+		<li>Fixed a Page FX effect losing its settings panel once another effect had claimed the block, leaving no way to switch it off short of removing the other effect first</li>
+		<li>Fixed the Scroll Animation Page Effect flickering while the page is scrolled, and one set to play every time replaying over and over. Both came from measuring the block by the size its own animation was drawing it at</li>
+		<li>Fixed Page FX showing the last saved page in the WordPress preview instead of the one being previewed</li>
+		<li>Fixed the Page FX settings dialog and colour picker at smaller screen sizes, where the Opacity and Angle boxes stood taller than the hex field beside them and the gradient row wrapped onto two lines</li>
+		<li>Hover Morph Add-On: fixed the Slide Background effect staying on screen after its switch was turned off, where until now it only went away after the editor was reloaded</li>
+		<li>Fixed a fixed font weight being loaded on top of the variable font a theme had already provided, which shut down weight animation across the whole page, so a menu that thickens to bold on hover stayed put</li>
+		<li>Fixed the layer settings tab reading Attibutes, and Layer reading Importar Slider in Brazilian Portuguese</li>
+		<li>Fixed the upload path for add-on images and videos</li>
+		<li>Fixed download_url in the load balancer failing with Invalid destination path for symlinked upload directories</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.6 (7th August 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Slide background transitions are now a browser: tiles grouped by effect family that play on hover, and a hub for direction, options, fill and easing before applying</li>
+		<li>Every slide background transition has an Easing selector</li>
+		<li>Fill (Normal / Dark / Light / Blank) is its own control instead of a separate preset per colour</li>
+		<li>Cube, Stage Turn, Toss and Flip take a Direction, Zoom and Tilt</li>
+		<li>Transition Pack: the Cut / Reveal transitions are their own family, with Style, Pattern, Direction and Intensity</li>
+		<li>Ensured the Block Editor detects changes when editing and saving Page Effects settings</li>
+		<li>Every tile in the transition and animation browser now shows its own artwork, loaded as you scroll</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Background transitions are named after what they do, and variants that were really settings became controls: 51 tiles are now 40, with every previous variant still reachable</li>
+		<li>Presets holding several effects were split (Switch / Toss / Corners, Noise / Shatter, Cross Fade / Shockwave), and presets that were one effect under different names now share a tile</li>
+		<li>Zoom and Tilt on the 3D transitions are strength steps (Subtle / Medium / Strong) instead of on / off, and Zoom pulls further away. Zoom is shown as unavailable while a Tilt is set</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed an issue causing default data to be lost when saving slide AddOn settings</li>
+		<li>Fixed grid alignment in the Image Editor</li>
+		<li>Fixed an issue causing newly added keyframes to have undefined aliases</li>
+		<li>Fixed alignment issues with YouTube and Vimeo players</li>
+		<li>The "Remove Frame" button no longer appears for keyframes that cannot be removed</li>
+		<li>Fixed a freeze of up to 40 seconds before the first background transition on Firefox and Windows</li>
+		<li>Fixed the slide background disappearing in the editor after applying a transition without an effect ("None")</li>
+		<li>Fixed the Switch and Distort background transitions failing to run</li>
+		<li>Fixed a black flash on fades through a hold colour, the layer order of Double Parallax, a crash in the filter transitions, and the first transition after a page load being cut short</li>
+		<li>Ken Burns keeps running when navigating back to a slide it already played on</li>
+		<li>Panorama slide backgrounds run through background transitions again</li>
+		<li>The bundled Google Fonts list is loaded once per request instead of up to four times</li>
+		<li>Hardening: prepared statements for database maintenance, UTC-pinned date calculations, and an explicit charset on new tables</li>
+		<li>Fixed an icon or text layer losing its Y position when resized on the stage</li>
+		<li>Fixed an issue causing incorrect auto-animation direction in two-slide modules</li>
+		<li>Image layers with an effect on the second or a later slide were drawn at the image's own size instead of the layer's size</li>
+		<li>Pan &amp; Zoom no longer jumps back once a slide transition has finished</li>
+		<li>Split transitions with a fixed direction started at the wrong corner: "From Top Left" swept up from the bottom</li>
+		<li>The transition browser showed "Applied" on a slide that had nothing applied yet</li>
+		<li>Migration from version 6 now makes duplicated layer ID and Wrapper ID attributes unique</li>
+		<li>A slide's "Hide on Mobile" setting had no effect; it now skips that slide on mobile</li>
+		<li>3D Parallax: the "Tween Speed" field was labelled in milliseconds but used as seconds, which made the effect look dead. It is in seconds now, and older values are still read correctly</li>
+		<li>"Disable Module on Mobile" left an empty, height-reserving box on mobile instead of removing the module. Cached pages have the leftover box removed too</li>
+		<li>Modules could stay blank for up to five seconds before appearing, most visibly when opening a modal: a fast connection behind a slow server was misjudged as 2G, which stretched the wait for fonts</li>
+		<li>A font that never loads is now reported in the browser console</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.5 (27th July 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>New Effects part in the animation timeline: add GPU effects to any layer and keyframe them like any other animation, each effect on its own timeline, Vignette, Film Grain, Glitch, Grain, Chromatic Aberration, Halftone, Duotone, Gradient Map, Posterize, Pixelate and Dither (Stylize), Defocus (Blur) and Motion Trail (Motion). Several effects on the same layer share a single WebGL context instead of one each</li>
+		<li>New Performance Observer: it measures the actual framerate, and if it drops below ~46fps for a sustained period the most expensive effects, Blur, Liquid Glass, Background Transitions, Distortion, Filmstrip carousel blur, are automatically simplified step by step instead of dropping frames. The chosen level stays stable for the current slide and starts fresh at full quality on the next one. In our tests a carousel with ~100 blurs went from 16 to over 30fps with minimal visual trade-off and significantly less GPU and CPU load (disable with SR7.perf.off = true)</li>
+		<li>Transition Pack: new Reveal Effect for image and video layers, pick a transition that plays as the layer animates in (Animation Mode timeline, IN scene). It rides the layer's own in-animation duration; Ease is selectable</li>
+		<li>Transition Pack: new Advanced Hover Effect for layers, transition-pack effects play on mouseenter (Interaction panel)</li>
+		<li>Layer Reveal effects from the core catalog: Double Parallax, the Zoom / Rotation / Slide / Cross Fade / Noise / Dream / Pull split tiles, and the 3D cubes (Columns / Rows / Boxes / Rain) can now reveal image and video layers</li>
+		<li>Reveal Effects have a Columns / Rows control to adjust the tile and piece count</li>
+		<li>Distortion: new visual Effect picker, an icon grid replaces the Effect dropdown (Displacement Map / Liquid Fluid / Cursor Zoom / Cursor Pixelate / Cursor Ripple / Sticky Image)</li>
+		<li>Particles Add-On: new Soft Glow / Bokeh rendering, particles can be soft-edged glowing orbs with an optional bright core, plus Additive and Screen blend modes so overlapping lights bloom instead of stacking flat</li>
+		<li>Particles Add-On: new Lifecycle animation, each particle is born small, grows as it fades in, keeps growing as it fades out and respawns elsewhere, with per-particle timing so the field never pulses in sync</li>
+		<li>Particles Add-On: new Depth Parallax hover mode, larger (nearer) particles shift more with the pointer for a layered 3D feel, plus a Spin control that rotates shape particles as they move</li>
+		<li>Particles Add-On: ten new ready-made presets, Bokeh Dream, Bokeh Rise, Bokeh Gold, Bokeh Aurora, Fireflies, Embers, Dust, Fog, Confetti and Falling Petals</li>
+		<li>Carousel: Auto Rotate Direction setting (Right to Left / Left to Right) — reverse autorotate motion and progression order, with matching arrow / bullet / tab navigation</li>
+		<li>Before/After: Divider Angle (0–90°) — continuous control from vertical (0°) through diagonal to horizontal (90°); legacy Horizontal/Vertical settings migrate automatically</li>
+		<li>Before/After: Handle Position (%) — place the drag button anywhere along the divider</li>
+		<li>Before/After: Follow Drag toggle — optionally keep the handle locked to Handle Position instead of tracking the pointer on the cross-axis</li>
+		<li>Paintbrush Add-On: new Effect mode selector — keep the classic Brush Reveal, or pick Curl Trail, a springy tapering cursor stroke with its own tip / tail colors, width, length, spring, glow and fade</li>
+		<li>The Cluster Add-On: new Resonance behavior — particles settle on a volumetric nodal field (cymatic volume) or a flat Chladni Plate instead of only following gravity, with Morph, Wavelength, Mode N/M/L, Amp, Damping, Drive, Opacity and Strike Decay</li>
+		<li>The Cluster Add-On: Resonance interaction — Mouse Drive (Amplitude / Strike / Local + Strike), Scroll Drive (Wavelength / Morph / Both), Strike button, optional Keep Gravity, and camera Motions (Still, Cinema Orbit, Hero Drift, Slow Tumble, Turntable, Vertigo Tilt)</li>
+		<li>The Cluster Add-On: five new factory presets — Resonance Sphere, Resonance Fold, Chladni Plate, Resonance Tumble and Resonance Vertigo — plus Soft Sphere, Dense Fold, Plate 3×2 and Plate 5×4 pattern shortcuts</li>
+		<li>The Cluster Add-On: new Magnetic behavior — turn a photo into an iron-filings grain cloud that springs back to the image; the cursor acts as a dipole magnet so grains stream along classic field-line arcs, then settle home again (Magnet, Rest, Strength, Threshold, Fill; sample image or layer background)</li>
+		<li>The Cluster Add-On: Magnetic photo fill — cover-fit bake with bilinear color sampling, saturation-safe Normal blending, and denser grains at rest that refine while streaming so the picture stays readable and the filings stay sharp</li>
+		<li>The Cluster Add-On: two Magnetic factory presets — Magnetic Photo and Magnetic Soft</li>
+		<li>The Cluster Add-On: 3D depth (Size Attenuation + Depth Fade), Interaction Orbit camera, Soft Disc particle style, Constraint behavior with neighbor distance bonds, softer mouse Gravity (Radius / Falloff / Attract-Repel-PushPull), and Particle-Love inspired presets (Constraint, Ice Bubbles, Hyper Mix, The Spirit, Love Low/Medium/High); Spirit/Streak overhaul — curl-driven fibrous filaments, Normal+depth volume, dense inGlobe presets</li>
+		<li>Panorama Add-On: Start X / Start Y — set the initial look direction in degrees (0–360° / −85…85°) before autoplay or drag; missing values default to 0 on existing modules</li>
+		<li>Panorama Add-On: Attach to Panorama — pin layers to a look direction (Look X / Look Y) so they travel with the sphere as hotspots, with hide-when-off-screen and “Use Current View”</li>
+		<li>New Animation Presets (Essentials): layer In / Out / Additional animations are now a live, preview-driven browser — hover any preset to watch it play in place, then open a hub to set its variant, easing and duration. Adds Curved Motion path presets (arc, swoop, whip, drift, hook, lob) and one-click WebGL Looks (Vignette, Film, Grain, Glitch, Noir, Vintage, Duotone, Chromatic, Halftone, Posterize, Pixelate, Dreamy) that render a live preview of the effect right in the grid, with Lifetime and Strength controls</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Slide background transitions now render on the GPU: the whole background transition system, fades, motion, the filter transitions, the split and grid effects, and the 3D family (Cube, Stage Turn, Flip, Dynamic Toss), moved from the old canvas engine to WebGL. They stay smooth at full size, and both slides' layers now animate over the changing background</li>
+		<li>The "3D Effects" split transitions now render as real rotating bars instead of a flat approximation</li>
+		<li>Motion Blur now renders natively on the GPU</li>
+		<li>Pan Zoom: independent anchor point, and a rotated layer is covered properly instead of showing its edges</li>
+		<li>WebGL contexts are now released again for out-of-view modules and inactive slides, so a page with many modules uses far fewer of them</li>
+		<li>three.js now ships as its own file and is only downloaded when a module actually needs 3D, a page without 3D effects no longer loads ~780KB of it</li>
+		<li>Distortion: cleaner background edges (mirror texture wrap) removes the border artifacts, so the "BG Scale" zoom setting is no longer needed and was removed, this also ends the size "jump" between slides using different effects</li>
+		<li>Filmstrip slide backgrounds now ride slide transitions, the belt keeps scrolling through the out-animation</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Video layers now keep playing through background transitions instead of freezing on a still frame.</li>
+		<li>Several split background transitions that misbehaved on the previous engine — the Split Cut and Noise effects — now render correctly and stay smooth at full resolution.</li>
+		<li>Paintbrush slide backgrounds keep their real painted look through slide transitions and their strokes fade out naturally as the slide leaves; a 1-frame flash of a previously visited paintbrush slide at transition start is also gone.</li>
+		<li>Carousel Ken Burns now eases the pan and zoom back to its start when focus leaves a slide, instead of snapping.</li>
+		<li>Carousel / CarouselX Accordion: fixed a 1-frame flash where the previously focused panel jumped to the wrong position while rotating — the raw track position is no longer written to the DOM before layout effects are applied.</li>
+		<li>HTML5 slide-background and cover videos: the module now waits until the video has playable frames (up to 6 seconds) before starting the layer animations, so a hero no longer runs its intro ahead of a still-buffering video.</li>
+		<li>Filmstrip: WebP cards no longer pop in abruptly (preloaded media is reused and cards fade in when ready), and marquee tiles fade in only while they are on screen.</li>
+		<li>Before/After: the divider drag no longer loses to the slider swipe, and default “before” content is now clipped correctly inside the split (requires Before/After Add-On 7.1.2+).</li>
+		<li>Editor: add-ons that animate on the shared ticker (such as Particles) now play on the editor stage and update live as you change their settings.</li>
+		<li>Editor: importing a layer that was relative inside a group or column now switches it to absolute only when it lands on the slide root.</li>
+		<li>Editor: the layer 3D-rotation gizmo no longer leaves duplicate helper rings around other layers.</li>
+		<li>Editor: fixed a crash after an undo left empty entries in a slide’s actions — layers could stay in the panel without drawing on stage, and new layers could not be added.</li>
+		<li>Editor: Shift+Add Slide(s) from the media library now refreshes the slide list and selects the first new slide immediately (no save/reload needed).</li>
+		<li>Add-Ons library: the “Page FX” tag now always uses its solid pink (action) style.</li>
+		<li>Editor: advanced (Transition Pack) background-transition previews now show the correct images and replay cleanly in the presets browser.</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.4 (17th July 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Ctrl + Space keyboard shortcut: preview the current slide in a new tab (same as the Slides list preview button)</li>
+		<li>Favorite modules from the dashboard and Select Module modal — starred modules are saved across reloads, shown at the top of the list by default, and can be filtered via Filter &rarr; Favorites</li>
+		<li>Module Position: choose Sticky None, Top (menu overlay), or Bottom (info / add-to-cart style bar) — overflow at the sticky edge can be set to Visible or Hidden; optional Reserve Space keeps page content from sitting under the sticky module</li>
+		<li>Drag and drop image, video (MP4), and — when DepthForge is installed — GLB 3D model files from the desktop onto the editor stage to upload them to the WordPress Media Library and add the matching layer type</li>
+		<li>Layer 3D rotation gizmo: toolbar toggle enters rotation mode on the selected layer and adds Reset / X / Y / Z controls — drag an axis ring on stage or drag up/down on the toolbar labels to rotate; drag inside the layer for free rotation; toggle again to exit (writes to Extra Style transforms)</li>
+		<li>Add-Ons library filter: Enabled in Module shows only add-ons turned on for the current module (editor only); filter options trimmed to All States, Enabled in Module, Global Addons, and Need Attention</li>
+		<li>Right-click context menu on the layers list — same layer actions as the stage context menu (edit, copy, paste, duplicate, delete, show/hide, lock/unlock)</li>
+		<li>Page Effects recorder: Preview Live opens the current (unsaved) effect in a new tab without writing to post meta</li>
+		<li>Chalk Line: draw each segment over or behind the rest of the page content, show or hide the tracking (ghost) path while live editing, and stroke widths up to 500px</li>
+		<li>DepthForge: Shift-click to multi-select 3D objects and move, rotate or scale them together around a shared centre — Duplicate and "Put in Center" apply to the whole selection</li>
+		<li>DepthForge: texture "Auto Fit to Area" toggle — on by default for artwork authored to the print area, off to reveal manual Transform / Repeat / Offset / Rotation placement</li>
+		<li>WooCommerce: dedicated Add to Cart layer action (AJAX, optional quantity) when WooCommerce is active — uses the current stream product</li>
+		<li>Simple Link actions: Meta picker for URL-safe dynamic tags (e.g. {{link}}, {{wc_add_to_cart}}, {{home_url}})</li>
+		<li>Quick Edit: text layers show a compact font summary under the textarea (family · weight · size · device) as a reference for Bulk Style Editor</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Page Effects device switcher restyled like Quick Edit — icon buttons centred in the recorder top bar</li>
+		<li>WooCommerce {{wc_add_to_cart_button}} now always builds proper loop-style markup with ajax_add_to_cart and enqueues WooCommerce cart scripts</li>
+		<li>DepthForge: "Put in Center" now moves a 3D object to the centre of the camera's view and keeps its rotation and scale, instead of resetting it to the scene origin</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Custom CSS/JS edits in the module scripts editor now correctly mark the module as unsaved</li>
+		<li>Fixed CodeMirror cursor and selection misalignment when re-opening Custom CSS/JS and other code editors after the panel was hidden</li>
+		<li>Context menu paste label now shows the correct property name (e.g. "Paste Parallax" instead of "Paste Layers") when copying partial layer properties</li>
+		<li>Fixed properties sidebar inputs not being focusable again after tabbing to the layers list search field</li>
+		<li>Fixed Gutenberg block dropdown menus misaligned in the Site Editor (zoomed / iframed canvas)</li>
+		<li>Made Gutenberg block flyout menus environment-proof (fixed portal + inline styles, no WP Popover dependency)</li>
+		<li>Hardened Gutenberg block chrome with inline layout styles so missing editor CSS cannot collapse header buttons or stretch menus</li>
+		<li>Removed overlapping parent-folder subtitles from the Move to Folder dropdown</li>
+		<li>Fixed slide Publish/Unpublish button layout breaking after toggle in the module list</li>
+		<li>Removed leftover Optimize action from slide menus in the overview (was dropped from modules in Oct 2025 but left on slides)</li>
+		<li>Fixed a white block editor screen with Jetpack active — the defer-exclusion filter no longer scans or rewrites inline scripts (e.g. the editor settings JSON), only real script file URLs</li>
+		<li>Fixed WooCommerce Add to Cart from product modules — empty {{wc_add_to_cart_button}} in stream data, missing AJAX classes, and same-page ?add-to-cart= links being treated as in-page scroll</li>
+		<li>Quick Edit: Meta/Icon inserts into text layers now save correctly (programmatic inserts fire the input event so the save queue gets the updated text)</li>
+		<li>Quick Edit: replacing a selected Meta token via the Meta picker now persists; text fields keep literal &lt;br&gt; (Enter inserts &lt;br/&gt;), matching the full editor</li>
+		<li>Quick Edit: Cmd/Ctrl+S blurs the active field and runs Quick Edit save (no longer triggers the full editor save)</li>
+		<li>Quick Edit: bulk font family/weight changes now persist settings.fonts so the frontend loads the new Google/custom fonts</li>
+		<li>Frontend: {{home_url}} and {{current_page_link}} basic metas now resolve on the published page — in layer text, inline links, and action URLs (previously only worked in the editor preview)</li>
+		<li>Full Height Offset (Decrease Module Height): remeasure and update module height when offset containers (e.g. theme headers) change size after line-wrap or font load, not only on window resize</li>
+		<li>Addons library: after Check for Updates, addon preview videos/banners load again without requiring a full page reload</li>
+		<li>Add-On install now reports the real reason it failed — a download, permission, extraction or license error is shown instead of a generic "Addon could not be activated", and a failed download no longer tries to activate the add-on</li>
+		<li>Timeline (experimental): Shift+click multi-select layers; drag a frame to move matching frames on all selected layers together (stops at colliding frames)</li>
+		<li>DepthForge: 3D object rotation and scale edited on one device no longer leak to all other devices — they are stored per device like position and the camera, and existing modules repair themselves on the next capture</li>
+		<li>DepthForge: the 3D world re-renders when switching device or resizing the stage, instead of only after toggling Animation/Editing mode</li>
+		<li>DepthForge: fixed the editor view jumping away from the saved framing on the first orbit</li>
+		<li>DepthForge: fixed the 3D World group background painting over the Slide Background and any 2D layer placed behind the world</li>
+		<li>Featured Slider: fixed a meta box crash in the Site Editor (undefined post meta on templates)</li>
+		<li>Filmstrip: full width Filmstrip no longer leaves a gap on the right — the live strip now expands across the theme's alignfull break-out margins instead of staying pinned to the content width</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.3 (14th July 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Drop-in product branding for GLB objects — the printable label area is detected automatically (by material name) and your artwork fits the print area correctly, with per-material recolor slots for the rest of the object</li>
+		<li>14 new one-click PBR material presets — grass, soil, marble, concrete, fabrics, ice, brushed metal and more — with the full surface look (roughness, displacement, glass/ice settings) baked in</li>
+		<li>Studio-grade renders: the built-in studio environment is now true HDR — chrome and metals pick up hot softbox highlights like a real product shoot</li>
+		<li>Crystal-clear glass: transparent materials now refract the studio around them, and new Ice controls (volume tint, dispersion) create deep frosted-glass looks</li>
+		<li>New "Unlit Glow" material engine — colors glow exactly as picked, no white clipping with Bloom</li>
+		<li>Soft real-time floor reflections that stay sharp at the contact point, plus auto-fitted crisp shadows and a punchy "Dramatic" lighting look</li>
+		<li>Reorganized, simplified panels: everything light-related now lives in one "Light & Mood" section — from empty scene to premium look in fewer clicks</li>
+		<li>Add a module to the Slider Revolution block without leaving the page — import a template as a new per-page module, or pick an existing module, straight from quick dropdowns on the block</li>
+		<li>New "Quick Edit" option on the block — swap text, images, videos and slide backgrounds directly in place without opening the full editor, with a slide and layer list to reach every editable element</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>WebGL framework: Bloom pass now supports tone mapping and exposure (Look / Contrast control for DepthForge scenes with Bloom enabled)</li>
+		<li>DepthForge world and object animations can now be driven by a module's Scroll Based Timeline</li>
+		<li>DepthForge: layers placed behind the 3D world are now clickable — clicks and taps pass through the world except when over an interactive 3D object</li>
+		<li>DepthForge: GLB objects can now load and save material presets per mesh</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>DepthForge: fixed 3D object displacement not showing on the published front-end</li>
+		<li>DepthForge: fixed see-through gaps along the edges of displaced Box / Rounded Box objects</li>
+		<li>Fixed fullwidth carousel modules being clipped to their container width</li>
+		<li>Removed duplicated Space Above / Space Below inputs in the Carousel Settings panel</li>
+		<li>Fixed a front-end WebGL crash ("fsQuad.render is not a function") when a Bloom scene builds before three.js finished loading</li>
+		<li>Fixed issues related to WooCommerce metadata retrieval</li>
+		<li>Fixed product price filtering in WooCommerce stream-based modules</li>
+		<li>Fixed icon alignment for the Slider Revolution module in Avada Builder</li>
+		<li>Fixed Lottie animations occasionally failing to load when the same Lottie library was requested by more than one layer or add-on at once — every request waiting on the shared script now registers as ready, not just the first</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.2 (2nd July 2026)</h3>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Improved stability and loading times on frontend and backend</li>
+		<li>Page Effects: block inserter icons, hover previews and editor buttons harmonized with the Slider Revolution block</li>
+		<li>Reorganized the Hover Style panel into a unified Interaction panel with Cursor Motion and Style & Transform</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed action panel display errors caused by invalid saved action types</li>
+		<li>Restricted deletion of zone row layers</li>
+		<li>Compressed migration AJAX responses to prevent response size limit issues</li>
+		<li>Fixed issues when copying, pasting, or duplicating layers with an ID attribute set</li>
+		<li>Restored a deprecated function to ensure compatibility with the Jupiter theme and WPBakery Builder</li>
+		<li>Readded Missing Timing and Flow panel if SlideBg selected in the animation sidebar</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.1 (24th June 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Static Slides: optionally show a chosen regular slide's layers as a dimmed reference behind the static slide while editing, to help align global layers (Static Slide Settings)</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Added new custom JavaScript examples to the Custom Scripts section of the Editor</li>
+		<li>Admin and editor stylesheets are now minified in the release build for faster editor loading</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed an issue causing unnecessary module reloading on WPBakery-built pages</li>
+		<li>Fixed initial module rendering in the WPBakery Live Builder</li>
+		<li>Prevented the user-select: none style from affecting headings outside the plugin</li>
+		<li>Fixed layer list item alignment in name editing mode</li>
+		<li>RTL: fixed the rotating loading spinner not applying its reversed direction</li>
+		<li>Fixed border width settings not resetting correctly in Hover Style</li>
+		<li>Vimeo videos in cover mode now fill the area for non-16:9 formats by using the video's real aspect ratio</li>
+	</ul>
+	<h3 class="version-number">Version 7.1.0 (22nd June 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Smart Spacing Guides: equal-spacing detection while dragging layers - gap rulers with pixel labels show when a layer has the same distance to its neighbours or repeats a sibling gap, with optional snapping (configurable in Global Settings)</li>
+		<li>Arrange toolbar for multi-selections: align left / center / right / top / middle / bottom, distribute horizontally or vertically with equal gaps, and one-click Row, Column and Grid layouts</li>
+		<li>Stage Zoom: zoom the editor stage in and out for precise editing, with a zoom hint that can be re-shown on demand</li>
+		<li>Timeline Zoom for fine-grained keyframe editing on long animations</li>
+		<li>Keyboard Shortcuts list: a quick reference of all editor shortcuts</li>
+		<li>Custom Shape Builder: create parametric, generative shape layers (blobs, waves and more) directly in the editor, including a reusable Custom Shape symbol</li>
+		<li>Layer Interactions: new cursor-driven effects for any layer - Magnetic, Attract, Repel, Squeeze and Tilt - that compose with existing animations</li>
+		<li>RTL Support for the backend: the editor, dashboard, popups and panels now mirror correctly on RTL WordPress installs, plus a Use Editor in LTR Mode global setting to keep the default layout while the admin stays RTL</li>
+		<li>Move to Folder: organise modules from the dashboard via a new Move to Folder function</li>
+		<li>Grouped Add-Ons: Slider Revolution add-ons are now grouped behind a single Slider Revolution Add-ons view in the WP plugins list instead of cluttering it - add-ons with pending updates stay visible, and the behavior can be disabled in Global Settings &rarr; System</li>
+		<li>Added the ability to import multiple slides at once from other modules</li>
+		<li>Liquid Glass: a frosted backdrop-blur glass effect for layers, with blur and intensity controls (Extra Style)</li>
+		<li>Progressive Blur: gradient (iOS-style) blur that ramps along a direction - as a backdrop overlay or on image content, with direction, max blur, fade and tint controls (Extra Style)</li>
+		<li>Custom Font Upload: upload your own font files (WOFF2, WOFF, TTF, OTF) in Global Settings - Fonts, with automatic weight and style detection and generated font-face CSS, so no manual hosting is needed</li>
+		<li>Image Editor: edit layer and background images right in the editor - crop, rotate, flip, light - colour adjustments, curves, blur and filters, plus saveable presets - the result is stored in the Media Library as a new image and applied to the layer</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Dashboard folder listing can now be sorted by Most Recent and by Date</li>
+		<li>Extended preset support for add-ons and made the Position and Size panel aware of add-on driven changes</li>
+		<li>Eliminated unnecessary re-authentication requests in the Select Module modal for builder integrations</li>
+		<li>New Force Swipe over Effects navigation option (Touch settings, off by default): when enabled a horizontal swipe over a WebGL/effect layer changes slides instead of being captured by the effect</li>
+		<li>Module imports now include add-on media - add-on file types such as Lottie (.json) and DepthForge (.glb) are allowed</li>
+		<li>Reworked the add-on framework for better stability and performance when running several add-ons or WebGL effects together: a shared WebGL rendering budget prevents browser context limits, with unified add-on registration and settings handling</li>
+		<li>Updated the bundled 3D / WebGL engine to Three.js r184</li>
+		<li>Added an Edit Image pen to the layer toolbar for image layers and image shapes, opening the Image Editor directly</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Improved layer toolbar click reliability: icons no longer swallow clicks, the toolbar stays in place during consecutive actions, and toolbar presses can no longer trigger an unintended layer drag</li>
+		<li>Fixed shape presets, compiler handling and preloading for shape layers</li>
+		<li>RTL: fixed dashboard toolbar spacing and notification badge, the layer list panel, and dropdown arrows overlapping their labels</li>
+		<li>Fixed the Check for Add-On Updates feature when used from the Editor</li>
+		<li>Show "No Title" for page selection options that do not have a title</li>
+		<li>Fixed a JavaScript error in the calendar control when used on the Overview page</li>
+		<li>Fixed carousel videos failing to autoplay on mobile (muted before autoplay)</li>
+		<li>Fixed modals reopening on the wrong slide when the trigger's target slide is not part of the modal</li>
+		<li>Fixed full-height layers rendering at zero height on slow editor loads (e.g. WebGL effect layers staying blank until a slide swap)</li>
+		<li>Fixed a 500 error when editing pages in Gutenberg, Elementor, Divi, Avada, WPBakery and BeBuilder caused by an asset-timestamp call</li>
+		<li>Fixed the editor occasionally getting stuck on Loading Editor Resources on slow connections</li>
+		<li>Fixed slides occasionally getting stuck while preparing (no drawing or animations) on slow loads with WebGL effects</li>
+		<li>Fixed rapid navigation clicks being dropped when triggered in quick succession</li>
+		<li>Fixed add-ons and effects not re-initializing after Ajax / PJAX page navigation</li>
+		<li>Accessibility: interactive link and button layers are no longer left hidden from screen readers</li>
+		<li>Fixed the dashboard module list loading duplicate entries (and a possible divide-by-zero) on large libraries</li>
+		<li>Added SVG sanitization for media uploaded through Slider Revolution</li>
+		<li>Module registration errors no longer silently stop the remaining modules on a page from loading</li>
+		<li>Fixed a module rendering error caused by Scroll-Based Timeline being enabled for autoplay and multi-slide modules</li>
+		<li>Fixed the incorrect navigation style displayed in the Editor when navigation is enabled for the first time</li>
+		<li>Fixed Cross Site Scripting vulnerability due to unprotected message content</li>
+		<li>Fixed the editor freezing when selecting or adding a layer with the Layers list open</li>
+		<li>Fixed Google Fonts not loading (stylesheet MIME type error) when font caching/download was enabled</li>
+		<li>Unified the add-on framework so add-ons share one registration, update and resource system; fixed add-on stylesheets not loading on the front end or being left out of HTML exports, and prevented some add-ons from loading their assets twice</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.16 (9th June 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>
+	<ul>
+		<li>Filmstrip 7.1.0: New 3D layout modes alongside the classic Marquee - Coverflow, Path, Stack, Cascade, Zoom Slide and 3D Showcase - with real CSS 3D perspective</li>
+		<li>Filmstrip 7.1.0: Drag and throw, mouse wheel, autoplay and snap interaction on every layout (the marquee now supports drag, wheel and pause on hover, too)</li>
+		<li>Filmstrip 7.1.0: Item sizing (Auto, Aspect Ratio or Fixed), drop shadows and Marquee edge fade-out, plus a reorganised settings / slides panel</li>
+		<li>CarouselX: New SVG Path carousel type - arrange slides along a custom path shape (Line, Wave, Arc, S-Curve, Circle, Zig-Zag and more) with optional path-tangent rotation and a visible guide line</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Added Mouse Wheel navigation for carousel modules, with auto trackpad/mouse detection and sequential or infinite looping via the wheel scroll setting</li>
+		<li>Added WPML compatibility: detects an active WPML install, auto-enables the AI Translate add-on for modules, and shows a dashboard notice</li>
+		<li>Timeline now stays synced to the selected keyframe, layer and animation part, highlighting the active frame</li>
+		<li>Fixed overlapping text and slide icons for unpublished slides in the editor sidebar</li>
+		<li>Removed global slides from the import slides selection list</li>
+		<li>Slide list and dashboard thumbnails now follow the slide background automatically, while keeping manually chosen thumbnails</li>
+		<li>Disabled Scroll-Based timeline for autoplay and multi-slide modules to avoid unexpected behavior</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed horizontal layer alignment and offsets in full width modules using a vertical CarouselX 3D Showcase</li>
+		<li>Changed duplicated layers to be inserted above the original instead of at the end of the list</li>
+		<li>Removed broken Slide Range repeater, which is not used any more in SR7</li>
+		<li>The dashboard module thumbnail now correctly follows the first slide after reordering slides</li>
+		<li>Fixed incorrect preview URL argument handling in the Overview modules list that could cause preview errors</li>
+		<li>Fixed misaligned tags in the elements library details modal</li>
+		<li>Increased saving speed by better handling of cache clearing</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.15 (25th May 2026)</h3>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Removed ThemePunch Cookie option from the Consent Management plugin list</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Improved editing behavior for align and snap threshold values in Global Settings</li>
+		<li>Updated the AI image generator background removal workflow to properly refresh credits</li>
+		<li>Resolved an issue preventing the context menu from opening in empty static slides</li>
+		<li>Enhanced support for loading custom fonts from external CSS providers such as Bunny Fonts</li>
+		<li>Corrected an Incorrect Authorization to Authenticated (Contributor+) Sensitive Information Exposure vulnerability</li>
+		<li>Addressed a Missing Authorization to Authenticated (Contributor+) Arbitrary Plugin Deactivation vulnerability</li>
+		<li>Refined Gutenberg block previews inside the Add Block sidebar</li>
+		<li>Adjusted the Back to Parent navigation link in the module selector</li>
+		<li>Updated required version validation for the Divi 4 module</li>
+		<li>Removed duplicate popup markup injection on post edit pages</li>
+		<li>Corrected pause-on-hover behavior on mobile devices</li>
+		<li>Fixed incorrect layer order after duplication</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.14 (18th May 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed an issue with pasting rows into static slides</li>
+		<li>Fixed errors when pasting content into a static slide containing a single layer</li>
+		<li>Fixed sizing issue of progress bullet navigation elements</li>
+		<li>Resolved PHP deprecation warnings in Divi 4 module integration</li>
+		<li>Action mouse events were not recognised on Looped animations</li>
+	</ul>	
+	<h3 class="version-number">Version 7.0.13 (11th May 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Slide Background Animation presets were animating in the wrong direction when certain slide transition effects were selected</li>
+		<li>Improved RTL Navigation handling with new Auto, On, and Off modes for global navigation RTL settings</li>
+		<li>Fixed dragging of navigation elements in the editor</li>
+		<li>Fixed missing static layers during slide and layer imports</li>
+		<li>Fixed popup content not updating correctly between the Import Slides and Import Layers dialogs</li>
+		<li>Fixed incorrect display of navigation tabs when first added in the editor</li>
+		<li>Fixed escaped slashes appearing in navigation skin markup</li>
+		<li>Fixed alignment issues of navigation ghost layers</li>
+		<li>Fixed incorrect navigation skin selection in the dropdown for modules using custom navigation skins</li>
+		<li>The currently selected navigation item is now highlighted in the editor</li>
+		<li>Fixed an error when switching slides while a text layer was selected</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.12 (7th May 2026)</h3>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Scheduled and unpublished slides are now displayed in the slide list with additional icons and red highlighting for easier identification.</li>
+		<li>Migration labels and panels are now more prominent to better catch the customers attention during the migration process.</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed an issue where the migration process could break when migrating from versions older than 6.7.14 to 7.0.x.</li>
+		<li>Fixed an issue where undefined module height and width values on device sizes could break the Editor loading process.</li>			
+		<li>Fixed an issue where slide auto-rotation was not working when the progress bar was enabled.</li>
+		<li>Fixed a migration issue where Mobile Device Mode could become unexpectedly deactivated.</li>
+		<li>Fixed an issue where Mobile Size could not be deactivated and became active again after reloading the Editor.</li>	
+	</ul>
+	<h3 class="version-number">Version 7.0.11 (4th May 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>	
+	<ul>
+		<li>Improved integration with Avada Fusion Builder</li>
+		<li>Added support for progress bars in scroll-based timelines</li>
+		<li>Carousel slides now support shadow effects</li>
+		<li>Carousel X Addon introduced - extending the Carousel with Accordion, Cascade, 3D Showcase and ZoomSlide Types</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Optimized loading of required dependencies for builder modules</li>
+		<li>Added line-height option for Groups</li>
+		<li>Removed text clipping for SVG and Audio layers</li>
+		<li>Added en_US translation file to support backend localization</li>
+		<li>Module height calculation for Carousels now respects padding and content height</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed issue preventing template installation without pre-installed add-ons</li>
+		<li>Resolved empty template library after upgrading from version 6.x</li>
+		<li>Fixed occasional meta box error messages appearing in the editor</li>
+		<li>Prevented warnings from external output buffers from breaking layouts in some themes</li>
+		<li>Fixed module not displaying when Fixed on Top option was enabled</li>
+		<li>Fixed Auto Infinity Loop not starting when Slide Progress was set to Auto</li>
+		<li>Prevented duplicate items from appearing in builder module selectors</li>
+		<li>Fixed an error caused by third-party elements injected into the image list</li>
+		<li>Unpublished slides if hero is set in module settings will now be properly ignored</li>
+		<li>Vertical Carousel height and first draw was calculated with NaN values</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.10 (22nd April 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>	
+	<ul>
+		<li>Slide background layer can be deleted now</li>
+		<li>Alt text from image sources is now applied to non-image elements as aria-label with role="img" when available</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>YouTube background was breaking since 7.0.9 update in preview</li>
+		<li>Timeline states were always showing the state markers from the IN Scene</li>
+		<li>Removed unnecessary editor assets from the frontend</li>
+		<li>Since version 7.0.9 you could not add or create new slides</li>
+		<li>New slides (imported, or created from scratch) had no admin thumbnail until reload</li>
+		<li>Unauthenticated sensitive information exposure via 'sliders/stream'</li>
+		<li>Arbitrary file upload via _get_media_url</li>
+		<li>Fixed potential errors caused by missing frontend scripts in Elementor frontend mode</li>
+		<li>Fix for unpublished on schedule beeing pushed to frontend</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.9 (17th April 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>	
+	<ul>
+		<li>Layers hidden in the editor (because they are not part of the active scene) can now be edited by temporarily resetting parent transitions and visibility during editing.</li>
+		<li>In the editor, full-stage alignment is now calculated based on the visible checkerboard stage area (instead of the full wrapper container) to make elements easier to edit</li>
+		<li>Added an optional live preview rendering feature in the Elementor Builder</li>
+		<li>Added a function to add bulk slides from WP media library</li>
+		<li>Added a function to add Slide(s) from existing modules</li>
+	</ul>
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Renamed Element to Layer for consistent terminology</li>
+		<li>Removed none working WPML class and replaced it with a new WPML functionality through the AI Translate AddOn</li>
+	</ul>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>			
+		<li>Fixed carousel touch swipe not working on Android devices.</li>
+		<li>SR7.F.module.collect() now reinitializes fast Ajax-loaded content after page changes.</li>
+		<li>Fixed the default action link target so links open in the same window by default.</li>
+		<li>Action setup is now guided: the trigger selector stays disabled until an action type is selected.</li>
+		<li>The slide background can now be used as an action trigger.</li>
+		<li>Fixed multi-selected layers not moving with the keyboard arrow keys.</li>
+		<li>Improved stability on fast Ajax/PJAX sites where SR7 could fail to start after navigation.</li>
+		<li>Fixed modules failing to load in the Divi Builder after upgrading.</li>
+		<li>Fixed a typo in the video settings.</li>
+		<li>Removed the full-screen button from video controls when Allow Full Screen is disabled.</li>
+		<li>Fixed Uniform Gaps not appearing in preview and preventing unexpected spacing issues.</li>
+		<li>Fixed a bug where video thumbnails were regenerated whenever the source changed, even if a matching thumbnail already existed in the WordPress Media Library.</li>
+		<li>YouTube, HTML5, and Vimeo videos now support contain/cover sizing based on the selected aspect ratio while keeping the original layer dimensions.</li>
+		<li>Fixed a backward compatibility issue caused by themes/plugins calling the removed getAllSliderAliases() function.</li>
+		<li>Fixed scroll-based filters and transforms rendering even when scroll effects were disabled globally.</li>
+		<li>Fixed an issue where a missing canvas could break nested modals and render content with unwanted empty space.</li>
+		<li>Fixed duplicated layers in the editor sometimes receiving multiple chained _DBL_ random suffixes.</li>
+		<li>Fixed an issue where Disabled on Mobile could disable the entire module, even when the module was not set to run on mobile.</li>
+		<li>Fixed missing Alt and Title attributes in noscript image elements generated by Slide Background layers.</li>
+		<li>Improved Slide ID handling: duplicate Slide IDs are now updated in the editor and frontend to prevent broken processing.</li>
+		<li>Scroll Based Timeline interactions were not started in some situations</li>
+	</ul>	
+	<h3 class="version-number">Version 7.0.8 (9th April 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>	
+	<ul>
+		<li>Enhanced the BeBuilder Slider Plugin module selector and improved builder slider widget preview.</li>
+		<li>Added RTL options for legacy navigation components.</li>
+		<li>Enabled support for external image sources for background images and layer image sources.</li>
+		<li>Maintained module selection in the Gutenberg editor when updating the module alias.</li>
+	</ul>
+
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>			
+		<li>Improved slide thumbnail loading in the editor to ensure smooth performance, even with 200+ large slides.</li>
+		<li>Resolved an issue where the editor initialization was delayed when loading modules with 200+ slides.</li>
+		<li>Optimized processing of slides and modules during editor load.</li>
+		<li>Fixed an issue where very old SR6 modules without background or layer IDs could not be edited.</li>
+		<li>Resolved cases where the editor failed to load or produced JavaScript errors due to premature initialization of AddOns and slides.</li>
+		<li>Corrected image dimension display in the image source selector when no image is selected.</li>
+		<li>Removed occasional duplicate entries in builder module selectors.</li>
+		<li>Fixed an issue where callback action targets were converted into arrays during migration, preventing execution on first render.</li>
+		<li>Corrected message escaping for status messages received from ThemePunch servers.</li>
+		<li>Fixed an error when loading modules with numeric custom IDs.</li>
+		<li>Resolved PHP deprecation warnings that caused JavaScript errors on certain pages.</li>
+		<li>Corrected image dimension updates and background/layer image source handling.</li>		
+		<li>Restored deprecated slider wrapper hooks to maintain backward compatibility.</li>
+		<li>Fixed toolbar position inputs being visible when multiple layers were selected.</li>
+		<li>Resolved an issue where background position fields disappeared after selecting custom positioning.</li>
+		<li>Fixed missing vertical direction option for bullet navigation.</li>
+		<li>Resolved conflicts when mixing modules with and without the ScrollVideo AddOn on the same page (requires ScrollVideo v7.0.5).</li>		
+	</ul>
+	<h3 class="version-number">Version 7.0.7.1 (30th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>			
+		<li>Translation Bug breaks Editor and Preview</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.7 (30th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>			
+		<li>Resolved a migration issue affecting very old modules with missing timeline data</li>
+		<li>Fixed an issue that could break the Elementor builder when using transparent background colors</li>
+		<li>Improved REST API reliability for post-based modules in certain edge cases</li>
+		<li>Ensured correct fetching of the current post via REST API</li>
+		<li>Eliminated slide overlay flickering during transitions</li>		
+		<li>Fixed HoverMorph and Filmstrip addons not updating correctly after slide changes in the backend</li>				
+		<li>Resolved an issue where custom fonts were not displaying properly in the backend and frontend</li>		
+		<li>Fixed the "Edit Module" functionality in the WPBakery widget</li>
+		<li>Improved bulk color handling to correctly remember the last selected color before applying changes</li>		
+		<li>Fixed background animations from transparent to RGBA in specific cases (e.g., SVG layers)</li>
+		<li>Restored missing video sources (YouTube/Vimeo) and poster images when using stream content</li>		
+		<li>Resolved a MetaBox error on builder pages</li>
+		<li>Fixed display issues with the Slider Revolution logo in Elementor dark mode</li>
+		<li>Preserved full-width and full-height settings when adding modules via the add_revslider function</li>
+		<li>Corrected CSS loading order issues that caused layout misalignment in preview mode</li>		
+	</ul>	
+
+	<div class="newfeature"><strong style="font-weight:700">New Features</strong></div>	
+	<ul>
+		<li>Added full support for Divi 5 Builder</li>
+		<li>Introduced keyboard accessibility: slides can now be changed using the "Enter" key when navigation arrows are focused</li>
+		<li>Admin and navigation thumbnails are now automatically optimized and saved as WebP images for better performance</li>
+		<li>Improved thumbnail navigation settings to reliably retain selected sizes after saving</li>
+	</ul>
+
+	<div class="change"><strong style="font-weight:700">Changes</strong></div>
+	<ul>
+		<li>Enhanced backend translations for multiple languages (DE, ES, FR, IT, JA, PT, RU)</li>
+		<li>Extended migration support to unlicensed modules that do not use addons or premium features</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.6 (20th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>			
+		<li>Removed the Dark Theme CSS class name from not our own admin pages</li>	
+		<li>Compatibility fix for Visual Composer using deprecated RevSlider class</li>
+		<li>Opening the editor with a wrong module id or slide id will redirect now to the dashboard</li>
+		<li>Link action pointing on the "/" path was broken after update to SR7. Now it will redirect to the root domain</li>
+		<li>AI Image Size Dimension slider was showing the wrong values</li>
+		<li>Fixed an issue where modals triggered by URL hash changes only worked on page reload and not during runtime</li>
+		<li>Fields to set HTML Data, Id, Class, DeepLink and Attributes for slides were not editable</li>
+		<li>Fixed not working vertical touch swipe navigation in Android devices</li>
+		<li>The slider failed to load on the frontend when the Borlabs Cookie plugin was active</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.5.1 (17th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Improved compatibility with hard-cached backend environments where third-party or server-side caching may cause mixed loading of SR6 and SR7 editor assets.</li>
+		<li>Fixed compatibility error with Divi 5 builder.</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.5 (16th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Supporting Advanced Transitions (7.0.2) with the SunBeam (7.0.2) and Distortion Addons (7.0.2) now</li>
+		<li>Hover animation stucked. The Timeline is now reversed to Idle if further animation started on the layer after hovering it</li>
+		<li>Fixed a compatibility issue caused by third-party scripts overriding the native String.replaceAll() function</li>
+		<li>Fixed problem with module selection not changing Elementor builder to dirty state.</li>
+		<li>New Motion Path function did not render correctly in Frontend</li>
+		<li>Added warning when trying to access slider functions from builders without permissions</li>
+		<li>Fixed NULL on initial Addons loading error in updating process</li>
+		<li>Fixed upgrading from v5 to v7 issue where the upgrade process stopped</li>
+		<li>Added backwards compatibility file for themes that still use pre 6.0 classes and functions</li>
+		<li>Fixed Module Background Repeat settings</li>
+		<li>Hovering can have now different border color, style, size and radius</li>
+		<li>Default Values in Global Settings showing "on" even the value was set to "off"</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.4 (12th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes</strong></div>
+	<ul>
+		<li>Fixed deinstallation of plugin not working as intended</li>
+		<li>Improved compatibility with the Elementor Builder</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.3 (11th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Compatibility Improvements.</strong></div>
+	<ul>
+		<li>Improved compatibility with the Divi Builder</li>
+		<li>Improved compatibility with the Elementor Builder</li>
+		<li>Improved compatibility with the Avada Theme</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.2 (10th March 2026)</h3>
+	<div class="bugfix"><strong style="font-weight:700">Bug Fixes and Performance Improvements.</strong></div>
+	<ul>
+		<li>Fixed an issue where importing layers from other modules was not possible</li>
+		<li>Optimized template library requests and preview video loading</li>
+		<li>Improved compatibility with WPBakery</li>
+		<li>Improved initial module selection when used inside Elementor</li>
+		<li>Added Avada theme backwards compatibility</li>
+	</ul>
+	<h3 class="version-number">Version 7.0.0 (9th March 2026)</h3>
+	<div class="newfeature"><strong style="font-weight:700">Slider Revolution 7.0 – New Era Module Editor.</strong></div>
+	<ul>
+		<li>Completely rebuilt editor designed for a faster and clearer workflow</li>
+		<li>Cleaner workspace with improved usability and better organization</li>
+		<li>More accurate editing experience thanks to the new shared rendering system</li>
+		<li>Created to make building complex modules easier and more intuitive</li>
+	</ul>
+
+	<div class="newfeature"><strong style="font-weight:700">Integrated AI Features Built Into the Editor.</strong></div>
+	<ul>
+		<li>AI image generation directly inside Slider Revolution 7</li>
+		<li>AI text generation built into the editor workflow</li>
+		<li>AI background removal for images generated in SR7</li>
+		<li>Creative AI tools available without leaving the editor</li>
+	</ul>
+
+	<div class="newfeature"><strong style="font-weight:700">Powered by the SR7 "Velocity" Engine.</strong></div>
+	<ul>
+		<li>Editor backend and live frontend now use the same rendering engine</li>
+		<li>Previews match the final published output more accurately</li>
+		<li>Modernized foundation for the new SR7 editing experience</li>
+		<li>Improved consistency across editing and live display</li>
+	</ul>
+
+	<div class="newfeature"><strong style="font-weight:700">Dedicated Editing Modes for Faster Workflows.</strong></div>
+	<ul>
+		<li>New Design Mode for styling and layout creation</li>
+		<li>New Animation Mode for timing, motion, and effects</li>
+		<li>New Action Mode for interactions and slide behavior</li>
+		<li>Each mode focuses the interface on the task at hand</li>
+	</ul>
+
+	<div class="newfeature"><strong style="font-weight:700">Redesigned Interface and Workspace.</strong></div>
+	<ul>
+		<li>Top bar redesigned for quicker access to preview and device controls</li>
+		<li>Settings moved into a dedicated left sidebar</li>
+		<li>Right sidebar now focuses on design, animation, and actions</li>
+		<li>Slides and layers are managed through clearer dedicated panels</li>
+	</ul>
+
+	<div class="newfeature"><strong style="font-weight:700">New Stage and Animation Workflow.</strong></div>
+	<ul>
+		<li>The old Canvas was replaced by the new Stage</li>
+		<li>Device-specific bounds make responsive editing clearer</li>
+		<li>Timeline now focuses purely on animation work</li>
+		<li>Animations are organized into scenes for better control</li>
+	</ul>
+
+	<div class="newfeature"><strong style="font-weight:700">Better Visual Design and Layer Control.</strong></div>
+	<ul>
+		<li>Improved layer workflow for adding, organizing, and editing content</li>
+		<li>Design tools now give faster access to styling and visual effects</li>
+		<li>New features include shape layers and richer shadow controls</li>
+		<li>Overall module creation is more structured and efficient</li>
+	</ul>	
+</div>
