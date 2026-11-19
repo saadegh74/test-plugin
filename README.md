@@ -11,18 +11,18 @@
 ```text
 plugins/raw/
 ├── on/                                     <-- افزونه‌های دارای قابلیت و لینک آپدیتر سرور
-│   ├── advanced-custom-fields-pro/         <-- نسخه old پاک‌سازی‌شده (6.8.11) متصل به سرور ما
+│   ├── advanced-custom-fields-pro/         <-- نسخه old پاک‌سازی‌شده (6.8.10 برای تست آپدیت به 6.8.11) متصل به سرور ما
 │   ├── elementor-pro/                      <-- نسخه old پاک‌سازی‌شده (4.3.3) متصل به سرور ما
 │   ├── jet-compare-wishlist/               <-- نسخه old پاک‌سازی‌شده (1.5.5.2) متصل به سرور ما
 │   ├── jet-elements/                       <-- نسخه old پاک‌سازی‌شده (2.6.13.1) متصل به سرور ما
 │   ├── jet-engine/                         <-- نسخه old پاک‌سازی‌شده (3.2.6) متصل به سرور ما
 │   ├── jet-search/                         <-- نسخه old پاک‌سازی‌شده (3.1.1) متصل به سرور ما
 │   ├── jet-smart-filters/                  <-- نسخه old پاک‌سازی‌شده (3.3.2) متصل به سرور ما
-│   ├── jet-tabs/                           <-- نسخه old پاک‌سازی‌شده (2.3.5) متصل به سرور ما
+│   ├── jet-tabs/                           <-- نسخه old پاک‌سازی‌شده (2.3.4 برای تست آپدیت به 2.3.5) متصل به سرور ما
 │   ├── jet-woo-builder/                    <-- نسخه old پاک‌سازی‌شده (2.1.7.3) متصل به سرور ما
 │   ├── powerpack-elements/                 <-- نسخه old پاک‌سازی‌شده (2.9.19) متصل به سرور ما
 │   ├── revslider/                          <-- نسخه old پاک‌سازی‌شده (7.2.10) متصل به سرور ما
-│   ├── wp-rocket/                          <-- نسخه old پاک‌سازی‌شده (3.23.5.1) متصل به سرور ما
+│   ├── wp-rocket/                          <-- نسخه old پاک‌سازی‌شده (3.23.5 برای تست آپدیت به 3.23.5.1) متصل به سرور ما
 │   └── old/                                <-- فایل‌های اصلی و دست‌نخورده سرور بیرونی (منبع استخراج لینک دانلود آپدیت‌ها)
 │       ├── advanced-custom-fields-pro/
 │       ├── elementor-pro/
@@ -170,7 +170,7 @@ plugins/updates/
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/wp-rocket-v3.23.5.1.zip`
 * **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
-  * نسخه old با سرور ما: `plugins/raw/on/wp-rocket/` (نسخه `3.23.5.1`)
+  * نسخه old با سرور ما: `plugins/raw/on/wp-rocket/` (نسخه `3.23.5` برای تست آپدیت)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/wp-rocket/` (نسخه `3.23.5.1`)
 
 #### افزونه Advanced Custom Fields PRO (نسخه 6.8.11)
@@ -179,7 +179,7 @@ plugins/updates/
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/advanced-custom-fields-pro/advanced-custom-fields-pro-v6.8.11.zip`
 * **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
-  * نسخه old با سرور ما: `plugins/raw/on/advanced-custom-fields-pro/` (نسخه `6.8.11`)
+  * نسخه old با سرور ما: `plugins/raw/on/advanced-custom-fields-pro/` (نسخه `6.8.10` برای تست آپدیت)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/advanced-custom-fields-pro/` (نسخه `6.8.11`)
 
 #### افزونه JetTabs For Elementor (نسخه 2.3.5)
@@ -188,7 +188,7 @@ plugins/updates/
   * لینک دانلود: `https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-tabs/jet-tabs-v2.3.5.zip`
 * **کانال پایدار (Production):** *پس از تست و تأیید نهایی در کانال آزمایشی قرار می‌گیرد.*
 * **سورس‌های `raw`:**
-  * نسخه old با سرور ما: `plugins/raw/on/jet-tabs/` (نسخه `2.3.5`)
+  * نسخه old با سرور ما: `plugins/raw/on/jet-tabs/` (نسخه `2.3.4` برای تست آپدیت)
   * فایل اصلی دست‌نخورده: `plugins/raw/on/old/jet-tabs/` (نسخه `2.3.5`)
 
 #### افزونه JetWooBuilder (نسخه 2.3.6)
