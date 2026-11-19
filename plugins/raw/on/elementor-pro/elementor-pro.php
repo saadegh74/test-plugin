@@ -27,32 +27,36 @@ $text_domain = 'elementor-pro';
 	unload_textdomain($text_domain);
 	load_textdomain($text_domain, $ESPACK_lang );
 }
-update_option( 'elementor_pro_license_key', '*********' );
-update_option(
-    '_elementor_pro_license_v2_data',
-    [
-        'timeout' => strtotime('+12 hours', current_time('timestamp')),
-        'value' => json_encode([
-            'success' => true,
-            'license' => 'valid',
-            'expires' => '2030-01-01 12:12:12',
-            'subscription_id' => 960,
-            'status' => 'ACTIVE',
-            'recurring' => false,
-            'features' => ["template_access_level_None","kit_access_level_None","activity-log","breadcrumbs","form","posts","template","countdown","slides","price-list","portfolio","flip-box","price-table","login","share-buttons","theme-post-content","theme-post-title","nav-menu","blockquote","media-carousel","animated-headline","facebook-comments","facebook-embed","facebook-page","facebook-button","testimonial-carousel","post-navigation","search-form","post-comments","author-box","call-to-action","post-info","theme-site-logo","theme-site-title","theme-archive-title","theme-post-excerpt","theme-post-featured-image","archive-posts","theme-page-title","sitemap","reviews","table-of-contents","lottie","code-highlight","hotspot","video-playlist","progress-tracker","section-effects","sticky","scroll-snap","page-transitions","mega-menu","nested-carousel","loop-grid","loop-carousel","theme-builder","elementor_icons","elementor_custom_fonts","dynamic-tags","taxonomy-filter","email","email2","mailpoet","mailpoet3","redirect","header","footer","single-post","single-page","archive","search-results","error-404","loop-item","font-awesome-pro","typekit","gallery","off-canvas","link-in-bio-var-2","link-in-bio-var-3","link-in-bio-var-4","link-in-bio-var-5","link-in-bio-var-6","link-in-bio-var-7","search","size-variable","transitions","pro-interactions","atomic-components","element-manager-permissions","akismet","display-conditions","woocommerce-products","wc-products","woocommerce-product-add-to-cart","wc-elements","wc-categories","woocommerce-product-price","woocommerce-product-title","woocommerce-product-images","woocommerce-product-upsell","woocommerce-product-short-description","woocommerce-product-meta","woocommerce-product-stock","woocommerce-product-rating","wc-add-to-cart","dynamic-tags-wc","woocommerce-product-data-tabs","woocommerce-product-related","woocommerce-breadcrumb","wc-archive-products","woocommerce-archive-products","woocommerce-product-additional-information","woocommerce-menu-cart","woocommerce-product-content","woocommerce-archive-description","paypal-button","woocommerce-checkout-page","woocommerce-cart","woocommerce-my-account","woocommerce-purchase-summary","woocommerce-notices","settings-woocommerce-pages","settings-woocommerce-notices","popup","custom-css","global-css","custom_code","custom-attributes","form-submissions","form-integrations","dynamic-tags-acf","dynamic-tags-pods","dynamic-tags-toolset","editor_comments","stripe-button","role-manager","global-widget","activecampaign","cf7db","convertkit","discord","drip","getresponse","mailchimp","mailerlite","slack","webhook","product-single","product-archive","wc-single-elements","atomic-custom-attributes","atomic-custom-css","notes","atomic-loop"],
-			'tier' => 'agency',
-            'generation' => 'empty',
-            'activated' => true,
-            'success' => true
-        ])
-    ]
-);add_filter( 'elementor/connect/additional-connect-info', '__return_empty_array', 999 );
+$ep_license_data = get_option( '_elementor_pro_license_v2_data' );
+if ( empty( $ep_license_data ) || ! is_array( $ep_license_data ) || empty( $ep_license_data['timeout'] ) || (int) $ep_license_data['timeout'] < time() + 3600 ) {
+	update_option( 'elementor_pro_license_key', '*********' );
+	update_option(
+	    '_elementor_pro_license_v2_data',
+	    [
+	        'timeout' => strtotime('+12 hours', current_time('timestamp')),
+	        'value' => json_encode([
+	            'success' => true,
+	            'license' => 'valid',
+	            'expires' => '2030-01-01 12:12:12',
+	            'subscription_id' => 960,
+	            'status' => 'ACTIVE',
+	            'recurring' => false,
+	            'features' => ["template_access_level_None","kit_access_level_None","activity-log","breadcrumbs","form","posts","template","countdown","slides","price-list","portfolio","flip-box","price-table","login","share-buttons","theme-post-content","theme-post-title","nav-menu","blockquote","media-carousel","animated-headline","facebook-comments","facebook-embed","facebook-page","facebook-button","testimonial-carousel","post-navigation","search-form","post-comments","author-box","call-to-action","post-info","theme-site-logo","theme-site-title","theme-archive-title","theme-post-excerpt","theme-post-featured-image","archive-posts","theme-page-title","sitemap","reviews","table-of-contents","lottie","code-highlight","hotspot","video-playlist","progress-tracker","section-effects","sticky","scroll-snap","page-transitions","mega-menu","nested-carousel","loop-grid","loop-carousel","theme-builder","elementor_icons","elementor_custom_fonts","dynamic-tags","taxonomy-filter","email","email2","mailpoet","mailpoet3","redirect","header","footer","single-post","single-page","archive","search-results","error-404","loop-item","font-awesome-pro","typekit","gallery","off-canvas","link-in-bio-var-2","link-in-bio-var-3","link-in-bio-var-4","link-in-bio-var-5","link-in-bio-var-6","link-in-bio-var-7","search","size-variable","transitions","pro-interactions","atomic-components","element-manager-permissions","akismet","display-conditions","woocommerce-products","wc-products","woocommerce-product-add-to-cart","wc-elements","wc-categories","woocommerce-product-price","woocommerce-product-title","woocommerce-product-images","woocommerce-product-upsell","woocommerce-product-short-description","woocommerce-product-meta","woocommerce-product-stock","woocommerce-product-rating","wc-add-to-cart","dynamic-tags-wc","woocommerce-product-data-tabs","woocommerce-product-related","woocommerce-breadcrumb","wc-archive-products","woocommerce-archive-products","woocommerce-product-additional-information","woocommerce-menu-cart","woocommerce-product-content","woocommerce-archive-description","paypal-button","woocommerce-checkout-page","woocommerce-cart","woocommerce-my-account","woocommerce-purchase-summary","woocommerce-notices","settings-woocommerce-pages","settings-woocommerce-notices","popup","custom-css","global-css","custom_code","custom-attributes","form-submissions","form-integrations","dynamic-tags-acf","dynamic-tags-pods","dynamic-tags-toolset","editor_comments","stripe-button","role-manager","global-widget","activecampaign","cf7db","convertkit","discord","drip","getresponse","mailchimp","mailerlite","slack","webhook","product-single","product-archive","wc-single-elements","atomic-custom-attributes","atomic-custom-css","notes","atomic-loop"],
+				'tier' => 'agency',
+	            'generation' => 'empty',
+	            'activated' => true,
+	            'success' => true
+	        ])
+	    ]
+	);
+}
+add_filter( 'elementor/connect/additional-connect-info', '__return_empty_array', 999 );
 
 add_action( 'plugins_loaded', function() {
 add_filter( 'pre_http_request', function( $pre, $parsed_args, $url ) {
 if ( strpos( $url, 'my.elementor.com/api/v2/licenses' ) !== false ) {
 return [
-'response' => [ 'code' => 200, 'message' => 'ОК' ],
+'response' => [ 'code' => 200, 'message' => 'OK' ],
 'body' => json_encode( [ 'success' => true, 'license' => 'valid', 'expires' => '01.01.2030' ] )
 ];
 } else {
@@ -60,7 +64,7 @@ return $pre;
 }
 }, 10, 3 );
 } ); 
-require 'plugin-update-checker/plugin-update-checker.php';
+require_once __DIR__ . '/plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 	'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/elementor-pro/info.json',
 	__FILE__, //Full path to the main plugin file or functions.php.

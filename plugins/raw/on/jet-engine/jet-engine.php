@@ -567,11 +567,11 @@ jet_engine();
 function jet_engine_update_checker() {
 	$json_url    = 'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/jet-engine/info.json';
 	$plugin_slug = 'jet-engine';
-	require 'plugin-update-checker/plugin-update-checker.php';
+	require_once __DIR__ . '/plugin-update-checker/plugin-update-checker.php';
 	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 		$json_url,
 		__FILE__, //Full path to the main plugin file or functions.php.
 		$plugin_slug
 	);
 }
-add_action( 'admin_init', 'jet_engine_update_checker', 99 );
+add_action( 'init', 'jet_engine_update_checker', 20 );

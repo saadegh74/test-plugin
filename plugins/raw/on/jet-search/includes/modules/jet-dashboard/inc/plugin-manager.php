@@ -287,11 +287,22 @@ class Plugin_Manager {
 	 */
 	public function check_update( $data ) {
 
-		delete_site_transient( 'jet_dashboard_remote_jet_plugin_list' );
+		$cleared_remote_list = false;
 
 		$registered_plugins = Dashboard::get_instance()->get_registered_plugins();
 
 		foreach ( $registered_plugins as $plugin_slug => $plugin_data ) {
+
+			$package_url = Utils::package_url( $plugin_data['file'] );
+
+			if ( ! $package_url ) {
+				continue;
+			}
+
+			if ( ! $cleared_remote_list ) {
+				delete_site_transient( 'jet_dashboard_remote_jet_plugin_list' );
+				$cleared_remote_list = true;
+			}
 
 			$new_update_version = $this->check_new_update_version( $plugin_data );
 
@@ -308,7 +319,7 @@ class Plugin_Manager {
 				$update->plugin      = $plugin_data['file'];
 				$update->new_version = $new_update_version;
 				$update->url         = false;
-				$update->package     = Utils::package_url( $plugin_data['file'] );
+				$update->package     = $package_url;
 
 				$data->response[ $plugin_data['file'] ] = $update;
 			}

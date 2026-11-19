@@ -89,8 +89,11 @@ add_action('init', function() {
 		);
 		set_transient('wp_rocket_settings', $options, YEAR_IN_SECONDS);
 	}
-	update_option('wp_rocket_no_licence', 0);
-	$customer_data = (object) array(
+	if ( get_option( 'wp_rocket_no_licence' ) != 0 ) {
+		update_option( 'wp_rocket_no_licence', 0 );
+	}
+	if ( false === get_transient( 'wp_rocket_customer_data' ) ) {
+		$customer_data = (object) array(
 		'licence_account' => -1,
 		'licence_expiration' => time() + (4 * YEAR_IN_SECONDS),
 		'licence' => (object) array('name' => 'Infinite'),
@@ -127,7 +130,8 @@ add_action('init', function() {
 			)
 		)
 	);
-	set_transient('wp_rocket_customer_data', $customer_data, DAY_IN_SECONDS);
+		set_transient('wp_rocket_customer_data', $customer_data, DAY_IN_SECONDS);
+	}
 });
 // Rocket defines.
 define( 'WP_ROCKET_VERSION',               '3.23.5.1' );
@@ -241,11 +245,11 @@ unset( $wp_rocket_requirement_checks );
 function wp_rocket_update_checker() {
 	$json_url    = 'https://raw.githubusercontent.com/saadegh74/test-plugin/main/plugins/updates/up-on/staging/wp-rocket/info.json';
 	$plugin_slug = 'wp-rocket';
-	require 'plugin-update-checker/plugin-update-checker.php';
+	require_once __DIR__ . '/plugin-update-checker/plugin-update-checker.php';
 	$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 		$json_url,
 		__FILE__, //Full path to the main plugin file or functions.php.
 		$plugin_slug
 	);
 }
-add_action( 'admin_init', 'wp_rocket_update_checker', 99 );
+add_action( 'init', 'wp_rocket_update_checker', 20 );
